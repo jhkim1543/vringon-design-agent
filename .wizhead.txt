@@ -1,0 +1,4 @@
+ background: var(--bg-2); border: 1px solid var(--line-2); border-radius: var(--r-8);
+  padding: 8px 12px; font-size: 13px; outline: none; width: 100%;
+}
+.input:focus { border-color: var(--accent); }

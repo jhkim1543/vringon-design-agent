@@ -163,7 +163,8 @@ export interface RunParams {
   variationCount: 0 | 2 | 3 | 4 | 6 | 8
   /** 디자인 다음 단계 · 컨셉 촬영 컷 수 (착용/스튜디오/로케이션) */
   conceptShots: 0 | 2 | 3
-  video: boolean
+  /** 멀티뷰 → 3D 모델 생성 */
+  make3d: boolean
   approvalGate: boolean
   /** 디자인 생성 모델 · 화면에는 성격으로만 노출한다 */
   imageEngine: 'fast' | 'detail'
@@ -180,7 +181,7 @@ export const DEFAULT_PARAMS: RunParams = {
   mode: 'trend', category: 'shoe', itemType: 'loafer',
   endStage: 'S3', sketchCount: 12, tierRatio: [1, 1, 1],
   renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
-  topN: 3, wearCuts: 2, variationCount: 3, conceptShots: 3, video: false, approvalGate: true,
+  topN: 3, wearCuts: 2, variationCount: 3, conceptShots: 3, make3d: true, approvalGate: true,
   imageEngine: 'detail', imageBudget: 12,
   trend: {
     // 기본을 비워둔다. 가상의 브랜드명으로 검색하면 결과가 무의미하고 시간만 든다.
@@ -358,8 +359,8 @@ export interface Design {
   modelEval: { label: string; value: string; basis: string }[]
   colorways: string[]          // hue names
   images: DesignImage[]        // 실제 생성 이미지 (비면 SVG 시뮬레이션 표시)
-  /** 컨셉 영상 · 오픈소스 백엔드가 있으면 실제 생성, 없으면 카메라 무빙 클립 */
-  clips?: { url: string; hash: string; backend: string; note?: string }[]
+  /** 멀티뷰에서 만든 3D 모델 (GLB) */
+  model?: { url: string; hash: string; format: string; views: number; note?: string }
   imageError?: string          // 부분 실패 격리 · 이 건만 실패, 나머지는 진행
   isTop: boolean
   topDistance?: number         // Top N 상호 스펙 거리

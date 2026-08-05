@@ -24,7 +24,7 @@ export function estimate(p: RunParams): Estimate {
   const variations = renders * p.variationCount
   const wearImgs = p.topN * p.wearCuts
   const conceptImgs = p.topN * p.conceptShots
-  const videos = p.video ? p.topN : 0
+  const models = p.make3d ? p.topN : 0
 
   // ── S1 조사 · 모드마다 실제로 수행하는 조사가 다르다
   let s1Min = 1.2, s1Usd = 0.15
@@ -83,7 +83,7 @@ export function estimate(p: RunParams): Estimate {
     {
       // 컨셉 촬영은 생성 이미지다. 영상은 로컬 오픈소스라 과금이 붙지 않는다.
       stage: 'S5', label: 'Concept shoot',
-      minutes: 1.2 + realS5 * MIN_PER_IMAGE + videos * 0.5,
+      minutes: 1.2 + realS5 * MIN_PER_IMAGE + models * 1.6,
       usd: 0.25 + realS5 * USD_PER_IMAGE * RETRY,
       images: conceptImgs,
       real: realS5,

@@ -142,24 +142,93 @@ export function colorwayEditPrompt(colorway: string): string {
 
 /** 착용 컷 · 기준 렌더를 편집해 사람이 착용한 상태로 옮긴다.
  *  제품 형태는 그대로 두고 배경과 사람만 들어오게 지시한다. */
-const WEAR_SCENE: Record<Category, string[]> = {
-  shoe: [
-    'a real person actually wearing this pair, mid-stride walking, camera at floor level, frame cropped from just below the knee down so only the lower legs and both shoes are visible, bare lower legs, plain seamless light grey studio floor and backdrop, soft even studio light, a faint reflection of the shoes on the floor, both shoes clearly readable, three-quarter side view',
-    'a real person actually wearing this pair, standing still with one foot slightly forward, camera at floor level, frame cropped from mid-calf down, plain tapered trousers just touching the shoe, plain seamless light grey studio floor and backdrop, soft even studio light, side view',
-  ],
-  jewelry: [
-    'a real person actually wearing this piece, close crop on the hand and wrist, relaxed natural pose, plain seamless light grey backdrop, soft even studio light, the piece sharp and clearly readable',
-    'a real person actually wearing this piece, close crop on the neck and collarbone, chin out of frame, plain seamless light grey backdrop, soft even studio light, the piece sharp and clearly readable',
-  ],
+// 착용 위치는 품목마다 다르다. 반지를 손목에 끼우면 그 자체로 틀린 사진이다.
+// 여기서 품목별로 "어디에, 어떤 프레임으로" 를 정해 준다.
+interface WearSpot {
+  /** 신체 어디에 착용하는가 */
+  on: string
+  /** 어떻게 잘라 찍는가 */
+  framing: string[]
 }
 
-export function wearEditPrompt(category: Category, index: number): string {
-  const scenes = WEAR_SCENE[category]
-  const scene = scenes[index % scenes.length]
+const WEAR_SPOT: Record<string, WearSpot> = {
+  // ── 반지 · 손가락에만 ──────────────────────────────────────────
+  band: { on: 'worn on the ring finger of one hand', framing: [
+    'macro close-up of a relaxed hand, fingers slightly curled, the ring on the ring finger filling the frame',
+    'close crop of two hands resting together, the ring on the ring finger clearly readable, the other hand out of focus behind',
+  ] },
+  // ── 귀걸이 · 귓불에만 ──────────────────────────────────────────
+  stud: { on: 'worn in the earlobe', framing: [
+    'tight profile crop of one ear and jawline, hair tucked behind the ear, the earring reading clearly, eyes out of frame',
+    'three-quarter crop of the side of the head from cheekbone to shoulder, hair pulled back, the earring catching the light',
+  ] },
+  // ── 목걸이 · 목과 쇄골 ─────────────────────────────────────────
+  pendant: { on: 'worn around the neck, sitting on the collarbone', framing: [
+    'close crop from chin to upper chest, plain neckline, the necklace lying naturally on the skin',
+    'three-quarter crop of the neck and shoulder, the chain following the collarbone, the pendant centred',
+  ] },
+  // ── 팔찌 · 손목 ────────────────────────────────────────────────
+  bangle: { on: 'worn on the wrist', framing: [
+    'close crop of a forearm and wrist held across the body, the bracelet sitting just above the wrist bone',
+    'close crop of a hand resting on a surface, the bracelet on the wrist, fingers relaxed and out of focus',
+  ] },
+  // ── 브로치 · 옷깃 ──────────────────────────────────────────────
+  brooch: { on: 'pinned to a jacket lapel', framing: [
+    'close crop of a tailored lapel and shoulder, the brooch pinned high on the lapel, face out of frame',
+  ] },
+  // ── 앵클릿 · 발목 ──────────────────────────────────────────────
+  anklet: { on: 'worn around the ankle', framing: [
+    'close crop from mid-calf down, bare foot and ankle, the anklet sitting just above the ankle bone',
+  ] },
+}
+
+// 같은 계열은 같은 자리에 찬다
+const WEAR_ALIAS: Record<string, string> = {
+  solitaire: 'band', eternity: 'band', signet: 'band',
+  hoop: 'stud', drop: 'stud', ear_cuff: 'stud', earcuff: 'stud',
+  choker: 'pendant', chain: 'pendant', station: 'pendant',
+  chain_bracelet: 'bangle', cuff: 'bangle', tennis: 'bangle',
+}
+
+// 신발은 전부 발에 신지만, 목이 있는 것과 없는 것은 프레임이 다르다
+const SHOE_FRAMING: Record<string, string[]> = {
+  low: [
+    'mid-stride walking, camera at floor level, frame cropped from just below the knee down, bare lower legs, both shoes visible, three-quarter side view',
+    'standing with one foot slightly forward, camera at floor level, frame cropped from mid-calf down, plain tapered trousers just touching the shoe, side view',
+  ],
+  tall: [
+    'standing, camera low, frame cropped from mid-thigh down so the full shaft of the boot is visible, slim trousers tucked in, three-quarter view',
+    'one leg crossed over the other while seated, frame cropped from the knee down, the shaft and the ankle break both readable',
+  ],
+  open: [
+    'standing on a warm concrete floor, camera at floor level, frame cropped from mid-calf down, bare feet and ankles, the straps and toe line clearly readable, three-quarter view',
+    'mid-step, camera at floor level, frame cropped from just below the knee, bare legs, the footbed and straps in focus',
+  ],
+}
+const SHOE_KIND: Record<string, keyof typeof SHOE_FRAMING> = {
+  ankle_boot: 'tall', chelsea: 'tall', knee_high: 'tall', combat: 'tall',
+  strappy: 'open', slide: 'open', gladiator: 'open',
+}
+
+function wearSpot(category: Category, itemType: string): { on: string; framing: string[] } {
+  if (category === 'shoe') {
+    const kind = SHOE_KIND[itemType] ?? 'low'
+    return { on: 'worn on both feet', framing: SHOE_FRAMING[kind] }
+  }
+  const key = WEAR_ALIAS[itemType] ?? itemType
+  return WEAR_SPOT[key] ?? WEAR_SPOT.band
+}
+
+export function wearEditPrompt(category: Category, itemType: string, index: number): string {
+  const spot = wearSpot(category, itemType)
+  const framing = spot.framing[index % spot.framing.length]
   return [
     'Keep this exact product: same design, same materials, same proportions, same colour, same hardware.',
-    `Show it being worn: ${scene}.`,
-    'Photorealistic editorial campaign photography, the product stays in sharp focus and is the subject of the frame.',
+    `Show it being worn by a real person. It is ${spot.on}.`,
+    `Framing: ${framing}.`,
+    'Plain seamless light grey studio backdrop, soft even studio light, the product sharp and unmistakably the subject.',
+    'Photorealistic editorial campaign photography.',
+    `Do not place it anywhere other than where it belongs — it is ${spot.on}, nowhere else.`,
     'Do not redesign the product. Do not show a face. No text, no logo, no watermark.',
   ].join(' ')
 }
@@ -230,7 +299,7 @@ export const PERSONAS: Record<Category, ConceptPersona[]> = {
 export interface ConceptShot {
   key: string
   label: string
-  build: (subject: string, persona: ConceptPersona, mood: string) => string
+  build: (subject: string, persona: ConceptPersona, mood: string, spot: string) => string
 }
 
 /** 컨셉 촬영 컷 목록. 착용컷 → 스튜디오 → 로케이션 순으로 쓰인다. */
@@ -238,12 +307,13 @@ export const CONCEPT_SHOTS: ConceptShot[] = [
   {
     key: 'fit_full',
     label: 'Virtual fitting',
-    build: (subject, p, mood) => [
+    build: (subject, p, mood, spot) => [
       'Keep this exact product: same design, materials, proportions, colour and hardware.',
-      `Place it on a model: ${p.brief}, actually wearing the ${subject}.`,
-      'Full editorial campaign frame, the product clearly visible and in sharp focus, natural pose, plain studio backdrop with soft directional light.',
+      `Place it on a model: ${p.brief}. The piece is ${spot}.`,
+      'Editorial campaign frame, the product clearly visible and in sharp focus, natural pose, plain studio backdrop with soft directional light.',
       mood ? `Mood: ${mood}.` : '',
-      'Photorealistic fashion photography. Do not redesign the product. No text, no logo, no watermark.',
+      `Photorealistic fashion photography. It goes ${spot} and nowhere else.`,
+      'Do not redesign the product. No text, no logo, no watermark.',
     ].filter(Boolean).join(' '),
   },
   {
@@ -269,12 +339,13 @@ export const CONCEPT_SHOTS: ConceptShot[] = [
 ]
 
 export function conceptPrompt(
-  category: Category, shotIndex: number, personaIndex: number, subject: string, mood: string,
+  category: Category, itemType: string, shotIndex: number, personaIndex: number, subject: string, mood: string,
 ): { prompt: string; label: string; persona: string } {
   const shot = CONCEPT_SHOTS[shotIndex % CONCEPT_SHOTS.length]
   const list = PERSONAS[category]
   const persona = list[personaIndex % list.length]
-  return { prompt: shot.build(subject, persona, mood), label: shot.label, persona: persona.label }
+  const spot = wearSpot(category, itemType).on
+  return { prompt: shot.build(subject, persona, mood, spot), label: shot.label, persona: persona.label }
 }
 
 // ── 조사 결과를 디자인 생성에 실어 보낸다 ───────────────────────────
@@ -316,28 +387,31 @@ export async function stampLogo(baseHash: string, brand: BrandIdentity): Promise
 }
 
 
-// ── 컨셉 영상 ───────────────────────────────────────────────────────
-// 유료 영상 API를 쓰지 않는다. 로컬 ComfyUI(오픈소스)가 떠 있으면 그쪽으로 가고,
-// 없으면 스틸에서 카메라 무빙만 있는 짧은 클립으로 대체한다.
-export interface VideoResult {
+// ── 3D 모델 · Tripo ─────────────────────────────────────────────────
+// 이미 만들어 둔 멀티뷰(측면·3/4·탑, 주얼리는 정면·45도·디테일)를 그대로 넘긴다.
+// 한 장으로 만드는 것보다 여러 각도를 주는 쪽이 형태가 훨씬 정확하다.
+export interface ModelResult {
   hash: string
-  ext: string
   url: string
-  backend: 'comfyui' | 'kenburns'
+  format: string
+  views: number
+  cached: boolean
   note?: string
 }
 
-export async function videoProbe(): Promise<{ available: boolean; reason?: string; device?: string }> {
-  const r = await fetch('/api/video/probe')
+export async function modelProbe(): Promise<{ available: boolean; reason?: string }> {
+  const r = await fetch('/api/model/probe')
   return r.json()
 }
 
-export async function generateVideo(baseHash: string, prompt: string): Promise<VideoResult> {
-  const r = await fetch('/api/video/generate', {
+export async function generateModel(hashes: string[], meta: {
+  subject?: string; category?: string; itemType?: string
+}): Promise<ModelResult> {
+  const r = await fetch('/api/model/generate', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ baseHash, prompt }),
+    body: JSON.stringify({ hashes, ...meta }),
   })
   const j = await r.json()
-  if (!r.ok) throw new Error(j.error || `video ${r.status}`)
+  if (!r.ok) throw new Error(j.error || `model ${r.status}`)
   return j
 }

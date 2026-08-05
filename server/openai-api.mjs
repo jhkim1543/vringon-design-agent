@@ -7,9 +7,9 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createMiroBoard, planMiroBoard } from './miro-api.mjs'
 import { DEEP_MODEL_DEFAULT, researchCompetitors, researchTrends, researchSeasonDossier } from './research-api.mjs'
-import { geminiEdit, geminiGenerate, geminiProbe } from './gemini-api.mjs'
+import { geminiEdit, geminiGenerate, geminiProbe, geminiShotPlan } from './gemini-api.mjs'
 import { compositeLogo, logoAvailable } from './logo-api.mjs'
-import { comfyProbe, generateVideoComfy, generateVideoFallback } from './video-api.mjs'
+import { tripoMultiview, tripoProbe, readModel } from './tripo-api.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..')
@@ -58,9 +58,8 @@ const DEEP_RESEARCH = env.OPENAI_DEEP_RESEARCH === '1'
 const DEEP_KEY = env.OPENAI_DEEP_RESEARCH_KEY || env.OPENAI_API_KEY || ''
 const DEEP_MODEL = env.OPENAI_DEEP_RESEARCH_MODEL || DEEP_MODEL_DEFAULT
 
-// 오픈소스 영상 백엔드 · ComfyUI를 로컬에 띄우면 여기로 붙는다
-const COMFY_URL = env.COMFY_URL || ''
-const COMFY_WORKFLOW = env.COMFY_I2V_WORKFLOW || ''
+// Tripo · 멀티뷰에서 3D 모델을 만든다
+const TRIPO_KEY = env.TRIPO_API_KEY || ''
 
 const SHOT_DIR = join(ROOT, '.cache', 'shots')
 
@@ -174,6 +173,7 @@ export async function handleApi(req, res) {
       miroConnected: !!MIRO_TOKEN,
       deepResearch: DEEP_RESEARCH, deepModel: DEEP_MODEL,
       geminiConnected: !!GEMINI_KEY,
+      tripoConnected: !!TRIPO_KEY,
       engines: { fast: ENGINE.fast.model, detail: ENGINE.detail.model },
     })
   }
@@ -291,50 +291,36 @@ export async function handleApi(req, res) {
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
   }
 
-  // 컨셉 영상 · ComfyUI(오픈소스)가 떠 있으면 그쪽, 없으면 카메라 무빙 폴백
-  if (path === '/api/video/probe') {
-    return json(res, 200, {
-      ...(await comfyProbe(COMFY_URL)),
-      workflow: COMFY_WORKFLOW,
-      fallback: 'kenburns',
-    })
+  // 3D 모델 · 이미 만들어 둔 멀티뷰를 Tripo에 넘긴다
+  if (path === '/api/model/probe') {
+    return json(res, 200, await tripoProbe(TRIPO_KEY))
   }
 
-  if (path === '/api/video/generate' && req.method === 'POST') {
+  if (path === '/api/model/generate' && req.method === 'POST') {
     try {
       const b = await readBody(req)
-      const baseImagePath = join(CACHE_DIR, `${b.baseHash}.png`)
-      if (!existsSync(baseImagePath)) return json(res, 404, { error: `Base image not found: ${b.baseHash}` })
+      const hashes = Array.isArray(b.hashes) ? b.hashes.filter(h => /^[a-f0-9]{8,64}$/.test(h)) : []
+      if (!hashes.length) return json(res, 400, { error: 'no view hashes given' })
 
-      const probe = await comfyProbe(COMFY_URL)
-      if (probe.available && COMFY_WORKFLOW) {
-        try {
-          const r = await generateVideoComfy(ROOT, {
-            comfyUrl: COMFY_URL, workflowPath: COMFY_WORKFLOW,
-            baseImagePath, prompt: b.prompt ?? '', seed: b.seed ?? 12345,
-          })
-          return json(res, 200, { ...r, url: `/api/video/file/${r.hash}.${r.ext}` })
-        } catch (e) {
-          // ComfyUI가 떠 있어도 워크플로가 안 맞을 수 있다. 그때는 폴백으로 내려간다.
-          const r = await generateVideoFallback(ROOT, { baseImagePath })
-          return json(res, 200, { ...r, url: `/api/video/file/${r.hash}.${r.ext}`, note: String(e.message || e).slice(0, 160) })
-        }
-      }
-      const r = await generateVideoFallback(ROOT, { baseImagePath })
-      return json(res, 200, { ...r, url: `/api/video/file/${r.hash}.${r.ext}`, note: probe.reason ?? 'ComfyUI not running' })
+      const views = hashes.map(h => {
+        const p = join(CACHE_DIR, `${h}.png`)
+        return existsSync(p) ? { buf: readFileSync(p), name: `${h}.png` } : null
+      }).filter(Boolean)
+      if (!views.length) return json(res, 404, { error: 'none of those views are in the cache' })
+
+      const r = await tripoMultiview(ROOT, TRIPO_KEY, { views })
+      return json(res, 200, { ...r, url: `/api/model/file/${r.hash}.${r.format}` })
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
   }
 
-  if (path.startsWith('/api/video/file/')) {
-    const raw = path.slice('/api/video/file/'.length)
-    const m = /^([a-f0-9]{8,64})\.(webp|gif|mp4|webm)$/.exec(raw)
-    if (!m) { res.statusCode = 400; return res.end('bad name') }
-    const file = join(ROOT, '.cache', 'video', raw)
-    if (!existsSync(file)) { res.statusCode = 404; return res.end('not found') }
-    const type = { webp: 'image/webp', gif: 'image/gif', mp4: 'video/mp4', webm: 'video/webm' }[m[2]]
-    res.setHeader('Content-Type', type)
+  if (path.startsWith('/api/model/file/')) {
+    const raw = path.slice('/api/model/file/'.length)
+    if (!/^[a-f0-9]{8,64}\.(glb|gltf)$/.test(raw)) { res.statusCode = 400; return res.end('bad name') }
+    const buf = readModel(ROOT, raw)
+    if (!buf) { res.statusCode = 404; return res.end('not found') }
+    res.setHeader('Content-Type', 'model/gltf-binary')
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
-    return res.end(readFileSync(file))
+    return res.end(buf)
   }
 
   if (path === '/api/miro/export' && req.method === 'POST') {
@@ -372,16 +358,16 @@ export async function handleApi(req, res) {
         writeFileSync(join(outDir, `${h}.png`), readFileSync(src))
         copied++
       }
-      // 컨셉 영상도 함께 옮긴다. 캐시를 지워도 샘플이 살아 있어야 한다.
+      // 3D 모델도 함께 옮긴다. 캐시를 지워도 샘플이 살아 있어야 한다.
       const vidRe = new RegExp('/api/video/file/([a-f0-9]{8,64})\\.(webp|gif|mp4|webm)', 'g')
       const vidHashes = [...new Set([...text.matchAll(vidRe)].map(m => m[1] + '.' + m[2]))]
       for (const name of vidHashes) {
-        const src = join(ROOT, '.cache', 'video', name)
+        const src = join(ROOT, '.cache', 'models', name)
         if (!existsSync(src)) continue
         writeFileSync(join(outDir, name), readFileSync(src))
         copied++
       }
-      text = text.replaceAll('/api/image/file/', '/samples/').replaceAll('/api/video/file/', '/samples/')
+      text = text.replaceAll('/api/image/file/', '/samples/').replaceAll('/api/model/file/', '/samples/')
       const dir = join(ROOT, 'src', 'samples')
       mkdirSync(dir, { recursive: true })
       writeFileSync(join(dir, `${name}.json`), JSON.stringify(JSON.parse(text), null, 1))

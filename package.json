@@ -10,10 +10,12 @@
     "build:pages": "tsc -b && vite build"
   },
   "dependencies": {
+    "@types/three": "^0.185.4",
     "@xyflow/react": "^12.3.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sharp": "^0.35.3",
+    "three": "^0.185.1",
     "undici": "^8.9.0"
   },
   "devDependencies": {

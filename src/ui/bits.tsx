@@ -1,4 +1,5 @@
 // 공용 소형 컴포넌트
+import { setLang, useLang } from '../core/i18n'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 
@@ -67,4 +68,21 @@ export function ThemeToggle({ theme, onToggle }: { theme: 'light' | 'dark'; onTo
 
 export function Tag({ kind, children }: { kind?: 'accent' | 'ok' | 'warn' | 'danger'; children: ReactNode }) {
   return <span className={`tag${kind ? ` tag-${kind}` : ''}`}>{children}</span>
+}
+
+/** 언어 토글 · 두 개뿐이라 드롭다운 대신 두 칸짜리 스위치로 둔다 */
+export function LangToggle() {
+  const lang = useLang()
+  return (
+    <div className="langtoggle" role="group" aria-label="Language">
+      {(['ko', 'en'] as const).map(l => (
+        <button key={l} className={lang === l ? 'on' : ''}
+          onClick={() => setLang(l)}
+          aria-pressed={lang === l}
+          title={l === 'ko' ? '한국어로 보기' : 'View in English'}>
+          {l === 'ko' ? '한국어' : 'EN'}
+        </button>
+      ))}
+    </div>
+  )
 }

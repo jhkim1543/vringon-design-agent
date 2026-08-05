@@ -1,0 +1,5 @@
+
+/* ── run view ── */
+.run { flex: 1; min-width: 0; display: flex; }
+.run-left { width: 300px; border-right: 1px solid var(--line); padding: 16px; overflow: auto; flex-shrink: 0; }
+.run-center { flex:

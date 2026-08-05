@@ -1,4 +1,5 @@
 // ── 디자인 카드 (지시서 12.4) · 목표값/시각화/검증 분리 + 근거 패널 + 게이트 ──
+import { t } from '../core/i18n'
 import { useState } from 'react'
 import type { Design, Signal } from '../core/types'
 import { TIER_LABEL, TYPE_LABEL, CAT_LABEL, VERDICT_TAGS } from '../core/types'
@@ -43,10 +44,10 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
           onError={e => { (e.currentTarget as HTMLImageElement).src = svgDataUri(mainSvg) }} />
         <div className="flag" style={{ display: 'flex', gap: 4 }}>
           {d.isTop && <Tag kind="accent">TOP</Tag>}
-          {d.viewMismatch && <Tag kind="warn">View mismatch</Tag>}
-          {d.rejected && <Tag kind="danger">Rule reject</Tag>}
+          {d.viewMismatch && <Tag kind="warn">{t('View mismatch')}</Tag>}
+          {d.rejected && <Tag kind="danger">{t('Rule reject')}</Tag>}
         </div>
-        {!heroImg && !d.rejected && <span className="simbadge">Diagram</span>}
+        {!heroImg && !d.rejected && <span className="simbadge">{t('Diagram')}</span>}
       </div>
 
       {rendered && !compact && (
@@ -71,7 +72,7 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
                 ))}
               </>)}
           </div>
-          <div className="hint" style={{ marginTop: 4 }}>A concept rendering of the target spec. It may not match the numbers exactly.</div>
+          <div className="hint" style={{ marginTop: 4 }}>{t('A concept rendering of the target spec. It may not match the numbers exactly.')}</div>
         </div>
       )}
 
@@ -83,13 +84,13 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
         </div>
 
         {/* 설계 목표값 (AI 생성 스펙) · 한 줄 요약, 상세는 근거 패널 */}
-        <div className="metric"><b>Target</b> {specSummary}
+        <div className="metric"><b>{t('Target')}</b> {specSummary}
           {d.spec.fieldsLocked.length > 0 && <> · <span style={{ color: 'var(--accent-hi)' }}>🔒 DNA {d.spec.fieldsLocked.length}</span></>}
         </div>
 
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           {fails.length === 0
-            ? <Tag kind="ok">Passed rules</Tag>
+            ? <Tag kind="ok">{t('Passed rules')}</Tag>
             : fails.map(r => <Tag kind="danger" key={r.rule}>{r.rule}</Tag>)}
           {warns.map(r => <Tag kind="warn" key={r.rule}>{r.rule}</Tag>)}
           {d.qa.length > 0 && <Tag kind={qaPass === d.qa.length ? 'ok' : 'warn'}>QA {qaPass}/{d.qa.length}</Tag>}
@@ -105,11 +106,11 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
       {/* 승인 게이트 · 카드 위 (별도 평가 화면 금지) */}
       {onVerdict && !d.rejected && (
         <div className="gate-actions">
-          {d.verdict === 'approve' && <Tag kind="ok">Approved</Tag>}
+          {d.verdict === 'approve' && <Tag kind="ok">{t('Approved')}</Tag>}
           {d.verdict === 'reject' && <Tag kind="danger">Rejected · {d.verdictTags?.join(', ')}</Tag>}
           {!d.verdict && !pendingReject && (<>
-            <button className="btn btn-ok btn-sm" onClick={() => onVerdict(d.spec.design_id, 'approve', [])}>Approve</button>
-            <button className="btn btn-danger btn-sm" onClick={() => setPendingReject(true)}>Reject</button>
+            <button className="btn btn-ok btn-sm" onClick={() => onVerdict(d.spec.design_id, 'approve', [])}>{t('Approve')}</button>
+            <button className="btn btn-danger btn-sm" onClick={() => setPendingReject(true)}>{t('Reject')}</button>
           </>)}
           {pendingReject && (<>
             <div className="tagpick">
@@ -119,7 +120,7 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
               ))}
             </div>
             <button className="btn btn-danger btn-sm" disabled={tags.length === 0}
-              onClick={() => { onVerdict(d.spec.design_id, 'reject', tags); setPendingReject(false) }}>Confirm reasons</button>
+              onClick={() => { onVerdict(d.spec.design_id, 'reject', tags); setPendingReject(false) }}>{t('Confirm reasons')}</button>
           </>)}
         </div>
       )}
@@ -131,20 +132,20 @@ export function RationalePanel({ d, signals }: { d: Design; signals: Signal[] })
   return (
     <div className="rationale">
       <div>
-        <h5>Metrics, calculated and reproducible</h5>
+        <h5>{t('Metrics, calculated and reproducible')}</h5>
         <div style={{ color: 'var(--text-2)' }}>
           {d.metrics.map(m => <span key={m.label}>{m.label} <b style={{ color: 'var(--text)' }}>{m.value}</b> · </span>)}
-          {d.topDistance != null && <span>Distance between top picks <b style={{ color: 'var(--text)' }}>{d.topDistance}</b></span>}
+          {d.topDistance != null && <span>{t('Distance between top picks')} <b style={{ color: 'var(--text)' }}>{d.topDistance}</b></span>}
         </div>
       </div>
       <div>
-        <h5>Model judgement, kept separate</h5>
+        <h5>{t('Model judgement, kept separate')}</h5>
         {d.modelEval.map(m => (
           <div key={m.label} style={{ color: 'var(--text-2)' }}>{m.label} <b style={{ color: 'var(--text)' }}>{m.value}</b> <span style={{ color: 'var(--text-3)' }}>· {m.basis}</span></div>
         ))}
       </div>
       <div>
-        <h5>Signals behind this, with sources</h5>
+        <h5>{t('Signals behind this, with sources')}</h5>
         {d.rationale.driving_signals.map(ds => {
           const s = signals.find(x => x.signal_id === ds.signal_id)
           if (!s) return null
@@ -161,7 +162,7 @@ export function RationalePanel({ d, signals }: { d: Design; signals: Signal[] })
         })}
       </div>
       <div>
-        <h5>References, for attribution</h5>
+        <h5>{t('References, for attribution')}</h5>
         {d.rationale.reference_images.map(r => (
           <div className="refthumb" key={r.ref_id} style={{ marginBottom: 4 }}>
             <div className="ph">{r.source_type === 'competitor' ? 'CMP' : r.source_type === 'archive' ? 'ARC' : 'REF'}</div>
@@ -169,7 +170,7 @@ export function RationalePanel({ d, signals }: { d: Design; signals: Signal[] })
               {r.source_type} · collected {r.collected_at} · {r.borrowed_attributes.join(', ')}
               <div>
                 <Tag kind={r.usage === 'attribute_only' ? undefined : 'accent'}>{r.usage}</Tag>
-                {r.source_type === 'competitor' && <span style={{ color: 'var(--text-3)' }}> blocked from generation, attributes only</span>}
+                {r.source_type === 'competitor' && <span style={{ color: 'var(--text-3)' }}> {t('blocked from generation, attributes only')}</span>}
               </div>
             </div>
           </div>
@@ -177,30 +178,30 @@ export function RationalePanel({ d, signals }: { d: Design; signals: Signal[] })
       </div>
       {d.rationale.reference_prompts.length > 0 && (
         <div>
-          <h5>Concept prompt</h5>
+          <h5>{t('Concept prompt')}</h5>
           {d.rationale.reference_prompts.map((p, i) => (
             <div key={i} style={{ color: 'var(--text-2)' }}>"{p.text}" → {p.applied_as.join(' · ')}</div>
           ))}
         </div>
       )}
       {d.rationale.series_dna_inherited.length > 0 && (
-        <div><h5>Inherited series DNA</h5>
+        <div><h5>{t('Inherited series DNA')}</h5>
           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
             {d.rationale.series_dna_inherited.map(e => <Tag key={e} kind="accent">🔒 {e}</Tag>)}
           </div>
         </div>
       )}
       <div>
-        <h5>Why this tier</h5>
+        <h5>{t('Why this tier')}</h5>
         <div style={{ color: 'var(--text-2)' }}>{d.rationale.type_placement_reason}</div>
       </div>
       <div>
-        <h5>Talk track</h5>
+        <h5>{t('Talk track')}</h5>
         {d.rationale.narrative.map((n, i) => <div key={i} style={{ color: 'var(--text-2)' }}>{i + 1}. {n}</div>)}
       </div>
       {d.qa.length > 0 && (
         <div>
-          <h5>Vision QA</h5>
+          <h5>{t('Vision QA')}</h5>
           {d.qa.map(q => (
             <div key={q.check} style={{ color: q.pass ? 'var(--text-2)' : 'var(--warn)' }}>
               {q.pass ? '✓' : '⚠'} {q.check} · target {q.target} / observed {q.observed}
@@ -209,7 +210,7 @@ export function RationalePanel({ d, signals }: { d: Design; signals: Signal[] })
         </div>
       )}
       <div>
-        <h5>Cost, with band, assumptions and exclusions</h5>
+        <h5>{t('Cost, with band, assumptions and exclusions')}</h5>
         <div style={{ color: 'var(--text-2)' }}>
           Estimated KRW {(d.cost.estimated_total_krw / 10000).toFixed(1)}0k · band {d.cost.estimated_band_krw.map(v => (v / 10000).toFixed(1)).join('~')}0k · confidence {d.cost.confidence}
           {d.cost.tooling.total_tooling_krw > 0 && (

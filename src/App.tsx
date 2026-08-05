@@ -1,4 +1,5 @@
 // ── VRINGON Design Agent · 앱 셸 ─────────────────────────────────────
+import { t, useLang } from './core/i18n'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { PipelineEvent, RunParams, RunState, Stage } from './core/types'
 import { runPipeline } from './core/pipeline'
@@ -6,7 +7,7 @@ import type { PipelineHandle } from './core/pipeline'
 import Wizard from './ui/Wizard'
 import RunView from './ui/RunView'
 import Board from './ui/Board'
-import { ThemeToggle, VringonLogo } from './ui/bits'
+import { ThemeToggle, VringonLogo, LangToggle } from './ui/bits'
 import BrandSetup from './ui/BrandSetup'
 import { loadBrand, saveBrand, isBrandConfigured } from './core/brand'
 import type { BrandIdentity } from './core/brand'
@@ -33,6 +34,7 @@ function freshState(params: RunParams): RunState {
 }
 
 export default function App() {
+  useLang()
   const [view, setView] = useState<View>('create')
   const [st, setSt] = useState<RunState | null>(null)
   const [progress, setProgress] = useState<Record<string, number>>({})
@@ -153,32 +155,35 @@ export default function App() {
         <div className="brand">
           <VringonLogo />
           VRINGON
-          <span className="module">Design Agent</span>
+          <span className="module">{t('Design Agent')}</span>
         </div>
         <nav className="topnav">
-          <button className={view === 'create' ? 'on' : ''} onClick={() => setView('create')}>Create</button>
-          <button className={view === 'run' ? 'on' : ''} onClick={() => st && setView('run')} disabled={!st} style={!st ? { opacity: .4 } : undefined}>Run</button>
-          <button className={view === 'board' ? 'on' : ''} onClick={() => st && setView('board')} disabled={!st} style={!st ? { opacity: .4 } : undefined}>Board</button>
+          <button className={view === 'create' ? 'on' : ''} onClick={() => setView('create')}>{t('Create')}</button>
+          <button className={view === 'run' ? 'on' : ''} onClick={() => st && setView('run')} disabled={!st} style={!st ? { opacity: .4 } : undefined}>{t('Run')}</button>
+          <button className={view === 'board' ? 'on' : ''} onClick={() => st && setView('board')} disabled={!st} style={!st ? { opacity: .4 } : undefined}>{t('Board')}</button>
         </nav>
         <div className="right">
           <button className={`btn btn-sm ${isBrandConfigured(brand) ? 'btn-ghost' : 'btn-primary'}`}
             onClick={() => setBrandOpen(true)}
             title="Logo and brand rules ride along with every result">
-            {isBrandConfigured(brand) ? brand.brandName : 'Set up brand'}
+            {isBrandConfigured(brand) ? brand.brandName : t('Set up brand')}
           </button>
+          <LangToggle />
           <ThemeToggle theme={theme} onToggle={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
           <div className="avatar">J</div>
         </div>
       </div>
       <div className="main">
         <aside className="siderail">
+          {/* 상단은 "지금 어디", 좌측은 "지난 작업". 축이 겹치면 안 되므로
+              Create와 같은 곳으로 가던 Run setup 항목은 두지 않는다. */}
           <nav>
-            <button className={`sr-i ${view === 'create' ? 'on' : ''}`} onClick={() => setView('create')}>Run setup</button>
-            <button className={`sr-i ${view === 'library' ? 'on' : ''}`} onClick={() => setView('library')}>History</button>
-            <button className={`sr-i ${view === 'starred' ? 'on' : ''}`} onClick={() => setView('starred')}>Starred</button>
+            <div className="sr-label">{t('Saved runs')}</div>
+            <button className={`sr-i ${view === 'library' ? 'on' : ''}`} onClick={() => setView('library')}>{t('History')}</button>
+            <button className={`sr-i ${view === 'starred' ? 'on' : ''}`} onClick={() => setView('starred')}>{t('Starred')}</button>
           </nav>
           <div className="sr-foot">
-            <div className="sr-label">This session</div>
+            <div className="sr-label">{t('This session')}</div>
             <div className="sr-usage">
               <b>{usage.images}</b> images · <b>{usage.searches}</b> searches
             </div>
@@ -206,7 +211,7 @@ export default function App() {
             onResolveDna={onResolveDna} />
         )}
         {view === 'board' && st && <Board st={st} onVerdict={onVerdict} runId={runIdRef.current} />}
-        {(view === 'run' || view === 'board') && !st && <div className="empty">No run open. Start one from Run setup.</div>}
+        {(view === 'run' || view === 'board') && !st && <div className="empty">{t('No run open. Start one from Run setup.')}</div>}
       </div>
       {brandOpen && (
         <BrandSetup brand={brand} onClose={() => setBrandOpen(false)}
@@ -218,7 +223,7 @@ export default function App() {
           <div className="modal gate" onClick={e => e.stopPropagation()}>
             <div className="modal-h">
               <div>
-                <h2>Set up your brand first</h2>
+                <h2>{t('Set up your brand first')}</h2>
                 <p className="hint">
                   Whatever the agent decides, the result still has to look like your brand.
                   The logo placement, signature details and the things you never do get attached to every image.

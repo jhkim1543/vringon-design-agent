@@ -1,5 +1,6 @@
 // ── 품평 보드 · 좌에서 우로 흐르는 근거 흐름도 (React Flow) ──────────
 // Input → Research → Signals → Directions → Designs → Picks. 연결선은 실제 데이터다.
+import { t } from '../core/i18n'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ReactFlow, ReactFlowProvider, Background, Controls, MiniMap,
@@ -9,13 +10,14 @@ import type { Node, Edge, NodeChange } from '@xyflow/react'
 import type { RunState } from '../core/types'
 import { TIER_LABEL } from '../core/types'
 import { buildBoardModel } from '../core/boardModel'
-import { openTrendReportPdf } from '../core/reportPdf'
-import { openDossierPdf } from '../core/dossierPdf'
+import { openTrendReportPdf, saveTrendReportHtml } from '../core/reportPdf'
+import { openDossierPdf, saveDossierHtml } from '../core/dossierPdf'
 import type { BoardEdits } from '../core/boardEdits'
 import { EMPTY_EDITS, loadEdits, newNoteId, saveEdits } from '../core/boardEdits'
 import type { BoardNode } from '../core/boardModel'
 import { DesignCard } from './Card'
 import { Tag, ThemeToggle } from './bits'
+import { ModelViewer } from './ModelViewer'
 
 const COL_X = [0, 400, 800, 1180, 1600, 2320, 2740, 3160]
 const colX = (c: number) => {
@@ -31,6 +33,7 @@ const ROW_Y = 150
 // contentEditable을 쓰면 캔버스 드래그와 싸우므로, 클릭했을 때만 textarea로 바꾼다.
 interface NodeEdit {
   editing: boolean
+  light?: boolean
   onTitle: (id: string, v: string) => void
   onBody: (id: string, v: string[]) => void
   onHide: (id: string) => void
@@ -48,7 +51,7 @@ function EditableText({ value, onSave, className, multiline, editing }: {
         onDoubleClick={editing ? (e) => { e.stopPropagation(); setOpen(true) } : undefined}
         title={editing ? 'Double-click to edit' : undefined}
         style={editing ? { cursor: 'text' } : undefined}>
-        {value || (editing ? <span className="hint">Double-click to write</span> : null)}
+        {value || (editing ? <span className="hint">{t('Double-click to write')}</span> : null)}
       </div>
     )
   }
@@ -75,16 +78,14 @@ function StepNode({ data }: { data: { n: BoardNode; ed?: NodeEdit } }) {
       {editing && (
         <button className="bn-x" title="Hide this card"
           onPointerDown={e => e.stopPropagation()}
-          onClick={() => ed?.onHide(n.id)}>Hide</button>
+          onClick={() => ed?.onHide(n.id)}>{t('Hide')}</button>
       )}
       <EditableText className="bn-t" value={n.title} editing={editing}
         onSave={v => ed?.onTitle(n.id, v)} />
       {/* 착용 컷처럼 이미지가 붙는 노드는 사진이 먼저 보여야 한다 */}
-      {n.imageUrl && <img className="bn-img" src={n.imageUrl} alt="" loading="lazy" />}
-      {/* 애니메이션 WebP는 img로 그대로 재생된다. mp4면 video로 바꿔 단다. */}
-      {n.clipUrl && (/\.(mp4|webm)$/.test(n.clipUrl)
-        ? <video className="bn-img" src={n.clipUrl} autoPlay loop muted playsInline />
-        : <img className="bn-img" src={n.clipUrl} alt="" loading="lazy" />)}
+      {n.imageUrl && !n.modelUrl && <img className="bn-img" src={n.imageUrl} alt="" loading="lazy" />}
+      {/* 3D는 카드 안에서 바로 돌려 본다 */}
+      {n.modelUrl && <ModelViewer url={n.modelUrl} poster={n.imageUrl} height={186} light={ed?.light} />}
       <EditableText className="bn-body" multiline editing={editing}
         value={n.body.join('\n')}
         onSave={v => ed?.onBody(n.id, v.split('\n').filter(x => x.trim()))} />
@@ -157,7 +158,7 @@ function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit): {
     const isDesign = n.kind === 'design' && !!n.design
     const w = isDesign ? 268 : (n as any).isPitch ? 300 : 312
     // 이미지가 붙는 노드는 사진 높이만큼 더 잡아야 연결선이 엉뚱한 데 붙지 않는다
-    const h = isDesign ? 430 : 44 + n.body.length * 20 + (n.imageUrl ? 186 : 0) + (n.clipUrl ? 186 : 0)
+    const h = isDesign ? 430 : 44 + n.body.length * 20 + (n.imageUrl ? 186 : 0) + (n.modelUrl ? 200 : 0)
     nodes.push({
       id: n.id,
       type: isDesign ? 'designFlow' : 'step',
@@ -198,12 +199,14 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
   useEffect(() => { saveEdits(runId, edits) }, [runId, edits])
 
   // 편집 콜백은 안정적이어야 한다. 매 렌더마다 새로 만들면 노드가 통째로 다시 그려진다.
+  const [light, setLight] = useState(() => (localStorage.getItem('vringon.boardTheme') ?? 'light') === 'light')
   const ed = useMemo<NodeEdit>(() => ({
     editing,
+    light,
     onTitle: (id, v) => setEdits(e => ({ ...e, titles: { ...e.titles, [id]: v } })),
     onBody: (id, v) => setEdits(e => ({ ...e, bodies: { ...e.bodies, [id]: v } })),
     onHide: (id) => setEdits(e => ({ ...e, hidden: [...new Set([...e.hidden, id])] })),
-  }), [editing])
+  }), [editing, light])
 
   const initial = useMemo(() => build(st, onVerdict, edits, ed), [st, onVerdict, edits, ed])
   const [nodes, setNodes] = useState<Node[]>(initial.nodes)
@@ -212,7 +215,6 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
   const [showNotes, setShowNotes] = useState(true)
   const [miro, setMiro] = useState<{ busy: boolean; msg: string | null }>({ busy: false, msg: null })
   const [showEdges, setShowEdges] = useState(true)
-  const [light, setLight] = useState(() => (localStorage.getItem('vringon.boardTheme') ?? 'light') === 'light')
   useEffect(() => {
     localStorage.setItem('vringon.boardTheme', light ? 'light' : 'dark')
     // 보드도 attribute만 바꾸면 일부 배경이 옛 테마 값으로 남는다. 강제 재계산.
@@ -329,51 +331,61 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
     <div className={`board ${light ? 'board-light' : ''}`} data-theme={light ? 'light' : 'dark'}>
       <div className="boardbar">
         {!present ? (<>
-          <span style={{ fontWeight: 700, fontSize: 13 }}>Review board</span>
-          <span className="hint">Input → Research → Signals → Directions → Designs → Picks</span>
+          <span style={{ fontWeight: 700, fontSize: 13 }}>{t('Review board')}</span>
+          <span className="hint">{t('Input → Research → Signals → Directions → Designs → Picks')}</span>
           <span className="bar-sep" />
           <Tag kind="ok">{approved} approved</Tag>
           <Tag kind="danger">{rejectedByUser} rejected</Tag>
           <span className="bar-sep" />
-          <button className="btn btn-ghost btn-sm" onClick={() => { setPresent(true); setPresentIdx(0) }}>Present</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => { setPresent(true); setPresentIdx(0) }}>{t('Present')}</button>
           {/* 확대·축소는 상단에서도 바로 되게 둔다. 우하단 패널에만 의존하지 않는다 */}
-          <button className="btn btn-ghost btn-sm" onClick={() => rf.zoomOut({ duration: 200 })} title="Zoom out">Zoom out</button>
-          <button className="btn btn-ghost btn-sm" onClick={() => rf.zoomIn({ duration: 200 })} title="Zoom in">Zoom in</button>
-          <button className="btn btn-ghost btn-sm" onClick={() => rf.fitView({ duration: 400 })}>Fit</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => rf.zoomOut({ duration: 200 })} title={t('Zoom out')}>{t('Zoom out')}</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => rf.zoomIn({ duration: 200 })} title={t('Zoom in')}>{t('Zoom in')}</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => rf.fitView({ duration: 400 })}>{t('Fit')}</button>
           <button className={`btn btn-sm ${showEdges ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => setShowEdges(v => !v)} title="Show the lines between nodes">
-            Links {showEdges ? 'on' : 'off'}
+            onClick={() => setShowEdges(v => !v)} title={t('Show the lines between nodes')}>
+            {t('Links')} {t(showEdges ? 'On' : 'Off')}
           </button>
           <span className="bar-sep" />
           <button className={`btn btn-sm ${editing ? 'btn-primary' : 'btn-ghost'}`}
             onClick={() => setEditing(v => !v)}
             title="Double-click any card to rewrite it">
-            Edit {editing ? 'on' : 'off'}
+            {t('Edit')} {t(editing ? 'On' : 'Off')}
           </button>
-          <button className="btn btn-ghost btn-sm" onClick={addNote} title="Drop a note card on the board">Add note</button>
-          <button className="btn btn-ghost btn-sm" onClick={addColumn} title="Open another lane on the right">Add lane</button>
+          <button className="btn btn-ghost btn-sm" onClick={addNote} title={t('Drop a note card on the board')}>{t('Add note')}</button>
+          <button className="btn btn-ghost btn-sm" onClick={addColumn} title={t('Open another lane on the right')}>{t('Add lane')}</button>
           {(edits.notes.length > 0 || edits.hidden.length > 0 || Object.keys(edits.titles).length > 0) && (
-            <button className="btn btn-ghost btn-sm" onClick={resetEdits} title="Back to the generated board">Reset edits</button>
+            <button className="btn btn-ghost btn-sm" onClick={resetEdits} title={t('Back to the generated board')}>{t('Reset edits')}</button>
           )}
           <ThemeToggle theme={light ? 'light' : 'dark'} onToggle={() => setLight(v => !v)} />
           <button className="btn btn-primary btn-sm" onClick={exportMiro} disabled={miro.busy}>
-            {miro.busy ? 'Exporting' : 'Export to Miro'}
+            {miro.busy ? t('Exporting') : t('Export to Miro')}
           </button>
-          <button className="btn btn-ghost btn-sm" onClick={() => window.print()}>Board PDF</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => window.print()}>{t('Board PDF')}</button>
+          {/* 리포트는 인쇄(=PDF 저장)와 파일 저장 두 가지로 낸다.
+              인쇄 대화상자가 막힌 환경에서도 손에 남는 것이 있어야 한다. */}
           {st.trendReport && (
-            <button className="btn btn-ghost btn-sm" onClick={() => openTrendReportPdf(st)}>Report PDF</button>
+            <span className="btn-split">
+              <button className="btn btn-ghost btn-sm" onClick={() => openTrendReportPdf(st)}>{t('Report PDF')}</button>
+              <button className="btn btn-ghost btn-sm sq" title={t('Save as file')}
+                onClick={() => saveTrendReportHtml(st)}>↓</button>
+            </span>
           )}
           {st.dossier && (
-            <button className="btn btn-primary btn-sm" onClick={() => openDossierPdf(st)}>Season dossier</button>
+            <span className="btn-split">
+              <button className="btn btn-primary btn-sm" onClick={() => openDossierPdf(st)}>{t('Season dossier')}</button>
+              <button className="btn btn-primary btn-sm sq" title={t('Save as file')}
+                onClick={() => saveDossierHtml(st)}>↓</button>
+            </span>
           )}
         </>) : (<>
           <span style={{ fontWeight: 700, fontSize: 13 }}>{presentIdx + 1} / {focusOrder.length}</span>
           <span className="hint">{currentNode?.title}</span>
           <span className="bar-sep" />
-          <button className="btn btn-ghost btn-sm" onClick={() => setPresentIdx(i => Math.max(0, i - 1))}>Prev</button>
-          <button className="btn btn-ghost btn-sm" onClick={() => setPresentIdx(i => Math.min(focusOrder.length - 1, i + 1))}>Next</button>
-          <button className="btn btn-ghost btn-sm" onClick={() => setShowNotes(v => !v)}>Notes {showNotes ? 'on' : 'off'}</button>
-          <button className="btn btn-ghost btn-sm" onClick={() => { setPresent(false); rf.fitView({ duration: 480 }) }}>Exit</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => setPresentIdx(i => Math.max(0, i - 1))}>{t('Prev')}</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => setPresentIdx(i => Math.min(focusOrder.length - 1, i + 1))}>{t('Next')}</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => setShowNotes(v => !v)}>{t('Notes')} {t(showNotes ? 'On' : 'Off')}</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => { setPresent(false); rf.fitView({ duration: 480 }) }}>{t('Exit')}</button>
         </>)}
       </div>
 
@@ -434,7 +446,7 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
 export default function Board(props: { st: RunState; onVerdict: any; runId?: string }) {
   if (props.st.designs.length === 0 && props.st.signals.length === 0) {
     return <div className="empty" style={{ flex: 1 }}>
-      <div>Nothing on the board yet.<br /><span className="hint">Run the agent and the flow from research to selection fills in.</span></div>
+      <div>{t('Nothing on the board yet.')}<br /><span className="hint">{t('Run the agent and the flow from research to selection fills in.')}</span></div>
     </div>
   }
   return <ReactFlowProvider><BoardInner {...props} runId={props.runId ?? 'current'} /></ReactFlowProvider>

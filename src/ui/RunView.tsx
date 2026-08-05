@@ -1,4 +1,5 @@
 // ── Run 실행 화면 · 핵심만 노출, 상세는 접힘 (진행 · 부분 결과 · 게이트) ──
+import { t } from '../core/i18n'
 import { useEffect, useRef, useState } from 'react'
 import type { RunState } from '../core/types'
 import { MODE_LABEL, CAT_LABEL, TYPE_LABEL } from '../core/types'
@@ -66,8 +67,8 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
               <div key={s.key} className={`stage-item ${status}`}>
                 <div className="dot" />
                 <div style={{ flex: 1 }}>
-                  <div className="t">{s.t}</div>
-                  <div className="d">{s.d}</div>
+                  <div className="t">{t(s.t)}</div>
+                  <div className="d">{t(s.d)}</div>
                   {status === 'running' && progress[s.key] != null && (
                     <div className="progressbar"><div style={{ width: `${progress[s.key]}%` }} /></div>
                   )}
@@ -93,10 +94,10 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
       <div className="run-center">
         {gated && (
           <div className="gatebar">
-            <span style={{ fontWeight: 700 }}>Review gate</span>
-            <span className="hint">Approve or reject on the cards. Reasons feed the next run.</span>
+            <span style={{ fontWeight: 700 }}>{t('Review gate')}</span>
+            <span className="hint">{t('Approve or reject on the cards. Reasons feed the next run.')}</span>
             <span style={{ marginLeft: 'auto' }} className="hint">{approvedCount} approved · {rejectedCount} rejected</span>
-            <button className="btn btn-primary btn-sm" onClick={onResume}>Continue</button>
+            <button className="btn btn-primary btn-sm" onClick={onResume}>{t('Continue')}</button>
           </div>
         )}
 
@@ -120,7 +121,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
 
         {/* S1 상세 · 접힘. 요약 한 줄이 곧 논리 구조의 각 단계 */}
         {st.competitors.length > 0 && (
-          <Collapse title="Competitors" summary={compSummary}>
+          <Collapse title={t('Competitors')} summary={compSummary}>
             <div style={{ padding: '8px 14px 0' }}>
               {isLiveResearch ? (
                 <div className="notice info" style={{ fontSize: 12 }}>
@@ -169,7 +170,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                       </div>
                     ) : null}
                     <div className="cc-links">
-                      {c.product_url && <a href={c.product_url} target="_blank" rel="noreferrer">Product</a>}
+                      {c.product_url && <a href={c.product_url} target="_blank" rel="noreferrer">{t('Product')}</a>}
                       {(c.source_urls ?? []).slice(0, 2).map((u, i) => (
                         <a key={i} href={u} target="_blank" rel="noreferrer">Source {i + 1}</a>
                       ))}
@@ -183,7 +184,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
 
         {(st.dossier || st.dossierPending) && (
           <Collapse
-            title="Season dossier"
+            title={t('Season dossier')}
             summary={st.dossier
               ? `${(st.dossier as SeasonDossier).macrotrends?.length ?? 0} macrotrends · ${(st.dossier as SeasonDossier).sources?.length ?? 0} sources`
               : 'Building'}
@@ -202,7 +203,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                       <h4>{d.season} · {d.season_title}</h4>
                       {d.powershift && <div className="ds-power">Powershift: {d.powershift}</div>}
                     </div>
-                    <button className="btn btn-primary btn-sm" onClick={() => openDossierPdf(st)}>Dossier PDF</button>
+                    <button className="btn btn-primary btn-sm" onClick={() => openDossierPdf(st)}>{t('Dossier PDF')}</button>
                   </div>
                   {(d.macrotrends ?? []).map((m, i) => (
                     <div className="ds-macro" key={m.name + i}>
@@ -257,12 +258,12 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                   ))}
                   {(d.yearly_context ?? []).length > 0 && (
                     <div className="ds-years">
-                      <div className="ds-sub">How the last few seasons moved</div>
+                      <div className="ds-sub">{t('How the last few seasons moved')}</div>
                       {d.yearly_context.map((y, i) => (
                         <div className="ds-year" key={y.season + i}>
                           <b>{y.season}</b>
                           <span>{y.headline}
-                            {y.source_url && <a className="ds-link" href={y.source_url} target="_blank" rel="noreferrer">source</a>}
+                            {y.source_url && <a className="ds-link" href={y.source_url} target="_blank" rel="noreferrer">{t('source')}</a>}
                           </span>
                         </div>
                       ))}
@@ -276,7 +277,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
 
         {(st.trendReport || st.reportPending) && (
           <Collapse
-            title="Trend report"
+            title={t('Trend report')}
             summary={st.trendReport
               ? `${(st.trendReport as TrendReport).design_implications?.length ?? 0} design implications`
               : 'Writing'}
@@ -292,7 +293,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                     <h4 style={{ flex: 1, minWidth: 0 }}>{rep.title}</h4>
                     {/* 리포트만 따로 뽑아 갈 수 있어야 한다 */}
-                    <button className="btn btn-ghost btn-sm" onClick={() => openTrendReportPdf(st)}>Report PDF</button>
+                    <button className="btn btn-ghost btn-sm" onClick={() => openTrendReportPdf(st)}>{t('Report PDF')}</button>
                   </div>
                   <div className="tr-exec">{rep.executive_view}</div>
                   {rep.design_implications?.length > 0 && (
@@ -356,9 +357,9 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
         )}
 
         {st.signals.length > 0 && (
-          <Collapse title="Signals" summary={sigSummary}>
+          <Collapse title={t('Signals')} summary={sigSummary}>
             <table className="mini">
-              <thead><tr><th>Signal</th><th>Axis</th><th>Seen</th><th>Trend</th><th>{st.params.mode === 'moodboard' ? 'Page' : 'Proxy'}</th><th>Source</th></tr></thead>
+              <thead><tr><th>Signal</th><th>Axis</th><th>Seen</th><th>{t('Trend')}</th><th>{st.params.mode === 'moodboard' ? 'Page' : 'Proxy'}</th><th>Source</th></tr></thead>
               <tbody>
                 {st.signals.map(s => (
                   <tr key={s.signal_id}>
@@ -409,7 +410,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
 
         {st.designs.length === 0 && st.signals.length === 0 && (
           <div className="empty" style={{ height: 300 }}>
-            <div>Starting the pipeline<br /><span className="hint">Partial results appear here as they land</span></div>
+            <div>{t('Starting the pipeline')}<br /><span className="hint">{t('Partial results appear here as they land')}</span></div>
           </div>
         )}
       </div>
@@ -419,7 +420,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
         <div className="run-right">
           <div className="panel-h" style={{ borderBottom: '1px solid var(--line)' }}>
             Progress log
-            <button className="btn btn-ghost btn-sm" style={{ marginLeft: 'auto' }} onClick={() => setShowLog(false)}>Close</button>
+            <button className="btn btn-ghost btn-sm" style={{ marginLeft: 'auto' }} onClick={() => setShowLog(false)}>{t('Close')}</button>
           </div>
           <div className="log" ref={logRef}>
             {st.logs.map((l, i) => (

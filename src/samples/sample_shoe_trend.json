@@ -2621,7 +2621,7 @@
    "images": [
     {
      "view": "sketch",
-     "url": "/samples/7a28342791c4e3faaa6ab809.png",
+     "url": "/samples/7a28342791c4e3faaa6ab809.webp",
      "hash": "7a28342791c4e3faaa6ab809",
      "origin": "generated"
     }
@@ -2811,7 +2811,7 @@
    "images": [
     {
      "view": "sketch",
-     "url": "/samples/6c8939bc4083a14ec6e3e30e.png",
+     "url": "/samples/6c8939bc4083a14ec6e3e30e.webp",
      "hash": "6c8939bc4083a14ec6e3e30e",
      "origin": "generated"
     }
@@ -3026,33 +3026,33 @@
    "images": [
     {
      "view": "sketch",
-     "url": "/samples/55eeee90c944a0d7be8b70eb.png",
+     "url": "/samples/55eeee90c944a0d7be8b70eb.webp",
      "hash": "55eeee90c944a0d7be8b70eb",
      "origin": "generated"
     },
     {
      "view": "lateral",
-     "url": "/samples/780ee2d38cb8913d406ef5ca.png",
+     "url": "/samples/780ee2d38cb8913d406ef5ca.webp",
      "hash": "780ee2d38cb8913d406ef5ca",
      "origin": "generated"
     },
     {
      "view": "top",
-     "url": "/samples/8719aa2a47ac591d49bec69f.png",
+     "url": "/samples/8719aa2a47ac591d49bec69f.webp",
      "hash": "8719aa2a47ac591d49bec69f",
      "origin": "edited_from",
      "editedFrom": "780ee2d38cb8913d406ef5ca"
     },
     {
      "view": "q34",
-     "url": "/samples/9a8feda31ac561a0cfb55061.png",
+     "url": "/samples/9a8feda31ac561a0cfb55061.webp",
      "hash": "9a8feda31ac561a0cfb55061",
      "origin": "edited_from",
      "editedFrom": "780ee2d38cb8913d406ef5ca"
     },
     {
      "view": "variation",
-     "url": "/samples/a444acf3cc87b48b7a454329.png",
+     "url": "/samples/a444acf3cc87b48b7a454329.webp",
      "hash": "a444acf3cc87b48b7a454329",
      "origin": "edited_from",
      "editedFrom": "780ee2d38cb8913d406ef5ca",
@@ -3061,7 +3061,7 @@
     },
     {
      "view": "variation",
-     "url": "/samples/d0ec5d7371a0ad09a6dee9b5.png",
+     "url": "/samples/d0ec5d7371a0ad09a6dee9b5.webp",
      "hash": "d0ec5d7371a0ad09a6dee9b5",
      "origin": "edited_from",
      "editedFrom": "780ee2d38cb8913d406ef5ca",
@@ -3070,7 +3070,7 @@
     },
     {
      "view": "variation",
-     "url": "/samples/84302f132600628b63cf3644.png",
+     "url": "/samples/84302f132600628b63cf3644.webp",
      "hash": "84302f132600628b63cf3644",
      "origin": "edited_from",
      "editedFrom": "780ee2d38cb8913d406ef5ca",
@@ -3079,21 +3079,21 @@
     },
     {
      "view": "wear",
-     "url": "/samples/dc69e9e92eda584357e17437.png",
+     "url": "/samples/dc69e9e92eda584357e17437.webp",
      "hash": "dc69e9e92eda584357e17437",
      "origin": "edited_from",
      "editedFrom": "780ee2d38cb8913d406ef5ca"
     },
     {
      "view": "wear",
-     "url": "/samples/a43826338396a51f6c8a51a7.png",
+     "url": "/samples/a43826338396a51f6c8a51a7.webp",
      "hash": "a43826338396a51f6c8a51a7",
      "origin": "edited_from",
      "editedFrom": "780ee2d38cb8913d406ef5ca"
     },
     {
      "view": "concept",
-     "url": "/samples/21ec3965bb8961e7292d8fb6.png",
+     "url": "/samples/21ec3965bb8961e7292d8fb6.webp",
      "hash": "21ec3965bb8961e7292d8fb6",
      "origin": "edited_from",
      "editedFrom": "780ee2d38cb8913d406ef5ca",
@@ -3102,7 +3102,7 @@
     },
     {
      "view": "concept",
-     "url": "/samples/4d269d93f4808fbb467b5088.png",
+     "url": "/samples/4d269d93f4808fbb467b5088.webp",
      "hash": "4d269d93f4808fbb467b5088",
      "origin": "edited_from",
      "editedFrom": "780ee2d38cb8913d406ef5ca",
@@ -3111,7 +3111,7 @@
     },
     {
      "view": "concept",
-     "url": "/samples/e01b2a287ba74304c8ac3edb.png",
+     "url": "/samples/e01b2a287ba74304c8ac3edb.webp",
      "hash": "e01b2a287ba74304c8ac3edb",
      "origin": "edited_from",
      "editedFrom": "780ee2d38cb8913d406ef5ca",
@@ -3338,33 +3338,33 @@
    "images": [
     {
      "view": "sketch",
-     "url": "/samples/6a64d77ae2776ced1492fa45.png",
+     "url": "/samples/6a64d77ae2776ced1492fa45.webp",
      "hash": "6a64d77ae2776ced1492fa45",
      "origin": "generated"
     },
     {
      "view": "lateral",
-     "url": "/samples/c944f88d13dfa1bb97b817c2.png",
+     "url": "/samples/c944f88d13dfa1bb97b817c2.webp",
      "hash": "c944f88d13dfa1bb97b817c2",
      "origin": "generated"
     },
     {
      "view": "q34",
-     "url": "/samples/c1eb7abb2a737c6afad43328.png",
+     "url": "/samples/c1eb7abb2a737c6afad43328.webp",
      "hash": "c1eb7abb2a737c6afad43328",
      "origin": "edited_from",
      "editedFrom": "c944f88d13dfa1bb97b817c2"
     },
     {
      "view": "top",
-     "url": "/samples/bdd745d3dffbb81db90fa513.png",
+     "url": "/samples/bdd745d3dffbb81db90fa513.webp",
      "hash": "bdd745d3dffbb81db90fa513",
      "origin": "edited_from",
      "editedFrom": "c944f88d13dfa1bb97b817c2"
     },
     {
      "view": "variation",
-     "url": "/samples/7517d9b7adffd92e7571f256.png",
+     "url": "/samples/7517d9b7adffd92e7571f256.webp",
      "hash": "7517d9b7adffd92e7571f256",
      "origin": "edited_from",
      "editedFrom": "c944f88d13dfa1bb97b817c2",
@@ -3373,7 +3373,7 @@
     },
     {
      "view": "variation",
-     "url": "/samples/d0f8a3cd6a96d5c228d61dcb.png",
+     "url": "/samples/d0f8a3cd6a96d5c228d61dcb.webp",
      "hash": "d0f8a3cd6a96d5c228d61dcb",
      "origin": "edited_from",
      "editedFrom": "c944f88d13dfa1bb97b817c2",
@@ -3382,7 +3382,7 @@
     },
     {
      "view": "variation",
-     "url": "/samples/ec38882dbb03394bbd2153db.png",
+     "url": "/samples/ec38882dbb03394bbd2153db.webp",
      "hash": "ec38882dbb03394bbd2153db",
      "origin": "edited_from",
      "editedFrom": "c944f88d13dfa1bb97b817c2",
@@ -3391,21 +3391,21 @@
     },
     {
      "view": "wear",
-     "url": "/samples/79345d4c4c5665169835cd63.png",
+     "url": "/samples/79345d4c4c5665169835cd63.webp",
      "hash": "79345d4c4c5665169835cd63",
      "origin": "edited_from",
      "editedFrom": "c944f88d13dfa1bb97b817c2"
     },
     {
      "view": "wear",
-     "url": "/samples/593ccb43352027a2befd3a36.png",
+     "url": "/samples/593ccb43352027a2befd3a36.webp",
      "hash": "593ccb43352027a2befd3a36",
      "origin": "edited_from",
      "editedFrom": "c944f88d13dfa1bb97b817c2"
     },
     {
      "view": "concept",
-     "url": "/samples/541778cb571cccd5758d511a.png",
+     "url": "/samples/541778cb571cccd5758d511a.webp",
      "hash": "541778cb571cccd5758d511a",
      "origin": "edited_from",
      "editedFrom": "c944f88d13dfa1bb97b817c2",
@@ -3414,7 +3414,7 @@
     },
     {
      "view": "concept",
-     "url": "/samples/6973e555043d472b2a14645b.png",
+     "url": "/samples/6973e555043d472b2a14645b.webp",
      "hash": "6973e555043d472b2a14645b",
      "origin": "edited_from",
      "editedFrom": "c944f88d13dfa1bb97b817c2",
@@ -3423,7 +3423,7 @@
     },
     {
      "view": "concept",
-     "url": "/samples/2156d384b8e567638725ddc9.png",
+     "url": "/samples/2156d384b8e567638725ddc9.webp",
      "hash": "2156d384b8e567638725ddc9",
      "origin": "edited_from",
      "editedFrom": "c944f88d13dfa1bb97b817c2",

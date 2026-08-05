@@ -6,7 +6,7 @@ import { COMPETITORS, DIRECTIONS, DNA_CONFLICT, DNA_LOCKS, PROMPT_PARSE, REPORT_
 import { COLORWAY_NAMES } from './sketch'
 import {
   colorwayEditPrompt, conceptPrompt, editImage, generateImage, renderPrompt,
-  generateVideo, sketchPrompt, stampLogo, variationAxes, variationPrompt, videoProbe, viewEditPrompt, wearEditPrompt,
+  generateModel, sketchPrompt, stampLogo, variationAxes, variationPrompt, viewEditPrompt, wearEditPrompt,
 } from './aiClient'
 import type { TrendClauseInput } from './aiClient'
 import { fetchCompetitors, fetchDossier, fetchTrends, toBias, toCompetitors, toSignals } from './research'
@@ -74,6 +74,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
 
     // 조사에서 나온 시즌 방향. S2 스케치와 S3 렌더 프롬프트가 이걸 참조한다.
     let trendClause: TrendClauseInput | null = null
+    // 촬영 계획에 실을 시즌 방향. trendClause는 뒤에서 타입이 좁혀지므로 값만 따로 붙든다.
+    let macroName = ''
     // 도시에가 캐시에 있으면 스케치 전에 반영되어야 한다. 새로 조사할 때만 뒤에서 따라온다.
     let dossierJob: Promise<unknown> | null = null
 
@@ -195,6 +197,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
               colors: (m0.palette ?? []).map(c => ({ name: c.name, hex: c.hex })),
               keySpec: (m0.key_items ?? []).find(k => k.segment === 'women')?.silhouette_spec,
             }
+            macroName = m0.name
             emit({ kind: 'log', stage: 'S1', text: `Design prompts now carry the ${m0.name} direction: ${(m0.materials ?? []).map(x => x.label).slice(0, 3).join(', ')}` })
           }
           emit({ kind: 'dossier', dossier: d })
@@ -457,7 +460,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       await pool(wearJobs.slice(0, Math.max(0, budget.left())), 2, async (job) => {
         if (cancelled) return
         try {
-          const r = await editImage(job.base, wearEditPrompt(params.category, job.idx), params.imageEngine)
+          const r = await editImage(job.base, wearEditPrompt(params.category, params.itemType, job.idx), params.imageEngine)
           budget.spend()
           job.d.images = [...job.d.images, { view: 'wear', url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: job.base }]
           emit({ kind: 'design-update', design: { ...job.d } })
@@ -473,56 +476,33 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
 
     // ══ S5 품평 패키지 ══
     emit({ kind: 'stage-start', stage: 'S5' })
-    if (params.video) {
-      const probe = await videoProbe().catch(() => ({ available: false, reason: 'probe failed', device: undefined }))
-      emit({
-        kind: 'log', stage: 'S5',
-        text: probe.available
-          ? `Concept clips via local ComfyUI (${probe.device ?? 'gpu'}) · open-source image-to-video`
-          : `No local video model running (${probe.reason ?? 'ComfyUI off'}) · falling back to a camera-move clip built from the stills`,
-      })
+    // 멀티뷰 → 3D · S3에서 이미 만든 각도 컷을 그대로 Tripo에 넘긴다.
+    // 한 장으로 추론시키는 것보다 여러 각도를 주는 쪽이 형태가 훨씬 정확하다.
+    if (params.make3d) {
+      emit({ kind: 'log', stage: 'S5', text: 'Building 3D from the multiview shots of each top pick' })
       for (const d of top) {
         if (cancelled) return
-        const src = d.images.find(i => i.view === 'concept') ?? d.images.find(i => i.view === 'wear')
-          ?? d.images.find(i => i.origin === 'generated' && i.view !== 'sketch')
-        if (!src) continue
+        // 사람이나 배경이 들어간 컷은 빼고, 흰 배경의 제품 컷만 넘긴다
+        const views = d.images
+          .filter(i => !['sketch', 'wear', 'concept', 'variation'].includes(i.view))
+          .slice(0, 4)
+        if (views.length < 2) {
+          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} has only ${views.length} clean view, so 3D is skipped` })
+          continue
+        }
         try {
-          const v = await generateVideo(src.hash, `slow push in on the ${(TYPE_LABEL[params.itemType] ?? params.itemType).toLowerCase()}, product stays sharp`)
-          d.clips = [...(d.clips ?? []), { url: v.url, hash: v.hash, backend: v.backend, note: v.note }]
+          const m = await generateModel(views.map(v => v.hash), {
+            subject: (TYPE_LABEL[params.itemType] ?? params.itemType).toLowerCase(),
+            category: params.category,
+            itemType: params.itemType,
+          })
+          d.model = { url: m.url, hash: m.hash, format: m.format, views: m.views }
           emit({ kind: 'design-update', design: { ...d } })
-          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} clip ready · ${v.backend}` })
+          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} 3D ready from ${m.views} views${m.cached ? ' (reused)' : ''}` })
         } catch (e) {
-          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} clip failed · ${String((e as Error).message).slice(0, 90)}` })
+          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} 3D failed · ${String((e as Error).message).slice(0, 90)}` })
         }
       }
-    }
-    // 디자인 다음 단계 · 가상 인물 착용컷과 스튜디오·로케이션 컨셉컷
-    if (params.conceptShots > 0) {
-      const mood = (st_mood(params) || '').slice(0, 160)
-      const subject = (TYPE_LABEL[params.itemType] ?? params.itemType).toLowerCase()
-      emit({ kind: 'log', stage: 'S5', text: `Concept shoot for the top picks · ${params.conceptShots} frames each, on a virtual model and on set` })
-      const shots: { d: Design; base: string; k: number }[] = []
-      top.forEach((d, di) => {
-        const base = d.images.find(i => i.origin === 'generated' && i.view !== 'sketch') ?? d.images.find(i => i.view !== 'sketch')
-        if (!base) return
-        for (let k = 0; k < params.conceptShots; k++) shots.push({ d, base: base.hash, k: k + di })
-      })
-      await pool(shots.slice(0, Math.max(0, budget.left())), 2, async (job) => {
-        if (cancelled) return
-        const c = conceptPrompt(params.category, job.k, job.k, subject, mood)
-        try {
-          const r = await editImage(job.base, c.prompt, params.imageEngine)
-          budget.spend()
-          job.d.images = [...job.d.images, {
-            view: 'concept', url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: job.base,
-            conceptLabel: c.label, persona: c.persona,
-          }]
-          emit({ kind: 'design-update', design: { ...job.d } })
-          emit({ kind: 'log', stage: 'S5', text: `${job.d.spec.design_id} ${c.label.toLowerCase()} done (${c.persona})` })
-        } catch {
-          emit({ kind: 'log', stage: 'S5', text: `${job.d.spec.design_id} ${c.label.toLowerCase()} failed · skipping that frame` })
-        }
-      })
     }
 
     emit({ kind: 'log', stage: 'S5', text: 'Assembling the board · five lanes: brief, Core, Push, Signature, appendix' })

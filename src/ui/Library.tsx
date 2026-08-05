@@ -1,4 +1,5 @@
 // ── Library · 지난 Run을 카드로 보고 다시 연다 ────────────────────────
+import { t } from '../core/i18n'
 import { useMemo, useState } from 'react'
 import type { RunRecord } from '../core/store'
 import { deleteRun, listRuns, toggleFavorite } from '../core/store'
@@ -20,11 +21,11 @@ export default function Library({ onOpen, filter: initial = 'all' }: {
     return (
       <div className="libwrap">
         <div className="libhead">
-          <h1>Library</h1>
-          <p className="lead">Finished runs are kept here. Nothing yet.</p>
+          <h1>{t('Library')}</h1>
+          <p className="lead">{t('Finished runs are kept here. Nothing yet.')}</p>
         </div>
         <div className="empty" style={{ height: 260 }}>
-          <div>Run the agent once and it will show up here.</div>
+          <div>{t('Run the agent once and it will show up here.')}</div>
         </div>
       </div>
     )
@@ -34,8 +35,8 @@ export default function Library({ onOpen, filter: initial = 'all' }: {
     <div className="libwrap">
       <div className="libhead">
         <div>
-          <h1>Library</h1>
-          <p className="lead">Past runs, with their boards. Star the ones worth keeping.</p>
+          <h1>{t('Library')}</h1>
+          <p className="lead">{t('Past runs, with their boards. Star the ones worth keeping.')}</p>
         </div>
         <div className="chiprow" style={{ flex: 'none' }}>
           <button className={`pick sm ${filter === 'all' ? 'on' : ''}`} onClick={() => setFilter('all')}>
@@ -59,7 +60,7 @@ export default function Library({ onOpen, filter: initial = 'all' }: {
                 {r.thumb
                   ? <img src={r.thumb} alt="" onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
                   : <span className="lc-nothumb">No image</span>}
-                {st.sample && <span className="lc-badge">Sample</span>}
+                {st.sample && <span className="lc-badge">{t('Sample')}</span>}
               </button>
               <div className="lc-body">
                 <div className="lc-title">
@@ -75,8 +76,8 @@ export default function Library({ onOpen, filter: initial = 'all' }: {
                   <span className="lc-date">{new Date(r.savedAt).toLocaleDateString()}</span>
                 </div>
                 <div className="lc-acts">
-                  <button className="btn btn-ghost btn-sm" onClick={() => onOpen(r, 'run')}>Run</button>
-                  <button className="btn btn-ghost btn-sm" onClick={() => onOpen(r, 'board')}>Board</button>
+                  <button className="btn btn-ghost btn-sm" onClick={() => onOpen(r, 'run')}>{t('Run')}</button>
+                  <button className="btn btn-ghost btn-sm" onClick={() => onOpen(r, 'board')}>{t('Board')}</button>
                   <button className={`starbtn ${r.favorite ? 'on' : ''}`}
                     title={r.favorite ? 'Remove star' : 'Star'}
                     onClick={() => { toggleFavorite(r.id); setTick(t => t + 1) }}>
@@ -87,7 +88,7 @@ export default function Library({ onOpen, filter: initial = 'all' }: {
                   </button>
                   {!st.sample && (
                     <button className="btn btn-ghost btn-sm" style={{ marginLeft: 'auto' }}
-                      onClick={() => { deleteRun(r.id); setTick(t => t + 1) }}>Delete</button>
+                      onClick={() => { deleteRun(r.id); setTick(t => t + 1) }}>{t('Delete')}</button>
                   )}
                 </div>
               </div>
