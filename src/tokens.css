@@ -67,8 +67,8 @@
   --icon-success: #1CC38A;
   --icon-warning: #FB8200;
   --icon-failed: #FF4550;
-  --shadow-shadow1: #000000;
-  --shadow-shadow2: #000000;
+  --shadow-shadow1: #000000;
+  --shadow-shadow2: #000000;
   /* 의미 이름 · var() 연쇄를 피해 실제 값을 직접 넣는다 */
   --bg: #FFFFFF;
   --bg-2: #F9FAFB;
@@ -158,8 +158,8 @@
   --icon-success: #2AEEA8;
   --icon-warning: #FFAB5C;
   --icon-failed: #FF7474;
-  --shadow-shadow1: #FFFFFF;
-  --shadow-shadow2: #FFFFFF;
+  --shadow-shadow1: #FFFFFF;
+  --shadow-shadow2: #FFFFFF;
   /* 의미 이름 · var() 연쇄를 피해 실제 값을 직접 넣는다 */
   --bg: #05070E;
   --bg-2: #0F1217;

@@ -58,6 +58,10 @@ export function tf(s: string, vars: Record<string, string | number>): string {
 const KO: Record<string, string> = {
   // ── 공통 ────────────────────────────────────────────────────────
   // ── 위저드 · 질문 세 개로 나눈 화면 ──────────────────────────────
+  'New run': '새 실행',
+  'Current session': '이번 세션',
+  'Clear session': '세션 초기화',
+  'Searches': '웹 검색',
   'This is a preview of the full demo.': '전체 데모의 미리보기입니다.',
   'Learn how it actually works': '실제로 어떻게 도는지 보기',
   'What to create': '무엇을',

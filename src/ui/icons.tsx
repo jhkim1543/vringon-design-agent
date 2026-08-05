@@ -47,3 +47,8 @@ export const GROUP_ICON: Record<string, () => JSX.Element> = {
   sneaker: IcSneaker, dress: IcDress, heel: IcHeel, flat: IcFlat, boot: IcBoot, sandal: IcSandal,
   ring: IcRing, earring: IcEarring, necklace: IcNecklace, bracelet: IcBracelet, other: IcBrooch,
 }
+
+// 레일 조작
+export const IcPlus = () => <I><path d="M12 5v14M5 12h14" /></I>
+export const IcChevron = () => <I><path d="M7.6 10l4.4 4.4 4.4-4.4" /></I>
+export const IcTrash = () => <I><path d="M4.4 6.6h15.2" /><path d="M9.4 6.6V5a1.4 1.4 0 0 1 1.4-1.4h2.4A1.4 1.4 0 0 1 14.6 5v1.6" /><path d="M6.4 6.6l.9 12.2a1.6 1.6 0 0 0 1.6 1.5h6.2a1.6 1.6 0 0 0 1.6-1.5l.9-12.2" /><path d="M10.2 10.4v6M13.8 10.4v6" /></I>

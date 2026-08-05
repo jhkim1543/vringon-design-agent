@@ -7,7 +7,7 @@ import type { PipelineHandle } from './core/pipeline'
 import Wizard from './ui/Wizard'
 import RunView from './ui/RunView'
 import Board from './ui/Board'
-import { IcClock, IcStar } from './ui/icons'
+import { IcChevron, IcClock, IcPlus, IcStar, IcTrash } from './ui/icons'
 import { ThemeToggle, VringonLogo, LangToggle } from './ui/bits'
 import BrandSetup from './ui/BrandSetup'
 import { loadBrand, saveBrand, isBrandConfigured } from './core/brand'
@@ -47,6 +47,8 @@ export default function App() {
   const [brandOpen, setBrandOpen] = useState(false)
   const [brandGate, setBrandGate] = useState<RunParams | null>(null)
   const runIdRef = useRef<string>(newRunId())
+  // New run을 누르면 위저드를 새로 마운트해 입력을 처음 상태로 되돌린다
+  const [wizardKey, setWizardKey] = useState(0)
 
   // 예시 Run을 한 번 심어 둔다. 처음 열어도 결과가 어떻게 나오는지 볼 수 있게.
   useEffect(() => { ensureSampleRuns() }, [])
@@ -178,8 +180,10 @@ export default function App() {
         <aside className="siderail">
           {/* 상단은 "지금 어디", 좌측은 "지난 작업". 축이 겹치면 안 되므로
               Create와 같은 곳으로 가던 Run setup 항목은 두지 않는다. */}
+          <button className="sr-new" onClick={() => { setView('create'); setWizardKey(k => k + 1) }}>
+            <IcPlus /> <span>{t('New run')}</span> <IcChevron />
+          </button>
           <nav>
-            <div className="sr-label">{t('Saved runs')}</div>
             <button className={`sr-i ${view === 'library' ? 'on' : ''}`} onClick={() => setView('library')}>
               <IcClock /> {t('History')}
             </button>
@@ -188,15 +192,20 @@ export default function App() {
             </button>
           </nav>
           <div className="sr-foot">
-            <div className="sr-label">{t('This session')}</div>
-            <div className="sr-usage">
-              <b>{usage.images}</b> images · <b>{usage.searches}</b> searches
+            <div className="sr-label">{t('Current session')}</div>
+            {/* 숫자 위, 라벨 아래. 한국어에 조사를 붙일 필요가 없어진다. */}
+            <div className="sr-stats">
+              <div><b>{usage.images}</b><span>{t('Images')}</span></div>
+              <div><b>{usage.searches}</b><span>{t('Searches')}</span></div>
             </div>
-            <div className="sr-bar"><div style={{ width: `${Math.min(100, usage.images * 3)}%` }} /></div>
+            <button className="sr-clear" onClick={() => setUsage({ images: 0, searches: 0 })}
+              disabled={!usage.images && !usage.searches}>
+              <IcTrash /> {t('Clear session')}
+            </button>
           </div>
         </aside>
         {view === 'create' && (
-          <Wizard onStart={p => {
+          <Wizard key={wizardKey} onStart={p => {
             if (!isBrandConfigured(brand)) { setBrandGate(p); return }
             start(p)
           }} />
