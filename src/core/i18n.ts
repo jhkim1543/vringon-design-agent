@@ -58,6 +58,28 @@ export function tf(s: string, vars: Record<string, string | number>): string {
 const KO: Record<string, string> = {
   // ── 공통 ────────────────────────────────────────────────────────
   // ── 위저드 · 질문 세 개로 나눈 화면 ──────────────────────────────
+  'This is a preview of the full demo.': '전체 데모의 미리보기입니다.',
+  'Learn how it actually works': '실제로 어떻게 도는지 보기',
+  'What to create': '무엇을',
+  'Results': '결과물',
+  'Reference': '출발점',
+  'Category': '품목',
+  'Research competitors and market trends': '경쟁사와 시장 트렌드를 조사합니다',
+  'Carry on a series you already have': '이미 있는 시리즈를 이어 갑니다',
+  'Pick where the design should start from. It decides what gets researched in the next step.':
+    '디자인이 무엇에서 출발할지 고릅니다. 다음 단계에서 무엇을 조사할지가 여기서 정해집니다.',
+  'Footwear family': '신발 계열',
+  'Jewelry family': '주얼리 계열',
+  'N lasts in the library. Athletic types need a running last.':
+    '라스트 N종 보유 · 운동화 계열은 러닝 라스트가 필요합니다.',
+  'N molds in the library. Core designs must reuse an existing mold.':
+    '몰드 N종 보유 · Core는 기존 몰드를 다시 써야 합니다.',
+  'Project summary': '실행 요약',
+  'Estimated time': '예상 소요',
+  'Estimated cost': '예상 비용',
+  'View details': '자세히 보기',
+  'Hide details': '접기',
+  'Recent': '최근',
   'Steps': '단계',
   'What': '무엇을',
   'Output': '결과물',

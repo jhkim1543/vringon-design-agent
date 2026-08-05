@@ -2,8 +2,8 @@
 // 한 화면에 결정 열 개를 늘어놓으면 어느 것도 주인공이 되지 못한다.
 // 그래서 질문 세 개로 나눈다: 무엇을 · 어떻게 조사할지 · 어디까지.
 //
-// 색 규칙 하나만 지킨다. 파란색은 (1) 지금 편집 중인 단계와 (2) 최종 실행 버튼,
-// 이 둘에만 쓴다. 나머지 선택 상태는 면과 체크 표시로 구분한다.
+// 선택지는 아이콘 + 제목 + 한 줄로 읽는다. 고른 것만 accent 테두리와
+// 체크 배지를 달고, 나머지는 조용히 둔다.
 import { t } from '../core/i18n'
 import { useEffect, useMemo, useState } from 'react'
 import { detectRuntime } from '../core/runtime'
@@ -14,18 +14,20 @@ import { cumulative, estimate, SCOPE_COPY } from '../core/estimate'
 import { LAST_LIBRARY } from '../core/packs'
 import { Seg, Tag } from './bits'
 import { ENGINES } from '../core/imageEngines'
+import {
+  GROUP_ICON, IcArrow, IcExternal, IcGem, IcMoodboard, IcSeries, IcShoe, IcTrend,
+} from './icons'
 
 // 카드 안에서는 한 줄만 읽게 한다. 자세한 설명은 고른 뒤에 보여준다.
 const MODE_SHORT: Record<Mode, string> = {
-  trend: 'Research competitors and trends',
-  series: 'Extend a series you already have',
+  trend: 'Research competitors and market trends',
+  series: 'Carry on a series you already have',
   moodboard: 'Work only from a file you upload',
 }
-const MODE_DESC: Record<Mode, string> = {
-  trend: 'Name your competitors. Their best sellers and the trends get researched.',
-  series: 'Upload your series and what it stands for. Trends are added on top.',
-  moodboard: 'Works only from the report or moodboard you upload.',
+const MODE_ICON: Record<Mode, () => JSX.Element> = {
+  trend: IcTrend, series: IcSeries, moodboard: IcMoodboard,
 }
+const CAT_ICON: Record<Category, () => JSX.Element> = { shoe: IcShoe, jewelry: IcGem }
 
 // 사용자 말로 쓴 범위 이름. S1~S5는 안쪽 사정이라 화면에 내보내지 않는다.
 const SCOPE_NAME: Record<Stage, string> = {
@@ -63,16 +65,18 @@ function ReportThumb() {
   )
 }
 
-const CHECK = (
-  <svg className="ck" viewBox="0 0 16 16" aria-hidden="true">
-    <path d="M3.5 8.5 6.5 11.5 12.5 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
+/** 고른 카드에만 붙는 체크 배지 */
+const Badge = () => (
+  <span className="o-badge" aria-hidden="true">
+    <svg viewBox="0 0 16 16"><path d="M3.6 8.3 6.5 11.2 12.4 5" fill="none" stroke="currentColor"
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+  </span>
 )
 
 const STEPS = [
-  { n: 1, tab: 'What', ask: 'What are we making?' },
+  { n: 1, tab: 'What to create', ask: 'What are we making?' },
   { n: 2, tab: 'Research', ask: 'What should the research look at?' },
-  { n: 3, tab: 'Output', ask: 'How far should we take it?' },
+  { n: 3, tab: 'Results', ask: 'How far should we take it?' },
 ] as const
 
 export default function Wizard({ onStart }: { onStart: (p: RunParams) => void }) {
@@ -117,6 +121,7 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
   const rsum = p.tierRatio.reduce((a, b) => a + b, 0)
   const perTier = (r: number) => Math.round(p.sketchCount * r / rsum)
   const designCount = Math.max(1, Math.round(p.sketchCount * p.renderRatio))
+  const CatIcon = CAT_ICON[p.category]
 
   return (
     <div className="wizard">
@@ -124,17 +129,23 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
         <div className="wcol">
           {isStatic && (
             <div className="staticnote">
-              <b>{t('Read-only demo.')}</b> {t('Research and image generation run on a local Node server that is not part of this static build, so nothing is called from here. Everything a full run produced is saved: open History in the left rail to walk through the sample run, its board, the season dossier and the PDFs.')}
-              <a href="https://github.com/jhkim1543/vringon-design-agent#running-it-for-real" target="_blank" rel="noreferrer">{t('How to run it for real')}</a>
+              <div className="sn-body">
+                <b>{t('This is a preview of the full demo.')}</b>
+                <p>{t('Research and image generation run on a local Node server that is not part of this static build, so nothing is called from here. Everything a full run produced is saved: open History in the left rail to walk through the sample run, its board, the season dossier and the PDFs.')}</p>
+                <a href="https://github.com/jhkim1543/vringon-design-agent#running-it-for-real" target="_blank" rel="noreferrer">
+                  {t('Learn how it actually works')} <IcArrow />
+                </a>
+              </div>
+              <span className="sn-art" aria-hidden="true" />
             </div>
           )}
 
-          {/* 단계 표시 · 파란색을 쓰는 첫 번째 자리 */}
+          {/* 단계 표시 */}
           <nav className="steps" aria-label={t('Steps')}>
             {STEPS.map(s => (
               <button key={s.n} className={`stp ${step === s.n ? 'on' : ''} ${step > s.n ? 'done' : ''}`}
                 onClick={() => setStep(s.n)}>
-                <span className="stp-n">{step > s.n ? CHECK : s.n}</span>
+                <span className="stp-n">{s.n}</span>
                 <span className="stp-t">{t(s.tab)}</span>
               </button>
             ))}
@@ -145,58 +156,76 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
           {/* ── 1단계 · 무엇을 ──────────────────────────────────── */}
           {step === 1 && (<>
             <section className="sect">
-              <h2>{t('Starting point')}</h2>
+              <h2>{t('Reference')}</h2>
               <div className="opts three">
-                {(Object.keys(MODE_LABEL) as Mode[]).map(m => (
-                  <button key={m} className={`opt ${p.mode === m ? 'on' : ''}`} onClick={() => set('mode', m)}>
-                    <span className="o-t">{t(MODE_LABEL[m])}{p.mode === m && CHECK}</span>
-                    <span className="o-d">{t(MODE_SHORT[m])}</span>
-                  </button>
-                ))}
+                {(Object.keys(MODE_LABEL) as Mode[]).map(m => {
+                  const Icon = MODE_ICON[m]
+                  return (
+                    <button key={m} className={`opt ${p.mode === m ? 'on' : ''}`} onClick={() => set('mode', m)}>
+                      <span className="o-ic"><Icon /></span>
+                      <span className="o-t">{t(MODE_LABEL[m])}</span>
+                      <span className="o-d">{t(MODE_SHORT[m])}</span>
+                      {p.mode === m && <Badge />}
+                    </button>
+                  )
+                })}
               </div>
-              <p className="note">
-                {t(MODE_DESC[p.mode])} <span className="dim">{t(scope.note)}</span>
-              </p>
+              <p className="note">{t('Pick where the design should start from. It decides what gets researched in the next step.')}</p>
             </section>
 
             <section className="sect">
-              <h2>{t('Product')}</h2>
+              <h2>{t('Category')}</h2>
               <div className="opts two">
-                {(['shoe', 'jewelry'] as const).map(c => (
-                  <button key={c} className={`opt ${p.category === c ? 'on' : ''}`} onClick={() => pickCategory(c)}>
-                    <span className="o-t">{t(CAT_LABEL[c])}{p.category === c && CHECK}</span>
-                    <span className="o-d">{TAXONOMY[c].length} {t('families')}</span>
-                  </button>
-                ))}
+                {(['shoe', 'jewelry'] as const).map(c => {
+                  const Icon = CAT_ICON[c]
+                  return (
+                    <button key={c} className={`opt side ${p.category === c ? 'on' : ''}`} onClick={() => pickCategory(c)}>
+                      <span className="o-ic"><Icon /></span>
+                      <span className="o-txt">
+                        <span className="o-t">{t(CAT_LABEL[c])}</span>
+                        <span className="o-d">{TAXONOMY[c].length} {t('families')}</span>
+                      </span>
+                      {p.category === c && <Badge />}
+                    </button>
+                  )
+                })}
               </div>
 
-              <div className="field">
-                <span className="lbl">{t('Family')}</span>
-                <div className="chiprow">
-                  {TAXONOMY[p.category].map(g => (
-                    <button key={g.id} className={`pick ${curGroup?.id === g.id ? 'on' : ''}`}
-                      onClick={() => set('itemType', firstTypeOf(p.category, g.id))}>
-                      {g.label}
-                      <span className="pk-n">{g.note}</span>
-                    </button>
-                  ))}
+              <div className="stack">
+                <span className="lbl">{t(p.category === 'shoe' ? 'Footwear family' : 'Jewelry family')}</span>
+                <div className="famrow">
+                  {TAXONOMY[p.category].map(g => {
+                    const Icon = GROUP_ICON[g.id] ?? CatIcon
+                    const on = curGroup?.id === g.id
+                    return (
+                      <button key={g.id} className={`fam ${on ? 'on' : ''}`}
+                        onClick={() => set('itemType', firstTypeOf(p.category, g.id))}>
+                        <span className="fam-ic"><Icon /></span>
+                        <span className="fam-txt">
+                          <span className="fam-t">{g.label}</span>
+                          <span className="fam-n">{g.note}</span>
+                        </span>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
 
-              <div className="field">
+              <div className="stack">
                 <span className="lbl">{t('Type')}</span>
                 <div className="chiprow">
                   {(curGroup?.types ?? []).map(ty => (
-                    <button key={ty.id} className={`pick sm ${p.itemType === ty.id ? 'on' : ''}`}
+                    <button key={ty.id} className={`pick ${p.itemType === ty.id ? 'on' : ''}`}
                       onClick={() => set('itemType', ty.id)}>{ty.label}</button>
                   ))}
                 </div>
               </div>
 
               <p className="note">
-                {p.category === 'shoe'
-                  ? `${LAST_LIBRARY.length} ${t('lasts loaded. Athletic types need a running last.')}`
-                  : t('22 molds loaded. Core designs must reuse an existing mold.')}
+                {(p.category === 'shoe'
+                  ? t('N lasts in the library. Athletic types need a running last.')
+                  : t('N molds in the library. Core designs must reuse an existing mold.')
+                ).replace('N', String(p.category === 'shoe' ? LAST_LIBRARY.length : 22))}
               </p>
             </section>
           </>)}
@@ -206,7 +235,7 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
             {p.mode === 'trend' && (<>
               <section className="sect">
                 <h2>{t('Competitor brands')}</h2>
-                <p className="note">{t('Their best sellers and the trends around them get searched on the web.')}</p>
+                <p className="note top">{t('Their best sellers and the trends around them get searched on the web.')}</p>
                 <div className="chiplist">
                   {p.trend.competitors.map(c => (
                     <span className="chip-in" key={c}>
@@ -227,19 +256,19 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                     ? ['ASICS', 'adidas', 'Nike', 'New Balance', 'HOKA']
                     : ['Tiffany', 'Cartier', 'Pandora', 'Swarovski']
                   ).filter(b => !p.trend.competitors.includes(b)).map(b => (
-                    <button key={b} className="pick sm" onClick={() => addCompetitor(b)}>{b}</button>
+                    <button key={b} className="pick" onClick={() => addCompetitor(b)}>{b}</button>
                   ))}
                 </div>
               </section>
 
               <section className="sect">
                 <h2>{t('Where it sits in the market')}</h2>
-                <div className="field">
+                <div className="stack">
                   <span className="lbl">{t('Tier')}</span>
                   <Seg options={['mass', 'contemporary', 'premium', 'luxury'] as const} value={p.trend.priceBand}
                     onChange={v => setTrend({ priceBand: v })} />
                 </div>
-                <div className="field">
+                <div className="stack">
                   <span className="lbl">{t('Price')}</span>
                   <div className="inrow">
                     <input className="input" style={{ maxWidth: 110 }} type="number" value={p.trend.priceMinKrw}
@@ -250,13 +279,14 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                     <span className="hint">{t('KRW. Search widens 30% beyond this.')}</span>
                   </div>
                 </div>
+                <p className="note">{t(scope.note)}</p>
               </section>
             </>)}
 
             {p.mode === 'series' && (<>
               <section className="sect">
                 <h2>{t('Your series')}</h2>
-                <div className="field">
+                <div className="stack">
                   <span className="lbl">{t('Name')}</span>
                   <input className="input" style={{ maxWidth: 260 }} placeholder="e.g. Arc line"
                     value={p.series.seriesName} onChange={e => setSeries({ seriesName: e.target.value })} />
@@ -284,12 +314,12 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                 <textarea className="input" rows={3} style={{ width: '100%', resize: 'vertical' }}
                   placeholder={t('What this series has kept, and what you want to change this season')}
                   value={p.series.valueStatement} onChange={e => setSeries({ valueStatement: e.target.value })} />
-                <div className="field">
+                <div className="stack">
                   <span className="lbl">{t('Trends')}</span>
                   <Seg options={['On', 'Off'] as const} value={p.series.trendSearch ? 'On' : 'Off'}
                     onChange={v => setSeries({ trendSearch: v === 'On' })} />
-                  <span className="hint">{t('The only outside research in this mode')}</span>
                 </div>
+                <p className="note">{t('The only outside research in this mode')}</p>
               </section>
             </>)}
 
@@ -311,9 +341,9 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                     ))}
                   </div>
                 )}
-                <div className="field">
+                <div className="stack">
                   <span className="lbl">{t('Notes')}</span>
-                  <textarea className="input" rows={2} style={{ flex: 1, resize: 'vertical' }}
+                  <textarea className="input" rows={2} style={{ width: '100%', resize: 'vertical' }}
                     placeholder={t('Anything specific to look for')}
                     value={p.moodboard.notes} onChange={e => setMood({ notes: e.target.value })} />
                 </div>
@@ -330,16 +360,17 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                 {cum.map(s => {
                   const st = s.stage as Stage
                   const art = SCOPE_ART[st]
+                  const on = p.endStage === st
                   return (
-                    <button key={st} className={`scopecard ${p.endStage === st ? 'on' : ''}`}
-                      onClick={() => set('endStage', st)}>
+                    <button key={st} className={`scopecard ${on ? 'on' : ''}`} onClick={() => set('endStage', st)}>
                       {/* 넷 합쳐 57KB다. lazy로 미루면 이득 없이 빈 칸만 잠깐 보인다. */}
                       <span className="sc-thumb">{art ? <img src={art} alt="" /> : <ReportThumb />}</span>
                       <span className="sc-txt">
-                        <span className="sc-n">{t(SCOPE_NAME[st])}{p.endStage === st && CHECK}</span>
+                        <span className="sc-n">{t(SCOPE_NAME[st])}</span>
                         <span className="sc-g">{t(SCOPE_COPY[st].gets)}</span>
-                        <span className="sc-m">{s.minutes}m · ${s.usd.toFixed(2)}</span>
                       </span>
+                      <span className="sc-m">{s.minutes}m · ${s.usd.toFixed(2)}</span>
+                      {on && <Badge />}
                     </button>
                   )
                 })}
@@ -348,15 +379,19 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
 
             <section className="sect">
               <h2>{t('How many')}</h2>
-              <div className="field">
+              <div className="stack">
                 <span className="lbl">{t('Sketches')}</span>
-                <Seg options={[6, 12, 18, 24] as const} value={p.sketchCount} onChange={v => set('sketchCount', v)} />
-                <span className="hint">{t('Core')} {perTier(rc)} · {t('Push')} {perTier(rp)} · {t('Signature')} {p.sketchCount - perTier(rc) - perTier(rp)}</span>
+                <div className="inrow">
+                  <Seg options={[6, 12, 18, 24] as const} value={p.sketchCount} onChange={v => set('sketchCount', v)} />
+                  <span className="hint">{t('Core')} {perTier(rc)} · {t('Push')} {perTier(rp)} · {t('Signature')} {p.sketchCount - perTier(rc) - perTier(rp)}</span>
+                </div>
               </div>
-              <div className="field">
+              <div className="stack">
                 <span className="lbl">{t('Top picks')}</span>
-                <Seg options={[1, 2, 3, 4, 5] as const} value={p.topN as any} onChange={v => set('topN', Number(v))} />
-                <span className="hint">{t('At least one from each tier')}</span>
+                <div className="inrow">
+                  <Seg options={[1, 2, 3, 4, 5] as const} value={p.topN as any} onChange={v => set('topN', Number(v))} />
+                  <span className="hint">{t('At least one from each tier')}</span>
+                </div>
               </div>
               <label className="checkline">
                 <input type="checkbox" checked={p.approvalGate} onChange={e => set('approvalGate', e.target.checked)} />
@@ -370,57 +405,72 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
             </button>
 
             {more && (<div className="morebox">
-              <div className="field"><span className="lbl">{t('Mix')}</span>
-                <Seg options={['1:1:1', '2:1:1', '1:2:1', '2:2:1'] as const}
-                  value={p.tierRatio.join(':') as any}
-                  onChange={v => set('tierRatio', String(v).split(':').map(Number) as [number, number, number])} />
-                <span className="hint">{t('Core : Push : Signature')}</span>
+              <div className="stack"><span className="lbl">{t('Mix')}</span>
+                <div className="inrow">
+                  <Seg options={['1:1:1', '2:1:1', '1:2:1', '2:2:1'] as const}
+                    value={p.tierRatio.join(':') as any}
+                    onChange={v => set('tierRatio', String(v).split(':').map(Number) as [number, number, number])} />
+                  <span className="hint">{t('Core : Push : Signature')}</span>
+                </div>
               </div>
-              <div className="field"><span className="lbl">{t('To render')}</span>
-                <Seg options={[0.25, 0.5, 0.75] as const} value={p.renderRatio} onChange={v => set('renderRatio', v)} format={v => `${Number(v) * 100}%`} />
-                <span className="hint">{designCount} {t('move on')}</span>
+              <div className="stack"><span className="lbl">{t('To render')}</span>
+                <div className="inrow">
+                  <Seg options={[0.25, 0.5, 0.75] as const} value={p.renderRatio} onChange={v => set('renderRatio', v)} format={v => `${Number(v) * 100}%`} />
+                  <span className="hint">{designCount} {t('move on')}</span>
+                </div>
               </div>
-              <div className="field"><span className="lbl">{t('Views')}</span>
-                <Seg options={[1, 3, 4] as const} value={p.viewCount} onChange={v => set('viewCount', v)} />
-                <span className="lbl sub">{t('Colorways')}</span>
-                <Seg options={[0, 1, 2, 3] as const} value={p.colorwayCount} onChange={v => set('colorwayCount', v)} />
+              <div className="stack"><span className="lbl">{t('Views')}</span>
+                <div className="inrow">
+                  <Seg options={[1, 3, 4] as const} value={p.viewCount} onChange={v => set('viewCount', v)} />
+                  <span className="lbl sub">{t('Colorways')}</span>
+                  <Seg options={[0, 1, 2, 3] as const} value={p.colorwayCount} onChange={v => set('colorwayCount', v)} />
+                </div>
               </div>
-              <div className="field"><span className="lbl">{t('Variations')}</span>
-                <Seg options={[0, 2, 3, 4, 6, 8] as const} value={p.variationCount} onChange={v => set('variationCount', v)} />
-                <span className="hint">{t('Branches off one sketch, one axis changed each')}</span>
+              <div className="stack"><span className="lbl">{t('Variations')}</span>
+                <div className="inrow">
+                  <Seg options={[0, 2, 3, 4, 6, 8] as const} value={p.variationCount} onChange={v => set('variationCount', v)} />
+                  <span className="hint">{t('Branches off one sketch, one axis changed each')}</span>
+                </div>
               </div>
-              <div className="field"><span className="lbl">{t('Worn')}</span>
-                <Seg options={[0, 2, 4] as const} value={p.wearCuts} onChange={v => set('wearCuts', v)} />
-                <span className="lbl sub">{t('Concept shoot')}</span>
-                <Seg options={[0, 2, 3] as const} value={p.conceptShots} onChange={v => set('conceptShots', v)} />
+              <div className="stack"><span className="lbl">{t('Worn')}</span>
+                <div className="inrow">
+                  <Seg options={[0, 2, 4] as const} value={p.wearCuts} onChange={v => set('wearCuts', v)} />
+                  <span className="lbl sub">{t('Concept shoot')}</span>
+                  <Seg options={[0, 2, 3] as const} value={p.conceptShots} onChange={v => set('conceptShots', v)} />
+                </div>
               </div>
-              <div className="field"><span className="lbl">{t('3D model')}</span>
-                <Seg options={['Off', 'On'] as const} value={p.make3d ? 'On' : 'Off'} onChange={v => set('make3d', v === 'On')} />
-                <span className="hint">{t('Multiview goes to Tripo. The result is a GLB you can turn on the board.')}</span>
+              <div className="stack"><span className="lbl">{t('3D model')}</span>
+                <div className="inrow">
+                  <Seg options={['Off', 'On'] as const} value={p.make3d ? 'On' : 'Off'} onChange={v => set('make3d', v === 'On')} />
+                  <span className="hint">{t('Multiview goes to Tripo. The result is a GLB you can turn on the board.')}</span>
+                </div>
               </div>
-              <div className="field"><span className="lbl">{t('Model')}</span>
+              <div className="stack"><span className="lbl">{t('Model')}</span>
                 <div className="opts two tight">
                   {(['fast', 'detail'] as const).map(id => (
                     <button key={id} className={`opt ${p.imageEngine === id ? 'on' : ''}`}
                       onClick={() => set('imageEngine', id)}>
-                      <span className="o-t">{ENGINES[id].label}{p.imageEngine === id && CHECK}</span>
+                      <span className="o-t">{ENGINES[id].label}</span>
                       <span className="o-d">{ENGINES[id].blurb}</span>
                       <span className="o-m">${ENGINES[id].usdPerImage.toFixed(3)} · {ENGINES[id].secPerImage}s each</span>
+                      {p.imageEngine === id && <Badge />}
                     </button>
                   ))}
                 </div>
               </div>
-              <div className="field"><span className="lbl">{t('Image cap')}</span>
-                <Seg options={[0, 6, 12, 24, 48] as const} value={p.imageBudget}
-                  onChange={v => set('imageBudget', v)}
-                  format={v => v === 0 ? 'None' : `${v}`} />
-                <span className="hint">
-                  {api && !api.keyPresent
-                    ? t('No image server. Diagrams only.')
-                    : p.imageBudget === 0
-                      ? t('Spec diagrams only')
-                      : `${t('Anything past the cap falls back to a diagram')}${api?.cachedImages ? ` · ${api.cachedImages} ${t('reusable')}` : ''}`}
-                </span>
+              <div className="stack"><span className="lbl">{t('Image cap')}</span>
+                <div className="inrow">
+                  <Seg options={[0, 6, 12, 24, 48] as const} value={p.imageBudget}
+                    onChange={v => set('imageBudget', v)}
+                    format={v => v === 0 ? 'None' : `${v}`} />
+                  <span className="hint">
+                    {api && !api.keyPresent
+                      ? t('No image server. Diagrams only.')
+                      : p.imageBudget === 0
+                        ? t('Spec diagrams only')
+                        : `${t('Anything past the cap falls back to a diagram')}${api?.cachedImages ? ` · ${api.cachedImages} ${t('reusable')}` : ''}`}
+                  </span>
+                </div>
               </div>
             </div>)}
           </>)}
@@ -432,44 +482,51 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
             </button>
             <div className="wb-msg">{stepBlocked && t(stepBlocked)}</div>
             {step < 3
-              ? <button className="btn btn-primary" disabled={!!stepBlocked} onClick={() => setStep(step + 1)}>{t('Continue')}</button>
-              : <button className="btn btn-primary" disabled={!!blocked} onClick={() => onStart(p)}>{t('Start the run')}</button>}
+              ? <button className="btn btn-primary" disabled={!!stepBlocked} onClick={() => setStep(step + 1)}>
+                  {t('Continue')} <IcArrow />
+                </button>
+              : <button className="btn btn-primary" disabled={!!blocked} onClick={() => onStart(p)}>
+                  {t('Start the run')} <IcArrow />
+                </button>}
           </div>
           {step === 3 && blocked && <div className="blockmsg">{t(blocked)}</div>}
         </div>
 
         {/* 오른쪽은 요약이다. 결정하는 자리가 아니다. */}
         <aside className="summary">
-          <div className="sm-brief">
-            <b>{t(TYPE_LABEL[p.itemType])}</b>
-            <span>{t(MODE_LABEL[p.mode])} · {t(SCOPE_NAME[p.endStage])}</span>
+          <div className="sumcard">
+            <h3>{t('Project summary')}</h3>
+            <div className="sm-brief">
+              <b>{t(TYPE_LABEL[p.itemType])}</b>
+              <span>{t(MODE_LABEL[p.mode])} · {t(SCOPE_NAME[p.endStage])}</span>
+            </div>
+            <div className="sm-stats">
+              <div><span className="v">{p.endStage === 'S1' ? '—' : designCount}</span><span className="k">{t('Designs')}</span></div>
+              <div><span className="v">{est.totalMinutes}<i>m</i></span><span className="k">{t('Estimated time')}</span></div>
+              <div><span className="v">${est.totalUsd.toFixed(2)}</span><span className="k">{t('Estimated cost')}</span></div>
+            </div>
+            <button className="btn btn-ghost btn-sm sm-more" onClick={() => setBreakdown(v => !v)}>
+              {breakdown ? t('Hide details') : t('View details')} <IcExternal />
+            </button>
+            {breakdown && (
+              <table className="sm-table">
+                <tbody>
+                  {est.perStage.map(s => {
+                    const order = ['S1', 'S2', 'S3', 'S4', 'S5']
+                    const active = order.indexOf(s.stage) <= order.indexOf(p.endStage)
+                    return (
+                      <tr key={s.stage} className={active ? '' : 'dim'}>
+                        <td>{t(s.label)}</td>
+                        {/* 상한에 걸리면 "만들 수 있는 수 / 원한 수"로 보여야 오해가 없다 */}
+                        <td>{s.images > 0 ? (s.real < s.images ? `${s.real} of ${s.images}` : `${s.images} imgs`) : ''}</td>
+                        <td>{Math.max(1, Math.round(s.minutes))}m · ${s.usd.toFixed(2)}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
           </div>
-          <div className="sm-stats">
-            <div><span className="v">{p.endStage === 'S1' ? '—' : designCount}</span><span className="k">{t('Designs')}</span></div>
-            <div><span className="v">{est.totalMinutes}<i>m</i></span><span className="k">{t('Time')}</span></div>
-            <div><span className="v">${est.totalUsd.toFixed(2)}</span><span className="k">{t('Cost')}</span></div>
-          </div>
-          <button className="sm-more" onClick={() => setBreakdown(v => !v)}>
-            {breakdown ? t('Hide the breakdown') : t('Show the breakdown')}
-          </button>
-          {breakdown && (
-            <table className="sm-table">
-              <tbody>
-                {est.perStage.map(s => {
-                  const order = ['S1', 'S2', 'S3', 'S4', 'S5']
-                  const active = order.indexOf(s.stage) <= order.indexOf(p.endStage)
-                  return (
-                    <tr key={s.stage} className={active ? '' : 'dim'}>
-                      <td>{t(s.label)}</td>
-                      {/* 상한에 걸리면 "만들 수 있는 수 / 원한 수"로 보여야 오해가 없다 */}
-                      <td>{s.images > 0 ? (s.real < s.images ? `${s.real} of ${s.images}` : `${s.images} imgs`) : ''}</td>
-                      <td>{Math.max(1, Math.round(s.minutes))}m · ${s.usd.toFixed(2)}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          )}
         </aside>
       </div>
     </div>

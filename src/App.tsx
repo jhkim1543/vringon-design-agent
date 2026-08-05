@@ -7,6 +7,7 @@ import type { PipelineHandle } from './core/pipeline'
 import Wizard from './ui/Wizard'
 import RunView from './ui/RunView'
 import Board from './ui/Board'
+import { IcClock, IcStar } from './ui/icons'
 import { ThemeToggle, VringonLogo, LangToggle } from './ui/bits'
 import BrandSetup from './ui/BrandSetup'
 import { loadBrand, saveBrand, isBrandConfigured } from './core/brand'
@@ -179,8 +180,12 @@ export default function App() {
               Create와 같은 곳으로 가던 Run setup 항목은 두지 않는다. */}
           <nav>
             <div className="sr-label">{t('Saved runs')}</div>
-            <button className={`sr-i ${view === 'library' ? 'on' : ''}`} onClick={() => setView('library')}>{t('History')}</button>
-            <button className={`sr-i ${view === 'starred' ? 'on' : ''}`} onClick={() => setView('starred')}>{t('Starred')}</button>
+            <button className={`sr-i ${view === 'library' ? 'on' : ''}`} onClick={() => setView('library')}>
+              <IcClock /> {t('History')}
+            </button>
+            <button className={`sr-i ${view === 'starred' ? 'on' : ''}`} onClick={() => setView('starred')}>
+              <IcStar /> {t('Starred')}
+            </button>
           </nav>
           <div className="sr-foot">
             <div className="sr-label">{t('This session')}</div>
