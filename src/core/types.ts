@@ -158,11 +158,13 @@ export interface RunParams {
   viewCount: 1 | 3 | 4
   colorwayCount: 0 | 1 | 2 | 3
   topN: number                              // 1~5
-  wearCuts: 0 | 2 | 4
   /** 스케치 한 장에서 갈라지는 제품 베리에이션 수 */
   variationCount: 0 | 2 | 3 | 4 | 6 | 8
-  /** 디자인 다음 단계 · 컨셉 촬영 컷 수 (착용/스튜디오/로케이션) */
-  conceptShots: 0 | 2 | 3
+  /** 캠페인 컷 · 착용컷과 연출컷을 한 묶음으로 뽑는다 (top 하나당 장수) */
+  campaignShots: 0 | 2 | 4 | 6
+  /** 옛 샘플 호환 · 저장된 Run이 아직 이 두 값을 들고 있다 */
+  wearCuts?: number
+  conceptShots?: number
   /** 멀티뷰 → 3D 모델 생성 */
   make3d: boolean
   approvalGate: boolean
@@ -177,11 +179,18 @@ export interface RunParams {
   brand?: import('./brand').BrandIdentity
 }
 
+
+/** 캠페인 컷 수 · 옛 Run은 wearCuts + conceptShots 로 저장돼 있다 */
+export function campaignCount(p: Pick<RunParams, 'campaignShots' | 'wearCuts' | 'conceptShots'>): number {
+  if (typeof p.campaignShots === 'number') return p.campaignShots
+  return (p.wearCuts ?? 0) + (p.conceptShots ?? 0)
+}
+
 export const DEFAULT_PARAMS: RunParams = {
   mode: 'trend', category: 'shoe', itemType: 'loafer',
   endStage: 'S3', sketchCount: 12, tierRatio: [1, 1, 1],
   renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
-  topN: 3, wearCuts: 2, variationCount: 3, conceptShots: 3, make3d: true, approvalGate: true,
+  topN: 3, variationCount: 3, campaignShots: 4, make3d: true, approvalGate: true,
   imageEngine: 'detail', imageBudget: 12,
   trend: {
     // 기본을 비워둔다. 가상의 브랜드명으로 검색하면 결과가 무의미하고 시간만 든다.

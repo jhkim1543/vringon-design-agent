@@ -1,3 +1,4 @@
+import { getLang, LANG_NAME } from './i18n'
 // ── 리서치 클라이언트 · 서버가 웹 검색으로 실제 수집한 결과를 받는다 ──
 import type { CompetitorProduct, ReportBias, Signal } from './types'
 
@@ -60,9 +61,11 @@ export interface TrendResearch {
 }
 
 async function post<T>(url: string, body: unknown): Promise<T> {
+  // 조사 결과는 화면 언어로 써야 한다. 세 엔드포인트가 모두 이 함수를 지나므로
+  // 여기서 한 번만 실어 보낸다. 서버는 이 값을 캐시 키에도 넣는다.
   const r = await fetch(url, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ ...(body as object), lang: getLang(), langName: LANG_NAME[getLang()] }),
   })
   const j = await r.json()
   if (!r.ok || j.error) throw new Error(j.error ?? `${url} ${r.status}`)

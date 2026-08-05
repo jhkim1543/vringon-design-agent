@@ -142,12 +142,14 @@ function dossierDir(root) {
  *  한 번에 다 물으면 응답이 얕아지고 상류 연결도 먼저 끊긴다. */
 export async function researchDossier(deps, root, opts) {
   const { ask } = deps
-  const { categoryEn, season, priceBand, brands = [], deep = false, onStep } = opts
-  const key = createHash('sha256').update(JSON.stringify(['dossier2', categoryEn, season, priceBand ?? '', brands, deep])).digest('hex').slice(0, 24)
+  const { categoryEn, season, priceBand, brands = [], deep = false, onStep, langName = 'English' } = opts
+  const key = createHash('sha256').update(JSON.stringify(['dossier3', langName, categoryEn, season, priceBand ?? '', brands, deep])).digest('hex').slice(0, 24)
   const file = join(dossierDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
-  const base = `대상: ${categoryEn} · 시즌 ${season}${priceBand ? ` · 가격대 ${priceBand}` : ''}${brands.length ? ` · 참고 브랜드 ${brands.join(', ')}` : ''}
+  const LANG = langName
+  const base = `출력 언어: 모든 문자열을 ${LANG}로 쓴다. 검색은 어떤 언어로 하든 좋다. 브랜드·모델명은 공식 표기 그대로 둔다.
+대상: ${categoryEn} · 시즌 ${season}${priceBand ? ` · 가격대 ${priceBand}` : ''}${brands.length ? ` · 참고 브랜드 ${brands.join(', ')}` : ''}
 
 ${SOURCE_NOTE}
 

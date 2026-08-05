@@ -1,5 +1,5 @@
 // ── 예상 시간·비용 · 설정을 바꾸면 즉시 다시 계산된다 (지시서 2.2) ──
-import { MODE_SCOPE } from './types'
+import { campaignCount, MODE_SCOPE } from './types'
 import { ENGINES } from './imageEngines'
 import type { RunParams, Stage } from './types'
 
@@ -22,8 +22,7 @@ export function estimate(p: RunParams): Estimate {
   const extraViews = renders * Math.max(0, p.viewCount - 1)
   const colorways = renders * p.colorwayCount
   const variations = renders * p.variationCount
-  const wearImgs = p.topN * p.wearCuts
-  const conceptImgs = p.topN * p.conceptShots
+  const campaignImgs = p.topN * campaignCount(p)
   const models = p.make3d ? p.topN : 0
 
   // ── S1 조사 · 모드마다 실제로 수행하는 조사가 다르다
@@ -50,8 +49,8 @@ export function estimate(p: RunParams): Estimate {
   const budget = p.imageBudget
   const realS2 = Math.min(wantS2, budget)
   const realS3 = Math.min(wantS3, Math.max(0, budget - realS2))
-  const realS4 = Math.min(wearImgs, Math.max(0, budget - realS2 - realS3))
-  const realS5 = Math.min(conceptImgs, Math.max(0, budget - realS2 - realS3 - realS4))
+  const realS4 = Math.min(campaignImgs, Math.max(0, budget - realS2 - realS3))
+  const realS5 = 0                              // 3D 쇼룸은 이미지를 만들지 않는다
 
   const eng = ENGINES[p.imageEngine]
   const USD_PER_IMAGE = eng.usdPerImage
@@ -74,18 +73,18 @@ export function estimate(p: RunParams): Estimate {
       real: realS3,
     },
     {
-      stage: 'S4', label: 'Worn',
+      stage: 'S4', label: 'Campaign',
       minutes: 0.7 + realS4 * MIN_PER_IMAGE,
       usd: 0.1 + realS4 * USD_PER_IMAGE * RETRY,
-      images: wearImgs,
+      images: campaignImgs,
       real: realS4,
     },
     {
       // 컨셉 촬영은 생성 이미지다. 영상은 로컬 오픈소스라 과금이 붙지 않는다.
-      stage: 'S5', label: 'Concept shoot',
-      minutes: 1.2 + realS5 * MIN_PER_IMAGE + models * 1.6,
-      usd: 0.25 + realS5 * USD_PER_IMAGE * RETRY,
-      images: conceptImgs,
+      stage: 'S5', label: '3D showroom',
+      minutes: 1.2 + models * 1.6,
+      usd: 0.25 + models * 0.08,
+      images: 0,
       real: realS5,
     },
   ]
@@ -118,6 +117,6 @@ export const SCOPE_COPY: Record<Stage, { title: string; gets: string }> = {
   S1: { title: 'Research only', gets: 'Competitors, trend signals and the season dossier. No images.' },
   S2: { title: 'Sketches', gets: 'Everything above, plus specs, rule checks and hand-drawn sketches.' },
   S3: { title: 'Designs', gets: 'Sketches turned into finished renders, extra views and product variations.' },
-  S4: { title: 'Worn shots', gets: 'Top picks scored, then photographed on a model.' },
-  S5: { title: 'Concept shoot', gets: 'Worn on a virtual model, staged in studio and on location, plus clips, board and talk track.' },
+  S4: { title: 'Campaign shots', gets: 'Top picks scored, then worn on a virtual model and staged in studio and on location.' },
+  S5: { title: '3D showroom', gets: 'Multiview renders go to Tripo. You get a 3D model you can turn on the board.' },
 }

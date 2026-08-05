@@ -63,8 +63,8 @@ const TREND_SCHEMA = {
         additionalProperties: false,
         required: ['label', 'axis', 'attribute', 'direction', 'observed_count', 'evidence', 'source_urls', 'confidence'],
         properties: {
-          label: { type: 'string', description: 'Signal name, in English' },
-          axis: { type: 'string', description: 'Attribute axis, in English (e.g. Toe shape, Sole thickness)' },
+          label: { type: 'string', description: 'Signal name, in the requested output language' },
+          axis: { type: 'string', description: 'Attribute axis, in the requested output language (e.g. Toe shape, Sole thickness)' },
           attribute: { type: 'string', description: '영문 속성 키' },
           direction: { type: 'string', enum: ['rising', 'stable', 'declining'] },
           observed_count: { type: 'integer', description: '서로 다른 출처에서 확인된 횟수' },
@@ -80,7 +80,7 @@ const TREND_SCHEMA = {
 }
 
 // 지시서 14장 · 리포트 문체 규격
-const REPORT_STYLE = `Write in English. Style rules:
+const reportStyle = (langName = 'English') => `Write in ${langName}. Style rules:
 - No emoji. Do not fall into repeated three-bullet groups. Avoid "the key is", "in conclusion", "not only but also", "it can be said that".
 - Vary paragraph length between two and seven sentences. Do not let equal-length paragraphs run in sequence.
 - Do not add a summary paragraph at the end.
@@ -196,13 +196,13 @@ async function ask(apiKey, { input, schema, name }) {
 /** 브랜드가 여러 곳이면 한 번에 묶지 않고 브랜드별로 나눠 병렬로 돈다.
  *  한 요청이 커지면 상류 연결이 먼저 끊기고, 한 브랜드 실패가 전체를 날린다. */
 export async function researchCompetitors(apiKey, root, opts) {
-  const { brands = [], categoryKo, typeKo, priceMin, priceMax } = opts
-  const key = createHash('sha256').update(JSON.stringify(['comp3en', brands, categoryKo, typeKo, priceMin, priceMax])).digest('hex').slice(0, 24)
+  const { brands = [], categoryKo, typeKo, priceMin, priceMax, langName = 'English' } = opts
+  const key = createHash('sha256').update(JSON.stringify(['comp4', langName, brands, categoryKo, typeKo, priceMin, priceMax])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
   const results = await Promise.allSettled(
-    brands.map(b => researchOneBrand(apiKey, root, { ...opts, brand: b })),
+    brands.map(b => researchOneBrand(apiKey, root, { ...opts, brand: b , langName })),
   )
   const products = []
   const notes = []
@@ -243,11 +243,12 @@ const TERM_ALIAS = {
 }
 function canonTerm(t) { return TERM_ALIAS[String(t).trim().toLowerCase()] ?? t }
 
-async function researchOneBrand(apiKey, root, { brand: rawBrand, categoryKo: rawCat, typeKo: rawType, priceMin, priceMax }) {
+async function researchOneBrand(apiKey, root, { brand: rawBrand, categoryKo: rawCat, typeKo: rawType, priceMin, priceMax, langName = 'English' }) {
+  const LANG = langName
   const brand = canonBrand(rawBrand)
   const categoryKo = canonTerm(rawCat)
   const typeKo = canonTerm(rawType)
-  const key = createHash('sha256').update(JSON.stringify(['brand2en', brand, categoryKo, typeKo, priceMin, priceMax])).digest('hex').slice(0, 24)
+  const key = createHash('sha256').update(JSON.stringify(['brand3', langName, brand, categoryKo, typeKo, priceMin, priceMax])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return JSON.parse(readFileSync(file, 'utf8'))
 
@@ -269,8 +270,8 @@ async function researchOneBrand(apiKey, root, { brand: rawBrand, categoryKo: raw
 - design_traits에는 사진과 상세 설명에서 확인되는 디자인 특징을 적습니다 (예: "두꺼운 EVA 미드솔", "메시 갑피에 TPU 오버레이").
 - image_urls에는 제품 사진의 직접 링크만 넣습니다. 페이지 주소가 아니라 이미지 파일 주소여야 합니다. 확실하지 않으면 빈 배열로 둡니다.
 - product_url에는 제품 상세 페이지 주소를 넣습니다.
-- In notes, list what you could not confirm and the limits of this pass. Write it in English.
-- Search in Korean where that finds more, but every string you output must be written in English. Keep brand and model names as they are officially written.`
+- In notes, list what you could not confirm and the limits of this pass. Write it in ${LANG}.
+- Search in Korean where that finds more, but every string you output must be written in ${LANG}. Keep brand and model names as they are officially written.`
 
   const { data, searches } = await ask(apiKey, { input, schema: COMPETITOR_SCHEMA, name: 'competitor_research' })
   const out = { ...data, searches }
@@ -280,13 +281,15 @@ async function researchOneBrand(apiKey, root, { brand: rawBrand, categoryKo: raw
 
 export async function researchTrends(apiKey, root, {
   categoryKo: rawCat, typeKo: rawType, brands: rawBrands, season, priceBandKo, deep, deepModel, wantReport = true, depth = 4, onStep,
+  langName = 'English',
 }) {
+  const LANG = langName
   const categoryKo = canonTerm(rawCat)
   const typeKo = canonTerm(rawType)
   const brands = (rawBrands ?? []).map(canonBrand)
   const useDeep = !!deep
   const key = createHash('sha256').update(JSON.stringify([
-    'trend3en', categoryKo, typeKo, brands ?? [], season, priceBandKo ?? '',
+    'trend5', LANG, categoryKo, typeKo, brands ?? [], season, priceBandKo ?? '',
     useDeep ? 'deep' : wantReport ? `multi${depth}` : 'fast',
   ])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
@@ -305,9 +308,10 @@ ${brands?.length ? `참고 브랜드: ${brands.join(', ')}` : ''}
 - 실제로 검색해서 확인한 것만 적습니다. 확인하지 못한 것은 넣지 마세요.
 - observed_count는 서로 다른 출처에서 확인된 횟수입니다. 부풀리지 마세요.
 - confidence는 출처가 3곳 이상이면 high, 1곳이면 low로 둡니다.
-- label and axis are English; attribute is English snake_case.
+- label과 axis는 반드시 ${LANG}로 씁니다. attribute만 영어 snake_case로 두세요 (기계가 쓰는 키라서 언어를 타면 안 됩니다).
+- 아래 예시는 영어로 적혀 있지만, 실제 출력은 ${LANG}로 씁니다.
 - In report_perspective, say which market and viewpoint the material leans towards.
-- Search in Korean where that finds more, but every string you output must be written in English.
+- Search in Korean where that finds more, but every string you output must be written in ${LANG}.
 - 신호는 반드시 '제품에서 관측된 디자인 속성'이어야 합니다. 실제 판매 중인 제품 페이지·리뷰·기사에서 본 형태, 소재, 부자재, 비율, 컬러를 적으세요.
 - 데이터가 없다거나 확인이 어렵다는 서술은 신호가 아닙니다. 그런 내용은 notes에만 적고 signals에는 절대 넣지 마세요.
 - label은 디자인 속성 이름이어야 합니다. 좋은 예: 'Square toe', 'Chunky lug sole', 'Low block heel 25-35mm', 'Suede upper', 'Elastic gore closure', 'Metal hardware accent'.
@@ -361,9 +365,9 @@ ${brands?.length ? `참고 브랜드: ${brands.join(', ')}` : ''}
     ).join('\n\n')
 
     const rep = await ask(apiKey, {
-      input: `아래 조사 결과만 근거로 ${categoryKo} / ${typeKo} (${season}, 가격대 ${priceBandKo ?? '미지정'}) 트렌드 trend report in English, using only the research below.
+      input: `아래 조사 결과만 근거로 ${categoryKo} / ${typeKo} (${season}, 가격대 ${priceBandKo ?? '미지정'}) 트렌드 trend report written in ${LANG}, using only the research below.
 
-${REPORT_STYLE}
+${reportStyle(LANG)}
 
 --- 조사 결과 ---
 ${digest}

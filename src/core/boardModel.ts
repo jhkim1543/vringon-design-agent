@@ -54,7 +54,8 @@ export function buildBoardModel(st: RunState): BoardModel {
     { key: 'design', title: '5 · Designs', note: 'Spec, rules, image' },
     { key: 'selection', title: '6 · Selection', note: 'Metrics and calls' },
     { key: 'variation', title: '7 · Variations', note: 'One sketch, several products' },
-    { key: 'concept', title: '8 · Concept shoot', note: 'Worn, staged, on location' },
+    { key: 'campaign', title: '8 · Campaign shots', note: 'Worn on a model, staged on set' },
+    { key: 'showroom', title: '9 · 3D showroom', note: 'Turn it, or open it full size' },
   ]
 
   // ── 1 입력 ──────────────────────────────────────────────────────
@@ -296,8 +297,9 @@ export function buildBoardModel(st: RunState): BoardModel {
     })
     top.forEach(d => edges.push({ from: d.spec.design_id, to: 'top', label: 'selected' }))
 
-    // 컨셉 촬영은 디자인 다음 단계다. 착용컷·스튜디오·로케이션을 각각 카드로 올린다.
-    let conceptRow = 0
+    // 캠페인 컷은 디자인 다음 단계다. 착용컷과 연출컷을 한 열에 나란히 올린다.
+    let campaignRow = 0
+    let showroomRow = 0
     top.forEach((d) => {
       const worn = d.images.filter(im => im.view === 'wear')
       const concepts = d.images.filter(im => im.view === 'concept')
@@ -308,27 +310,27 @@ export function buildBoardModel(st: RunState): BoardModel {
       if (d.model) {
         const id = `model-${d.spec.design_id}`
         nodes.push({
-          id, kind: 'selection', column: 7, row: conceptRow++,
+          id, kind: 'selection', column: 8, row: showroomRow++,
           title: `${d.spec.design_id} · 3D`,
           body: [
             `Built from ${d.model.views} views of this design, not from one photo.`,
-            'Drag to turn it. Scroll to zoom.',
+            'Drag to turn it. Scroll to zoom. Click the image to open it full size.',
             ...(d.model.note ? [d.model.note] : []),
           ],
           modelUrl: d.model.url,
           imageUrl: (d.images.find(i => i.origin === 'generated' && i.view !== 'sketch') ?? d.images[0])?.url,
         })
-        edges.push({ from: 'top', to: id, label: '3D' })
+        edges.push({ from: 'top', to: id, label: '3D showroom' })
       }
       frames.forEach((fr, k) => {
         const id = `shot-${d.spec.design_id}-${k}`
         nodes.push({
-          id, kind: 'selection', column: 7, row: conceptRow++,
+          id, kind: 'selection', column: 7, row: campaignRow++,
           title: `${d.spec.design_id} · ${fr.label}`,
           body: [fr.note, 'Edited from the base render, so it is the same product.'],
           imageUrl: fr.im.url,
         })
-        edges.push({ from: 'top', to: id, label: k === 0 ? 'concept shoot' : undefined })
+        edges.push({ from: 'top', to: id, label: k === 0 ? 'campaign' : undefined })
       })
     })
   }

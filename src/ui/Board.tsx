@@ -110,8 +110,8 @@ function ColumnNode({ data }: { data: { title: string; note: string; h: number; 
   return (
     <div className="bcol" style={{ height: data.h, width: data.w ?? 356 }}>
       <div className="bcol-h">
-        <span className="bcol-t">{data.title}</span>
-        <span className="bcol-n">{data.note}</span>
+        <span className="bcol-t">{t(data.title)}</span>
+        <span className="bcol-n">{t(data.note)}</span>
       </div>
     </div>
   )

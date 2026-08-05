@@ -34,8 +34,8 @@ const SCOPE_NAME: Record<Stage, string> = {
   S1: 'Research only',
   S2: 'Through sketches',
   S3: 'Finished designs',
-  S4: 'With worn shots',
-  S5: 'With campaign shots',
+  S4: 'With campaign shots',
+  S5: 'With a 3D showroom',
 }
 
 // 각 범위가 실제로 무엇을 내놓는지, 지난 Run에서 나온 결과물로 보여준다.
@@ -401,7 +401,7 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
 
             <button className="moretoggle" onClick={() => setMore(v => !v)}>
               {more ? t('Hide advanced settings') : t('Advanced settings')}
-              <span className="mt-sum">{`${p.tierRatio.join(':')} · ${Math.round(p.renderRatio * 100)}% · ${p.viewCount} views · ${ENGINES[p.imageEngine].label}`}</span>
+              <span className="mt-sum">{`${p.tierRatio.join(':')} · ${Math.round(p.renderRatio * 100)}% · ${p.viewCount} views · ${p.campaignShots} cuts · ${ENGINES[p.imageEngine].label}`}</span>
             </button>
 
             {more && (<div className="morebox">
@@ -432,14 +432,13 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                   <span className="hint">{t('Branches off one sketch, one axis changed each')}</span>
                 </div>
               </div>
-              <div className="stack"><span className="lbl">{t('Worn')}</span>
+              <div className="stack"><span className="lbl">{t('Campaign cuts')}</span>
                 <div className="inrow">
-                  <Seg options={[0, 2, 4] as const} value={p.wearCuts} onChange={v => set('wearCuts', v)} />
-                  <span className="lbl sub">{t('Concept shoot')}</span>
-                  <Seg options={[0, 2, 3] as const} value={p.conceptShots} onChange={v => set('conceptShots', v)} />
+                  <Seg options={[0, 2, 4, 6] as const} value={p.campaignShots} onChange={v => set('campaignShots', v)} />
+                  <span className="hint">{t('Half worn on a model, half staged in studio and on location')}</span>
                 </div>
               </div>
-              <div className="stack"><span className="lbl">{t('3D model')}</span>
+              <div className="stack"><span className="lbl">{t('3D showroom')}</span>
                 <div className="inrow">
                   <Seg options={['Off', 'On'] as const} value={p.make3d ? 'On' : 'Off'} onChange={v => set('make3d', v === 'On')} />
                   <span className="hint">{t('Multiview goes to Tripo. The result is a GLB you can turn on the board.')}</span>

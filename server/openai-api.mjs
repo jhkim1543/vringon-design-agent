@@ -277,7 +277,7 @@ export async function handleApi(req, res) {
       const b = await readBody(req)
       return json(res, 200, await researchSeasonDossier(DEEP_RESEARCH ? DEEP_KEY : API_KEY, ROOT, {
         categoryEn: b.categoryEn, season: b.season, priceBand: b.priceBand,
-        brands: b.brands ?? [], deep: DEEP_RESEARCH,
+        brands: b.brands ?? [], deep: DEEP_RESEARCH, langName: b.langName,
       }))
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
   }

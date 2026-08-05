@@ -10,7 +10,7 @@ import {
 } from './aiClient'
 import type { TrendClauseInput } from './aiClient'
 import { fetchCompetitors, fetchDossier, fetchTrends, toBias, toCompetitors, toSignals } from './research'
-import { CAT_LABEL, MODE_LABEL, MODE_SCOPE, TYPE_LABEL } from './types'
+import { campaignCount, CAT_LABEL, MODE_LABEL, MODE_SCOPE, TYPE_LABEL } from './types'
 import { ENGINES } from './imageEngines'
 
 export type Emit = (e: PipelineEvent) => void
@@ -448,38 +448,50 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     emit({ kind: 'log', stage: 'S4', text: `Worn pipeline: BiRefNet cutout, MediaPipe ${params.category === 'shoe' ? 'Pose for ankle and ground line' : 'Hand and Face for joints and earlobe'}, scale normalise, depth occlusion` })
     if (params.category === 'shoe') emit({ kind: 'log', stage: 'S4', text: 'Ground contact aligned and heel height checked visually, within 20%' })
     await wait(800)
-    // 착용 컷은 기준 렌더를 편집해 만든다. 새로 그리면 같은 제품이 아니게 된다.
-    if (params.wearCuts > 0) {
-      emit({ kind: 'log', stage: 'S4', text: `${params.wearCuts} worn cuts per top pick · caption forced: simulated wear, the real fit may differ` })
-      const wearJobs: { d: Design; base: string; idx: number }[] = []
+    // 캠페인 컷 · 착용컷과 연출컷을 한 단계에서 같이 뽑는다.
+    // 둘 다 기준 렌더의 편집이다. 새로 그리면 같은 제품이 아니게 된다.
+    const shots = campaignCount(params)
+    if (shots > 0) {
+      const worn = Math.ceil(shots / 2)          // 절반은 착용, 나머지는 연출
+      emit({ kind: 'log', stage: 'S4', text: `${shots} campaign cuts per top pick · ${worn} worn, ${shots - worn} staged · caption forced: simulated wear, the real fit may differ` })
+      const subject = (TYPE_LABEL[params.itemType] ?? params.itemType).toLowerCase()
+      const jobs: { d: Design; base: string; idx: number; kind: 'wear' | 'concept' }[] = []
       for (const d of top) {
         const base = d.images.find(i => i.origin === 'generated' && i.view !== 'sketch') ?? d.images.find(i => i.view !== 'sketch')
         if (!base) continue
-        for (let k = 0; k < params.wearCuts; k++) wearJobs.push({ d, base: base.hash, idx: k })
+        for (let k = 0; k < shots; k++) {
+          jobs.push({ d, base: base.hash, idx: k, kind: k < worn ? 'wear' : 'concept' })
+        }
       }
-      await pool(wearJobs.slice(0, Math.max(0, budget.left())), 2, async (job) => {
+      await pool(jobs.slice(0, Math.max(0, budget.left())), 2, async (job) => {
         if (cancelled) return
+        const personaIdx = top.indexOf(job.d)
+        const c = job.kind === 'concept'
+          ? conceptPrompt(params.category, params.itemType, job.idx - worn, personaIdx, subject, macroName ?? '')
+          : null
+        const prompt = c ? c.prompt : wearEditPrompt(params.category, params.itemType, job.idx)
+        const what = c ? c.label : `worn cut ${job.idx + 1}`
         try {
-          const r = await editImage(job.base, wearEditPrompt(params.category, params.itemType, job.idx), params.imageEngine)
+          const r = await editImage(job.base, prompt, params.imageEngine)
           budget.spend()
-          job.d.images = [...job.d.images, { view: 'wear', url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: job.base }]
+          job.d.images = [...job.d.images, { view: job.kind, url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: job.base }]
           emit({ kind: 'design-update', design: { ...job.d } })
-          emit({ kind: 'log', stage: 'S4', text: `${job.d.spec.design_id} worn cut ${job.idx + 1} done` })
+          emit({ kind: 'log', stage: 'S4', text: `${job.d.spec.design_id} ${what} done` })
         } catch {
-          emit({ kind: 'log', stage: 'S4', text: `${job.d.spec.design_id} worn cut ${job.idx + 1} failed · skipping that cut` })
+          emit({ kind: 'log', stage: 'S4', text: `${job.d.spec.design_id} ${what} failed · skipping that cut` })
         }
       })
     }
-    emit({ kind: 'checkpoint', label: 'S4 done · Top N and worn shots saved' })
+    emit({ kind: 'checkpoint', label: 'S4 done · Top N and campaign shots saved' })
     emit({ kind: 'stage-done', stage: 'S4' })
     if (upto === 3) { emit({ kind: 'done', endStage: 'S4' }); return }
 
-    // ══ S5 품평 패키지 ══
+    // ══ S5 3D 쇼룸 ══
     emit({ kind: 'stage-start', stage: 'S5' })
     // 멀티뷰 → 3D · S3에서 이미 만든 각도 컷을 그대로 Tripo에 넘긴다.
     // 한 장으로 추론시키는 것보다 여러 각도를 주는 쪽이 형태가 훨씬 정확하다.
     if (params.make3d) {
-      emit({ kind: 'log', stage: 'S5', text: 'Building 3D from the multiview shots of each top pick' })
+      emit({ kind: 'log', stage: 'S5', text: 'Building the 3D showroom · the multiview renders of each top pick go to Tripo' })
       for (const d of top) {
         if (cancelled) return
         // 사람이나 배경이 들어간 컷은 빼고, 흰 배경의 제품 컷만 넘긴다
@@ -508,7 +520,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     emit({ kind: 'log', stage: 'S5', text: 'Assembling the board · five lanes: brief, Core, Push, Signature, appendix' })
     await wait(600)
     emit({ kind: 'log', stage: 'S5', text: 'Writing the talk track from rationale: trend evidence, brand fit, objections, sources' })
-    emit({ kind: 'checkpoint', label: 'S5 done · board, talk track and PDF export ready' })
+    emit({ kind: 'checkpoint', label: 'S5 done · 3D showroom, board and PDF export ready' })
     emit({ kind: 'stage-done', stage: 'S5' })
     emit({ kind: 'done', endStage: 'S5' })
   })()

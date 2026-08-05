@@ -1,5 +1,5 @@
 // 공용 소형 컴포넌트
-import { setLang, useLang } from '../core/i18n'
+import { LANGS, setLang, useLang } from '../core/i18n'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 
@@ -75,12 +75,12 @@ export function LangToggle() {
   const lang = useLang()
   return (
     <div className="langtoggle" role="group" aria-label="Language">
-      {(['ko', 'en'] as const).map(l => (
-        <button key={l} className={lang === l ? 'on' : ''}
-          onClick={() => setLang(l)}
-          aria-pressed={lang === l}
-          title={l === 'ko' ? '한국어로 보기' : 'View in English'}>
-          {l === 'ko' ? '한국어' : 'EN'}
+      {LANGS.map(l => (
+        <button key={l.id} className={lang === l.id ? 'on' : ''}
+          onClick={() => setLang(l.id)}
+          aria-pressed={lang === l.id}
+          title={l.label}>
+          {l.short}
         </button>
       ))}
     </div>

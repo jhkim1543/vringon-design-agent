@@ -5,7 +5,11 @@
 //  · 브라우저는 동시에 열 수 있는 WebGL 컨텍스트 수가 제한된다 (보통 16개)
 //  · 보드는 노드를 자주 다시 그려서, 자동 초기화하면 컨텍스트를 만들자마자 버리게 된다
 // 그래서 눌렀을 때만 띄우고, 닫으면 정리한다.
+//
+// 카드 안에서 못 띄우는 경우(컨텍스트 소진, 카드가 너무 작음)를 위해 팝업을 둔다.
+// 팝업은 한 번에 하나만 열리므로 컨텍스트가 모자랄 일이 없다.
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -25,9 +29,12 @@ function Stage({ url, height, light, onError }: {
     let renderer: THREE.WebGLRenderer | null = null
     let controls: OrbitControls | null = null
 
+    let ro: ResizeObserver | null = null
     try {
-      const w = el.clientWidth || 280
-      const h = height
+      // 레이아웃이 아직 안 잡혔을 때 0으로 그리면 아무것도 안 보인다.
+      // 바닥값을 두고, 실제 크기가 잡히면 ResizeObserver로 따라간다.
+      const w = Math.max(160, el.clientWidth || 280)
+      const h = Math.max(160, height)
       const scene = new THREE.Scene()
       scene.background = new THREE.Color(light ? 0xf3f5f8 : 0x0f1217)
 
@@ -55,6 +62,16 @@ function Stage({ url, height, light, onError }: {
       renderer.domElement.addEventListener('wheel', stop, { passive: false })
       renderer.domElement.addEventListener('pointerdown', stop)
 
+      ro = new ResizeObserver(() => {
+        if (disposed || !renderer) return
+        const nw = el.clientWidth, nh = el.clientHeight
+        if (nw < 2 || nh < 2) return
+        renderer.setSize(nw, nh)
+        camera.aspect = nw / nh
+        camera.updateProjectionMatrix()
+      })
+      ro.observe(el)
+
       new GLTFLoader().load(url, (gltf) => {
         if (disposed) return
         const root = gltf.scene
@@ -80,11 +97,13 @@ function Stage({ url, height, light, onError }: {
         if (!disposed) onError(String((err as Error)?.message ?? err).slice(0, 80))
       })
     } catch (e) {
+      // WebGL 컨텍스트를 못 얻으면 여기로 온다
       onError(String((e as Error)?.message ?? e).slice(0, 100))
     }
 
     return () => {
       disposed = true
+      ro?.disconnect()
       cancelAnimationFrame(frame)
       controls?.dispose()
       renderer?.dispose()
@@ -101,6 +120,40 @@ function Stage({ url, height, light, onError }: {
   )
 }
 
+/** 큰 화면으로 보는 팝업. 한 번에 하나만 열린다. */
+function Popup({ url, light, onClose }: { url: string; light?: boolean; onClose: () => void }) {
+  const [err, setErr] = useState('')
+  const [h, setH] = useState(() => Math.max(360, Math.min(620, Math.round((window.innerHeight || 900) * 0.68))))
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    const onResize = () => setH(Math.max(360, Math.min(620, Math.round((window.innerHeight || 900) * 0.68))))
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('resize', onResize)
+    return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('resize', onResize) }
+  }, [onClose])
+
+  return createPortal(
+    <div className="mv-pop" onPointerDown={e => e.stopPropagation()} onClick={onClose}>
+      <div className="mv-pop-box" onClick={e => e.stopPropagation()}>
+        <div className="mv-pop-head">
+          <span>{t('3D showroom')}</span>
+          <button onClick={onClose} aria-label={t('Close')}>✕</button>
+        </div>
+        <div className="mv-pop-stage" style={{ height: h }}>
+          {err
+            ? <div className="mv-state">{t('Could not load the model')} · {err}</div>
+            : <Stage url={url} height={h} light={light} onError={setErr} />}
+        </div>
+        <div className="mv-pop-foot">
+          <span>{t('Drag to turn · scroll to zoom')}</span>
+          <a href={url} download>{t('Download GLB')}</a>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  )
+}
+
 export function ModelViewer({ url, poster, height = 200, light }: {
   url: string
   poster?: string
@@ -108,18 +161,34 @@ export function ModelViewer({ url, poster, height = 200, light }: {
   light?: boolean
 }) {
   const [open, setOpen] = useState(false)
+  const [pop, setPop] = useState(false)
   const [err, setErr] = useState('')
+
+  // 카드 안에서 실패하면 거기서 끝내지 않고 팝업으로 넘긴다.
+  // 대개 WebGL 컨텍스트가 모자라서인데, 팝업은 하나만 뜨므로 거기서는 열린다.
+  const fail = (m: string) => { setErr(m); setOpen(false); setPop(true) }
 
   return (
     <div className="mv" style={{ height }}>
       {open && !err
-        ? <Stage url={url} height={height} light={light} onError={setErr} />
+        ? <Stage url={url} height={height} light={light} onError={fail} />
         : (
-          <button className="mv-open" onPointerDown={e => e.stopPropagation()} onClick={() => { setErr(''); setOpen(true) }}>
+          <button className="mv-open" onPointerDown={e => e.stopPropagation()}
+            onClick={() => { setErr(''); setOpen(true) }}>
             {poster && <img src={poster} alt="" />}
-            <span className="mv-cta">{err ? `${t('Could not load the model')} · ${err}` : t('Open 3D')}</span>
+            <span className="mv-cta">{t('Open 3D')}</span>
           </button>
         )}
+      {/* 인라인이 떠 있어도 크게 보고 싶을 수 있다 */}
+      <button className="mv-expand" title={t('Open full size')}
+        onPointerDown={e => e.stopPropagation()}
+        onClick={e => { e.stopPropagation(); setPop(true) }}>
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+          strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M9 3.8H4.4v4.6M15 3.8h4.6v4.6M9 20.2H4.4v-4.6M15 20.2h4.6v-4.6" />
+        </svg>
+      </button>
+      {pop && <Popup url={url} light={light} onClose={() => setPop(false)} />}
     </div>
   )
 }

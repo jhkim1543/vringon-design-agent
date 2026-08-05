@@ -6,16 +6,31 @@
 // 화면 틀만 바꾸고, 데이터는 수집된 그대로 둔다.
 
 import { useSyncExternalStore } from 'react'
+import { JA } from './i18n.ja'
 
-export type Lang = 'en' | 'ko'
+export type Lang = 'en' | 'ko' | 'ja'
+
+export const LANGS: { id: Lang; short: string; label: string }[] = [
+  { id: 'ko', short: 'KR', label: '한국어로 보기' },
+  { id: 'ja', short: 'JP', label: '日本語で表示' },
+  { id: 'en', short: 'EN', label: 'View in English' },
+]
+
+// 조사 결과를 쓸 때 모델에게 건네는 언어 이름. 화면 언어와 같은 값을 쓴다.
+export const LANG_NAME: Record<Lang, string> = {
+  en: 'English', ko: 'Korean (한국어)', ja: 'Japanese (日本語)',
+}
 
 const KEY = 'vringon.lang'
 
 function initial(): Lang {
   try {
     const saved = localStorage.getItem(KEY)
-    if (saved === 'ko' || saved === 'en') return saved
-    return navigator.language?.toLowerCase().startsWith('ko') ? 'ko' : 'en'
+    if (saved === 'ko' || saved === 'en' || saved === 'ja') return saved
+    const nav = navigator.language?.toLowerCase() ?? ''
+    if (nav.startsWith('ko')) return 'ko'
+    if (nav.startsWith('ja')) return 'ja'
+    return 'en'
   } catch {
     return 'en'
   }
@@ -42,10 +57,11 @@ export function useLang(): Lang {
   )
 }
 
-/** 영문 원문 → 현재 언어. 사전에 없으면 원문 그대로. */
+/** 영문 원문 → 현재 언어. 사전에 없으면 원문 그대로 나가므로 화면이 깨지지 않는다. */
 export function t(s: string): string {
   if (lang === 'en') return s
-  return KO[s] ?? s
+  const dict = lang === 'ja' ? JA : KO
+  return dict[s] ?? s
 }
 
 /** 치환이 있는 문장. t('{n} designs') 처럼 쓰고 vars로 값을 넣는다. */
@@ -58,7 +74,43 @@ export function tf(s: string, vars: Record<string, string | number>): string {
 const KO: Record<string, string> = {
   // ── 공통 ────────────────────────────────────────────────────────
   // ── 위저드 · 질문 세 개로 나눈 화면 ──────────────────────────────
-  'New run': '새 실행',
+  '1 · Input': '1 · 입력',
+  '2 · Research': '2 · 조사',
+  '3 · Signals': '3 · 신호',
+  '4 · Directions': '4 · 디렉션',
+  '5 · Designs': '5 · 디자인',
+  '6 · Selection': '6 · 선정',
+  '7 · Variations': '7 · 베리에이션',
+  '8 · Campaign shots': '8 · 캠페인 컷',
+  '9 · 3D showroom': '9 · 3D 쇼룸',
+  'What you gave it': '입력한 것',
+  'What the agent collected': '에이전트가 수집한 것',
+  'Trend research': '트렌드 조사',
+  'Your uploads, read': '올린 파일을 읽은 결과',
+  'Observations with a source': '출처가 있는 관측',
+  'Signals combined': '신호를 엮은 방향',
+  'Spec, rules, image': '스펙, 룰, 이미지',
+  'Metrics and calls': '지표와 판정',
+  'One sketch, several products': '스케치 하나에서 여러 제품',
+  'Worn on a model, staged on set': '모델 착용과 연출컷',
+  'Turn it, or open it full size': '돌려 보거나 크게 열기',
+  'Back to the start': '처음 화면으로',
+  'Campaign cuts': '캠페인 컷',
+  'Campaign shots': '캠페인 컷',
+  'Half worn on a model, half staged in studio and on location': '절반은 모델 착용, 절반은 스튜디오·로케이션 연출',
+  '3D showroom': '3D 쇼룸',
+  'With a 3D showroom': '3D 쇼룸까지',
+  'Top picks scored, then worn on a virtual model and staged in studio and on location.': 'Top을 뽑아 가상 모델에 착용시키고, 스튜디오와 로케이션으로 연출합니다.',
+  'Multiview renders go to Tripo. You get a 3D model you can turn on the board.': '멀티뷰 렌더를 Tripo에 넘겨 보드에서 돌려 볼 수 있는 3D 모델을 만듭니다.',
+  'Open full size': '크게 보기',
+  'Download GLB': 'GLB 내려받기',
+  'Open 3D': '3D 열기',
+  'Loading the model': '모델을 불러오는 중',
+  'Could not load the model': '모델을 열지 못했습니다',
+  'Drag to turn · scroll to zoom': '드래그로 회전 · 스크롤로 확대',
+  'Campaign': '캠페인',
+  'Virtual fitting': '가상 착용',
+  'New run': '새 분석',
   'Current session': '이번 세션',
   'Clear session': '세션 초기화',
   'Searches': '웹 검색',
@@ -78,7 +130,7 @@ const KO: Record<string, string> = {
     '라스트 N종 보유 · 운동화 계열은 러닝 라스트가 필요합니다.',
   'N molds in the library. Core designs must reuse an existing mold.':
     '몰드 N종 보유 · Core는 기존 몰드를 다시 써야 합니다.',
-  'Project summary': '실행 요약',
+  'Project summary': '분석 요약',
   'Estimated time': '예상 소요',
   'Estimated cost': '예상 비용',
   'View details': '자세히 보기',
@@ -128,18 +180,18 @@ const KO: Record<string, string> = {
   'move on': '장이 다음 단계로',
   'reusable': '장 재사용 가능',
   'Back': '이전',
-  'Start the run': '실행 시작',
+  'Start the run': '분석 시작',
   'Show the breakdown': '단계별로 보기',
   'Hide the breakdown': '접기',
-  'Saved runs': '지난 작업',
+  'Saved runs': '지난 분석',
   'Name': '이름',
 
   'Create': '새로 만들기',
-  'Run': '실행',
+  'Run': '분석',
   'Board': '보드',
-  'Run setup': '실행 설정',
-  'Run Setup': '실행 설정',
-  'History': '실행 히스토리',
+  'Run setup': '분석 설정',
+  'Run Setup': '분석 설정',
+  'History': '분석 내역',
   'Starred': '즐겨찾기',
   'Library': '라이브러리',
   'Set up brand': '브랜드 설정',
@@ -161,7 +213,7 @@ const KO: Record<string, string> = {
   'Images': '이미지',
   'Cost': '비용',
   'Time': '소요',
-  'Scope': '실행 범위',
+  'Scope': '분석 범위',
   'Product': '품목',
   'Family': '계열',
   'Type': '세부 품목',
@@ -185,7 +237,7 @@ const KO: Record<string, string> = {
 
   // ── 실행 설정 ───────────────────────────────────────────────────
   'Design Agent': '디자인 에이전트',
-  'Set the brief, pick how far to go, and run.': '브리프를 정하고, 어디까지 갈지 고른 뒤 실행합니다.',
+  'Set the brief, pick how far to go, and run.': '브리프를 정하고, 어디까지 갈지 고른 뒤 분석을 시작합니다.',
   'Agent mode': '에이전트 모드',
   'Trend': '트렌드',
   'Moodboard': '무드보드',
@@ -249,13 +301,13 @@ const KO: Record<string, string> = {
   'Read-only demo.': '보기 전용 데모입니다.',
   'How to run it for real': '실제로 돌리는 방법',
   'Live runs need the local server. Open the saved sample from History to see a finished run.':
-    '실행은 로컬 서버가 있어야 합니다. 실행 히스토리에서 저장된 샘플을 열면 완료된 결과를 볼 수 있습니다.',
+    '분석은 로컬 서버가 있어야 합니다. 분석 내역에서 저장된 샘플을 열면 완료된 결과를 볼 수 있습니다.',
 
   // ── 라이브러리 ──────────────────────────────────────────────────
   'Past runs, with their boards. Star the ones worth keeping.':
-    '지난 실행과 그 보드입니다. 남겨둘 것은 즐겨찾기해 두세요.',
+    '지난 분석과 그 보드입니다. 남겨둘 것은 즐겨찾기해 두세요.',
   'Run the agent once and it will show up here.': '에이전트를 한 번 돌리면 여기에 쌓입니다.',
-  'Finished runs are kept here. Nothing yet.': '완료된 실행이 여기 남습니다. 아직 없습니다.',
+  'Finished runs are kept here. Nothing yet.': '완료된 분석이 여기 남습니다. 아직 없습니다.',
   'passed': '통과',
 
   // ── 실행 화면 ───────────────────────────────────────────────────
@@ -282,7 +334,7 @@ const KO: Record<string, string> = {
   'source': '출처',
   'Review gate': '승인 게이트',
   'Approve or reject on the cards. Reasons feed the next run.':
-    '카드에서 승인·탈락을 정합니다. 사유는 다음 실행에 반영됩니다.',
+    '카드에서 승인·탈락을 정합니다. 사유는 다음 분석에 반영됩니다.',
   'Mapping the macrotrends first, then filling each one with palettes, materials, details and key items.':
     '매크로트렌드를 먼저 잡고, 각각에 팔레트·소재·디테일·키아이템을 채웁니다.',
   'Breaking it into sub-questions and pulling them together. It lands here when done.':
@@ -338,8 +390,8 @@ const KO: Record<string, string> = {
   'Notes': '노트',
   'Nothing on the board yet.': '보드가 비어 있습니다.',
   'Run the agent and the flow from research to selection fills in.':
-    '에이전트를 실행하면 조사부터 선정까지의 흐름이 채워집니다.',
-  'No run open. Start one from Run setup.': '열린 실행이 없습니다. 실행 설정에서 시작하세요.',
+    '에이전트를 돌리면 조사부터 선정까지의 흐름이 채워집니다.',
+  'No run open. Start one from Run setup.': '열린 분석이 없습니다. 분석 설정에서 시작하세요.',
   'Double-click to edit': '더블클릭해서 고치기',
   'Double-click to write': '더블클릭해서 쓰기',
   'Show the lines between nodes': '노드 사이 연결선 표시',
@@ -353,7 +405,7 @@ const KO: Record<string, string> = {
 
   // ── 브랜드 게이트 ───────────────────────────────────────────────
   'Set up your brand first': '브랜드 설정을 먼저 해주세요',
-  'Run without it': '설정 없이 실행',
+  'Run without it': '설정 없이 진행',
 
   // ── 오류 ────────────────────────────────────────────────────────
   'Something broke while rendering': '화면을 그리다가 문제가 생겼습니다',
@@ -431,7 +483,7 @@ const KO: Record<string, string> = {
   'Detailed': '디테일 모델',
   'For volume. Top quality, shorter wait.': '장수가 많을 때. 품질은 그대로, 대기가 짧습니다.',
   'For the board. The most detail this can do.': '품평에 올릴 안. 낼 수 있는 최대 디테일입니다.',
-  'Research and image generation run on a local Node server that is not part of this static build, so nothing is called from here. Everything a full run produced is saved: open History in the left rail to walk through the sample run, its board, the season dossier and the PDFs.': '조사와 이미지 생성은 로컬 Node 서버에서 도는데, 이 정적 빌드에는 그 서버가 없어 아무것도 호출하지 않습니다. 대신 한 번의 실행이 만든 결과가 전부 저장돼 있습니다. 왼쪽 실행 히스토리를 열면 샘플 실행과 보드, 시즌 도시에, PDF까지 볼 수 있습니다.',
+  'Research and image generation run on a local Node server that is not part of this static build, so nothing is called from here. Everything a full run produced is saved: open History in the left rail to walk through the sample run, its board, the season dossier and the PDFs.': '조사와 이미지 생성은 로컬 Node 서버에서 도는데, 이 정적 빌드에는 그 서버가 없어 아무것도 호출하지 않습니다. 대신 한 번의 분석이 만든 결과가 전부 저장돼 있습니다. 왼쪽 분석 내역을 열면 샘플 분석과 보드, 시즌 도시에, PDF까지 볼 수 있습니다.',
   'This session': '이번 세션',
   'images': '장',
   'searches': '회 검색',

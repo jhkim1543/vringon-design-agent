@@ -155,11 +155,12 @@ export default function App() {
     <ErrorBoundary onReset={() => setView('create')}>
     <div className="app">
       <div className="topbar">
-        <div className="brand">
+        {/* 로고는 어디서 눌러도 처음 화면으로 돌아온다 */}
+        <button className="brand" onClick={() => setView('create')} title={t('Back to the start')}>
           <VringonLogo />
           VRINGON
           <span className="module">{t('Design Agent')}</span>
-        </div>
+        </button>
         <nav className="topnav">
           <button className={view === 'create' ? 'on' : ''} onClick={() => setView('create')}>{t('Create')}</button>
           <button className={view === 'run' ? 'on' : ''} onClick={() => st && setView('run')} disabled={!st} style={!st ? { opacity: .4 } : undefined}>{t('Run')}</button>
