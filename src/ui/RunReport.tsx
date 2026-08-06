@@ -118,7 +118,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
 
       {/* ── 트렌드 리포트 PDF ─────────────────────────────────── */}
       {report && (
-        <section className="rep-sect">
+        <section className="rep-sect" id="sec-report">
           <div className="rep-head">
             <h2>{t('Trend report')}</h2>
             <button className="btn btn-ghost btn-sm" onClick={() => openTrendReportPdf(st)}>{t('Download PDF')}</button>
@@ -133,7 +133,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
 
       {/* ── 매크로트렌드 ──────────────────────────────────────── */}
       {macros.length > 0 && (
-        <section className="rep-sect">
+        <section className="rep-sect" id="sec-macros">
           <div className="rep-head"><h2>{t('Key macro trends')}</h2></div>
           <div className="rep-macros">
             {macros.map(m => {
@@ -171,7 +171,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
 
       {/* ── Top 디자인 ────────────────────────────────────────── */}
       {shown.length > 0 && (
-        <section className="rep-sect">
+        <section className="rep-sect" id="sec-designs">
           <div className="rep-head">
             <h2>{t('Top trending designs')}</h2>
             <button className="btn btn-ghost btn-sm" onClick={onOpenBoard}>{t('View all designs')}</button>
@@ -197,7 +197,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
 
       {/* ── 경쟁 구도 ─────────────────────────────────────────── */}
       {brands.length > 0 && (
-        <section className="rep-sect">
+        <section className="rep-sect" id="sec-comp">
           <div className="rep-head"><h2>{t('Competitive landscape')}</h2></div>
           <div className="rep-tablewrap">
             <table className="rep-table">
@@ -257,7 +257,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
 
       {/* ── 시즌 도시에 PDF ───────────────────────────────────── */}
       {d && (
-        <section className="rep-sect">
+        <section className="rep-sect" id="sec-season">
           <div className="rep-head">
             <h2>{t('Season report')}</h2>
             <button className="btn btn-ghost btn-sm" onClick={() => openDossierPdf(st)}>{t('Download PDF')}</button>
@@ -272,7 +272,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
 
       {/* ── 디자인 시사점 ─────────────────────────────────────── */}
       {implications.length > 0 && (
-        <section className="rep-sect">
+        <section className="rep-sect" id="sec-impl">
           <div className="rep-head"><h2>{t('Design implications')}</h2></div>
           <div className="rep-impl">
             {implications.map(r => (

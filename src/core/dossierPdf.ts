@@ -4,6 +4,13 @@
 //   → 오버뷰(매크로 4) → 매크로마다 무드·팔레트 / 소재·디테일 / 키아이템(여·남·키즈)
 //   → 연도별 흐름 → 출처 → 클로징
 // 가로 A4 한 장이 슬라이드 한 장이다.
+/** esc() 를 거친 텍스트 안의 [제목](url) 을 클릭되는 링크로 바꾼다.
+ *  조사 문장이 출처를 이 형태로 들고 오는데, 그대로 두면 괄호와 주소가 글을 덮는다. */
+function mdLinks(escaped: string): string {
+  return escaped.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,
+    '<a href="$2" target="_blank" rel="noreferrer" style="color:#3B45C8;text-decoration:underline;text-underline-offset:.8mm">$1</a>')
+}
+
 import type { RunState, Design } from './types'
 import { CAT_LABEL, TYPE_LABEL, MODE_LABEL } from './types'
 import type { SeasonDossier, DossierMetric, Macrotrend } from './research'
@@ -236,8 +243,8 @@ function buildDeck(st: RunState): { title: string; html: string } {
             </div>
             <div>${(m.sub_trends ?? []).map(s => `<span class="chip" style="background:${c}">${esc(s)}</span>`).join('')}</div>
             <div style="margin-top:1mm">${(m.drivers ?? []).slice(0, 3).map(x => statBar(x, c)).join('')}</div>
-            <div style="font-size:8pt;line-height:1.6;color:#40474F;margin-top:1mm;overflow:hidden">
-              ${narr.slice(0, 3).map(x => `<p>${esc(x)}</p>`).join('')}
+            <div style="font-size:8pt;line-height:1.6;color:#40474F;margin-top:1mm;overflow:hidden;flex:1;min-height:0">
+              ${narr.slice(0, 3).map(x => `<p>${mdLinks(esc(x))}</p>`).join('')}
             </div>
             <div class="quote" style="color:${c};margin-top:auto">${esc(m.statement)}</div>
           </div>

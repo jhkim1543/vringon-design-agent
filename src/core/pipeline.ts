@@ -307,9 +307,10 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       await pool(targets, ENGINES[params.imageEngine].concurrency, async (d) => {
         if (cancelled) return
         try {
-          const r = await generateImage(sketchPrompt(d.spec, params.imageEngine, params.brand, trendClause), params.imageEngine)
+          const skPrompt = sketchPrompt(d.spec, params.imageEngine, params.brand, trendClause)
+          const r = await generateImage(skPrompt, params.imageEngine)
           budget.spend()
-          d.images = [...d.images, { view: 'sketch', url: r.url, hash: r.hash, origin: 'generated' }]
+          d.images = [...d.images, { view: 'sketch', url: r.url, hash: r.hash, origin: 'generated', promptUsed: skPrompt }]
           emit({ kind: 'log', stage: 'S2', text: `${d.spec.design_id} sketch done${r.cached ? ' (reused)' : ''}` })
         } catch (e) {
           d.imageError = String((e as Error).message || e)
@@ -347,8 +348,9 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       if (budget.left() > 0) {
         // ① 기준 렌더 1장
         let baseHash: string | null = null
+        const basePrompt = renderPrompt(d.spec, params.imageEngine, params.brand, trendClause)
         try {
-          const r = await generateImage(renderPrompt(d.spec, params.imageEngine, params.brand, trendClause), params.imageEngine)
+          const r = await generateImage(basePrompt, params.imageEngine)
           budget.spend(); baseHash = r.hash
           let baseUrl = r.url
           // 브랜드 로고는 프롬프트가 아니라 실제 파일로 얹는다. 형태가 어긋나지 않는다.
@@ -363,12 +365,35 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
               emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} logo composite failed · ${String((e as Error).message).slice(0, 80)}` })
             }
           }
-          d.images = [...d.images, { view: pack.viewSet[0].key, url: baseUrl, hash: baseHash, origin: 'generated' }]
+          d.images = [...d.images, { view: pack.viewSet[0].key, url: baseUrl, hash: baseHash, origin: 'generated', promptUsed: basePrompt }]
           emit({ kind: 'design-update', design: { ...d } })
         } catch (e) {
           d.imageError = String((e as Error).message || e)
           emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} base render failed · ${d.imageError}` })
         }
+        // ② 스케치당 추가 디자인 · 트렌드에서 뽑은 방향을 하나씩 바꿔 프롬프트를 만든다
+        const dps = params.designsPerSketch ?? 1
+        if (baseHash && dps > 1) {
+          const angles = [
+            macroName ? `Push it further into the ${macroName} direction: exaggerate its defining material and hardware.` : 'Push the dominant season material further and make the hardware the focal point.',
+            'A quieter commercial take: same last and proportions, minimal hardware, tonal palette.',
+            'A bolder statement take: amplify the strongest observed trend signal into the main design feature.',
+          ]
+          for (let k = 0; k < Math.min(dps - 1, angles.length); k++) {
+            if (cancelled || budget.left() <= 0) break
+            const p2 = `Redesign this ${(TYPE_LABEL[params.itemType] ?? params.itemType).toLowerCase()} keeping the exact same sketch geometry and camera angle. ${angles[k]} ${trendClause} Plain white studio background, photorealistic product shot, no text, no watermark.`
+            try {
+              const r2 = await editImage(baseHash, p2, params.imageEngine)
+              budget.spend()
+              d.images = [...d.images, { view: 'design', url: r2.url, hash: r2.hash, origin: 'edited_from', editedFrom: baseHash, promptUsed: p2 }]
+              emit({ kind: 'design-update', design: { ...d } })
+              emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} design variant ${k + 2} of ${dps} done` })
+            } catch {
+              emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} design variant ${k + 2} failed · skipping` })
+            }
+          }
+        }
+
         // ③④ 추가 뷰·컬러웨이 = 기준 렌더의 편집 (동일 객체 유지)
         if (baseHash) {
           const jobs: { view: string; colorway?: string; prompt: string }[] = [

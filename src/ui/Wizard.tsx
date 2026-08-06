@@ -387,6 +387,13 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                 </div>
               </div>
               <div className="stack">
+                <span className="lbl">{t('Designs per sketch')}</span>
+                <div className="inrow">
+                  <Seg options={[1, 2, 3, 4] as const} value={p.designsPerSketch ?? 2} onChange={v => set('designsPerSketch', v)} />
+                  <span className="hint">{designCount * (p.designsPerSketch ?? 2)} {t('designs in total, each from a trend-based prompt')}</span>
+                </div>
+              </div>
+              <div className="stack">
                 <span className="lbl">{t('Top picks')}</span>
                 <div className="inrow">
                   <Seg options={[1, 2, 3, 4, 5] as const} value={p.topN as any} onChange={v => set('topN', Number(v))} />
@@ -446,13 +453,13 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
               <div className="stack"><span className="lbl">{t('Campaign cuts')}</span>
                 <div className="inrow">
                   <Seg options={[0, 2, 4, 6] as const} value={p.campaignShots} onChange={v => set('campaignShots', v)} />
-                  <span className="hint">{t('Half worn on a model, half staged in studio and on location')}</span>
+                  <span className="hint">{t('Per selected design. Half worn on a model, half staged.')}</span>
                 </div>
               </div>
               <div className="stack"><span className="lbl">{t('3D showroom')}</span>
                 <div className="inrow">
                   <Seg options={['Off', 'On'] as const} value={p.make3d ? 'On' : 'Off'} onChange={v => set('make3d', v === 'On')} />
-                  <span className="hint">{t('Multiview goes to Tripo. The result is a GLB you can turn on the board.')}</span>
+                  <span className="hint">{t('Only the final picks go to Tripo. The result is a GLB you can turn on the board.')}</span>
                 </div>
               </div>
               <div className="stack"><span className="lbl">{t('Model')}</span>

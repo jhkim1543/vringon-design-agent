@@ -371,8 +371,6 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
           <div className="bb-row bb-top">
             <span className="bb-title">{t('Review board')}</span>
             <span className="bb-sub">{t(TYPE_LABEL[st.params.itemType])} · {nodes.length} {t('cards')}</span>
-            <Tag kind="ok">{approved} {t('approved')}</Tag>
-            <Tag kind="danger">{rejectedByUser} {t('rejected')}</Tag>
             <span className="bb-gap" />
             <ThemeToggle theme={light ? 'light' : 'dark'} onToggle={() => setLight(v => !v)} />
             <button className="btn btn-ghost btn-sm" onClick={share} title={t('Copy a link to this board')}>{t('Share')}</button>
@@ -467,7 +465,11 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
             ['lane', t('Lane'), 'M4.6 4h4.4v16H4.6zM10.8 4h4.4v16h-4.4zM17 4h2.4v16H17z'],
           ] as const).map(([k, label, d]) => (
             <button key={k} className={`btool ${tool === k ? 'on' : ''}`} title={label}
-              onClick={() => setTool(k)}>
+              onClick={() => {
+                // 칸은 놓을 위치가 없다(열은 항상 오른쪽 끝). 누르는 즉시 추가한다.
+                if (k === 'lane') { addColumn(); return }
+                setTool(k)
+              }}>
               <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
                 strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
               <span>{label}</span>

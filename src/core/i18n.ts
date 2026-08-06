@@ -74,6 +74,18 @@ export function tf(s: string, vars: Record<string, string | number>): string {
 const KO: Record<string, string> = {
   // ── 공통 ────────────────────────────────────────────────────────
   // ── 위저드 · 질문 세 개로 나눈 화면 ──────────────────────────────
+  'Designs per sketch': '스케치당 디자인 수',
+  'designs in total, each from a trend-based prompt': '개 디자인 · 각각 트렌드 기반 프롬프트로 생성',
+  'Per selected design. Half worn on a model, half staged.': '선정된 디자인마다. 절반은 착용, 절반은 연출.',
+  'Only the final picks go to Tripo. The result is a GLB you can turn on the board.': '최종 후보만 Tripo로 갑니다. 보드에서 돌려 볼 수 있는 GLB가 나옵니다.',
+  'From sketch to design': '스케치에서 디자인까지',
+  'sketches': '개 스케치',
+  'Based on': '근거',
+  'Rendering': '렌더 중',
+  'Prompt not stored for this older run': '옛 분석이라 프롬프트가 저장돼 있지 않습니다',
+  'Open campaign shots and 3D': '캠페인 컷과 3D 열기',
+  'None for this design': '이 디자인에는 없습니다',
+  'Contents': '목차',
   'Report language': '리포트 언어',
   'Research, signals and both PDFs come out in this language.': '조사·신호·PDF 두 종이 이 언어로 나옵니다.',
   'Select': '선택',

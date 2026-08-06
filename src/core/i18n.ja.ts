@@ -5,6 +5,18 @@
 
 export const JA: Record<string, string> = {
   // ── 공통 ────────────────────────────────────────────────────────
+  'Designs per sketch': 'スケッチごとのデザイン数',
+  'designs in total, each from a trend-based prompt': '案。それぞれトレンド由来のプロンプトで生成',
+  'Per selected design. Half worn on a model, half staged.': '選ばれたデザインごと。半分は着用、半分は演出。',
+  'Only the final picks go to Tripo. The result is a GLB you can turn on the board.': '最終候補のみTripoへ。ボードで回せるGLBになります。',
+  'From sketch to design': 'スケッチからデザインへ',
+  'sketches': '枚のスケッチ',
+  'Based on': '根拠',
+  'Rendering': 'レンダー中',
+  'Prompt not stored for this older run': '旧い分析のためプロンプトは保存されていません',
+  'Open campaign shots and 3D': 'キャンペーンカットと3Dを開く',
+  'None for this design': 'このデザインにはありません',
+  'Contents': '目次',
   'Report language': 'レポート言語',
   'Research, signals and both PDFs come out in this language.': '調査・シグナル・2種のPDFがこの言語で出ます。',
   'Select': '選択',

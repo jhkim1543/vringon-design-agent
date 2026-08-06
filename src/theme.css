@@ -1264,3 +1264,101 @@ table.mini td b { color: var(--text); font-weight: 600; }
 
 /* 도구를 든 상태에서는 커서로 알려 준다 */
 .board.placing .react-flow__pane { cursor: crosshair; }
+
+
+/* 덱 좌우 화살표 · 스테이지 세로 중앙 */
+.dv-side {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+  width: 34px; height: 34px; border-radius: 999px;
+  display: grid; place-items: center; font-size: 19px; line-height: 1;
+  border: 1px solid rgba(20,24,29,.16); background: rgba(255,255,255,.94); color: #33383D;
+  opacity: 0; transition: opacity .15s;
+}
+.dv-frame:hover .dv-side { opacity: 1; }
+.dv-side.prev { left: 10px; }
+.dv-side.next { right: 10px; }
+.dv-side:hover:not(:disabled) { background: #fff; border-color: rgba(20,24,29,.34); }
+.dv-side:disabled { opacity: 0 !important; cursor: default; }
+
+
+/* ── 스케치 → 디자인 흐름 · 왼쪽이 원인(스케치·근거), 오른쪽이 결과(디자인·프롬프트) ── */
+.skflow { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+.skrow {
+  display: grid; grid-template-columns: 230px 1fr; gap: 16px;
+  padding: 14px; border-radius: var(--r-card); border: 1px solid var(--line); background: var(--panel);
+}
+.skrow.rejected { opacity: .55; }
+.sk-src { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.sk-shot {
+  aspect-ratio: 1; border-radius: var(--r-6); overflow: hidden;
+  background: #fff; border: 1px solid var(--line-2); display: block;
+}
+.sk-shot img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.sk-none { display: grid; place-items: center; height: 100%; color: var(--text-3); font-size: 12px; }
+.sk-src b { font-size: 13px; }
+.sk-tier { font-size: 11px; color: var(--text-3); border: 1px solid var(--line-2); border-radius: var(--r-chip); padding: 1px 7px; width: fit-content; }
+.sk-ev { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.sk-ev i { font-style: normal; font-size: 11px; color: var(--text-3); }
+.sk-ev em { font-style: normal; font-size: 11px; padding: 2px 7px; border-radius: var(--r-chip); background: var(--accent-soft); color: var(--accent-hi); font-weight: 600; }
+.sk-why { font-size: 12px; line-height: 1.55; color: var(--text-3); }
+.sk-outs { display: flex; gap: 10px; flex-wrap: wrap; align-content: flex-start; }
+.sk-out {
+  width: 168px; display: flex; flex-direction: column; gap: 6px; text-align: left;
+  border-radius: var(--r-6); padding: 0; background: none; border: 0;
+}
+.sk-out img {
+  width: 100%; aspect-ratio: 1; object-fit: contain; display: block;
+  background: #fff; border: 1px solid var(--line-2); border-radius: var(--r-6);
+  transition: border-color .15s;
+}
+.sk-out:hover img { border-color: var(--accent); }
+.sk-prompt { font-size: 10.5px; line-height: 1.5; color: var(--text-3); }
+@media (max-width: 760px) { .skrow { grid-template-columns: 1fr; } }
+
+/* 디자인 상세 모달 · 캠페인 컷과 3D */
+.dd-modal { position: fixed; inset: 0; z-index: 220; display: grid; place-items: center; padding: 24px; background: rgba(5,7,14,.78); backdrop-filter: blur(3px); }
+.dd-box { width: min(980px, 100%); max-height: 90vh; overflow: auto; border-radius: var(--r); border: 1px solid var(--line); background: var(--panel); }
+.dd-head { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.dd-head .dv-x { margin-left: auto; }
+.dd-body { display: grid; grid-template-columns: 290px 1fr; gap: 18px; padding: 18px; }
+.dd-sub { font-size: 13px; font-weight: 650; margin: 4px 0 8px; }
+.dd-camp { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.dd-camp img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--r-6); border: 1px solid var(--line-2); background: #fff; }
+@media (max-width: 720px) { .dd-body { grid-template-columns: 1fr; } }
+
+/* 왼쪽 목차 · 분석이 끝나면 진행표시 대신 */
+.toc { display: flex; flex-direction: column; gap: 2px; }
+.toc-h { font-size: 12px; color: var(--text-3); font-weight: 600; margin-bottom: 6px; }
+.toc-i {
+  text-align: left; padding: 8px 12px; border-radius: var(--r-8);
+  font-size: 13px; font-weight: 600; color: var(--text-2); border-left: 2px solid transparent;
+}
+.toc-i:hover { color: var(--text); background: var(--panel-2); border-left-color: var(--accent); }
+
+/* ── 예측 근거 상세 · 글벽을 카드 구조로 ──────────────────────────
+   왼쪽 240px = 이 매크로가 무엇인가(번호·이름·문장·지표), 오른쪽 = 무엇을 만들라는 것인가. */
+.ds-macro {
+  display: grid; grid-template-columns: 250px 1fr; gap: 18px;
+  padding: 16px; margin: 10px 14px; border-radius: var(--r-card);
+  border: 1px solid var(--line-2); background: var(--bg-2);
+}
+.ds-macro > .ds-m-h, .ds-macro > .ds-state, .ds-macro > .ds-metrics:first-of-type { grid-column: 1; }
+.ds-macro > .chiplist, .ds-macro > .ds-pal, .ds-macro > .ds-items, .ds-macro > .ds-metrics ~ .ds-metrics { grid-column: 2; }
+.ds-macro { grid-template-areas: none; grid-auto-flow: dense; }
+.ds-m-h { display: flex; align-items: center; gap: 8px; }
+.ds-num {
+  width: 24px; height: 24px; border-radius: var(--r-6); display: grid; place-items: center;
+  background: var(--accent); color: #fff; font-size: 12px; font-weight: 800; flex-shrink: 0;
+}
+[data-theme="dark"] .ds-num { background: #7481FF; color: #05070E; }
+.ds-m-h b { font-size: 14px; letter-spacing: -.01em; }
+.ds-state { font-size: 12.5px; line-height: 1.6; color: var(--text-2); }
+.ds-metrics { display: flex; flex-direction: column; gap: 4px; }
+.ds-met { font-size: 11.5px; line-height: 1.5; color: var(--text-3); }
+.ds-met b { color: var(--accent-hi); font-variant-numeric: tabular-nums; margin-right: 2px; }
+.ds-pal { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.ds-sw { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-3); }
+.ds-sw i { width: 13px; height: 13px; border-radius: 999px; border: 1px solid var(--line-2); display: inline-block; }
+.ds-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.ds-item { padding: 10px 12px; border-radius: var(--r-6); background: var(--panel); border: 1px solid var(--line-2); }
+@media (max-width: 860px) { .ds-macro { grid-template-columns: 1fr; } .ds-macro > * { grid-column: 1 !important; } }

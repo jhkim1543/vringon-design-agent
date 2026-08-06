@@ -128,6 +128,11 @@ export function DeckViewer({ html, title, onPrint, onSave, height }: {
     <div className="dv">
       <div className="dv-frame">
         {stage}
+        {/* 좌우 중앙 화살표 · 하단 내비가 화면 밖에 있을 때도 넘길 수 있어야 한다 */}
+        <button className="dv-side prev" onClick={() => setPage(p => Math.max(0, p - 1))}
+          disabled={page === 0} aria-label={t('Prev')}>‹</button>
+        <button className="dv-side next" onClick={() => setPage(p => Math.min(total - 1, p + 1))}
+          disabled={page >= total - 1} aria-label={t('Next')}>›</button>
         <button className="dv-full" onClick={() => setFull(true)} title={t('Open full size')}>
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
             strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

@@ -158,6 +158,8 @@ export interface RunParams {
   viewCount: 1 | 3 | 4
   colorwayCount: 0 | 1 | 2 | 3
   topN: number                              // 1~5
+  /** 스케치 한 장마다 몇 개의 디자인을 뽑을지. 트렌드 근거로 프롬프트를 바꿔 가며 생성한다. */
+  designsPerSketch?: 1 | 2 | 3 | 4
   /** 스케치 한 장에서 갈라지는 제품 베리에이션 수 */
   variationCount: 0 | 2 | 3 | 4 | 6 | 8
   /** 캠페인 컷 · 착용컷과 연출컷을 한 묶음으로 뽑는다 (top 하나당 장수) */
@@ -192,7 +194,7 @@ export const DEFAULT_PARAMS: RunParams = {
   mode: 'trend', category: 'shoe', itemType: 'loafer',
   endStage: 'S3', sketchCount: 12, tierRatio: [1, 1, 1],
   renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
-  topN: 3, variationCount: 3, campaignShots: 4, make3d: true, approvalGate: true,
+  topN: 3, designsPerSketch: 2, variationCount: 3, campaignShots: 4, make3d: true, approvalGate: true,
   imageEngine: 'detail', imageBudget: 12,
   trend: {
     // 기본을 비워둔다. 가상의 브랜드명으로 검색하면 결과가 무의미하고 시간만 든다.
@@ -350,6 +352,8 @@ export interface DesignImage {
   /** 베리에이션 축 이름 · 어떤 축을 바꾼 안인지 */
   variantOf?: string
   variantAxis?: string
+  /** 이 이미지를 만든 프롬프트 · 근거 표시용. 없으면 옛 데이터다. */
+  promptUsed?: string
   /** 컨셉 촬영 컷 라벨과 가상 인물 */
   conceptLabel?: string
   persona?: string

@@ -2,9 +2,10 @@
 import { t } from '../core/i18n'
 import { useEffect, useRef, useState } from 'react'
 import type { RunState } from '../core/types'
-import { MODE_LABEL, CAT_LABEL, TYPE_LABEL } from '../core/types'
+import { MODE_LABEL, CAT_LABEL, TIER_LABEL, TYPE_LABEL } from '../core/types'
 import RunReport from './RunReport'
 import { DesignCard } from './Card'
+import { ModelViewer } from './ModelViewer'
 import { Collapse, Tag } from './bits'
 import { shotUrl } from '../core/research'
 import type { TrendReport } from '../core/research'
@@ -31,6 +32,8 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
   onResolveDna: (choice: string) => void
 }) {
   const [showLog, setShowLog] = useState(false)
+  // 디자인 상세 모달 · 캠페인 컷과 3D 를 연다
+  const [detail, setDetail] = useState<string | null>(null)
   const logRef = useRef<HTMLDivElement>(null)
   useEffect(() => { if (showLog) logRef.current?.scrollTo({ top: 1e9 }) }, [st.logs.length, showLog])
 
@@ -261,6 +264,28 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
           </Collapse>
         )
 
+  // 분석이 끝나면 왼쪽은 진행표시가 아니라 목차가 된다.
+  // 오른쪽 리포트의 섹션 id 로 스크롤한다.
+  const TOC: { id: string; label: string; on: boolean }[] = [
+    { id: 'sec-report', label: 'Trend report', on: !!st.trendReport },
+    { id: 'sec-macros', label: 'Key macro trends', on: !!(st.dossier as { macrotrends?: unknown[] } | null)?.macrotrends?.length },
+    { id: 'sec-designs', label: 'Top trending designs', on: st.designs.length > 0 },
+    { id: 'sec-comp', label: 'Competitive landscape', on: st.competitors.length > 0 },
+    { id: 'sec-season', label: 'Season report', on: !!st.dossier },
+    { id: 'sec-impl', label: 'Design implications', on: !!st.dossier || st.signals.length > 0 },
+  ].filter(x => x.on)
+  // scrollIntoView 의 smooth 는 탭이 백그라운드면 멈춘다. 컨테이너를 직접 굴린다.
+  const jump = (id: string) => {
+    const el = document.getElementById(id)
+    if (!el) return
+    const box = el.closest('.run-center') as HTMLElement | null
+    if (!box) { el.scrollIntoView(); return }
+    const top = el.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop - 12
+    box.scrollTo({ top, behavior: 'smooth' })
+    // smooth 가 무시되는 환경 대비 · 한 프레임 뒤에 위치를 못 잡았으면 즉시 이동
+    setTimeout(() => { if (Math.abs(box.scrollTop - top) > 400) box.scrollTop = top }, 350)
+  }
+
   return (
     <div className="run">
       {/* 좌: 단계 네비 */}
@@ -269,6 +294,14 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
           <div style={{ fontWeight: 800, fontSize: 15 }}>{MODE_LABEL[st.params.mode]}</div>
           <div className="hint">{TYPE_LABEL[st.params.itemType]} · {st.params.sketchCount} sketches · through {st.params.endStage}</div>
         </div>
+        {st.finished && TOC.length > 0 ? (
+          <nav className="toc">
+            <div className="toc-h">{t('Contents')}</div>
+            {TOC.map(x => (
+              <button key={x.id} className="toc-i" onClick={() => jump(x.id)}>{t(x.label)}</button>
+            ))}
+          </nav>
+        ) : (
         <div className="stageline">
           {STAGE_META.map(s => {
             const status = st.stageStatus[s.key]
@@ -287,6 +320,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
             )
           })}
         </div>
+        )}
         {lastCheckpoint && (
           <div className="hint" style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--line)' }}>
             💾 {lastCheckpoint}
@@ -406,20 +440,92 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
         )}
 
         {st.designs.length > 0 && (
-          <>
+          <section className="skflow" id="sec-flow">
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, margin: '4px 0 10px' }}>
-              <h3 style={{ fontSize: 14 }}>{st.designs.length} designs</h3>
-              <span className="hint">{st.designs.filter(d => !d.rejected).length} passed rules · {st.designs.filter(d => d.rejected).length} rejected early</span>
+              <h3 style={{ fontSize: 15 }}>{t('From sketch to design')}</h3>
+              <span className="hint">{st.designs.length} {t('sketches')} · {st.designs.filter(d => !d.rejected).length} {t('passed')}</span>
             </div>
-            <div className="grid-cards">
-              {st.designs.map(d => (
-                <DesignCard key={d.spec.design_id} d={d} signals={st.signals}
-                  stagePassed={{ s3: s3done || st.stageStatus.S3 === 'running', s4: s4done }}
-                  onVerdict={gated || st.finished ? onGateVerdict : undefined} />
-              ))}
-            </div>
-          </>
+            {st.designs.map(d => {
+              const sketch = d.images.find(i => i.view === 'sketch')
+              // 기준 렌더 + 트렌드 프롬프트 변주가 이 스케치에서 나온 디자인들이다
+              const outs = d.images.filter(i =>
+                (i.origin === 'generated' && i.view !== 'sketch') || i.view === 'design')
+              // 이 스케치를 만든 근거 · 가중치 큰 신호부터
+              const evidence = (d.rationale?.driving_signals ?? [])
+                .slice()
+                .sort((a, b) => b.weight - a.weight)
+                .map(x => st.signals.find(g => g.signal_id === x.signal_id)?.label)
+                .filter((x): x is string => !!x)
+                .slice(0, 3)
+              return (
+                <article className={`skrow ${d.rejected ? 'rejected' : ''}`} key={d.spec.design_id}>
+                  <div className="sk-src">
+                    <span className="sk-shot">{sketch ? <img src={sketch.url} alt="" loading="lazy" /> : <span className="sk-none">{t('Diagram')}</span>}</span>
+                    <b>{d.spec.design_id}</b>
+                    <span className="sk-tier">{t(TIER_LABEL[d.spec.tier] ?? d.spec.tier)}</span>
+                    {evidence.length > 0 && (
+                      <span className="sk-ev">
+                        <i>{t('Based on')}</i>
+                        {evidence.map(e => <em key={e}>{e}</em>)}
+                      </span>
+                    )}
+                    {d.rationale?.narrative?.[0] && <span className="sk-why">{d.rationale.narrative[0]}</span>}
+                  </div>
+                  <div className="sk-outs">
+                    {outs.length === 0 && <span className="hint">{d.rejected ? t('Rule reject') : t('Rendering')}</span>}
+                    {outs.map((im, i) => (
+                      <button className="sk-out" key={im.hash + i} onClick={() => setDetail(d.spec.design_id)}
+                        title={t('Open campaign shots and 3D')}>
+                        <img src={im.url} alt="" loading="lazy" />
+                        <span className="sk-prompt">{im.promptUsed
+                          ? im.promptUsed.slice(0, 110) + (im.promptUsed.length > 110 ? '…' : '')
+                          : t('Prompt not stored for this older run')}</span>
+                      </button>
+                    ))}
+                  </div>
+                </article>
+              )
+            })}
+          </section>
         )}
+
+        {/* 디자인 상세 · 캠페인 컷과 3D 는 여기 저장돼 있다 */}
+        {detail && (() => {
+          const d = st.designs.find(x => x.spec.design_id === detail)
+          if (!d) return null
+          const camp = d.images.filter(i => i.view === 'wear' || i.view === 'concept')
+          return (
+            <div className="dd-modal" onClick={() => setDetail(null)}>
+              <div className="dd-box" onClick={e => e.stopPropagation()}>
+                <div className="dd-head">
+                  <b>{d.spec.design_id}</b>
+                  <span className="hint">{t(TIER_LABEL[d.spec.tier] ?? d.spec.tier)}</span>
+                  <button className="dv-x" onClick={() => setDetail(null)} aria-label={t('Close')}>✕</button>
+                </div>
+                <div className="dd-body">
+                  <div className="dd-left">
+                    <DesignCard d={d} signals={st.signals}
+                      stagePassed={{ s3: true, s4: true }}
+                      onVerdict={gated || st.finished ? onGateVerdict : undefined} />
+                  </div>
+                  <div className="dd-right">
+                    {d.model && (
+                      <>
+                        <div className="dd-sub">{t('3D showroom')}</div>
+                        <ModelViewer url={d.model.url} height={230}
+                          poster={(d.images.find(i => i.origin === 'generated' && i.view !== 'sketch') ?? d.images[0])?.url} />
+                      </>
+                    )}
+                    <div className="dd-sub">{t('Campaign shots')} {camp.length === 0 && <span className="hint">{t('None for this design')}</span>}</div>
+                    <div className="dd-camp">
+                      {camp.map((im, i) => <img key={im.hash + i} src={im.url} alt="" loading="lazy" />)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        })()}
 
         {st.designs.length === 0 && st.signals.length === 0 && (
           <div className="empty" style={{ height: 300 }}>

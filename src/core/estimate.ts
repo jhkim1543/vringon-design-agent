@@ -19,6 +19,10 @@ export function estimate(p: RunParams): Estimate {
   const scope = MODE_SCOPE[p.mode]
   const n = p.sketchCount
   const renders = Math.max(1, Math.round(n * p.renderRatio))
+  // 스케치당 디자인 수 · 옛 저장본에는 없으므로 1로 떨어진다
+  const dps = p.designsPerSketch ?? 1
+  // 추가 디자인은 같은 스케치에 다른 트렌드 프롬프트를 넣어 만든다
+  const extraDesigns = renders * Math.max(0, dps - 1)
   const extraViews = renders * Math.max(0, p.viewCount - 1)
   const colorways = renders * p.colorwayCount
   const variations = renders * p.variationCount
@@ -45,7 +49,7 @@ export function estimate(p: RunParams): Estimate {
 
   // ── 실제 생성 장수 · 상한과 실제 필요량 중 작은 쪽
   const wantS2 = n
-  const wantS3 = renders + extraViews + colorways + variations
+  const wantS3 = renders + extraDesigns + extraViews + colorways + variations
   const budget = p.imageBudget
   const realS2 = Math.min(wantS2, budget)
   const realS3 = Math.min(wantS3, Math.max(0, budget - realS2))
