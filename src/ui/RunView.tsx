@@ -55,7 +55,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
 
   // 아래 세 블록은 리포트 섹션 안으로 들어간다 (예전에는 화면 맨 밑에 따로 있었다)
   const competitorDetail = st.competitors.length > 0 && (
-          <Collapse title={t('Competitors')} summary={compSummary}>
+          <Collapse title={t('Collected products')} summary={compSummary}>
             <div style={{ padding: '8px 14px 0' }}>
               {isLiveResearch ? (
                 <div className="notice info" style={{ fontSize: 12 }}>
@@ -118,7 +118,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
   // 아래 세 블록은 리포트 섹션 안으로 들어간다 (예전에는 화면 맨 밑에 따로 있었다)
   const dossierDetail = (st.dossier || st.dossierPending) && (
           <Collapse
-            title={t('Season dossier')}
+            title={t('Forecast evidence')}
             summary={st.dossier
               ? `${(st.dossier as SeasonDossier).macrotrends?.length ?? 0} macrotrends · ${(st.dossier as SeasonDossier).sources?.length ?? 0} sources`
               : 'Building'}
@@ -211,7 +211,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
   // 아래 세 블록은 리포트 섹션 안으로 들어간다 (예전에는 화면 맨 밑에 따로 있었다)
   const reportDetail = (st.trendReport || st.reportPending) && (
           <Collapse
-            title={t('Trend report')}
+            title={t('Report text')}
             summary={st.trendReport
               ? `${(st.trendReport as TrendReport).design_implications?.length ?? 0} design implications`
               : 'Writing'}

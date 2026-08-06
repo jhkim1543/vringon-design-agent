@@ -32,8 +32,15 @@ export function DeckViewer({ html, title, onPrint, onSave, height }: {
   const [scale, setScale] = useState(0.5)
   const [full, setFull] = useState(false)
 
+  // 덱은 "/samples/..." 같은 절대 경로를 들고 있다. GitHub Pages 는 하위 경로에
+  // 올라가므로 그대로 두면 iframe 안에서 전부 404 가 나고 깨진 이미지만 남는다.
+  const BASE = import.meta.env.BASE_URL || '/'
+  const fixed = BASE === '/' ? html
+    : html.replace(/(src|href)="\/(samples|brand|assets)\//g, `$1="${BASE}$2/`)
+
   const doc = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
-<style>${DECK_CSS}${VIEWER_CSS}</style></head><body>${html}</body></html>`
+<base href="${location.origin}${BASE}">
+<style>${DECK_CSS}${VIEWER_CSS}</style></head><body>${fixed}</body></html>`
 
   // 슬라이드 수를 센다. srcdoc 은 부모와 같은 출처라 내용을 읽을 수 있다.
   const onLoad = () => {
@@ -77,8 +84,10 @@ export function DeckViewer({ html, title, onPrint, onSave, height }: {
     return () => window.removeEventListener('keydown', onKey)
   }, [full, total])
 
+  // transform: scale 은 레이아웃 높이를 줄이지 않는다. 그대로 두면 슬라이드
+  // 아래로 원본 높이만큼(약 790px) 흰 여백이 남는다. 높이를 직접 잡아 준다.
   const stage = (
-    <div className="dv-stage" ref={box} style={height && !full ? { height } : undefined}>
+    <div className="dv-stage" ref={box} style={{ height: Math.round(SLIDE_H * scale) }}>
       <div className="dv-scaler" style={{ width: SLIDE_W, height: SLIDE_H, transform: `scale(${scale})` }}>
         <iframe ref={frame} title={title} srcDoc={doc} onLoad={onLoad}
           style={{ width: SLIDE_W, height: SLIDE_H, border: 0 }} />

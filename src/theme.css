@@ -988,11 +988,12 @@ table.mini td b { color: var(--text); font-weight: 600; }
   font-size: 13px; line-height: 1.7; color: var(--text-3); max-width: 62ch;
   display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
 }
-.rep-stats { display: flex; gap: 12px; margin-top: auto; padding-top: 24px; }
+.rep-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 24px; }
 .rep-stats > div {
-  flex: 0 1 176px; display: flex; flex-direction: column; gap: 2px;
-  padding: 14px 16px; border-radius: var(--r-card); border: 1px solid var(--line-2); background: var(--bg-2);
+  flex: 1 1 132px; min-width: 118px; display: flex; flex-direction: column; gap: 2px;
+  padding: 13px 15px; border-radius: var(--r-card); border: 1px solid var(--line-2); background: var(--bg-2);
 }
+.rep-stats span { white-space: normal; overflow-wrap: normal; word-break: keep-all; }
 .rep-stats b { font-size: 24px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .rep-stats span { font-size: 12px; color: var(--text-3); }
 /* 비율을 고정한다. stretch 로 두면 글이 길어질수록 이미지가 세로로 늘어난다. */
@@ -1136,3 +1137,45 @@ table.mini td b { color: var(--text); font-weight: 600; }
 .rt-sig { max-width: 260px; }
 .rt-sig span { display: block; font-size: 11.5px; line-height: 1.5; color: var(--text-3); margin-bottom: 4px; }
 .rep-table td { vertical-align: top; }
+
+
+/* 리포트 반응형 · 사이드바가 있는 상태에서도 본문이 300px 아래로 내려간다 */
+@media (max-width: 1200px) {
+  .rep-hero { padding: 24px 22px; gap: 20px; }
+  .rep-hero h1 { font-size: 25px; }
+  .rep-hero-art { width: 240px; }
+}
+@media (max-width: 900px) {
+  .rep { gap: 30px; }
+  .rep-hero { flex-direction: column; align-items: stretch; padding: 20px; min-height: 0; }
+  .rep-hero-art { display: none; }
+  .rep-hero h1 { font-size: 22px; }
+  .rep-stats { padding-top: 18px; }
+  .rep-macros { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .rep-designs { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+}
+@media (max-width: 620px) {
+  .rep-hero h1 { font-size: 20px; line-height: 1.25; }
+  .rep-stats > div { flex: 1 1 100%; }
+  .rep-macros, .rep-designs { grid-template-columns: 1fr; }
+  .rep-head { flex-wrap: wrap; }
+  .rep-head h2 { font-size: 16px; }
+}
+/* 본문 자체가 좁아질 때 · 컨테이너 질의를 쓰면 창 너비와 무관하게 맞는다 */
+.run-center { container-type: inline-size; }
+@container (max-width: 780px) {
+  .rep-hero { flex-direction: column; align-items: stretch; }
+  .rep-hero-art { display: none; }
+  .rep-stats > div { flex: 1 1 120px; }
+}
+@container (max-width: 520px) {
+  .rep-stats > div { flex: 1 1 100%; }
+  .rep-macros, .rep-designs { grid-template-columns: 1fr; }
+}
+
+/* 본문은 가로로 넘치지 않는다. 넓은 조각(표·덱)은 자기 안에서 스크롤한다. */
+.run-center { min-width: 0; overflow-x: hidden; }
+.rep, .rep-sect { min-width: 0; max-width: 100%; }
+.rep-hero-txt { min-width: 0; }
+.rep-tablewrap { max-width: 100%; }
+.dv, .dv-frame, .dv-stage { max-width: 100%; }

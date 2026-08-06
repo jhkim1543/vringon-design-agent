@@ -74,6 +74,9 @@ export function tf(s: string, vars: Record<string, string | number>): string {
 const KO: Record<string, string> = {
   // ── 공통 ────────────────────────────────────────────────────────
   // ── 위저드 · 질문 세 개로 나눈 화면 ──────────────────────────────
+  'Forecast evidence': '예측 근거 상세',
+  'Collected products': '수집된 제품 원본',
+  'Report text': '리포트 원문',
   'Products found': '수집된 제품',
   'Design traits observed': '관측된 디자인 특징',
   'Market signals': '시장 신호',

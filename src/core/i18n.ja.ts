@@ -5,6 +5,9 @@
 
 export const JA: Record<string, string> = {
   // ── 공통 ────────────────────────────────────────────────────────
+  'Forecast evidence': '予測の根拠',
+  'Collected products': '収集した製品の原本',
+  'Report text': 'レポート原文',
   'Products found': '見つかった製品',
   'Design traits observed': '観測されたデザイン特徴',
   'Market signals': '市場シグナル',
