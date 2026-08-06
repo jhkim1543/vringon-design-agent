@@ -5,7 +5,15 @@
 
 export const JA: Record<string, string> = {
   // ── 공통 ────────────────────────────────────────────────────────
-  'Season report': 'シーズンレポート',
+  'Next season forecast': '次シーズン予測',
+  'Forecast for': '予測対象',
+  'Evidence from': '根拠シーズン',
+  'What it does next season': '次シーズンの展開',
+  'Confidence': '確度',
+  'high': '高',
+  'medium': '中',
+  'low': '低',
+  'Season report': '次シーズン予測',
   'Share': '共有',
   'Copy a link to this board': 'このボードのリンクをコピー',
   'Link copied. It opens this board in a browser that has this run.': 'リンクをコピーしました。この分析を持つブラウザで開きます。',
@@ -236,7 +244,7 @@ export const JA: Record<string, string> = {
   'Volume': '数量',
   'Generation': '生成',
   'Sketch count': 'スケッチ数',
-  'Top picks': 'Top選定',
+  'Top picks': '最終候補',
   'At least one from each tier': '各ティアから最低1点',
   'Mix': '構成比',
   'Core : Push : Signature': 'Core : Push : Signature',
@@ -263,7 +271,7 @@ export const JA: Record<string, string> = {
   // ── 분석 범위 ───────────────────────────────────────────────────
   'Worn shots': '着用カット',
   'Competitors, trend signals and the season dossier. No images.':
-    '競合、トレンドシグナル、シーズンドシエ。画像はありません。',
+    '競合、トレンドシグナル、次シーズン予測。画像はありません。',
   'Everything above, plus specs, rule checks and hand-drawn sketches.':
     '上記すべてに加え、仕様、ルール検査、手描きスケッチまで。',
   'Sketches turned into finished renders, extra views and product variations.':
@@ -293,16 +301,16 @@ export const JA: Record<string, string> = {
   'Signals and directions': 'シグナルとディレクション',
   'Specs, rules, rationale': '仕様、ルール、根拠',
   'Renders and views': 'レンダーとビュー',
-  'Metrics and top picks': '指標とTop選定',
+  'Metrics and top picks': '指標と最終候補',
   'Board and notes': 'ボードとメモ',
   'Starting the pipeline': 'パイプラインを開始しています',
   'Partial results appear here as they land': '出来たものから順にここに表示されます',
   'Progress log': '進行ログ',
   'Log': 'ログ',
   'Open board': 'ボードを開く',
-  'Season dossier': 'シーズンドシエ',
+  'Season dossier': '次シーズン予測',
   'Trend report': 'トレンドレポート',
-  'Dossier PDF': 'ドシエPDF',
+  'Dossier PDF': '予測レポートPDF',
   'Report PDF': 'レポートPDF',
   'Building': '作成中',
   'Writing': '執筆中',
@@ -311,7 +319,7 @@ export const JA: Record<string, string> = {
   'Still unverified': '未検証',
   'From': '出典',
   'source': '出典',
-  'Review gate': 'レビューゲート',
+  'Review gate': '中間レビュー',
   'Approve or reject on the cards. Reasons feed the next run.':
     'カードで承認・不採用を決めます。理由は次の分析に反映されます。',
   'Mapping the macrotrends first, then filling each one with palettes, materials, details and key items.':
@@ -339,7 +347,7 @@ export const JA: Record<string, string> = {
   'Talk track': 'トークトラック',
   'Vision QA': 'ビジョンQA',
   'Cost, with band, assumptions and exclusions': '原価。レンジ、前提、除外項目つき',
-  'Distance between top picks': 'Top同士の距離',
+  'Distance between top picks': '候補間の違い',
   'A concept rendering of the target spec. It may not match the numbers exactly.':
     '目標仕様のコンセプトレンダーです。数値と完全には一致しません。',
   'blocked from generation, attributes only': '生成対象外。属性のみ',

@@ -3,6 +3,7 @@
 // 여기 있는 숫자와 표는 전부 수집된 데이터에서 뽑는다. 채워 넣은 값은 없다.
 import { t } from '../core/i18n'
 import { useMemo } from 'react'
+import type { ReactNode } from 'react'
 import type { RunState } from '../core/types'
 import { CAT_LABEL, TYPE_LABEL, MODE_LABEL } from '../core/types'
 import { GRADE_LABEL, shotUrl } from '../core/research'
@@ -23,7 +24,14 @@ function macroShot(m: Macrotrend): string | null {
   return null
 }
 
-export default function RunReport({ st, onOpenBoard }: { st: RunState; onOpenBoard: () => void }) {
+export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDetail, reportDetail }: {
+  st: RunState
+  onOpenBoard: () => void
+  /** 조사 상세 · 예전에는 화면 맨 밑에 따로 있던 패널들이 각 섹션 안으로 들어온다 */
+  competitorDetail?: ReactNode
+  dossierDetail?: ReactNode
+  reportDetail?: ReactNode
+}) {
   const d = st.dossier as SeasonDossier | null
   const report = st.trendReport as TrendReport | null
   const macros = d?.macrotrends ?? []
@@ -116,6 +124,7 @@ export default function RunReport({ st, onOpenBoard }: { st: RunState; onOpenBoa
             <DeckViewer title={trendDeck.title} html={trendDeck.html}
               onPrint={() => openTrendReportPdf(st)} onSave={() => saveTrendReportHtml(st)} />
           )}
+          {reportDetail && <div className="rep-detail">{reportDetail}</div>}
         </section>
       )}
 
@@ -197,6 +206,14 @@ export default function RunReport({ st, onOpenBoard }: { st: RunState; onOpenBoa
               </tbody>
             </table>
           </div>
+          {competitorDetail && <div className="rep-detail">{competitorDetail}</div>}
+        </section>
+      )}
+
+      {brands.length === 0 && competitorDetail && (
+        <section className="rep-sect">
+          <div className="rep-head"><h2>{t('Competitors')}</h2></div>
+          <div className="rep-detail">{competitorDetail}</div>
         </section>
       )}
 
@@ -211,6 +228,7 @@ export default function RunReport({ st, onOpenBoard }: { st: RunState; onOpenBoa
             <DeckViewer title={seasonDeck.title} html={seasonDeck.html}
               onPrint={() => openDossierPdf(st)} onSave={() => saveDossierHtml(st)} />
           )}
+          {dossierDetail && <div className="rep-detail">{dossierDetail}</div>}
         </section>
       )}
 

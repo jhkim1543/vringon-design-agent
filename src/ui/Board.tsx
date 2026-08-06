@@ -225,10 +225,23 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
   const rf = useReactFlow()
   const positionsRef = useRef<Record<string, { x: number; y: number }>>({})
 
+  // 종류 필터 · 보드가 빽빽해지면 한 갈래만 따라가고 싶어진다
+  const [kindFilter, setKindFilter] = useState<'all' | 'research' | 'design' | 'selection'>('all')
+
   useEffect(() => {
-    setNodes(build(st, onVerdict, edits, ed).nodes.map(n =>
-      positionsRef.current[n.id] ? { ...n, position: positionsRef.current[n.id] } : n))
-  }, [st, onVerdict, edits, ed])
+    // 열(column) 노드는 늘 남긴다. 빼면 화면이 뼈대를 잃는다.
+    const KEEP: Record<string, string[]> = {
+      research: ['input', 'research', 'signal', 'direction'],
+      design: ['design', 'appendix'],
+      selection: ['selection'],
+    }
+    const allow = KEEP[kindFilter]
+    setNodes(build(st, onVerdict, edits, ed).nodes
+      // 종류는 data.n.kind 에 있다. data.kind 는 열 노드에만 없는 게 아니라 아예 없다.
+      .filter(n => !allow || n.type === 'column'
+        || allow.includes(String((n.data as { n?: BoardNode })?.n?.kind ?? '')))
+      .map(n => positionsRef.current[n.id] ? { ...n, position: positionsRef.current[n.id] } : n))
+  }, [st, onVerdict, edits, ed, kindFilter])
 
   // 노드 측정이 늦게 끝나는 환경에서도 첫 화면이 전체 흐름으로 맞춰지게 한다
   useEffect(() => {
@@ -346,6 +359,11 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
           <span className="bar-sep" />
           <Tag kind="ok">{approved} approved</Tag>
           <Tag kind="danger">{rejectedByUser} rejected</Tag>
+          <span className="bar-sep" />
+          {([['all', 'All'], ['research', 'Research'], ['design', 'Designs'], ['selection', 'Selection']] as const).map(([k, label]) => (
+            <button key={k} className={`btn btn-sm ${kindFilter === k ? 'btn-primary' : 'btn-ghost'}`}
+              onClick={() => setKindFilter(k)}>{t(label)}</button>
+          ))}
           <span className="bar-sep" />
           <button className="btn btn-ghost btn-sm" onClick={() => { setPresent(true); setPresentIdx(0) }}>{t('Present')}</button>
           {/* 확대·축소는 상단에서도 바로 되게 둔다. 우하단 패널에만 의존하지 않는다 */}

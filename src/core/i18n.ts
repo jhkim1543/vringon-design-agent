@@ -74,7 +74,15 @@ export function tf(s: string, vars: Record<string, string | number>): string {
 const KO: Record<string, string> = {
   // ── 공통 ────────────────────────────────────────────────────────
   // ── 위저드 · 질문 세 개로 나눈 화면 ──────────────────────────────
-  'Season report': '시즌 리포트',
+  'Next season forecast': '다음 시즌 예측',
+  'Forecast for': '예측 대상',
+  'Evidence from': '근거 시즌',
+  'What it does next season': '다음 시즌 전개',
+  'Confidence': '확신도',
+  'high': '높음',
+  'medium': '보통',
+  'low': '낮음',
+  'Season report': '다음 시즌 예측',
   'Share': '공유',
   'Copy a link to this board': '이 보드 링크 복사',
   'Link copied. It opens this board in a browser that has this run.': '링크를 복사했습니다. 이 분석을 가진 브라우저에서 열립니다.',
@@ -130,7 +138,7 @@ const KO: Record<string, string> = {
   'Half worn on a model, half staged in studio and on location': '절반은 모델 착용, 절반은 스튜디오·로케이션 연출',
   '3D showroom': '3D 쇼룸',
   'With a 3D showroom': '3D 쇼룸까지',
-  'Top picks scored, then worn on a virtual model and staged in studio and on location.': 'Top을 뽑아 가상 모델에 착용시키고, 스튜디오와 로케이션으로 연출합니다.',
+  'Top picks scored, then worn on a virtual model and staged in studio and on location.': '최종 후보를 뽑아 가상 모델에 착용시키고, 스튜디오와 로케이션으로 연출합니다.',
   'Multiview renders go to Tripo. You get a 3D model you can turn on the board.': '멀티뷰 렌더를 Tripo에 넘겨 보드에서 돌려 볼 수 있는 3D 모델을 만듭니다.',
   'Open full size': '크게 보기',
   'Download GLB': 'GLB 내려받기',
@@ -291,7 +299,7 @@ const KO: Record<string, string> = {
   'Volume': '분량',
   'Generation': '생성',
   'Sketch count': '스케치 수',
-  'Top picks': 'Top 선정',
+  'Top picks': '최종 후보',
   'At least one from each tier': '유형마다 최소 한 건',
   'Mix': '유형 비율',
   'Core : Push : Signature': 'Core : Push : Signature',
@@ -318,12 +326,12 @@ const KO: Record<string, string> = {
   'Research only': '조사만',
   'Worn shots': '착용컷',
   'Competitors, trend signals and the season dossier. No images.':
-    '경쟁사, 트렌드 신호, 시즌 도시에. 이미지는 없습니다.',
+    '경쟁사, 트렌드 신호, 다음 시즌 예측. 이미지는 없습니다.',
   'Everything above, plus specs, rule checks and hand-drawn sketches.':
     '위 전부에 더해 스펙, 룰 검사, 손그림 스케치까지.',
   'Sketches turned into finished renders, extra views and product variations.':
     '스케치를 완성 렌더로, 추가 뷰와 제품 베리에이션까지.',
-  'Top picks scored, then photographed on a model.': 'Top을 뽑고 모델에 신겨 촬영합니다.',
+  'Top picks scored, then photographed on a model.': '최종 후보를 뽑아 모델에 착용시켜 촬영합니다.',
   'Worn on a virtual model, staged in studio and on location, plus clips, board and talk track.':
     '가상 모델 착용, 스튜디오·로케이션 연출, 클립과 보드, 발표 노트까지.',
 
@@ -344,16 +352,16 @@ const KO: Record<string, string> = {
   'Signals and directions': '신호와 디렉션',
   'Specs, rules, rationale': '스펙, 룰, 근거',
   'Renders and views': '렌더와 뷰',
-  'Metrics and top picks': '지표와 Top 선정',
+  'Metrics and top picks': '지표와 최종 후보',
   'Board and notes': '보드와 노트',
   'Starting the pipeline': '파이프라인을 시작합니다',
   'Partial results appear here as they land': '결과가 나오는 대로 여기 붙습니다',
   'Progress log': '진행 로그',
   'Log': '로그',
   'Open board': '보드 열기',
-  'Season dossier': '시즌 도시에',
+  'Season dossier': '다음 시즌 예측',
   'Trend report': '트렌드 리포트',
-  'Dossier PDF': '도시에 PDF',
+  'Dossier PDF': '예측 리포트 PDF',
   'Report PDF': '리포트 PDF',
   'Building': '작성 중',
   'Writing': '작성 중',
@@ -362,7 +370,7 @@ const KO: Record<string, string> = {
   'Still unverified': '아직 확인하지 못한 것',
   'From': '근거',
   'source': '출처',
-  'Review gate': '승인 게이트',
+  'Review gate': '중간 검토',
   'Approve or reject on the cards. Reasons feed the next run.':
     '카드에서 승인·탈락을 정합니다. 사유는 다음 분석에 반영됩니다.',
   'Mapping the macrotrends first, then filling each one with palettes, materials, details and key items.':
@@ -392,7 +400,7 @@ const KO: Record<string, string> = {
   'Talk track': '발표 노트',
   'Vision QA': '비전 QA',
   'Cost, with band, assumptions and exclusions': '원가 · 밴드 · 가정 · 제외 항목',
-  'Distance between top picks': 'Top 상호 거리',
+  'Distance between top picks': '후보 간 차이',
   'A concept rendering of the target spec. It may not match the numbers exactly.':
     '목표 스펙의 컨셉 표현입니다. 수치와 다를 수 있습니다.',
   'blocked from generation, attributes only': '생성 투입 차단 · 속성 추출만',
@@ -513,7 +521,7 @@ const KO: Record<string, string> = {
   'Detailed': '디테일 모델',
   'For volume. Top quality, shorter wait.': '장수가 많을 때. 품질은 그대로, 대기가 짧습니다.',
   'For the board. The most detail this can do.': '품평에 올릴 안. 낼 수 있는 최대 디테일입니다.',
-  'Research and image generation run on a local Node server that is not part of this static build, so nothing is called from here. Everything a full run produced is saved: open History in the left rail to walk through the sample run, its board, the season dossier and the PDFs.': '조사와 이미지 생성은 로컬 Node 서버에서 도는데, 이 정적 빌드에는 그 서버가 없어 아무것도 호출하지 않습니다. 대신 한 번의 분석이 만든 결과가 전부 저장돼 있습니다. 왼쪽 분석 내역을 열면 샘플 분석과 보드, 시즌 도시에, PDF까지 볼 수 있습니다.',
+  'Research and image generation run on a local Node server that is not part of this static build, so nothing is called from here. Everything a full run produced is saved: open History in the left rail to walk through the sample run, its board, the season dossier and the PDFs.': '조사와 이미지 생성은 로컬 Node 서버에서 도는데, 이 정적 빌드에는 그 서버가 없어 아무것도 호출하지 않습니다. 대신 한 번의 분석이 만든 결과가 전부 저장돼 있습니다. 왼쪽 분석 내역을 열면 샘플 분석과 보드, 다음 시즌 예측, PDF까지 볼 수 있습니다.',
   'This session': '이번 세션',
   'images': '장',
   'searches': '회 검색',

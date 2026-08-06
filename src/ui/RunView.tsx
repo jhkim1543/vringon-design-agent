@@ -53,79 +53,8 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
   const topSig = [...st.signals].sort((a, b) => b.observed_count - a.observed_count)[0]
   const sigSummary = st.signals.length ? `${st.signals.length} signals · ${rising} rising` : ''
 
-  return (
-    <div className="run">
-      {/* 좌: 단계 네비 */}
-      <div className="run-left">
-        <div style={{ marginBottom: 14 }}>
-          <div style={{ fontWeight: 800, fontSize: 15 }}>{MODE_LABEL[st.params.mode]}</div>
-          <div className="hint">{TYPE_LABEL[st.params.itemType]} · {st.params.sketchCount} sketches · through {st.params.endStage}</div>
-        </div>
-        <div className="stageline">
-          {STAGE_META.map(s => {
-            const status = st.stageStatus[s.key]
-            return (
-              <div key={s.key} className={`stage-item ${status}`}>
-                <div className="dot" />
-                <div style={{ flex: 1 }}>
-                  <div className="t">{t(s.t)}</div>
-                  <div className="d">{t(s.d)}</div>
-                  {status === 'running' && progress[s.key] != null && (
-                    <div className="progressbar"><div style={{ width: `${progress[s.key]}%` }} /></div>
-                  )}
-                  {status === 'gated' && <Tag kind="warn">Waiting</Tag>}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-        {lastCheckpoint && (
-          <div className="hint" style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--line)' }}>
-            💾 {lastCheckpoint}
-          </div>
-        )}
-        {st.finished && (
-          <button className="btn btn-primary" style={{ width: '100%', marginTop: 16 }} onClick={onOpenBoard}>
-            Open board
-          </button>
-        )}
-      </div>
-
-      {/* 중앙: 핵심 결과 */}
-      <div className="run-center">
-        {/* 리포트가 맨 위 · 무엇이 나왔는지부터 보이고, 근거는 아래 접힘 패널에 그대로 남는다 */}
-        {(st.dossier || st.trendReport || st.designs.length > 0) && (
-          <RunReport st={st} onOpenBoard={onOpenBoard} />
-        )}
-        {gated && (
-          <div className="gatebar">
-            <span style={{ fontWeight: 700 }}>{t('Review gate')}</span>
-            <span className="hint">{t('Approve or reject on the cards. Reasons feed the next run.')}</span>
-            <span style={{ marginLeft: 'auto' }} className="hint">{approvedCount} approved · {rejectedCount} rejected</span>
-            <button className="btn btn-primary btn-sm" onClick={onResume}>{t('Continue')}</button>
-          </div>
-        )}
-
-        {st.dnaConflict && !st.dnaConflict.resolved && (
-          <div className="notice warn" style={{ marginBottom: 14, flexDirection: 'column' }}>
-            <div>
-              <b>Your description and what we observed disagree.</b> {st.dnaConflict.brandClaim} vs {st.dnaConflict.observed}. Pick which one leads.
-            </div>
-            <div style={{ display: 'flex', gap: 6 }}>
-              <button className="btn btn-ghost btn-sm" onClick={() => onResolveDna('description')}>Follow the description</button>
-              <button className="btn btn-ghost btn-sm" onClick={() => onResolveDna('archive')}>Follow the archive</button>
-              <button className="btn btn-ghost btn-sm" onClick={() => onResolveDna('shift')}>Shift toward the description</button>
-            </div>
-          </div>
-        )}
-        {st.dnaConflict?.resolved && (
-          <div className="notice info" style={{ marginBottom: 14 }}>
-            Using <b>{st.dnaConflict.resolved}</b> as the reference. The choice is recorded in the rationale.
-          </div>
-        )}
-
-        {/* S1 상세 · 접힘. 요약 한 줄이 곧 논리 구조의 각 단계 */}
-        {st.competitors.length > 0 && (
+  // 아래 세 블록은 리포트 섹션 안으로 들어간다 (예전에는 화면 맨 밑에 따로 있었다)
+  const competitorDetail = st.competitors.length > 0 && (
           <Collapse title={t('Competitors')} summary={compSummary}>
             <div style={{ padding: '8px 14px 0' }}>
               {isLiveResearch ? (
@@ -185,9 +114,9 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
               ))}
             </div>
           </Collapse>
-        )}
-
-        {(st.dossier || st.dossierPending) && (
+        )
+  // 아래 세 블록은 리포트 섹션 안으로 들어간다 (예전에는 화면 맨 밑에 따로 있었다)
+  const dossierDetail = (st.dossier || st.dossierPending) && (
           <Collapse
             title={t('Season dossier')}
             summary={st.dossier
@@ -278,9 +207,9 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
               )
             })() : null}
           </Collapse>
-        )}
-
-        {(st.trendReport || st.reportPending) && (
+        )
+  // 아래 세 블록은 리포트 섹션 안으로 들어간다 (예전에는 화면 맨 밑에 따로 있었다)
+  const reportDetail = (st.trendReport || st.reportPending) && (
           <Collapse
             title={t('Trend report')}
             summary={st.trendReport
@@ -330,7 +259,86 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
               )
             })() : null}
           </Collapse>
+        )
+
+  return (
+    <div className="run">
+      {/* 좌: 단계 네비 */}
+      <div className="run-left">
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontWeight: 800, fontSize: 15 }}>{MODE_LABEL[st.params.mode]}</div>
+          <div className="hint">{TYPE_LABEL[st.params.itemType]} · {st.params.sketchCount} sketches · through {st.params.endStage}</div>
+        </div>
+        <div className="stageline">
+          {STAGE_META.map(s => {
+            const status = st.stageStatus[s.key]
+            return (
+              <div key={s.key} className={`stage-item ${status}`}>
+                <div className="dot" />
+                <div style={{ flex: 1 }}>
+                  <div className="t">{t(s.t)}</div>
+                  <div className="d">{t(s.d)}</div>
+                  {status === 'running' && progress[s.key] != null && (
+                    <div className="progressbar"><div style={{ width: `${progress[s.key]}%` }} /></div>
+                  )}
+                  {status === 'gated' && <Tag kind="warn">Waiting</Tag>}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        {lastCheckpoint && (
+          <div className="hint" style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--line)' }}>
+            💾 {lastCheckpoint}
+          </div>
         )}
+        {st.finished && (
+          <button className="btn btn-primary" style={{ width: '100%', marginTop: 16 }} onClick={onOpenBoard}>
+            Open board
+          </button>
+        )}
+      </div>
+
+      {/* 중앙: 핵심 결과 */}
+      <div className="run-center">
+        {/* 리포트가 맨 위 · 무엇이 나왔는지부터 보이고, 근거는 아래 접힘 패널에 그대로 남는다 */}
+        {(st.dossier || st.trendReport || st.designs.length > 0) && (
+          <RunReport st={st} onOpenBoard={onOpenBoard}
+            competitorDetail={competitorDetail} dossierDetail={dossierDetail} reportDetail={reportDetail} />
+        )}
+        {gated && (
+          <div className="gatebar">
+            <span style={{ fontWeight: 700 }}>{t('Review gate')}</span>
+            <span className="hint">{t('Approve or reject on the cards. Reasons feed the next run.')}</span>
+            <span style={{ marginLeft: 'auto' }} className="hint">{approvedCount} approved · {rejectedCount} rejected</span>
+            <button className="btn btn-primary btn-sm" onClick={onResume}>{t('Continue')}</button>
+          </div>
+        )}
+
+        {st.dnaConflict && !st.dnaConflict.resolved && (
+          <div className="notice warn" style={{ marginBottom: 14, flexDirection: 'column' }}>
+            <div>
+              <b>Your description and what we observed disagree.</b> {st.dnaConflict.brandClaim} vs {st.dnaConflict.observed}. Pick which one leads.
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => onResolveDna('description')}>Follow the description</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => onResolveDna('archive')}>Follow the archive</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => onResolveDna('shift')}>Shift toward the description</button>
+            </div>
+          </div>
+        )}
+        {st.dnaConflict?.resolved && (
+          <div className="notice info" style={{ marginBottom: 14 }}>
+            Using <b>{st.dnaConflict.resolved}</b> as the reference. The choice is recorded in the rationale.
+          </div>
+        )}
+
+        {/* S1 상세 · 접힘. 요약 한 줄이 곧 논리 구조의 각 단계 */}
+
+
+
+
+
 
         {st.seriesDna && (
           <Collapse title="Series DNA"
