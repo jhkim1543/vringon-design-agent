@@ -3,6 +3,7 @@ import { t } from '../core/i18n'
 import { useEffect, useRef, useState } from 'react'
 import type { RunState } from '../core/types'
 import { MODE_LABEL, CAT_LABEL, TYPE_LABEL } from '../core/types'
+import RunReport from './RunReport'
 import { DesignCard } from './Card'
 import { Collapse, Tag } from './bits'
 import { shotUrl } from '../core/research'
@@ -92,6 +93,10 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
 
       {/* 중앙: 핵심 결과 */}
       <div className="run-center">
+        {/* 리포트가 맨 위 · 무엇이 나왔는지부터 보이고, 근거는 아래 접힘 패널에 그대로 남는다 */}
+        {(st.dossier || st.trendReport || st.designs.length > 0) && (
+          <RunReport st={st} onOpenBoard={onOpenBoard} />
+        )}
         {gated && (
           <div className="gatebar">
             <span style={{ fontWeight: 700 }}>{t('Review gate')}</span>

@@ -18,6 +18,7 @@ import type { BoardNode } from '../core/boardModel'
 import { DesignCard } from './Card'
 import { Tag, ThemeToggle } from './bits'
 import { ModelViewer } from './ModelViewer'
+import { copyText, shareLink } from '../core/share'
 
 const COL_X = [0, 400, 800, 1180, 1600, 2320, 2740, 3160]
 const colX = (c: number) => {
@@ -289,6 +290,15 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
     return () => window.removeEventListener('keydown', onKey)
   }, [present, presentIdx, focusOrder, rf])
 
+  // 공유 · 이 보드를 가리키는 주소를 복사한다.
+  // 다른 기기에서는 그 분석이 없어 열리지 않으므로, 그때는 내보내기를 써야 한다.
+  const share = useCallback(async () => {
+    const url = shareLink(runId, 'board')
+    const ok = await copyText(url)
+    // 복사가 막히는 환경이 있다. 그때는 링크를 그대로 띄워 직접 복사하게 둔다.
+    setMiro({ busy: false, msg: ok ? t('Link copied. It opens this board in a browser that has this run.') : url })
+  }, [runId])
+
   const exportMiro = useCallback(async () => {
     setMiro({ busy: true, msg: 'Converting board for Miro' })
     try {
@@ -358,6 +368,7 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
             <button className="btn btn-ghost btn-sm" onClick={resetEdits} title={t('Back to the generated board')}>{t('Reset edits')}</button>
           )}
           <ThemeToggle theme={light ? 'light' : 'dark'} onToggle={() => setLight(v => !v)} />
+          <button className="btn btn-ghost btn-sm" onClick={share} title={t('Copy a link to this board')}>{t('Share')}</button>
           <button className="btn btn-primary btn-sm" onClick={exportMiro} disabled={miro.busy}>
             {miro.busy ? t('Exporting') : t('Export to Miro')}
           </button>

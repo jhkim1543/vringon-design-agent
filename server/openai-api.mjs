@@ -326,6 +326,10 @@ export async function handleApi(req, res) {
   if (path === '/api/miro/export' && req.method === 'POST') {
     try {
       const { model, meta } = await readBody(req)
+      // 형태가 어긋나면 planMiroBoard 안에서 TypeError 가 나 원인이 안 보인다
+      if (!model || !Array.isArray(model.columns) || !Array.isArray(model.nodes)) {
+        return json(res, 400, { error: 'board model must have columns[] and nodes[]' })
+      }
       const plan = planMiroBoard(model, meta ?? { name: 'VRINGON 품평 보드', description: '' })
       if (!MIRO_TOKEN) {
         return json(res, 200, {

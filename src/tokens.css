@@ -84,7 +84,7 @@
   --accent-hi: #444AE8;
   --accent-soft: #F6F7FF;
   --warn: #B34F00;    /* #FA7500은 흰 배경에서 2.8:1로 AA 미달이었다 → 5.2:1 */
-  --danger: #E32F3F;
+  --danger: #D42B31;     /* #E32F3F는 흰 배경에서 4.4:1 이었다 → 5.0:1 */
   --alert: #E32F3F;
   --alert-hover: #FF4550;
   --line-2: #C5C9CF;
@@ -172,7 +172,7 @@
   --accent: #5D6CFA;
   --accent-hover: #444AE8;
   --accent-pressed: #0E0EA6;
-  --accent-hi: #5D6CFA;
+  --accent-hi: #6E7BFF;  /* #5D6CFA는 패널 위 11px에서 4.46:1 이었다 → 5.3:1 */
   --accent-soft: #000045;
   --warn: #FFAB5C;
   --danger: #FF7474;

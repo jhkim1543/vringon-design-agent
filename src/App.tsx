@@ -19,6 +19,8 @@ import { clearCurrent, firstImage, loadCurrent, newRunId, saveCurrent, saveRun }
 import type { RunRecord } from './core/store'
 import { CAT_LABEL, MODE_LABEL, TYPE_LABEL } from './core/types'
 import { ensureSampleRuns } from './core/sampleRun'
+import { getRun } from './core/store'
+import { pushShareTarget, readShareTarget } from './core/share'
 
 type View = 'create' | 'run' | 'board' | 'library' | 'starred'
 
@@ -49,18 +51,37 @@ export default function App() {
   const runIdRef = useRef<string>(newRunId())
   // New run을 누르면 위저드를 새로 마운트해 입력을 처음 상태로 되돌린다
   const [wizardKey, setWizardKey] = useState(0)
+  // 공유 링크가 가리키는 분석이 이 브라우저에 없을 때 알려 줄 값
+  const [shareMiss, setShareMiss] = useState<string | null>(null)
 
   // 예시 Run을 한 번 심어 둔다. 처음 열어도 결과가 어떻게 나오는지 볼 수 있게.
   useEffect(() => { ensureSampleRuns() }, [])
 
-  // 새로고침이나 렌더 오류로 화면이 날아가도 진행 결과를 되살린다
+  // 새로고침이나 렌더 오류로 화면이 날아가도 진행 결과를 되살린다.
+  // 공유 링크(?run=…)로 들어왔으면 그 분석을 먼저 연다.
   useEffect(() => {
+    const target = readShareTarget()
+    if (target) {
+      const rec = getRun(target.runId)
+      if (rec) {
+        runIdRef.current = rec.id
+        setSt(rec.state)
+        setView(target.view)
+        return
+      }
+      setShareMiss(target.runId)
+    }
     const prev = loadCurrent()
     if (prev && prev.state.designs.length) {
       runIdRef.current = prev.id
       setSt(prev.state)
     }
   }, [])
+
+  // 보드나 분석 화면을 보고 있으면 주소에 남긴다. 새로고침해도 같은 곳이 열린다.
+  useEffect(() => {
+    if (st && (view === 'board' || view === 'run')) pushShareTarget(runIdRef.current, view)
+  }, [view, st])
 
   const onEvent = useCallback((e: PipelineEvent) => {
     setSt(prev => {
@@ -205,6 +226,13 @@ export default function App() {
             </button>
           </div>
         </aside>
+        {shareMiss && view === 'create' && (
+          <div className="sharemiss">
+            <b>{t('That shared board is not in this browser.')}</b>
+            <span>{t('Boards are stored locally, so a link only opens one this browser already has. Ask for the exported file, or open the link on the machine that ran it.')}</span>
+            <button className="btn btn-ghost btn-sm" onClick={() => setShareMiss(null)}>{t('Close')}</button>
+          </div>
+        )}
         {view === 'create' && (
           <Wizard key={wizardKey} onStart={p => {
             if (!isBrandConfigured(brand)) { setBrandGate(p); return }
