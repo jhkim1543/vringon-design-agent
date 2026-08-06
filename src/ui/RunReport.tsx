@@ -61,9 +61,12 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
         items,
         lo: prices.length ? Math.min(...prices) : null,
         hi: prices.length ? Math.max(...prices) : null,
-        traits: [...new Set(items.flatMap(i => i.praise_points ?? []))].slice(0, 3),
+        // design_traits 가 실제로 채워지는 필드다. praise_points 는 비어 오는 경우가 많다.
+        traits: [...new Set(items.flatMap(i => i.design_traits ?? []))].slice(0, 6),
+        signals: [...new Set(items.flatMap(i => i.proxy_signals ?? []))].slice(0, 3),
         shots: items.map(i => i.image_urls?.[0]).filter(Boolean).slice(0, 2) as string[],
         inBand: items.filter(i => i.in_band).length,
+        strong: items.filter(i => i.evidence_strength === 'strong').length,
       }
     }).sort((a, b) => b.items.length - a.items.length)
   }, [st.competitors])
@@ -137,14 +140,28 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
               const shot = macroShot(m)
               return (
                 <article className="rep-macro" key={m.name}>
+                  {/* 대표 이미지가 없으면 팔레트를 띠로 깐다. 아이콘만 두면 임팩트가 없다. */}
                   <span className="rm-art">
-                    {shot ? <img src={shot} alt="" /> : <CatIcon />}
+                    {shot
+                      ? <img src={shot} alt="" />
+                      : (m.palette ?? []).length
+                        ? <span className="rm-pal">
+                            {(m.palette ?? []).slice(0, 6).map((c, i) => (
+                              <i key={i} style={{ background: c.hex }} title={`${c.name} ${c.hex}`} />
+                            ))}
+                          </span>
+                        : <CatIcon />}
+                    <span className="rm-grade">{t(GRADE_LABEL[m.grade] ?? m.grade)}</span>
                   </span>
                   <span className="rm-txt">
                     <b>{m.name}</b>
                     <span className="rm-d">{m.statement}</span>
+                    {(m.sub_trends ?? []).length > 0 && (
+                      <span className="rm-subs">
+                        {(m.sub_trends ?? []).slice(0, 4).map((s, i) => <i key={i}>{s}</i>)}
+                      </span>
+                    )}
                   </span>
-                  <span className="rm-grade">{t(GRADE_LABEL[m.grade] ?? m.grade)}</span>
                 </article>
               )
             })}
@@ -186,21 +203,42 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
             <table className="rep-table">
               <thead>
                 <tr>
-                  <th>{t('Brand')}</th><th>{t('Traits observed')}</th><th>{t('Key products')}</th>
-                  <th>{t('Price range')}</th><th>{t('In band')}</th>
+                  <th>{t('Brand')}</th><th>{t('Products found')}</th><th>{t('Design traits observed')}</th>
+                  <th>{t('Market signals')}</th><th>{t('Price range')}</th>
                 </tr>
               </thead>
               <tbody>
                 {brands.map(b => (
                   <tr key={b.brand}>
-                    <td className="rt-brand">{b.brand}</td>
-                    <td>{b.traits.length ? b.traits.join(', ') : <span className="dim">{t('none recorded')}</span>}</td>
-                    <td className="rt-shots">
-                      {b.shots.map((s, i) => <img key={i} src={shotUrl(s)} alt=""
-                        onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }} />)}
+                    <td className="rt-brand">
+                      {b.brand}
+                      <i>{b.inBand}/{b.items.length} {t('in band')}{b.strong ? ` · ${b.strong} ${t('strong')}` : ''}</i>
+                    </td>
+                    {/* 제품 사진과 이름을 함께 둔다. 사진만으로는 무엇을 본 건지 알 수 없다. */}
+                    <td className="rt-prods">
+                      {b.items.slice(0, 3).map(p => (
+                        <span className="rt-prod" key={p.product_id}>
+                          {p.image_urls?.[0] && <img src={shotUrl(p.image_urls[0])} alt=""
+                            onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />}
+                          <span>
+                            <b>{p.name}</b>
+                            {typeof p.price_krw === 'number' && p.price_krw > 0 && <i>{KRW(p.price_krw)}</i>}
+                          </span>
+                        </span>
+                      ))}
+                      {b.items.length > 3 && <span className="dim">+{b.items.length - 3}</span>}
+                    </td>
+                    <td className="rt-traits">
+                      {b.traits.length
+                        ? b.traits.map((x, i) => <i key={i}>{x}</i>)
+                        : <span className="dim">{t('none recorded')}</span>}
+                    </td>
+                    <td className="rt-sig">
+                      {b.signals.length
+                        ? b.signals.map((x, i) => <span key={i}>{x}</span>)
+                        : <span className="dim">—</span>}
                     </td>
                     <td className="rt-price">{b.lo != null ? `${KRW(b.lo)} – ${KRW(b.hi!)}` : <span className="dim">—</span>}</td>
-                    <td>{b.inBand} / {b.items.length}</td>
                   </tr>
                 ))}
               </tbody>
