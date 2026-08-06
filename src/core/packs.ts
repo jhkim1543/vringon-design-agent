@@ -1,6 +1,6 @@
-// ── CategoryPack · 주얼리·신발 팩 (지시서 4.1, 6장, 7장) ─────────────
+// ── FootwearPack · 신발 전용 팩 (지시서 4.1, 6장, 7장, 9.3, 11장) ────
 import type { Category, CostEstimate, DesignSpec, DesignTier, RuleResult } from './types'
-import { TYPE_LABEL } from './types'
+import { TYPE_LABEL, groupOf } from './types'
 import type { Rng } from './rng'
 
 export interface CategoryPack {
@@ -17,227 +17,149 @@ export interface CategoryPack {
 
 let seq = 0
 export function resetSeq() { seq = 0 }
-function nextId(cat: Category, tier: DesignTier) {
+function nextId(tier: DesignTier) {
   seq += 1
-  const p = cat === 'jewelry' ? 'JW' : 'SH'
   const t = tier === 'core' ? 'C' : tier === 'push' ? 'P' : 'S'
-  return `${p}-26FW-${t}${String(seq).padStart(2, '0')}`
+  return `SH-26FW-${t}${String(seq).padStart(2, '0')}`
 }
 
-// ════════════════════════════════ 주얼리 팩 ═══════════════════════════
-const METALS = ['925 silver', '14k gold', 'brass'] as const
-const SETTINGS = ['prong', 'bezel', 'pave', 'channel'] as const
-const FINISHES = ['polished', 'matte', 'hammered'] as const
-
-interface JewelProfile {
-  stones: [number, number]
-  weight: [number, number]
-  cap: number                   // 유형별 원가 상한 기준 (Core 100% 기준액)
-  pair?: boolean
-  chain?: boolean
-  settings?: string[]
-}
-const JEWEL_PROFILE: Record<string, JewelProfile> = {
-  band_ring: { stones: [0, 0], weight: [2.5, 6], cap: 58000 },
-  solitaire: { stones: [1, 1], weight: [2, 4.5], cap: 72000, settings: ['prong', 'bezel'] },
-  eternity: { stones: [12, 24], weight: [2.5, 5], cap: 115000, settings: ['channel', 'pave', 'bezel'] },
-  signet: { stones: [0, 1], weight: [4, 9], cap: 88000, settings: ['bezel'] },
-  stud: { stones: [1, 2], weight: [0.8, 2.5], cap: 42000, pair: true },
-  hoop: { stones: [0, 12], weight: [1.5, 5], cap: 60000, pair: true },
-  drop: { stones: [1, 6], weight: [2, 6], cap: 78000, pair: true },
-  ear_cuff: { stones: [0, 5], weight: [1, 3], cap: 40000 },
-  pendant: { stones: [1, 14], weight: [2, 7], cap: 82000, chain: true },
-  choker: { stones: [0, 10], weight: [4, 12], cap: 135000, chain: true },
-  chain_necklace: { stones: [0, 0], weight: [5, 16], cap: 155000, chain: true },
-  station: { stones: [5, 12], weight: [3, 9], cap: 118000, chain: true, settings: ['bezel', 'prong'] },
-  bangle: { stones: [0, 8], weight: [8, 22], cap: 175000 },
-  chain_bracelet: { stones: [0, 6], weight: [5, 15], cap: 145000, chain: true },
-  cuff: { stones: [0, 6], weight: [10, 26], cap: 205000 },
-  tennis: { stones: [20, 40], weight: [4, 10], cap: 195000, settings: ['prong', 'channel'] },
-  brooch: { stones: [1, 16], weight: [3, 10], cap: 95000 },
-  anklet: { stones: [0, 8], weight: [2, 6], cap: 72000, chain: true },
-}
-const DEFAULT_JEWEL_PROFILE: JewelProfile = { stones: [1, 6], weight: [2, 5], cap: 68000 }
-export const jewelCapOf = (t: string) => (JEWEL_PROFILE[t] ?? DEFAULT_JEWEL_PROFILE).cap
-
-export const jewelryPack: CategoryPack = {
-  id: 'jewelry',
-  types: Object.keys(JEWEL_PROFILE),
-  fieldLabels: {
-    metal: 'Metal', plating: 'Plating', target_weight_g: 'Target weight (g)',
-    stone_count: 'Stones', stone_size_mm: 'Stone size (mm)', setting_type: 'Setting',
-    min_wall_thickness_mm: 'Min wall (mm)', prong_count: 'Prongs',
-    chain_type: 'Chain', finish: 'Finish', is_pair: 'Pair', is_new_mold: 'New mould',
-    existing_mold_id: 'Mould ID',
-  },
-  generateSpec(rng, tier, itemType, locked) {
-    const prof = JEWEL_PROFILE[itemType] ?? DEFAULT_JEWEL_PROFILE
-    // 유형이 허용하는 범위 안에서, 티어가 위로 갈수록 상단을 쓴다
-    const span = prof.stones[1] - prof.stones[0]
-    const bias = tier === 'core' ? 0.35 : tier === 'push' ? 0.65 : 1
-    const stoneCount = prof.stones[0] + Math.round(span * rng.next() * bias)
-    const wSpan = prof.weight[1] - prof.weight[0]
-    const weight = prof.weight[0] + wSpan * (tier === 'signature' ? 0.5 + rng.next() * 0.5 : rng.next() * 0.7)
-    // Core는 원가가 낮은 금속 위주, Signature에서만 금을 폭넓게 쓴다
-    const metalPool = tier === 'core' ? ['925 silver', '925 silver', 'brass']
-      : tier === 'push' ? ['925 silver', '925 silver', 'brass', '14k gold']
-      : METALS as unknown as string[]
-    const f: Record<string, string | number | boolean> = {
-      metal: rng.pick(metalPool),
-      plating: rng.pick(['rhodium', '18k gold', 'none']),
-      target_weight_g: Math.round(weight * 10) / 10,
-      stone_count: stoneCount,
-      stone_size_mm: Math.round((0.8 + rng.next() * (itemType === 'tennis' || itemType === 'eternity' ? 1.8 : 4.5)) * 10) / 10,
-      setting_type: rng.pick(prof.settings ?? SETTINGS),
-      prong_count: rng.pick([4, 4, 4, 6, 3]),
-      // 주조 하한(0.8mm) 근처를 노리되, 일부는 미달하게 두어 룰이 실제로 걸러내게 한다
-      min_wall_thickness_mm: Math.round((0.74 + rng.next() * 0.86) * 100) / 100,
-      chain_type: prof.chain ? rng.pick(['cable', 'box', 'snake']) : 'none',
-      finish: rng.pick(FINISHES),
-      is_pair: !!prof.pair,
-      is_new_mold: tier === 'signature' ? rng.chance(0.6) : rng.chance(0.15),
-      existing_mold_id: `MLD-2024-${rng.int(3, 18)}`,
-    }
-    const lockedKeys: string[] = []
-    for (const [k, v] of Object.entries(locked)) { f[k] = v; lockedKeys.push(k) }
-    return { design_id: nextId('jewelry', tier), tier, category: 'jewelry', itemType, fields: f, fieldsLocked: lockedKeys }
-  },
-  rules(spec) {
-    const f = spec.fields
-    const r: RuleResult[] = []
-    if ((f.min_wall_thickness_mm as number) < 0.8)
-      r.push({ rule: 'J-01', severity: 'fail', message: `Wall thickness ${f.min_wall_thickness_mm}mm is under 0.8mm. Cannot be cast.` })
-    if (f.is_new_mold && spec.tier === 'core')
-      r.push({ rule: 'J-02', severity: 'fail', message: 'New mould on a Core piece. Core has to reuse an existing mould.' })
-    if (f.setting_type === 'pave' && (f.stone_size_mm as number) < 1.0)
-      r.push({ rule: 'J-03', severity: 'warn', message: `Pave with ${f.stone_size_mm}mm stones under 1.0mm. Setting labour climbs sharply.` })
-    if (f.metal === '925 silver' && f.plating === 'none' && f.finish === 'polished')
-      r.push({ rule: 'J-04', severity: 'warn', message: 'Unplated polished silver will tarnish.' })
-    if ((f.prong_count as number) < 4 && (f.stone_size_mm as number) > 5.0)
-      r.push({ rule: 'J-05', severity: 'fail', message: `${f.prong_count} prongs on a ${f.stone_size_mm}mm stone. The stone can work loose.` })
-    if (f.chain_type === 'snake' && (f.target_weight_g as number) > 8)
-      r.push({ rule: 'J-07', severity: 'warn', message: 'Snake chain with a pendant over 8g. Structurally marginal.' })
-    // 연속 세팅 유형은 스톤 크기 편차가 크면 라인이 흐트러진다
-    if ((spec.itemType === 'tennis' || spec.itemType === 'eternity') && (f.stone_size_mm as number) > 3.0)
-      r.push({ rule: 'J-09', severity: 'warn', message: `${f.stone_size_mm}mm stones on a ${TYPE_KO(spec.itemType)}. Both worn thickness and unit cost jump.` })
-    // 귀걸이류는 무게가 귓불 부담으로 직결된다
-    if (f.is_pair && (f.target_weight_g as number) > 5)
-      r.push({ rule: 'J-10', severity: 'fail', message: `${f.target_weight_g}g per earring. Past what an earlobe carries comfortably.` })
-    return r
-  },
-  costModel(spec, rng) {
-    const f = spec.fields
-    const metalRate = f.metal === '14k gold' ? 21000 : f.metal === '925 silver' ? 6600 : 2400
-    const metal = Math.round((f.target_weight_g as number) * metalRate)
-    const stone = (f.stone_count as number) * (f.stone_size_mm as number) * 480
-    const setting = f.setting_type === 'pave' ? (f.stone_count as number) * 1400 : (f.stone_count as number) * 700
-    const casting = 5000, findings = 3000
-    const plating = f.plating === 'none' ? 0 : 4000
-    const finishing = 3500
-    const chain = f.chain_type === 'none' ? 0 : 8000
-    const newMold = f.is_new_mold ? 480000 : 0
-    const amort = 500
-    const toolingPerUnit = Math.round(newMold / amort)
-    const lines = [
-      { label: 'Metal', krw: metal }, { label: 'Stones', krw: Math.round(stone) },
-      { label: 'Findings', krw: findings }, { label: 'Chain', krw: chain },
-      { label: 'Casting', krw: casting }, { label: 'Setting labour', krw: Math.round(setting) },
-      { label: 'Plating', krw: plating }, { label: 'Finishing', krw: finishing },
-      { label: 'Tooling, amortised', krw: toolingPerUnit },
-    ]
-    const total = lines.reduce((s, l) => s + l.krw, 0)
-    const yieldFactor = 1.12
-    const est = Math.round(total * yieldFactor)
-    const capBase = jewelCapOf(spec.itemType)
-    return {
-      lines,
-      tooling: { total_tooling_krw: newMold, mold_count_required: f.is_new_mold ? 1 : 0, amortization_volume: amort, tooling_per_unit_krw: toolingPerUnit },
-      estimated_total_krw: est,
-      estimated_band_krw: [Math.round(est * 0.85), Math.round(est * (1.18 + rng.next() * 0.06))],
-      cap_ratio: Math.round((est / capBase) * 100) / 100,
-      confidence: 'low',
-      assumptions: ['MOQ 300', 'Silver and gold priced at 2026-08-01', 'Standard setting labour rate', `Amortised over ${amort} units`],
-      excluded_costs: ['Packaging', 'Freight', 'Vendor margin', 'Defect rate', 'Sampling'],
-    }
-  },
-  signalAxes: ['Form', 'Metal and colour', 'Stones', 'Setting', 'How it is worn', 'Scale', 'Layering', 'Price band'],
-  viewSet: [
-    { key: 'front', label: 'Front (reference)', required: true },
-    { key: 'q45', label: '45 degrees', required: true },
-    { key: 'detail', label: 'Detail close-up', required: true },
-    { key: 'wear', label: 'Worn angle', required: false },
-  ],
-  qaChecks: ['Stone count matches', 'Setting reads correctly', 'Prong count', 'Same object across three views >=0.80', 'Pair matches left to right'],
-}
-
-// ════════════════════════════════ 신발 팩 ════════════════════════════
 const TOES = ['almond', 'square', 'round', 'pointed'] as const
-const HEEL_TYPES = ['flat', 'block', 'stiletto', 'stacked'] as const
-const CLOSURES = ['slip_on', 'lace', 'buckle', 'strap', 'elastic_gore'] as const
 
-// 브랜드 라스트 라이브러리 (지시서 18장 · 신발 Core·S-04의 전제)
+// 브랜드 라스트 라이브러리 (지시서 18장 · Core·S-04의 전제)
+// family가 다르면 같은 토 셰이프라도 다른 라스트다. 러닝 라스트에 드레스 어퍼를 얹을 수 없다.
 export const LAST_LIBRARY = [
-  { last_id: 'LST-2024-07', toe: 'almond', label: 'Almond last', athletic: false },
-  { last_id: 'LST-2024-11', toe: 'square', label: 'Square last', athletic: false },
-  { last_id: 'LST-2023-03', toe: 'round', label: 'Round last', athletic: false },
-  { last_id: 'LST-2025-01', toe: 'pointed', label: 'Pointed last', athletic: false },
-  { last_id: 'LST-RUN-02', toe: 'round', label: 'Running last, standard', athletic: true },
-  { last_id: 'LST-RUN-05', toe: 'round', label: 'Running last, wide', athletic: true },
+  { last_id: 'LST-2024-07', toe: 'almond', label: 'Almond dress last', family: 'dress' },
+  { last_id: 'LST-2024-11', toe: 'square', label: 'Square dress last', family: 'dress' },
+  { last_id: 'LST-2023-03', toe: 'round', label: 'Round dress last', family: 'dress' },
+  { last_id: 'LST-2025-01', toe: 'pointed', label: 'Pointed heel last', family: 'heel' },
+  { last_id: 'LST-HEEL-02', toe: 'almond', label: 'Almond heel last, 55-75mm pitch', family: 'heel' },
+  { last_id: 'LST-RUN-02', toe: 'round', label: 'Running last, medium volume', family: 'running' },
+  { last_id: 'LST-RUN-05', toe: 'round', label: 'Running last, wide 2E', family: 'running' },
+  { last_id: 'LST-RUN-07', toe: 'round', label: 'Racing last, low volume', family: 'running' },
+  { last_id: 'LST-CRT-01', toe: 'round', label: 'Court last', family: 'running' },
+  { last_id: 'LST-BOOT-04', toe: 'round', label: 'Boot last, medium-high volume', family: 'boot' },
+  { last_id: 'LST-FLAT-01', toe: 'round', label: 'Wide comfort flat last', family: 'flat' },
 ]
 
 // 타입별 설계 프로파일 · 룰과 원가가 타입에 따라 달라지는 지점
 interface ShoeProfile {
-  heel: [number, number]          // 힐/솔 높이 범위 mm
+  heel: [number, number]          // 힐/스택 높이 범위 mm
   closures: string[]
   panels: [number, number]
   constructions: string[]
   athletic?: boolean              // 운동화 계열 · 라스트·금형 논리가 다르다
   shaft?: number                  // 부츠 목높이 mm
   open?: boolean                  // 샌들류 · 갑피 면적이 작다
+  lastFamily: string              // 이 유형이 요구하는 라스트 계열
+  foams?: string[]                // 미드솔 폼 후보 (운동화)
+  plates?: string[]               // 플레이트 후보 (운동화)
+  drop?: [number, number]         // heel-to-toe drop 범위 (운동화)
+  lugs?: [number, number]         // 러그 깊이 범위 mm (트레일·하이킹)
 }
 const SHOE_PROFILE: Record<string, ShoeProfile> = {
-  running: { heel: [22, 38], closures: ['lace'], panels: [5, 11], constructions: ['cemented'], athletic: true },
-  court_sneaker: { heel: [18, 28], closures: ['lace'], panels: [4, 9], constructions: ['cemented', 'vulcanized'], athletic: true },
-  chunky_sneaker: { heel: [30, 55], closures: ['lace'], panels: [6, 12], constructions: ['cemented'], athletic: true },
-  trail: { heel: [24, 40], closures: ['lace'], panels: [6, 12], constructions: ['cemented'], athletic: true },
-  loafer: { heel: [18, 35], closures: ['slip_on', 'elastic_gore'], panels: [3, 6], constructions: ['cemented', 'blake', 'goodyear'] },
-  derby: { heel: [20, 35], closures: ['lace'], panels: [4, 7], constructions: ['blake', 'goodyear', 'cemented'] },
-  oxford: { heel: [20, 35], closures: ['lace'], panels: [4, 8], constructions: ['goodyear', 'blake'] },
-  monk: { heel: [20, 35], closures: ['buckle'], panels: [4, 7], constructions: ['blake', 'goodyear'] },
-  pump: { heel: [45, 95], closures: ['slip_on'], panels: [2, 5], constructions: ['cemented', 'blake'] },
-  slingback: { heel: [35, 85], closures: ['strap'], panels: [3, 6], constructions: ['cemented'] },
-  mary_jane: { heel: [15, 55], closures: ['strap'], panels: [3, 6], constructions: ['cemented', 'blake'] },
-  mule: { heel: [25, 80], closures: ['slip_on'], panels: [2, 4], constructions: ['cemented'] },
-  ballet_flat: { heel: [5, 15], closures: ['slip_on', 'elastic_gore'], panels: [2, 5], constructions: ['cemented', 'blake'] },
-  driving: { heel: [8, 18], closures: ['slip_on'], panels: [3, 6], constructions: ['cemented'] },
-  ankle_boot: { heel: [25, 70], closures: ['zip', 'lace'], panels: [4, 8], constructions: ['cemented', 'goodyear'], shaft: 110 },
-  chelsea: { heel: [20, 45], closures: ['elastic_gore'], panels: [3, 6], constructions: ['cemented', 'goodyear'], shaft: 120 },
-  long_boot: { heel: [25, 75], closures: ['zip'], panels: [5, 9], constructions: ['cemented'], shaft: 380 },
-  combat: { heel: [25, 45], closures: ['lace'], panels: [5, 10], constructions: ['goodyear', 'cemented'], shaft: 150 },
-  strap_sandal: { heel: [10, 75], closures: ['buckle', 'strap'], panels: [3, 7], constructions: ['cemented'], open: true },
-  slide: { heel: [10, 45], closures: ['slip_on'], panels: [1, 3], constructions: ['cemented'], open: true },
-  gladiator: { heel: [10, 40], closures: ['buckle'], panels: [5, 10], constructions: ['cemented'], open: true },
+  // ── Sneakers ──
+  running: { heel: [28, 40], closures: ['lace'], panels: [5, 11], constructions: ['cemented'], athletic: true, lastFamily: 'running', foams: ['EVA', 'supercritical EVA', 'PEBA blend'], plates: ['none', 'none', 'nylon'], drop: [6, 10] },
+  max_cushion: { heel: [38, 52], closures: ['lace'], panels: [5, 10], constructions: ['cemented'], athletic: true, lastFamily: 'running', foams: ['supercritical EVA', 'PEBA blend', 'EVA'], plates: ['none'], drop: [4, 8] },
+  tempo_racer: { heel: [30, 40], closures: ['lace'], panels: [4, 8], constructions: ['cemented'], athletic: true, lastFamily: 'running', foams: ['PEBA', 'PEBA blend'], plates: ['carbon', 'nylon', 'carbon'], drop: [4, 8] },
+  trail: { heel: [24, 36], closures: ['lace'], panels: [6, 12], constructions: ['cemented'], athletic: true, lastFamily: 'running', foams: ['EVA', 'supercritical EVA'], plates: ['none', 'rock plate'], drop: [4, 8], lugs: [3.5, 5.5] },
+  court_sneaker: { heel: [18, 28], closures: ['lace'], panels: [4, 9], constructions: ['cemented', 'vulcanized', 'cupsole'], athletic: true, lastFamily: 'running', foams: ['EVA'], plates: ['none', 'tpu shank'] },
+  lifestyle_runner: { heel: [24, 36], closures: ['lace'], panels: [6, 12], constructions: ['cemented'], athletic: true, lastFamily: 'running', foams: ['EVA'], plates: ['none'], drop: [8, 12] },
+  chunky_sneaker: { heel: [30, 55], closures: ['lace'], panels: [6, 12], constructions: ['cemented'], athletic: true, lastFamily: 'running', foams: ['EVA', 'PU'], plates: ['none'] },
+  // ── Dress ──
+  loafer: { heel: [18, 35], closures: ['slip_on', 'elastic_gore'], panels: [3, 6], constructions: ['cemented', 'blake', 'goodyear'], lastFamily: 'dress' },
+  horsebit_loafer: { heel: [18, 35], closures: ['slip_on'], panels: [3, 6], constructions: ['blake', 'cemented'], lastFamily: 'dress' },
+  chunky_loafer: { heel: [30, 55], closures: ['slip_on', 'elastic_gore'], panels: [3, 7], constructions: ['cemented', 'blake'], lastFamily: 'dress' },
+  derby: { heel: [20, 35], closures: ['lace'], panels: [4, 7], constructions: ['blake', 'goodyear', 'cemented'], lastFamily: 'dress' },
+  oxford: { heel: [20, 35], closures: ['lace'], panels: [4, 8], constructions: ['goodyear', 'blake'], lastFamily: 'dress' },
+  monk: { heel: [20, 35], closures: ['buckle'], panels: [4, 7], constructions: ['blake', 'goodyear'], lastFamily: 'dress' },
+  // ── Heels ──
+  pump: { heel: [45, 95], closures: ['slip_on'], panels: [2, 5], constructions: ['cemented', 'blake'], lastFamily: 'heel' },
+  slingback: { heel: [35, 85], closures: ['strap'], panels: [3, 6], constructions: ['cemented'], lastFamily: 'heel' },
+  mary_jane: { heel: [15, 55], closures: ['strap'], panels: [3, 6], constructions: ['cemented', 'blake'], lastFamily: 'heel' },
+  mule: { heel: [25, 80], closures: ['slip_on'], panels: [2, 4], constructions: ['cemented'], lastFamily: 'heel' },
+  // ── Flats ──
+  ballet_flat: { heel: [5, 15], closures: ['slip_on', 'elastic_gore'], panels: [2, 5], constructions: ['cemented', 'blake'], lastFamily: 'flat' },
+  driving: { heel: [8, 18], closures: ['slip_on'], panels: [3, 6], constructions: ['moccasin', 'cemented'], lastFamily: 'flat' },
+  espadrille: { heel: [10, 30], closures: ['slip_on'], panels: [2, 5], constructions: ['cemented'], lastFamily: 'flat' },
+  // ── Boots ──
+  ankle_boot: { heel: [25, 70], closures: ['zip', 'lace'], panels: [4, 8], constructions: ['cemented', 'goodyear'], shaft: 110, lastFamily: 'boot' },
+  chelsea: { heel: [20, 45], closures: ['elastic_gore'], panels: [3, 6], constructions: ['cemented', 'goodyear'], shaft: 120, lastFamily: 'boot' },
+  combat: { heel: [25, 45], closures: ['lace'], panels: [5, 10], constructions: ['goodyear', 'cemented'], shaft: 150, lastFamily: 'boot' },
+  long_boot: { heel: [25, 75], closures: ['zip'], panels: [5, 9], constructions: ['cemented'], shaft: 380, lastFamily: 'boot' },
+  hiking: { heel: [28, 42], closures: ['lace'], panels: [6, 12], constructions: ['cemented'], shaft: 130, lastFamily: 'boot', foams: ['PU', 'EVA'], lugs: [4, 6] },
+  // ── Sandals ──
+  strap_sandal: { heel: [10, 75], closures: ['buckle', 'strap'], panels: [3, 7], constructions: ['cemented'], open: true, lastFamily: 'flat' },
+  slide: { heel: [10, 45], closures: ['slip_on'], panels: [1, 3], constructions: ['cemented'], open: true, lastFamily: 'flat' },
+  sport_sandal: { heel: [18, 40], closures: ['strap'], panels: [2, 5], constructions: ['cemented'], open: true, lastFamily: 'flat', foams: ['EVA'] },
+  gladiator: { heel: [10, 40], closures: ['buckle'], panels: [5, 10], constructions: ['cemented'], open: true, lastFamily: 'flat' },
 }
-const DEFAULT_SHOE_PROFILE: ShoeProfile = { heel: [20, 40], closures: ['slip_on'], panels: [3, 7], constructions: ['cemented'] }
+const DEFAULT_SHOE_PROFILE: ShoeProfile = { heel: [20, 40], closures: ['slip_on'], panels: [3, 7], constructions: ['cemented'], lastFamily: 'dress' }
+export const profileOf = (t: string) => SHOE_PROFILE[t] ?? DEFAULT_SHOE_PROFILE
 const isAthletic = (t: string) => !!SHOE_PROFILE[t]?.athletic
 const isOpen = (t: string) => !!SHOE_PROFILE[t]?.open
-const TYPE_KO = (t: string) => TYPE_LABEL[t] ?? t
+const NAME = (t: string) => TYPE_LABEL[t] ?? t
+
+// ── 계열별 필수 뷰 (지시서 19장) · 계열이 다르면 봐야 하는 각도가 다르다
+const VIEWSETS: Record<string, { key: string; label: string; required: boolean }[]> = {
+  sneaker: [
+    { key: 'lateral', label: 'Lateral side (reference)', required: true },
+    { key: 'medial', label: 'Medial side', required: true },
+    { key: 'q34', label: 'Three-quarter front', required: true },
+    { key: 'top', label: 'Top-down', required: true },
+    { key: 'outsole', label: 'Outsole (Top N)', required: false },
+  ],
+  dress: [
+    { key: 'lateral', label: 'Lateral side (reference)', required: true },
+    { key: 'q34', label: 'Three-quarter front', required: true },
+    { key: 'top', label: 'Top-down', required: true },
+    { key: 'outsole', label: 'Outsole and welt (Top N)', required: false },
+  ],
+  heel: [
+    { key: 'lateral', label: 'Lateral side (reference)', required: true },
+    { key: 'q34', label: 'Three-quarter front', required: true },
+    { key: 'rear', label: 'Rear, heel and seat', required: true },
+    { key: 'top', label: 'Top-down', required: false },
+  ],
+  flat: [
+    { key: 'lateral', label: 'Lateral side (reference)', required: true },
+    { key: 'top', label: 'Top-down, vamp and topline', required: true },
+    { key: 'rear', label: 'Rear, heel hold', required: true },
+    { key: 'outsole', label: 'Outsole (Top N)', required: false },
+  ],
+  boot: [
+    { key: 'lateral', label: 'Lateral side (reference)', required: true },
+    { key: 'q34', label: 'Three-quarter front', required: true },
+    { key: 'rear', label: 'Rear, shaft and heel', required: true },
+    { key: 'outsole', label: 'Outsole (Top N)', required: false },
+  ],
+  sandal: [
+    { key: 'lateral', label: 'Lateral side (reference)', required: true },
+    { key: 'top', label: 'Top-down, straps and footbed', required: true },
+    { key: 'q34', label: 'Three-quarter front', required: true },
+    { key: 'outsole', label: 'Outsole (Top N)', required: false },
+  ],
+}
+
+/** 세부 유형의 필수 뷰셋 · 계열 기준 */
+export function viewSetFor(itemType: string): { key: string; label: string; required: boolean }[] {
+  const g = groupOf('shoe', itemType)
+  return VIEWSETS[g?.id ?? 'sneaker'] ?? VIEWSETS.sneaker
+}
 
 export const shoePack: CategoryPack = {
   id: 'shoe',
   types: Object.keys(SHOE_PROFILE),
   fieldLabels: {
     last_id: 'Last', is_new_last: 'New last', toe_shape: 'Toe shape',
-    heel_height_mm: 'Heel height (mm)', heel_type: 'Heel type', sole_construction: 'Construction',
+    heel_height_mm: 'Heel / stack (mm)', heel_type: 'Heel type', sole_construction: 'Construction',
     is_new_outsole_mold: 'New outsole mould', panel_count: 'Panels', closure: 'Closure',
     upper_material: 'Upper', upper_thickness_mm: 'Upper thickness (mm)', size_run_count: 'Size run',
+    midsole_foam: 'Midsole foam', plate: 'Plate', drop_mm: 'Drop (mm)', lug_depth_mm: 'Lug depth (mm)',
   },
   generateSpec(rng, tier, itemType, locked) {
-    const prof = SHOE_PROFILE[itemType] ?? DEFAULT_SHOE_PROFILE
-    // 운동화는 러닝 라스트를, 그 외는 정장 라스트를 쓴다
-    const pool = prof.athletic
-      ? LAST_LIBRARY.filter(l => l.athletic)
-      : LAST_LIBRARY.filter(l => !l.athletic)
+    const prof = profileOf(itemType)
+    // 유형이 요구하는 라스트 계열에서 고른다
+    const pool = LAST_LIBRARY.filter(l => l.family === prof.lastFamily)
     const last = rng.pick(pool.length ? pool : LAST_LIBRARY)
     // 라스트 정합: 대부분 라스트의 토 형상을 따르되, 일부는 어긋나게 (S-04 검증용)
     const toe = rng.chance(0.82) ? last.toe : rng.pick(TOES)
@@ -253,14 +175,32 @@ export const shoePack: CategoryPack = {
       : construction === 'goodyear' && rng.chance(0.8)
         ? ['calf 1.6mm', 'suede 1.4mm']
         : ['nappa 1.2mm', 'suede 1.4mm', 'patent 1.1mm', 'calf 1.6mm']
+
+    // ── 티어 = 라스트·몰드 변경 수준 (지시서 9.3) ──
+    // Core: 기존 라스트 + 기존 바텀. Push: 하나만 변경. Signature: 신규 허용.
+    // 일부러 위반 사례도 남긴다 — 룰이 실제로 걸러내는 것을 보여주는 지점.
+    let newLast = false, newMold = false
+    if (tier === 'core') {
+      newLast = rng.chance(0.06)                        // 위반 사례 (S-02가 잡는다)
+      newMold = rng.chance(0.1)                         // 위반 사례 (S-01이 잡는다)
+    } else if (tier === 'push') {
+      const which = rng.next()
+      newLast = which < 0.3
+      newMold = which >= 0.3 && which < 0.75            // 대부분 하나만 바꾼다
+      if (rng.chance(0.08)) { newLast = true; newMold = true }  // 위반 사례 (S-03)
+    } else {
+      newLast = rng.chance(0.5)
+      newMold = rng.chance(0.7)
+    }
+
     const f: Record<string, string | number | boolean> = {
       last_id: last.last_id,
-      is_new_last: tier === 'signature' ? rng.chance(0.4) : false,
+      is_new_last: newLast,
       toe_shape: toe,
       heel_height_mm: heelH,
       heel_type: heelType,
       sole_construction: construction,
-      is_new_outsole_mold: tier === 'core' ? rng.chance(0.12) : tier === 'push' ? rng.chance(0.35) : rng.chance(0.6),
+      is_new_outsole_mold: newMold,
       panel_count: rng.int(prof.panels[0], tier === 'signature' ? prof.panels[1] : Math.max(prof.panels[0], prof.panels[1] - 2)),
       closure: rng.pick(prof.closures),
       upper_material: rng.pick(materials),
@@ -269,19 +209,27 @@ export const shoePack: CategoryPack = {
       size_run_count: prof.athletic ? 11 : 7,
       shaft_height_mm: prof.shaft ?? 0,
     }
+    // 운동화 전용 필드 · 바텀 유닛이 곧 제품이다
+    if (prof.foams) f.midsole_foam = rng.pick(prof.foams)
+    if (prof.plates) f.plate = rng.pick(prof.plates)
+    if (prof.drop) f.drop_mm = rng.int(prof.drop[0], prof.drop[1])
+    if (prof.lugs) f.lug_depth_mm = Math.round((prof.lugs[0] + rng.next() * (prof.lugs[1] - prof.lugs[0])) * 10) / 10
     const lockedKeys: string[] = []
     for (const [k, v] of Object.entries(locked)) { f[k] = v; lockedKeys.push(k) }
-    return { design_id: nextId('shoe', tier), tier, category: 'shoe', itemType, fields: f, fieldsLocked: lockedKeys }
+    return { design_id: nextId(tier), tier, category: 'shoe', itemType, fields: f, fieldsLocked: lockedKeys }
   },
   rules(spec) {
     const f = spec.fields
     const r: RuleResult[] = []
+    // ── 티어 룰 · 라스트·몰드 변경 수준이 티어를 가른다 (지시서 9.3) ──
     if (f.is_new_outsole_mold && spec.tier === 'core')
-      r.push({ rule: 'S-01', severity: 'fail', message: 'New outsole mould on a Core piece. Rejected.' })
-    if (f.is_new_last && spec.tier !== 'signature')
-      r.push({ rule: 'S-02', severity: 'fail', message: 'A new last is only allowed on Signature. Rejected.' })
+      r.push({ rule: 'S-01', severity: 'fail', message: 'New outsole mould on a Core piece. Core reuses the existing bottom unit.' })
+    if (f.is_new_last && spec.tier === 'core')
+      r.push({ rule: 'S-02', severity: 'fail', message: 'New last on a Core piece. Core runs on an existing last.' })
+    if (f.is_new_last && f.is_new_outsole_mold && spec.tier === 'push')
+      r.push({ rule: 'S-03', severity: 'fail', message: 'Push changed both the last and the bottom unit. Push keeps one of the two.' })
     const last = LAST_LIBRARY.find(l => l.last_id === f.last_id)
-    if (last && last.toe !== f.toe_shape)
+    if (last && last.toe !== f.toe_shape && !f.is_new_last)
       r.push({ rule: 'S-04', severity: 'fail', message: `Toe shape ${f.toe_shape} does not match last ${f.last_id} (${last.toe}).` })
     if ((f.heel_height_mm as number) > 70 && f.heel_type === 'stiletto')
       r.push({ rule: 'S-05', severity: 'warn', message: `${f.heel_height_mm}mm stiletto. The shank spec needs checking.` })
@@ -293,14 +241,20 @@ export const shoePack: CategoryPack = {
     if (f.closure === 'elastic_gore' && f.sole_construction === 'goodyear' && !(Number(f.shaft_height_mm) > 0))
       r.push({ rule: 'S-09', severity: 'fail', message: 'Goodyear welt on a gore slip-on. The stretch opening fights the welt.' })
     // 운동화 전용 · 러닝 라스트가 아니면 발볼·토스프링이 맞지 않는다
-    if (isAthletic(spec.itemType) && !String(f.last_id).startsWith('LST-RUN'))
-      r.push({ rule: 'S-11', severity: 'fail', message: `Dress last ${f.last_id} on a ${TYPE_KO(spec.itemType)}. It needs a running last.` })
-    if (isAthletic(spec.itemType) && f.sole_construction !== 'cemented' && f.sole_construction !== 'vulcanized')
+    if (isAthletic(spec.itemType) && LAST_LIBRARY.some(l => l.last_id === f.last_id && l.family !== 'running'))
+      r.push({ rule: 'S-11', severity: 'fail', message: `${LAST_LIBRARY.find(l => l.last_id === f.last_id)?.label ?? f.last_id} on a ${NAME(spec.itemType)}. It needs a running-family last.` })
+    if (isAthletic(spec.itemType) && !['cemented', 'vulcanized', 'cupsole'].includes(String(f.sole_construction)))
       r.push({ rule: 'S-12', severity: 'fail', message: `${f.sole_construction} construction on an athletic shoe. Not workable.` })
     // 부츠 · 목높이가 있으면 지퍼 또는 고어가 있어야 신을 수 있다
     const shaft = Number(f.shaft_height_mm) || 0
     if (shaft >= 150 && !['zip', 'elastic_gore', 'lace'].includes(String(f.closure)))
       r.push({ rule: 'S-13', severity: 'fail', message: `${shaft}mm shaft with no way in or out (${f.closure}).` })
+    // 경기용 · World Athletics 규정은 로드 스택 40mm를 상한으로 둔다
+    if (f.plate === 'carbon' && (f.heel_height_mm as number) > 40)
+      r.push({ rule: 'S-14', severity: 'warn', message: `${f.heel_height_mm}mm stack with a carbon plate. Past the World Athletics 40mm road limit — competition eligibility needs checking.` })
+    // 트레일 · 러그가 얕으면 트레일 접지가 안 나온다
+    if ((spec.itemType === 'trail' || spec.itemType === 'hiking') && Number(f.lug_depth_mm) < 3)
+      r.push({ rule: 'S-15', severity: 'warn', message: `${f.lug_depth_mm}mm lugs on a ${NAME(spec.itemType)}. Under 3mm reads as a road outsole.` })
     return r
   },
   costModel(spec, rng) {
@@ -317,7 +271,11 @@ export const shoePack: CategoryPack = {
     const lining = Math.round((open ? 900 : 3000) * (1 + shaft / 500))
     const outsole = athletic ? 7200 : 4500
     const heel = athletic ? 0 : (f.heel_height_mm as number) > 50 ? 3200 : 2000
-    const midsole = athletic ? 6500 : 0     // EVA·폼 미드솔은 운동화에만
+    // 미드솔 · 폼 등급이 원가를 가른다 (수퍼크리티컬·PEBA는 비싸다)
+    const foam = String(f.midsole_foam ?? '')
+    const midsole = !athletic && !foam ? 0
+      : foam.includes('PEBA') ? 14500 : foam.includes('supercritical') ? 10500 : foam === 'PU' ? 5200 : 6500
+    const plate = f.plate === 'carbon' ? 12000 : f.plate === 'nylon' || f.plate === 'tpu shank' || f.plate === 'rock plate' ? 3800 : 0
     const hardware = f.closure === 'buckle' || f.closure === 'strap' ? 1800
       : f.closure === 'zip' ? 2600 : f.closure === 'lace' ? 1200 : 800
     const insole = athletic ? 2400 : 1200
@@ -336,7 +294,8 @@ export const shoePack: CategoryPack = {
     const lines = [
       { label: 'Upper', krw: upper }, { label: 'Lining', krw: lining },
       { label: 'Outsole', krw: outsole },
-      ...(midsole ? [{ label: 'Midsole', krw: midsole }] : []),
+      ...(midsole ? [{ label: `Midsole${foam ? ` (${foam})` : ''}`, krw: midsole }] : []),
+      ...(plate ? [{ label: `Plate (${f.plate})`, krw: plate }] : []),
       ...(heel ? [{ label: 'Heel', krw: heel }] : []),
       { label: 'Hardware', krw: hardware }, { label: 'Insole', krw: insole },
       { label: 'Cutting', krw: cutting }, { label: 'Stitching labour', krw: stitching },
@@ -356,17 +315,12 @@ export const shoePack: CategoryPack = {
       excluded_costs: ['Duty', 'Freight', 'Shoe box', 'Defect rate', 'Vendor margin', 'Sampling and last revisions'],
     }
   },
-  signalAxes: ['Silhouette', 'Toe shape', 'Heel height band', 'Heel type', 'Sole thickness', 'Upper', 'Closure', 'Hardware', 'Price band'],
-  viewSet: [
-    { key: 'lateral', label: 'Lateral side (reference)', required: true },
-    { key: 'q34', label: 'Three-quarter front', required: true },
-    { key: 'top', label: 'top-down', required: true },
-    { key: 'outsole', label: 'Outsole (Top N)', required: false },
-  ],
-  qaChecks: ['Toe shape reads correctly', 'Heel height within 20%', 'Panel count matches', 'Closure type', 'Same object across three views >=0.80', 'Ground line aligns'],
+  signalAxes: ['Silhouette', 'Toe shape', 'Heel height band', 'Heel type', 'Sole thickness', 'Midsole and plate', 'Upper', 'Closure', 'Hardware', 'Tread', 'Price band'],
+  viewSet: VIEWSETS.sneaker,
+  qaChecks: ['Toe shape reads correctly', 'Heel height within 20%', 'Panel count matches', 'Closure type', 'Same object across views >=0.80', 'Ground line aligns', 'Lateral and medial sides consistent'],
 }
 
-export const PACKS: Record<Category, CategoryPack> = { jewelry: jewelryPack, shoe: shoePack }
+export const PACKS: Record<Category, CategoryPack> = { shoe: shoePack }
 
 // ── 원가 상한 (유형 프리셋 · Core 100% / Push 130% / Signature 200%) ──
 export const TIER_COST_CAP: Record<DesignTier, number> = { core: 1.0, push: 1.3, signature: 2.0 }
@@ -375,12 +329,12 @@ export function tierCapRule(spec: DesignSpec, cost: CostEstimate): RuleResult[] 
   const cap = TIER_COST_CAP[spec.tier]
   const out: RuleResult[] = []
   if (cost.cap_ratio > cap)
-    out.push({ rule: spec.category === 'shoe' ? 'S-CAP' : 'J-CAP', severity: cost.cap_ratio > cap * 1.25 ? 'fail' : 'warn', message: `Cost sits at ${Math.round(cost.cap_ratio * 100)}% against a ${Math.round(cap * 100)}% cap` })
-  // J-08 / S-10: 툴링 상각 > 상한의 15%
+    out.push({ rule: 'S-CAP', severity: cost.cap_ratio > cap * 1.25 ? 'fail' : 'warn', message: `Cost sits at ${Math.round(cost.cap_ratio * 100)}% against a ${Math.round(cap * 100)}% cap` })
+  // S-10: 툴링 상각 > 상한의 15%
   if (cost.tooling.tooling_per_unit_krw > 0) {
-    const capBase = spec.category === 'shoe' ? 46000 : jewelCapOf(spec.itemType)
+    const capBase = 46000
     if (cost.tooling.tooling_per_unit_krw > capBase * cap * 0.15)
-      out.push({ rule: spec.category === 'shoe' ? 'S-10' : 'J-08', severity: 'warn', message: `Tooling amortises to KRW ${cost.tooling.tooling_per_unit_krw.toLocaleString()} per unit, over 15% of the cap` })
+      out.push({ rule: 'S-10', severity: 'warn', message: `Tooling amortises to KRW ${cost.tooling.tooling_per_unit_krw.toLocaleString()} per unit, over 15% of the cap` })
   }
   return out
 }

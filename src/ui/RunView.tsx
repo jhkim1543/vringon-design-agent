@@ -2,17 +2,33 @@
 import { t } from '../core/i18n'
 import { useEffect, useRef, useState } from 'react'
 import type { RunState } from '../core/types'
-import { MODE_LABEL, CAT_LABEL, TIER_LABEL, TYPE_LABEL } from '../core/types'
+import { COMP_GROUP_LABEL, MODE_LABEL, TIER_LABEL, TYPE_LABEL } from '../core/types'
 import RunReport from './RunReport'
 import { DesignCard } from './Card'
 import { ModelViewer } from './ModelViewer'
 import { Collapse, Tag } from './bits'
 import { shotUrl } from '../core/research'
+import { plainProse, proseBlocks } from '../core/prose'
 import type { TrendReport } from '../core/research'
 import { openTrendReportPdf } from '../core/reportPdf'
 import { openDossierPdf } from '../core/dossierPdf'
 import type { SeasonDossier } from '../core/research'
 import { GRADE_LABEL, SOURCE_LABEL, metricText } from '../core/research'
+
+// 순위 표기의 의미 · 노출 위치를 판매 순위처럼 읽지 않게 라벨을 단다 (지시서 12.1)
+const RANK_SEM: Record<string, string> = {
+  verified_sales_rank: 'sales rank',
+  retailer_bestseller_membership: 'retailer bestseller',
+  surface_position: 'page position',
+  marketplace_trade_rank: 'resale rank',
+}
+
+/** 수집 사진 · 직링크가 죽으면 다음 후보, 다 죽으면 페이지 og:image 폴백까지 시도한다 */
+function CompShot({ urls, page, alt }: { urls: string[]; page?: string; alt: string }) {
+  const [i, setI] = useState(0)
+  if (!urls.length || i >= urls.length) return <span className="cc-noshot">{t('No photo')}</span>
+  return <img src={shotUrl(urls[i], page)} alt={alt} loading="lazy" onError={() => setI(v => v + 1)} />
+}
 
 const STAGE_META: { key: 'S1' | 'S2' | 'S3' | 'S4' | 'S5'; t: string; d: string }[] = [
   { key: 'S1', t: 'Research', d: 'Signals and directions' },
@@ -74,21 +90,34 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
               {st.competitors.map(c => (
                 <div className={`compcard ${c.in_band ? '' : 'out'}`} key={c.product_id}>
                   <div className="cc-shot">
-                    {c.image_urls?.length
-                      ? <img src={shotUrl(c.image_urls[0])} alt={c.name}
-                          onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-                      : <span className="cc-noshot">No photo</span>}
+                    <CompShot urls={c.image_urls ?? []} page={c.product_url} alt={c.name} />
                   </div>
                   <div className="cc-main">
                     <div className="cc-head">
                       <b>{c.brand}</b> {c.name}
+                      {c.competitor_group && c.competitor_group !== 'direct' &&
+                        <Tag kind="warn">{COMP_GROUP_LABEL[c.competitor_group]}</Tag>}
+                      {c.competitor_group === 'direct' && <Tag kind="ok">{COMP_GROUP_LABEL.direct}</Tag>}
                       {!c.in_band && <Tag kind="warn">Out of band</Tag>}
                     </div>
                     <div className="cc-meta">
                       {c.price_krw > 0 ? `₩${(c.price_krw / 10000).toFixed(1)}0,000` : 'Price unknown'}
-                      {c.rank_note && <> · <span className="cc-rank">{c.rank_note}</span></>}
+                      {c.construction_tier && <> · {c.construction_tier}</>}
+                      {c.rank_note && <> · <span className="cc-rank">{c.rank_note}</span>
+                        {c.rank_semantics && c.rank_semantics !== 'none' && <span className="hint"> ({RANK_SEM[c.rank_semantics]})</span>}</>}
                       {c.evidence_strength && <> · {c.evidence_strength}</>}
                     </div>
+                    {(c.offered_sizes || c.size_status) && (
+                      <div className="cc-meta">
+                        {c.offered_sizes ? `sizes ${c.available_sizes ?? '?'} of ${c.offered_sizes} in stock` : ''}
+                        {c.size_status && c.size_status !== 'unknown' && (
+                          <> · <Tag kind={c.size_status === 'size_broken' || c.size_status === 'sold_out' ? 'warn' : 'ok'}>
+                            {c.size_status.replace('_', ' ')}
+                          </Tag></>
+                        )}
+                        {typeof c.colorway_count === 'number' && c.colorway_count > 1 && <> · {c.colorway_count} colourways, one design</>}
+                      </div>
+                    )}
                     {c.proxy_signals[0] && <div className="cc-ev">{c.proxy_signals[0]}</div>}
                     {c.design_traits?.length ? (
                       <div className="cc-traits">
@@ -232,7 +261,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                     {/* 리포트만 따로 뽑아 갈 수 있어야 한다 */}
                     <button className="btn btn-ghost btn-sm" onClick={() => openTrendReportPdf(st)}>{t('Report PDF')}</button>
                   </div>
-                  <div className="tr-exec">{rep.executive_view}</div>
+                  <div className="tr-exec">{plainProse(rep.executive_view)}</div>
                   {rep.design_implications?.length > 0 && (
                     <div style={{ marginBottom: 12 }}>
                       <div style={{ fontSize: 11.5, color: 'var(--text-3)', fontWeight: 700, marginBottom: 4 }}>
@@ -249,7 +278,13 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                       ))}
                     </div>
                   )}
-                  <div className="tr-body">{rep.body_markdown}</div>
+                  {/* 마크다운 기호를 화면에 그대로 내보내지 않는다 · 헤딩은 스타일로, 기호는 제거 */}
+                  <div className="tr-body">
+                    {proseBlocks(rep.body_markdown).map((b, i) =>
+                      b.kind === 'h'
+                        ? <h5 key={i} style={{ margin: '10px 0 4px', fontSize: 12.5, color: 'var(--accent-hi)' }}>{b.text}</h5>
+                        : <p key={i} style={{ margin: '0 0 8px' }}>{b.text}</p>)}
+                  </div>
                   {rep.open_questions?.length > 0 && (
                     <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--line)' }}>
                       <div style={{ fontSize: 11.5, color: 'var(--text-3)', fontWeight: 700, marginBottom: 4 }}>
@@ -270,6 +305,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
     { id: 'sec-report', label: 'Trend report', on: !!st.trendReport },
     { id: 'sec-macros', label: 'Key macro trends', on: !!(st.dossier as { macrotrends?: unknown[] } | null)?.macrotrends?.length },
     { id: 'sec-designs', label: 'Top trending designs', on: st.designs.length > 0 },
+    { id: 'sec-shots', label: 'Campaign gallery', on: st.designs.some(d => d.images.some(i => ['wear', 'concept', 'variation'].includes(i.view))) },
     { id: 'sec-comp', label: 'Competitive landscape', on: st.competitors.length > 0 },
     { id: 'sec-season', label: 'Season report', on: !!st.dossier },
     { id: 'sec-impl', label: 'Design implications', on: !!st.dossier || st.signals.length > 0 },
@@ -406,18 +442,32 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
         {st.signals.length > 0 && (
           <Collapse title={t('Signals')} summary={sigSummary}>
             <table className="mini">
-              <thead><tr><th>Signal</th><th>Axis</th><th>Seen</th><th>{t('Trend')}</th><th>{st.params.mode === 'moodboard' ? 'Page' : 'Proxy'}</th><th>Source</th></tr></thead>
+              <thead><tr><th>Signal</th><th>Axis</th><th>Seen</th><th>{t('Trend')}</th><th title="Commercial / Cultural / Forecast / Feasibility">{t('Indices')}</th><th>{t('Tooling')}</th><th>Source</th></tr></thead>
               <tbody>
-                {st.signals.map(s => (
-                  <tr key={s.signal_id}>
-                    <td><b>{s.label}</b> <span style={{ color: 'var(--text-3)', fontSize: 11 }}>{s.signal_id}</span>{s.oem_group && <Tag kind="warn">OEM group</Tag>}</td>
-                    <td>{s.axis}</td>
-                    <td>{s.observed_count}x</td>
-                    <td>{s.direction === 'rising' ? 'Rising' : s.direction === 'stable' ? 'Holding' : 'Fading'}</td>
-                    <td>{s.page_ref ?? (s.sales_proxy_score != null ? `${s.sales_proxy_score} (${s.proxy_confidence})` : 'not scored')}</td>
-                    <td>{s.sources.slice(0, 2).map((u, i) => <a key={i} href={u} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-hi)', marginRight: 4 }}>[{i + 1}]</a>)}</td>
-                  </tr>
-                ))}
+                {st.signals.map(s => {
+                  const idx = s.indices
+                  const iTxt = idx && (idx.commercial || idx.cultural || idx.forecast || idx.feasibility)
+                    ? `${(idx.commercial ?? '–')[0].toUpperCase()} / ${(idx.cultural ?? '–')[0].toUpperCase()} / ${(idx.forecast ?? '–')[0].toUpperCase()} / ${(idx.feasibility ?? '–')[0].toUpperCase()}`
+                    : (s.page_ref ?? (s.sales_proxy_score != null ? `${s.sales_proxy_score} (${s.proxy_confidence})` : '—'))
+                  const tooling = [
+                    s.last_change === 'required' ? 'new last' : s.last_change === 'modification' ? 'last mod' : null,
+                    s.bottom_tooling_change === 'required' ? 'new mould' : s.bottom_tooling_change === 'modification' ? 'mould mod' : null,
+                    s.upper_pattern_change === 'major' ? 'pattern major' : null,
+                  ].filter(Boolean).join(' · ') || 'reuses tooling'
+                  return (
+                    <tr key={s.signal_id}>
+                      <td><b>{s.label}</b> <span style={{ color: 'var(--text-3)', fontSize: 11 }}>{s.signal_id}</span>{s.oem_group && <Tag kind="warn">OEM group</Tag>}
+                        {s.co_occurring?.length ? <div style={{ color: 'var(--text-3)', fontSize: 11 }}>with {s.co_occurring.slice(0, 4).join(' · ')}</div> : null}
+                      </td>
+                      <td>{s.axis}</td>
+                      <td>{s.observed_count}x</td>
+                      <td>{s.adoption_stage && s.adoption_stage !== 'unknown' ? s.adoption_stage : s.direction === 'rising' ? 'Rising' : s.direction === 'stable' ? 'Holding' : 'Fading'}</td>
+                      <td title="Commercial / Cultural / Forecast / Feasibility">{iTxt}</td>
+                      <td style={{ fontSize: 11 }}>{tooling}</td>
+                      <td>{s.sources.slice(0, 2).map((u, i) => <a key={i} href={u} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-hi)', marginRight: 4 }}>[{i + 1}]</a>)}</td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </Collapse>

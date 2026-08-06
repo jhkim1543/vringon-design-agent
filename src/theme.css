@@ -283,6 +283,11 @@ button { cursor: pointer; background: none; border: none; }
 .opt.side .o-ic { margin-bottom: 0; flex-shrink: 0; }
 .opt.side .o-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .opts.tight .opt { padding: 12px 14px; }
+/* 프리셋 카드 · 12장이 리듬 있게 접히도록 촘촘한 그리드 */
+.presetgrid { gap: 8px; }
+.presetgrid .opt { padding: 11px 13px; gap: 2px; }
+.presetgrid .opt .o-t { font-size: 13.5px; }
+.presetgrid .opt .o-d { font-size: 11.5px; color: var(--text-3); }
 
 /* 체크 배지 · 고른 카드 오른쪽 위 */
 .o-badge {
@@ -517,21 +522,34 @@ button { cursor: pointer; background: none; border: none; }
 .board .react-flow__attribution { display: none; }
 /* ── 보드 · 단계 컬럼 + 흐름 노드 ── */
 .bcol {
-  width: 356px; border-radius: var(--r-16); border: 1px solid var(--line-2);
+  width: 430px; border-radius: var(--r-16); border: 1px solid var(--line-2);
   background: var(--bg-2); position: relative;
 }
-.bcol-h { position: absolute; top: -46px; left: 2px; display: flex; flex-direction: column; gap: 0px; }
-.bcol-t { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: .02em; }
-.bcol-n { font-size: 11px; color: var(--text-3); }
+.bcol-h { position: absolute; top: -50px; left: 2px; display: flex; flex-direction: column; gap: 0px; }
+.bcol-t { font-size: 14.5px; font-weight: 700; color: var(--text); letter-spacing: .02em; }
+.bcol-n { font-size: 11.5px; color: var(--text-3); }
 
 .bnode {
-  width: 312px; background: var(--panel); border: 1px solid var(--line-2);
-  border-radius: var(--r-card); padding: 12px 12px; font-size: 12px;
+  width: 384px; background: var(--panel); border: 1px solid var(--line-2);
+  border-radius: var(--r-card); padding: 14px 14px; font-size: 12.5px;
   border-left: 3px solid var(--line-2);
 }
-.bnode .bn-t { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 4px; line-height: 1.4; }
+.bnode .bn-t { font-weight: 700; font-size: 14.5px; color: var(--text); margin-bottom: 5px; line-height: 1.4; }
 .bnode .bn-b { color: var(--text-2); line-height: 1.6; }
 .bnode .bn-b + .bn-b { margin-top: 2px; }
+/* 팔레트 스와치 · 색 이름은 작게, 색이 먼저 */
+.bnode .bn-pal { display: flex; flex-wrap: wrap; gap: 4px 8px; margin: 4px 0 8px; }
+.bnode .bn-pal span { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; color: var(--text-3); }
+.bnode .bn-pal i { width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(255,255,255,.14); }
+.board-light .bnode .bn-pal i { border-color: rgba(0,0,0,.12); }
+/* 실제 생성 프롬프트 발췌 · 인용문처럼 */
+.bnode .bn-prompts { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
+.bnode .bn-prompt {
+  font-size: 11px; line-height: 1.5; color: var(--text-3);
+  border-left: 2px solid var(--accent); padding: 3px 8px;
+  background: rgba(93,108,250,.06); border-radius: 0 6px 6px 0;
+}
+.board-light .bnode .bn-prompt { color: #565D63; background: rgba(59,69,200,.05); }
 .bnode.tone-accent { border-left-color: var(--accent); }
 .bnode.tone-warn { border-left-color: var(--warn); }
 .bnode.tone-muted { opacity: .72; border-left-color: var(--line-2); }
@@ -733,9 +751,9 @@ table.mini td b { color: var(--text); font-weight: 600; }
 .modal.gate .modal-h { padding-bottom: 4px; }
 .modal.gate .hint { line-height: 1.7; }
 
-/* 보드 노드 안 이미지 · 착용 컷 등 */
+/* 보드 노드 안 이미지 · 사진이 먼저 읽혀야 한다 */
 .bnode .bn-img {
-  display: block; width: 100%; height: 172px; object-fit: cover;
+  display: block; width: 100%; height: 226px; object-fit: cover;
   border-radius: var(--r-8); margin: 4px 0 8px; background: #0E0E12;
 }
 .board-light .bnode .bn-img { background: #F0F2F5; }

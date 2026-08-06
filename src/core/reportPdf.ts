@@ -2,8 +2,9 @@
 // 도시에와 같은 뼈대를 쓴다. 이쪽은 서술형 리포트라 장수가 적다.
 // 화면(Run)에서는 텍스트로 읽고, 여기서는 발표에 그대로 쓸 수 있는 형태로 나간다.
 import type { RunState, Design } from './types'
-import { CAT_LABEL, MODE_LABEL, TYPE_LABEL } from './types'
+import { CAT_LABEL, COMP_GROUP_LABEL, lineFingerprint, MODE_LABEL, TYPE_LABEL, UNKNOWN } from './types'
 import type { TrendReport } from './research'
+import { shotUrl } from './research'
 import { downloadDeck, esc, printDeck, slide } from './deck'
 
 const ACCENT = '#3B45C8'
@@ -32,17 +33,31 @@ function build(st: RunState): { title: string; html: string } {
   let page = 0
   const P = () => ++page
 
-  // 표지
+  // 표지 · Research fingerprint (지시서 18장) — 무엇을 어떤 라인 조건으로 조사했는지가 표지에 있어야 한다
+  const lp = p.line
+  const u = (v?: string) => v && v !== UNKNOWN ? v : null
+  const fingerprint = [
+    ['Mode', MODE_LABEL[p.mode]],
+    ['Archetype', TYPE_LABEL[p.itemType] ?? p.itemType],
+    ['Use case', u(lp?.product.useCase)],
+    ['Last and fit', u(lp?.lastFit.lastFamily)],
+    ['Upper', u(lp?.upper.outer)],
+    ['Bottom', [u(lp?.bottom.midsole), u(lp?.bottom.outsole)].filter(Boolean).join(' + ') || null],
+    ['Construction', u(lp?.construction.soleAttachment)],
+    ['Market', lp?.commercial.markets?.join(', ') || null],
+    ['Price band', band || null],
+    ['Season', u(lp?.product.season)],
+    ['Captured', new Date().toISOString().slice(0, 10)],
+  ].filter(([, v]) => v) as [string, string][]
   out.push(slide({
     bare: true,
     body: `<div style="display:flex;height:100%">
-      <div style="flex:1;background:${ACCENT};color:#fff;padding:24mm 16mm;display:flex;flex-direction:column">
+      <div style="flex:1;background:${ACCENT};color:#fff;padding:20mm 16mm;display:flex;flex-direction:column">
         <div style="font-size:9pt;letter-spacing:.3em;font-weight:800">VRINGON</div>
-        <div style="font-size:7pt;letter-spacing:.24em;opacity:.75;margin-top:1mm">TREND REPORT</div>
-        <h1 class="title" style="margin-top:auto;color:#fff;font-size:26pt">${esc(rep.title)}</h1>
-        <div style="margin-top:auto;font-size:8pt;opacity:.85;line-height:1.7">
-          ${esc(item)}${band ? `<br>${esc(band)}` : ''}<br>
-          ${esc(MODE_LABEL[p.mode])} mode · ${st.signals.length} signals
+        <div style="font-size:7pt;letter-spacing:.24em;opacity:.75;margin-top:1mm">FOOTWEAR TREND EVIDENCE REPORT</div>
+        <h1 class="title" style="margin-top:auto;color:#fff;font-size:24pt">${esc(rep.title)}</h1>
+        <div style="margin-top:auto;font-size:7.4pt;opacity:.9;line-height:1.75">
+          ${fingerprint.map(([k, v]) => `<div style="display:flex;gap:3mm"><span style="width:22mm;opacity:.65;letter-spacing:.06em;text-transform:uppercase;font-size:6.4pt;padding-top:.4mm">${esc(k)}</span><b>${esc(v)}</b></div>`).join('')}
         </div>
       </div>
       <div style="flex:1.15">${img(at(pool.concept, 0) || at(pool.any, 0))}</div>
@@ -78,6 +93,52 @@ function build(st: RunState): { title: string; html: string } {
       </div>
     </div>`,
   }))
+
+  // 상업 신호 · 실제 수집한 경쟁 제품 사진과 가격·사이즈 재고 (지시서 18장 p5-6)
+  const comps = st.competitors.filter(c => c.image_urls?.length).slice(0, 6)
+  if (comps.length) {
+    out.push(slide({
+      eyebrow, tag: 'MARKET', page: P(),
+      body: `<h2 class="stitle">Live commercial signals <span class="thin">observed products</span></h2>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5mm;margin-top:4mm">
+          ${comps.map(c => `<div style="border:.25mm solid #E3E7EC;border-radius:1.5mm;overflow:hidden">
+            <div style="height:34mm;background:#F4F6F8">${img(shotUrl(c.image_urls![0], c.product_url))}</div>
+            <div style="padding:2.5mm 3mm">
+              <div style="font-size:7.6pt;font-weight:800">${esc(c.brand)} ${esc(c.name)}</div>
+              <div style="font-size:6.8pt;color:#565D63;margin-top:1mm;line-height:1.5">
+                ${c.price_krw > 0 ? `KRW ${Math.round(c.price_krw / 1000).toLocaleString()}k` : 'price unknown'}
+                ${c.competitor_group ? ` · ${esc(COMP_GROUP_LABEL[c.competitor_group])}` : ''}
+                ${c.size_status && c.size_status !== 'unknown' ? ` · ${esc(c.size_status.replace('_', ' '))}` : ''}
+                ${typeof c.colorway_count === 'number' && c.colorway_count > 1 ? ` · ${c.colorway_count} colourways, one design` : ''}
+              </div>
+              ${c.design_traits?.length ? `<div style="font-size:6.6pt;color:#8A9099;margin-top:1mm">${esc(c.design_traits.slice(0, 2).join(' · '))}</div>` : ''}
+            </div>
+          </div>`).join('')}
+        </div>
+        <div class="note" style="margin-top:4mm">
+          Photographs are live product pages captured at collection time. A page position is never read as a sales rank,
+          and a broken size run is recorded as availability, not as demand.
+        </div>`,
+    }))
+  }
+
+  // 디자인 갤러리 · 이 분석이 실제로 만든 컷들 (렌더·뷰·컬러웨이·캠페인)
+  const gallery = st.designs.filter(d => !d.rejected)
+    .flatMap(d => d.images.filter(i => i.view !== 'sketch').map(i => ({ id: d.spec.design_id, im: i })))
+    .slice(0, 8)
+  if (gallery.length >= 4) {
+    out.push(slide({
+      eyebrow, tag: 'DESIGNS', page: P(),
+      body: `<h2 class="stitle">Design output <span class="thin">renders, views and campaign cuts</span></h2>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4mm;margin-top:4mm">
+          ${gallery.map(g => `<div>
+            <div style="height:40mm">${img(g.im.url)}</div>
+            <div style="font-size:6.6pt;color:#8A9099;margin-top:1mm">${esc(g.id)} · ${esc(g.im.colorway ?? g.im.variantAxis ?? g.im.view)}</div>
+          </div>`).join('')}
+        </div>
+        <div class="note" style="margin-top:4mm">Generated imagery. Additional views and colourways are edits of the base render, so every cut shows the same product.</div>`,
+    }))
+  }
 
   // 디자인 시사점
   if (rep.design_implications?.length) {

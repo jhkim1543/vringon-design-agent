@@ -1,19 +1,29 @@
-// ── VRINGON Design Agent · 도메인 타입 (작업지시서 v5.0) ──────────────
+// ── VRINGON Shoe Agent · 도메인 타입 (신발 전용) ─────────────────────
+// 주얼리는 별도 제품(vringon-jewelry-agent)으로 분리되었다. 여기는 신발만 다룬다.
 
 export type Mode = 'trend' | 'series' | 'moodboard'
-export type Category = 'jewelry' | 'shoe'
+/** 카테고리는 신발 하나다. 저장된 Run과의 호환을 위해 리터럴 타입만 남긴다. */
+export type Category = 'shoe'
 export type DesignTier = 'core' | 'push' | 'signature'
 export type Stage = 'S1' | 'S2' | 'S3' | 'S4' | 'S5'
 
 export const MODE_LABEL: Record<Mode, string> = {
   trend: 'Trend', series: 'Series', moodboard: 'Moodboard',
 }
-export const CAT_LABEL: Record<Category, string> = { jewelry: 'Jewelry', shoe: 'Footwear' }
+export const CAT_LABEL: Record<Category, string> = { shoe: 'Footwear' }
 export const TIER_LABEL: Record<DesignTier, string> = {
   core: 'Core', push: 'Push', signature: 'Signature',
 }
 
-// ── 품목 분류 · 카테고리 → 그룹 → 타입 ─────────────────────────────
+// 티어의 의미를 생산 현실에 묶는다 (지시서 9.3).
+// 이미지의 과감함이 아니라 라스트·몰드 변경 수준이 티어를 가른다.
+export const TIER_MEANING: Record<DesignTier, string> = {
+  core: 'Existing last and existing bottom unit. Colour, material and minor upper changes only.',
+  push: 'Keeps either the last or the bottom unit, and changes the structure of the other.',
+  signature: 'New last, new outsole mould, new heel or a core technology package.',
+}
+
+// ── 품목 분류 · 계열 → 세부 유형 ────────────────────────────────────
 // en은 이미지 프롬프트에, label은 화면에 쓴다. 한 곳에서만 정의한다.
 export interface TypeDef { id: string; label: string; en: string }
 export interface GroupDef { id: string; label: string; note: string; types: TypeDef[] }
@@ -21,16 +31,21 @@ export interface GroupDef { id: string; label: string; note: string; types: Type
 export const TAXONOMY: Record<Category, GroupDef[]> = {
   shoe: [
     {
-      id: 'sneaker', label: 'Sneakers', note: 'Running, court', types: [
-        { id: 'running', label: 'Running', en: "running shoe with engineered mesh upper and cushioned midsole" },
+      id: 'sneaker', label: 'Sneakers', note: 'Running, court, lifestyle', types: [
+        { id: 'running', label: 'Road daily trainer', en: 'road running daily trainer with engineered mesh upper, cushioned rocker midsole and segmented rubber outsole' },
+        { id: 'max_cushion', label: 'Max cushion', en: 'max-cushion running shoe with a tall soft midsole stack, wide platform and moderate rocker' },
+        { id: 'tempo_racer', label: 'Tempo / racing', en: 'lightweight tempo racing shoe with a low-slung aggressive rocker midsole and thin engineered mesh upper' },
+        { id: 'trail', label: 'Trail', en: 'trail running shoe with aggressive lugged outsole, toe bumper and reinforced upper' },
         { id: 'court_sneaker', label: 'Court', en: 'low-top court sneaker with leather upper and cupsole' },
+        { id: 'lifestyle_runner', label: 'Lifestyle runner', en: 'retro lifestyle runner with layered suede and nylon mesh upper and EVA wedge midsole' },
         { id: 'chunky_sneaker', label: 'Chunky', en: 'chunky dad sneaker with layered exaggerated midsole' },
-        { id: 'trail', label: 'Trail', en: 'trail running shoe with aggressive lugged outsole' },
       ],
     },
     {
-      id: 'dress', label: 'Dress', note: 'Loafer, oxford', types: [
-        { id: 'loafer', label: 'Loafer', en: 'penny loafer' },
+      id: 'dress', label: 'Dress', note: 'Loafer, derby, oxford', types: [
+        { id: 'loafer', label: 'Penny loafer', en: 'penny loafer with raised apron seam and saddle strap' },
+        { id: 'horsebit_loafer', label: 'Horsebit loafer', en: 'horsebit loafer with metal snaffle hardware across the vamp' },
+        { id: 'chunky_loafer', label: 'Chunky loafer', en: 'chunky loafer with a lugged platform sole and high rounded volume' },
         { id: 'derby', label: 'Derby', en: 'derby shoe with open lacing' },
         { id: 'oxford', label: 'Oxford', en: 'oxford shoe with closed lacing' },
         { id: 'monk', label: 'Monk strap', en: 'monk strap shoe with metal buckle' },
@@ -47,62 +62,25 @@ export const TAXONOMY: Record<Category, GroupDef[]> = {
     {
       id: 'flat', label: 'Flats', note: 'Ballet, driving', types: [
         { id: 'ballet_flat', label: 'Ballet flat', en: 'ballet flat' },
-        { id: 'driving', label: 'Driving', en: 'driving moccasin with pebbled sole' },
+        { id: 'driving', label: 'Driving', en: 'driving moccasin with pebbled rubber pod sole' },
+        { id: 'espadrille', label: 'Espadrille', en: 'espadrille flat with jute-wrapped sole' },
       ],
     },
     {
-      id: 'boot', label: 'Boots', note: 'Ankle, chelsea', types: [
+      id: 'boot', label: 'Boots', note: 'Ankle, chelsea, hiking', types: [
         { id: 'ankle_boot', label: 'Ankle boot', en: 'ankle boot' },
         { id: 'chelsea', label: 'Chelsea', en: 'chelsea boot with elastic side gore' },
-        { id: 'long_boot', label: 'Knee-high', en: 'knee-high long boot' },
         { id: 'combat', label: 'Combat', en: 'lace-up combat boot with lugged sole' },
+        { id: 'long_boot', label: 'Knee-high', en: 'knee-high long boot' },
+        { id: 'hiking', label: 'Hiking', en: 'hiking boot with deep lugged outsole, protective toe cap and padded collar' },
       ],
     },
     {
-      id: 'sandal', label: 'Sandals', note: 'Strap, slide', types: [
+      id: 'sandal', label: 'Sandals', note: 'Slide, sport, strappy', types: [
         { id: 'strap_sandal', label: 'Strappy', en: 'strappy sandal' },
         { id: 'slide', label: 'Slide', en: 'single-band slide sandal' },
+        { id: 'sport_sandal', label: 'Sport', en: 'sport sandal with moulded footbed and adjustable webbing straps' },
         { id: 'gladiator', label: 'Gladiator', en: 'gladiator sandal with multiple ankle straps' },
-      ],
-    },
-  ],
-  jewelry: [
-    {
-      id: 'ring', label: 'Rings', note: 'Band, solitaire', types: [
-        { id: 'band_ring', label: 'Band', en: 'plain band ring' },
-        { id: 'solitaire', label: 'Solitaire', en: 'solitaire ring with a single center stone' },
-        { id: 'eternity', label: 'Eternity', en: 'eternity ring with stones set all around' },
-        { id: 'signet', label: 'Signet', en: 'signet ring with a flat engraved face' },
-      ],
-    },
-    {
-      id: 'earring', label: 'Earrings', note: 'Stud, hoop', types: [
-        { id: 'stud', label: 'Stud', en: 'stud earrings' },
-        { id: 'hoop', label: 'Hoop', en: 'hoop earrings' },
-        { id: 'drop', label: 'Drop', en: 'drop earrings' },
-        { id: 'ear_cuff', label: 'Ear cuff', en: 'ear cuff' },
-      ],
-    },
-    {
-      id: 'necklace', label: 'Necklaces', note: 'Pendant, chain', types: [
-        { id: 'pendant', label: 'Pendant', en: 'pendant necklace' },
-        { id: 'choker', label: 'Choker', en: 'choker necklace' },
-        { id: 'chain_necklace', label: 'Chain', en: 'chain necklace' },
-        { id: 'station', label: 'Station', en: 'station necklace with evenly spaced stones' },
-      ],
-    },
-    {
-      id: 'bracelet', label: 'Bracelets', note: 'Bangle, cuff', types: [
-        { id: 'bangle', label: 'Bangle', en: 'rigid bangle bracelet' },
-        { id: 'chain_bracelet', label: 'Chain', en: 'chain bracelet' },
-        { id: 'cuff', label: 'Cuff', en: 'open cuff bracelet' },
-        { id: 'tennis', label: 'Tennis', en: 'tennis bracelet with a continuous line of stones' },
-      ],
-    },
-    {
-      id: 'other', label: 'Other', note: 'Brooch, anklet', types: [
-        { id: 'brooch', label: 'Brooch', en: 'brooch' },
-        { id: 'anklet', label: 'Anklet', en: 'anklet' },
       ],
     },
   ],
@@ -119,15 +97,309 @@ export function firstTypeOf(category: Category, groupId: string): string {
   return TAXONOMY[category].find(g => g.id === groupId)?.types[0].id ?? TAXONOMY[category][0].types[0].id
 }
 
+// ── Footwear Line Profile (지시서 2장 · 22장) ────────────────────────
+// "어떤 라스트 위에 어떤 어퍼 구조와 바텀 유닛을 쓰는가"를 조사 전에 고정한다.
+// 모르는 값은 'unknown'으로 두는 것이 원칙이다. 사진만으로 라스트 치수를 확정하지 않는다.
+
+export type Unknown = 'unknown'
+
+export interface LineProduct {
+  useCase: 'daily' | 'running' | 'work' | 'formal' | 'outdoor' | 'travel' | 'occasion' | Unknown
+  environment: 'urban' | 'indoor' | 'trail' | 'court' | 'wet_climate' | 'all' | Unknown
+  targetConsumer: 'women' | 'men' | 'unisex' | 'kids'
+  season: string                    // 'FW26', 'SS27', 'carryover'
+  climate: 'all_season' | 'hot_humid' | 'cold_dry' | 'rainy' | Unknown
+}
+
+export interface LineLastFit {
+  lastFamily: string                // 'performance running medium volume' | 'existing dress last' | 'unknown'
+  baseSize: string                  // 'EU 42' | 'US W7' | 'unknown'
+  width: string                     // 'D' | 'D, 2E' | 'unknown'
+  toeShape: 'round' | 'almond' | 'square' | 'pointed' | Unknown
+  toeVolume: 'low' | 'medium' | 'high' | Unknown
+  heelHold: 'relaxed' | 'standard' | 'secure' | Unknown
+  existingLastReuse: boolean        // 기존 라스트 재사용 전제인가
+}
+
+export interface LineUpper {
+  outer: string                     // 'engineered mesh' | 'full-grain calf' | 'suede' | 'knit' | 'synthetic' | 'unknown'
+  lining: string
+  reinforcement: 'none' | 'light' | 'structured' | Unknown
+  closure: 'lace' | 'slip_on' | 'buckle' | 'strap' | 'zip' | 'elastic_gore' | 'dial' | Unknown
+  protection: 'none' | 'water_resistant' | 'waterproof_membrane' | Unknown
+}
+
+export interface LineBottom {
+  midsole: string                   // 'supercritical foam' | 'EVA' | 'PU' | 'leather/none' | 'unknown'
+  plate: 'none' | 'nylon' | 'tpu' | 'carbon' | Unknown
+  outsole: string                   // 'segmented rubber' | 'full rubber' | 'leather' | 'rubber forepart' | 'unknown'
+  stackBand: 'low' | 'mid' | 'high' | Unknown
+  dropMm: string                    // '6-10' | '8' | 'unknown'
+  rocker: 'none' | 'mild' | 'moderate' | 'aggressive' | Unknown
+  heel: 'none' | 'stacked' | 'block' | 'wedge' | 'stiletto' | 'kitten' | Unknown
+  existingBottomReuse: boolean      // 기존 몰드·아웃솔 재사용 전제인가
+}
+
+export interface LineConstruction {
+  lasting: 'strobel' | 'board' | 'moccasin' | Unknown
+  soleAttachment: 'cemented' | 'vulcanized' | 'blake' | 'goodyear' | 'direct_injection' | 'cupsole' | 'handsewn' | Unknown
+}
+
+export interface LinePerformance {
+  weightTargetG: string             // '240-285 (US M9)' | 'unknown'
+  cushioning: 'firm' | 'moderate' | 'high' | 'max' | Unknown
+  stability: 'neutral' | 'neutral_stable' | 'stability' | Unknown
+  wetGrip: 'not_required' | 'preferred' | 'required' | Unknown
+  flexibility: 'stiff' | 'moderate' | 'flexible' | Unknown
+}
+
+export interface LineCommercial {
+  markets: string[]                 // ['KR', 'JP']
+  channels: string[]                // ['DTC', 'department store', 'running specialty']
+}
+
+/** 신발 라인 정의 · 조사·프롬프트·리포트·QA 전 과정이 이 값을 공유한다 */
+export interface FootwearLineProfile {
+  product: LineProduct
+  lastFit: LineLastFit
+  upper: LineUpper
+  bottom: LineBottom
+  construction: LineConstruction
+  performance: LinePerformance
+  commercial: LineCommercial
+}
+
+export const UNKNOWN = 'unknown' as const
+
+export function defaultLineProfile(): FootwearLineProfile {
+  return {
+    product: { useCase: 'daily', environment: 'urban', targetConsumer: 'unisex', season: 'FW26', climate: 'all_season' },
+    lastFit: { lastFamily: UNKNOWN, baseSize: UNKNOWN, width: UNKNOWN, toeShape: UNKNOWN, toeVolume: UNKNOWN, heelHold: UNKNOWN, existingLastReuse: true },
+    upper: { outer: UNKNOWN, lining: UNKNOWN, reinforcement: UNKNOWN, closure: UNKNOWN, protection: UNKNOWN },
+    bottom: { midsole: UNKNOWN, plate: UNKNOWN, outsole: UNKNOWN, stackBand: UNKNOWN, dropMm: UNKNOWN, rocker: UNKNOWN, heel: UNKNOWN, existingBottomReuse: true },
+    construction: { lasting: UNKNOWN, soleAttachment: UNKNOWN },
+    performance: { weightTargetG: UNKNOWN, cushioning: UNKNOWN, stability: UNKNOWN, wetGrip: UNKNOWN, flexibility: UNKNOWN },
+    commercial: { markets: ['KR'], channels: ['DTC'] },
+  }
+}
+
+/** 라인 프로필을 사람이 읽는 짧은 지문으로. 리포트 표지와 캐시 키가 같이 쓴다. */
+export function lineFingerprint(lp: FootwearLineProfile | undefined, itemType: string): string {
+  if (!lp) return TYPE_LABEL[itemType] ?? itemType
+  const bits = [
+    TYPE_LABEL[itemType] ?? itemType,
+    lp.product.useCase !== UNKNOWN ? lp.product.useCase : '',
+    lp.product.targetConsumer,
+    lp.lastFit.lastFamily !== UNKNOWN ? lp.lastFit.lastFamily : '',
+    lp.upper.outer !== UNKNOWN ? `${lp.upper.outer} upper` : '',
+    lp.bottom.outsole !== UNKNOWN ? lp.bottom.outsole : '',
+    lp.construction.soleAttachment !== UNKNOWN ? lp.construction.soleAttachment : '',
+    lp.product.season,
+  ].filter(Boolean)
+  return bits.join(' · ')
+}
+
+// ── 빠른 프리셋 (지시서 4장) · 최종 분류가 아니라 입력값 번들 ─────────
+export interface LinePreset {
+  id: string
+  label: string
+  blurb: string
+  itemType: string
+  fill: (lp: FootwearLineProfile) => FootwearLineProfile
+}
+
+const P = (base: FootwearLineProfile, patch: {
+  product?: Partial<LineProduct>; lastFit?: Partial<LineLastFit>; upper?: Partial<LineUpper>
+  bottom?: Partial<LineBottom>; construction?: Partial<LineConstruction>; performance?: Partial<LinePerformance>
+}): FootwearLineProfile => ({
+  ...base,
+  product: { ...base.product, ...patch.product },
+  lastFit: { ...base.lastFit, ...patch.lastFit },
+  upper: { ...base.upper, ...patch.upper },
+  bottom: { ...base.bottom, ...patch.bottom },
+  construction: { ...base.construction, ...patch.construction },
+  performance: { ...base.performance, ...patch.performance },
+})
+
+export const LINE_PRESETS: LinePreset[] = [
+  {
+    id: 'road_daily', label: 'Road running daily', blurb: 'Daily running · mesh · cushioned rocker · rubber', itemType: 'running',
+    fill: lp => P(lp, {
+      product: { useCase: 'running', environment: 'urban' },
+      lastFit: { lastFamily: 'performance running, medium volume', toeShape: 'round', toeVolume: 'medium', heelHold: 'secure', existingLastReuse: false },
+      upper: { outer: 'engineered mesh', lining: 'moisture-management textile', reinforcement: 'light', closure: 'lace', protection: 'none' },
+      bottom: { midsole: 'supercritical foam', plate: 'none', outsole: 'segmented rubber', stackBand: 'high', dropMm: '6-10', rocker: 'moderate', heel: 'none', existingBottomReuse: false },
+      construction: { lasting: 'strobel', soleAttachment: 'cemented' },
+      performance: { weightTargetG: '240-285 (US M9)', cushioning: 'high', stability: 'neutral_stable', wetGrip: 'required', flexibility: 'moderate' },
+    }),
+  },
+  {
+    id: 'performance_racing', label: 'Performance racing', blurb: 'Light · high stack · plate · rules check', itemType: 'tempo_racer',
+    fill: lp => P(lp, {
+      product: { useCase: 'running', environment: 'urban' },
+      lastFit: { lastFamily: 'racing, low volume', toeShape: 'round', toeVolume: 'low', heelHold: 'secure', existingLastReuse: false },
+      upper: { outer: 'thin engineered mesh', lining: 'minimal', reinforcement: 'none', closure: 'lace', protection: 'none' },
+      bottom: { midsole: 'PEBA supercritical foam', plate: 'carbon', outsole: 'thin rubber', stackBand: 'high', dropMm: '6-8', rocker: 'aggressive', heel: 'none', existingBottomReuse: false },
+      construction: { lasting: 'strobel', soleAttachment: 'cemented' },
+      performance: { weightTargetG: '180-215 (US M9)', cushioning: 'high', stability: 'neutral', wetGrip: 'preferred', flexibility: 'stiff' },
+    }),
+  },
+  {
+    id: 'trail_technical', label: 'Trail technical', blurb: 'Lugs · wet grip · toe protection · stability', itemType: 'trail',
+    fill: lp => P(lp, {
+      product: { useCase: 'outdoor', environment: 'trail', climate: 'all_season' },
+      lastFit: { lastFamily: 'trail running, medium volume', toeShape: 'round', toeVolume: 'medium', heelHold: 'secure', existingLastReuse: false },
+      upper: { outer: 'ripstop mesh with TPU overlays', lining: 'drainage mesh', reinforcement: 'structured', closure: 'lace', protection: 'water_resistant' },
+      bottom: { midsole: 'EVA with rock plate', plate: 'tpu', outsole: 'deep lugged rubber', stackBand: 'mid', dropMm: '4-8', rocker: 'mild', heel: 'none', existingBottomReuse: false },
+      construction: { lasting: 'strobel', soleAttachment: 'cemented' },
+      performance: { weightTargetG: '260-310 (US M9)', cushioning: 'moderate', stability: 'stability', wetGrip: 'required', flexibility: 'moderate' },
+    }),
+  },
+  {
+    id: 'lifestyle_runner', label: 'Lifestyle runner', blurb: 'Fashion sneaker · suede mesh · EVA rubber', itemType: 'lifestyle_runner',
+    fill: lp => P(lp, {
+      product: { useCase: 'daily', environment: 'urban' },
+      lastFit: { lastFamily: 'lifestyle, medium volume', toeShape: 'round', toeVolume: 'medium', heelHold: 'standard', existingLastReuse: true },
+      upper: { outer: 'suede and nylon mesh', lining: 'textile', reinforcement: 'light', closure: 'lace', protection: 'none' },
+      bottom: { midsole: 'EVA', plate: 'none', outsole: 'rubber', stackBand: 'mid', dropMm: '8-10', rocker: 'none', heel: 'none', existingBottomReuse: true },
+      construction: { lasting: 'strobel', soleAttachment: 'cemented' },
+      performance: { weightTargetG: 'unknown', cushioning: 'moderate', stability: 'neutral', wetGrip: 'not_required', flexibility: 'moderate' },
+    }),
+  },
+  {
+    id: 'court_performance', label: 'Court performance', blurb: 'Lateral stability · pivot zone · toe drag', itemType: 'court_sneaker',
+    fill: lp => P(lp, {
+      product: { useCase: 'running', environment: 'court' },
+      lastFit: { lastFamily: 'court, medium volume', toeShape: 'round', toeVolume: 'medium', heelHold: 'secure', existingLastReuse: false },
+      upper: { outer: 'leather and synthetic', lining: 'textile', reinforcement: 'structured', closure: 'lace', protection: 'none' },
+      bottom: { midsole: 'EVA with lateral wrap', plate: 'tpu', outsole: 'herringbone rubber with pivot', stackBand: 'low', dropMm: '8-10', rocker: 'none', heel: 'none', existingBottomReuse: false },
+      construction: { lasting: 'board', soleAttachment: 'cupsole' },
+      performance: { weightTargetG: 'unknown', cushioning: 'moderate', stability: 'stability', wetGrip: 'not_required', flexibility: 'stiff' },
+    }),
+  },
+  {
+    id: 'premium_loafer', label: 'Premium leather loafer', blurb: 'Full-grain calf · dress last · low profile', itemType: 'loafer',
+    fill: lp => P(lp, {
+      product: { useCase: 'formal', environment: 'urban' },
+      lastFit: { lastFamily: 'existing dress last', toeShape: 'almond', toeVolume: 'low', heelHold: 'standard', existingLastReuse: true },
+      upper: { outer: 'full-grain calf', lining: 'leather', reinforcement: 'structured', closure: 'slip_on', protection: 'none' },
+      bottom: { midsole: 'leather/none', plate: 'none', outsole: 'rubber forepart with stacked heel', stackBand: 'low', dropMm: 'unknown', rocker: 'none', heel: 'stacked', existingBottomReuse: true },
+      construction: { lasting: 'board', soleAttachment: 'blake' },
+      performance: { weightTargetG: 'unknown', cushioning: 'firm', stability: 'neutral', wetGrip: 'not_required', flexibility: 'stiff' },
+    }),
+  },
+  {
+    id: 'tailored_oxford', label: 'Tailored oxford', blurb: 'Closed lacing · calf · welt or blake', itemType: 'oxford',
+    fill: lp => P(lp, {
+      product: { useCase: 'formal', environment: 'urban' },
+      lastFit: { lastFamily: 'existing dress last', toeShape: 'almond', toeVolume: 'low', heelHold: 'standard', existingLastReuse: true },
+      upper: { outer: 'full-grain calf', lining: 'leather', reinforcement: 'structured', closure: 'lace', protection: 'none' },
+      bottom: { midsole: 'leather/none', plate: 'none', outsole: 'leather with rubber top piece', stackBand: 'low', dropMm: 'unknown', rocker: 'none', heel: 'stacked', existingBottomReuse: true },
+      construction: { lasting: 'board', soleAttachment: 'goodyear' },
+      performance: { weightTargetG: 'unknown', cushioning: 'firm', stability: 'neutral', wetGrip: 'not_required', flexibility: 'stiff' },
+    }),
+  },
+  {
+    id: 'fashion_pump', label: 'Fashion pump', blurb: 'Heel last · pitch · toe shape', itemType: 'pump',
+    fill: lp => P(lp, {
+      product: { useCase: 'occasion', environment: 'urban', targetConsumer: 'women' },
+      lastFit: { lastFamily: 'heel last, 55-75mm pitch', toeShape: 'pointed', toeVolume: 'low', heelHold: 'secure', existingLastReuse: true },
+      upper: { outer: 'nappa or patent leather', lining: 'leather', reinforcement: 'structured', closure: 'slip_on', protection: 'none' },
+      bottom: { midsole: 'leather/none', plate: 'none', outsole: 'leather with rubber top piece', stackBand: 'low', dropMm: 'unknown', rocker: 'none', heel: 'stiletto', existingBottomReuse: true },
+      construction: { lasting: 'board', soleAttachment: 'cemented' },
+      performance: { weightTargetG: 'unknown', cushioning: 'firm', stability: 'neutral', wetGrip: 'not_required', flexibility: 'stiff' },
+    }),
+  },
+  {
+    id: 'comfort_flat', label: 'Comfort flat', blurb: 'Wide toe box · flexible sole · cushioned footbed', itemType: 'ballet_flat',
+    fill: lp => P(lp, {
+      product: { useCase: 'daily', environment: 'urban', targetConsumer: 'women' },
+      lastFit: { lastFamily: 'wide comfort last', toeShape: 'round', toeVolume: 'high', heelHold: 'relaxed', existingLastReuse: true },
+      upper: { outer: 'soft nappa', lining: 'textile', reinforcement: 'light', closure: 'slip_on', protection: 'none' },
+      bottom: { midsole: 'cushioned footbed', plate: 'none', outsole: 'flexible rubber', stackBand: 'low', dropMm: 'unknown', rocker: 'none', heel: 'none', existingBottomReuse: true },
+      construction: { lasting: 'strobel', soleAttachment: 'cemented' },
+      performance: { weightTargetG: 'unknown', cushioning: 'high', stability: 'neutral', wetGrip: 'not_required', flexibility: 'flexible' },
+    }),
+  },
+  {
+    id: 'chelsea_boot', label: 'Chelsea boot', blurb: 'Ankle last · shaft · gore · pull tab', itemType: 'chelsea',
+    fill: lp => P(lp, {
+      product: { useCase: 'daily', environment: 'urban', climate: 'cold_dry' },
+      lastFit: { lastFamily: 'ankle boot last', toeShape: 'almond', toeVolume: 'medium', heelHold: 'standard', existingLastReuse: true },
+      upper: { outer: 'full-grain calf or suede', lining: 'leather', reinforcement: 'structured', closure: 'elastic_gore', protection: 'water_resistant' },
+      bottom: { midsole: 'leather/none', plate: 'none', outsole: 'rubber', stackBand: 'low', dropMm: 'unknown', rocker: 'none', heel: 'stacked', existingBottomReuse: true },
+      construction: { lasting: 'board', soleAttachment: 'goodyear' },
+      performance: { weightTargetG: 'unknown', cushioning: 'firm', stability: 'neutral', wetGrip: 'preferred', flexibility: 'stiff' },
+    }),
+  },
+  {
+    id: 'outdoor_boot', label: 'Outdoor boot', blurb: 'Waterproof · insulated · lugs · toe protection', itemType: 'hiking',
+    fill: lp => P(lp, {
+      product: { useCase: 'outdoor', environment: 'trail', climate: 'cold_dry' },
+      lastFit: { lastFamily: 'hiking last, medium-high volume', toeShape: 'round', toeVolume: 'high', heelHold: 'secure', existingLastReuse: false },
+      upper: { outer: 'nubuck with textile panels', lining: 'waterproof membrane bootie', reinforcement: 'structured', closure: 'lace', protection: 'waterproof_membrane' },
+      bottom: { midsole: 'PU or EVA', plate: 'tpu', outsole: 'deep lugged rubber', stackBand: 'mid', dropMm: '8-12', rocker: 'mild', heel: 'none', existingBottomReuse: false },
+      construction: { lasting: 'strobel', soleAttachment: 'cemented' },
+      performance: { weightTargetG: 'unknown', cushioning: 'moderate', stability: 'stability', wetGrip: 'required', flexibility: 'stiff' },
+    }),
+  },
+  {
+    id: 'slide_sandal', label: 'Slide / sandal', blurb: 'Footbed · straps · barefoot wear', itemType: 'slide',
+    fill: lp => P(lp, {
+      product: { useCase: 'daily', environment: 'indoor', climate: 'hot_humid' },
+      lastFit: { lastFamily: 'sandal footbed last', toeShape: 'round', toeVolume: 'high', heelHold: 'relaxed', existingLastReuse: true },
+      upper: { outer: 'moulded synthetic or leather band', lining: 'none', reinforcement: 'none', closure: 'slip_on', protection: 'none' },
+      bottom: { midsole: 'contoured EVA footbed', plate: 'none', outsole: 'rubber', stackBand: 'low', dropMm: 'unknown', rocker: 'mild', heel: 'none', existingBottomReuse: true },
+      construction: { lasting: 'strobel', soleAttachment: 'cemented' },
+      performance: { weightTargetG: 'unknown', cushioning: 'high', stability: 'neutral', wetGrip: 'preferred', flexibility: 'flexible' },
+    }),
+  },
+]
+
+// ── 조사 목적 (지시서 8장) · 복수 선택 ───────────────────────────────
+export type ResearchObjective =
+  | 'live_commercial_pulse' | 'design_trends' | 'materials_construction'
+  | 'performance_technology' | 'price_whitespace' | 'next_season_forecast'
+
+export const OBJECTIVE_LABEL: Record<ResearchObjective, string> = {
+  live_commercial_pulse: 'Live commercial pulse',
+  design_trends: 'Design trends',
+  materials_construction: 'Materials and construction',
+  performance_technology: 'Performance technology',
+  price_whitespace: 'Price whitespace',
+  next_season_forecast: 'Next-season forecast',
+}
+
+// ── 경쟁군 (지시서 5.1) · 브랜드가 아니라 라인 단위 ──────────────────
+export type CompetitorGroup =
+  | 'direct' | 'commercial_leader' | 'technical_authority' | 'heritage_authority'
+  | 'directional_designer' | 'aspirational' | 'adjacent'
+
+export const COMP_GROUP_LABEL: Record<CompetitorGroup, string> = {
+  direct: 'Direct competitor',
+  commercial_leader: 'Commercial leader',
+  technical_authority: 'Technical authority',
+  heritage_authority: 'Heritage authority',
+  directional_designer: 'Directional designer',
+  aspirational: 'Aspirational reference',
+  adjacent: 'Adjacent reference',
+}
+
 // ── 모드별 입력 · 세 모드는 조사 범위 자체가 다르다 ──────────────────
-// 트렌드   : 경쟁사 입력 → 경쟁사 제품 리서치 + 트렌드 리서치 (외부 조사 최대)
+// 트렌드   : 경쟁 라인 입력 → 경쟁사 제품 리서치 + 트렌드 리서치 (외부 조사 최대)
 // 시리즈   : 시리즈 디자인 업로드 + 가치 기입 → 트렌드 조사까지만 (경쟁사 리서치 없음)
 // 무드보드 : 유저 PDF만 → 외부 조사 없음
 export interface TrendInput {
+  /** 경쟁 라인 · "Nike Performance Running"처럼 브랜드+라인으로 쓰는 것을 권장 */
   competitors: string[]
   priceBand: 'mass' | 'contemporary' | 'premium' | 'luxury'
+  /** Primary competitive band · 같은 공법·기술 티어의 직접 비교 구간 */
   priceMinKrw: number
   priceMaxKrw: number
+  /** 한 단계 위·아래 티어를 참고 구간으로 함께 볼지 (Adjacent reference band) */
+  adjacentBand?: boolean
+  /** 조사 목적 · 복수 선택 */
+  objectives?: ResearchObjective[]
 }
 export interface SeriesInput {
   seriesName: string
@@ -141,7 +413,7 @@ export interface MoodboardInput {
 }
 
 export const MODE_SCOPE: Record<Mode, { competitor: boolean; trend: boolean; upload: boolean; note: string }> = {
-  trend: { competitor: true, trend: true, upload: false, note: 'Researches competitor products and market trends' },
+  trend: { competitor: true, trend: true, upload: false, note: 'Researches competitor lines and market trends' },
   series: { competitor: false, trend: true, upload: true, note: 'Reads your series, then checks trends only' },
   moodboard: { competitor: false, trend: false, upload: true, note: 'Uses only the files you upload' },
 }
@@ -151,11 +423,17 @@ export interface RunParams {
   mode: Mode
   category: Category
   itemType: string
+  /** 신발 라인 정의 · 조사 전 과정이 공유한다. 옛 저장본에는 없다. */
+  line?: FootwearLineProfile
+  /** 채워 넣은 프리셋 id · 표시용 */
+  linePreset?: string
   endStage: Stage
+  /** 구조 후보 수 · Design ID가 되는 스펙의 수 */
   sketchCount: 6 | 12 | 18 | 24
   tierRatio: [number, number, number]      // Core : Push : Signature
   renderRatio: 0.25 | 0.5 | 0.75
   viewCount: 1 | 3 | 4
+  /** 후보별 컬러웨이 수 · 컬러웨이는 별도 디자인이 아니라 같은 Design ID의 SKU다 */
   colorwayCount: 0 | 1 | 2 | 3
   topN: number                              // 1~5
   /** 스케치 한 장마다 몇 개의 디자인을 뽑을지. 트렌드 근거로 프롬프트를 바꿔 가며 생성한다. */
@@ -192,6 +470,7 @@ export function campaignCount(p: Pick<RunParams, 'campaignShots' | 'wearCuts' | 
 
 export const DEFAULT_PARAMS: RunParams = {
   mode: 'trend', category: 'shoe', itemType: 'loafer',
+  line: defaultLineProfile(),
   endStage: 'S3', sketchCount: 12, tierRatio: [1, 1, 1],
   renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
   topN: 3, designsPerSketch: 2, variationCount: 3, campaignShots: 4, make3d: true, approvalGate: true,
@@ -200,6 +479,8 @@ export const DEFAULT_PARAMS: RunParams = {
     // 기본을 비워둔다. 가상의 브랜드명으로 검색하면 결과가 무의미하고 시간만 든다.
     competitors: [],
     priceBand: 'contemporary', priceMinKrw: 150000, priceMaxKrw: 450000,
+    adjacentBand: true,
+    objectives: ['live_commercial_pulse', 'design_trends', 'next_season_forecast'],
   },
   series: {
     seriesName: '', archiveFiles: [], valueStatement: '', trendSearch: true,
@@ -207,7 +488,18 @@ export const DEFAULT_PARAMS: RunParams = {
   moodboard: { files: [], notes: '' },
 }
 
-// ── 신호 (S1) ───────────────────────────────────────────────────────
+// ── 신호 (S1) · 신발용 스키마 (지시서 15·16장) ───────────────────────
+export interface SignalIndices {
+  /** 실제 판매·베스트셀러·재고·반복 출시 */
+  commercial: 'high' | 'medium' | 'low' | null
+  /** 검색·소셜·리세일·스타일링 */
+  cultural: 'high' | 'medium' | 'low' | null
+  /** 전시회·소재 트렌드·전문 전망 */
+  forecast: 'high' | 'medium' | 'low' | null
+  /** 라스트·몰드·패턴·시험·원가 실현성 */
+  feasibility: 'high' | 'medium' | 'low' | null
+}
+
 export interface Signal {
   signal_id: string
   attribute: string
@@ -222,9 +514,19 @@ export interface Signal {
   dedup_group: string
   oem_group: string | null
   page_ref?: string            // 무드보드 모드: 페이지·위치 참조
-  sales_proxy_score?: number   // 트렌드 모드
+  sales_proxy_score?: number   // 트렌드 모드 (옛 샘플 호환)
   proxy_confidence?: 'high' | 'medium' | 'low' | 'none'
   evidence?: string[]          // 웹 수집 시 확인된 근거 문장
+  /** 함께 관측되는 속성 묶음 · "chunky"가 아니라 high stack + wide platform + …로 */
+  co_occurring?: string[]
+  /** 하나의 점수 대신 네 지수로 분리 */
+  indices?: SignalIndices
+  /** 채택 단계 · 1회 수집이면 trajectory는 unknown이 정상이다 */
+  adoption_stage?: 'emerging' | 'growing' | 'established' | 'declining' | 'unknown'
+  /** 이 신호를 실행할 때 필요한 개발 변경 수준 */
+  last_change?: 'not_required' | 'modification' | 'required' | 'unknown'
+  bottom_tooling_change?: 'not_required' | 'modification' | 'required' | 'unknown'
+  upper_pattern_change?: 'minor' | 'major' | 'unknown'
 }
 
 export interface CompetitorProduct {
@@ -247,6 +549,19 @@ export interface CompetitorProduct {
   design_traits?: string[]
   image_urls?: string[]
   product_url?: string
+  /** 경쟁군 분류 · 프로필과 안 맞아도 제외하지 않고 참조군으로 분류한다 */
+  competitor_group?: CompetitorGroup
+  brand_line?: string
+  /** 공법·기술 티어 · 가격 비교는 같은 티어끼리가 우선이다 */
+  construction_tier?: string
+  /** 순위 표기의 의미 · 노출 위치를 판매 순위로 저장하면 안 된다 */
+  rank_semantics?: 'verified_sales_rank' | 'retailer_bestseller_membership' | 'surface_position' | 'marketplace_trade_rank' | 'none'
+  /** 사이즈별 재고 (지시서 13장) · 신발은 사이즈가 깨진 채 팔린다 */
+  offered_sizes?: number
+  available_sizes?: number
+  size_status?: 'full' | 'partial' | 'size_broken' | 'sold_out' | 'unknown'
+  /** 같은 모델의 컬러웨이 수 · 컬러웨이 10개는 디자인 10개가 아니다 */
+  colorway_count?: number
 }
 
 export interface Direction {

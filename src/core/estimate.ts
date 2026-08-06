@@ -54,7 +54,7 @@ export function estimate(p: RunParams): Estimate {
   const realS2 = Math.min(wantS2, budget)
   const realS3 = Math.min(wantS3, Math.max(0, budget - realS2))
   const realS4 = Math.min(campaignImgs, Math.max(0, budget - realS2 - realS3))
-  const realS5 = 0                              // 3D 쇼룸은 이미지를 만들지 않는다
+  const realS5 = models * 3                     // 턴어라운드 3컷 × 최종 후보 · 상한과 무관
 
   const eng = ENGINES[p.imageEngine]
   const USD_PER_IMAGE = eng.usdPerImage
@@ -84,12 +84,13 @@ export function estimate(p: RunParams): Estimate {
       real: realS4,
     },
     {
-      // 컨셉 촬영은 생성 이미지다. 영상은 로컬 오픈소스라 과금이 붙지 않는다.
+      // 3D는 후보마다 턴어라운드 3컷(front·back·right)을 더 만들어 규약 4뷰를 채운다.
+      // 최종 후보 한정이라 이미지 상한과 무관하게 돈다.
       stage: 'S5', label: '3D showroom',
-      minutes: 1.2 + models * 1.6,
-      usd: 0.25 + models * 0.08,
-      images: 0,
-      real: realS5,
+      minutes: 1.2 + models * (1.6 + 3 * MIN_PER_IMAGE),
+      usd: 0.25 + models * (0.08 + 3 * USD_PER_IMAGE),
+      images: models * 3,
+      real: models * 3,
     },
   ]
 
@@ -122,5 +123,5 @@ export const SCOPE_COPY: Record<Stage, { title: string; gets: string }> = {
   S2: { title: 'Sketches', gets: 'Everything above, plus specs, rule checks and hand-drawn sketches.' },
   S3: { title: 'Designs', gets: 'Sketches turned into finished renders, extra views and product variations.' },
   S4: { title: 'Campaign shots', gets: 'Top picks scored, then worn on a virtual model and staged in studio and on location.' },
-  S5: { title: '3D showroom', gets: 'Multiview renders go to Tripo. You get a 3D model you can turn on the board.' },
+  S5: { title: '3D showroom', gets: 'A four-view turnaround of each pick goes to Tripo. You get a GLB you can turn and download.' },
 }

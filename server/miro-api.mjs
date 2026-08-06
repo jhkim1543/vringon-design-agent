@@ -32,29 +32,37 @@ export function planMiroBoard(model, meta) {
 
   // Miro는 스티키보다 카드가 제목·본문 구조를 그대로 유지한다.
   // 이미지가 있는 노드는 카드 옆에 이미지 아이템을 따로 붙인다.
+  // 로컬 캐시 이미지(/api/...)는 URL로 못 가져가므로 파일 업로드 대상으로 표시한다.
   const items = []
   for (const n of model.nodes) {
     const x = n.column * (COL_W + COL_GAP)
     const y = HEADER_H + n.row * ROW_H
+    const bodyLines = [
+      ...n.body,
+      ...(n.palette?.length ? [n.palette.map(c => `${c.name} ${c.hex}`).join(' · ')] : []),
+      ...(n.prompts ?? []),
+    ]
     items.push({
       kind: 'card',
       key: n.id,
       payload: {
         data: {
-          title: esc(n.title),
-          description: n.body.map(b => `<p>${esc(b)}</p>`).join(''),
+          title: esc(plain(n.title)),
+          description: bodyLines.map(b => `<p>${esc(plain(b))}</p>`).join(''),
         },
         style: { cardTheme: TONE_HEX[n.tone ?? 'neutral'] },
         position: { x, y },
         geometry: { width: COL_W - 60 },
       },
     })
-    if (n.imageUrl && /^https?:\/\//.test(n.imageUrl)) {
+    if (n.imageUrl) {
       items.push({
         kind: 'image',
         key: `${n.id}__img`,
+        // 원격 URL은 그대로, 로컬 경로는 localUrl로 넘겨 서버가 파일 업로드로 바꾼다
+        ...(/^https?:\/\//.test(n.imageUrl) ? {} : { localUrl: n.imageUrl }),
         payload: {
-          data: { url: n.imageUrl, title: esc(n.title) },
+          data: { title: esc(plain(n.title)), ...(/^https?:\/\//.test(n.imageUrl) ? { url: n.imageUrl } : {}) },
           position: { x: x + COL_W - 20, y },
           geometry: { width: 220 },
         },
@@ -96,6 +104,14 @@ function maxRow(model, col) {
 function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
+/** 마크다운 기호를 걷어낸다 · Miro 카드에 ##, ** 가 그대로 보이면 안 된다 */
+function plain(s) {
+  return String(s ?? '')
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/^\s*[-•*]\s+/gm, '')
+}
 
 async function miro(token, path, body, method = 'POST') {
   const r = await fetch(`${API}${path}`, {
@@ -107,8 +123,25 @@ async function miro(token, path, body, method = 'POST') {
   return r.json()
 }
 
-/** 실제 생성 — 프레임 → 스티키 → 커넥터 순 (커넥터는 아이템 id가 있어야 한다) */
-export async function createMiroBoard(token, plan) {
+/** 로컬 캐시 이미지를 Miro에 파일 업로드한다 (URL은 localhost라 Miro가 못 가져간다) */
+async function miroImageUpload(token, bid, buf, name, payload) {
+  const form = new FormData()
+  form.append('resource', new Blob([buf], { type: 'image/png' }), name)
+  form.append('data', JSON.stringify({
+    title: payload?.data?.title ?? name,
+    position: payload?.position,
+    geometry: payload?.geometry,
+  }))
+  const r = await fetch(`${API}/boards/${bid}/images`, {
+    method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: form,
+  })
+  if (!r.ok) throw new Error(`Miro image upload → ${r.status}: ${(await r.text()).slice(0, 200)}`)
+  return r.json()
+}
+
+/** 실제 생성 — 프레임 → 카드 → 커넥터 순 (커넥터는 아이템 id가 있어야 한다)
+ *  resolveLocal(url) → Buffer | null 을 주면 로컬 캐시 이미지를 파일로 올린다. */
+export async function createMiroBoard(token, plan, resolveLocal) {
   const board = await miro(token, '/boards', plan.board)
   const bid = board.id
   const idMap = {}
@@ -118,8 +151,15 @@ export async function createMiroBoard(token, plan) {
     idMap[f.key] = res.id
   }
   for (const it of plan.items) {
-    const path = it.kind === 'image' ? 'images' : 'cards'
     try {
+      if (it.kind === 'image' && it.localUrl) {
+        const buf = resolveLocal?.(it.localUrl)
+        if (!buf) continue
+        const res = await miroImageUpload(token, bid, buf, `${it.key}.png`, it.payload)
+        idMap[it.key] = res.id
+        continue
+      }
+      const path = it.kind === 'image' ? 'images' : 'cards'
       const res = await miro(token, `/boards/${bid}/${path}`, it.payload)
       idMap[it.key] = res.id
     } catch (e) {

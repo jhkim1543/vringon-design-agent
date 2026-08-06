@@ -111,9 +111,7 @@ function buildDesignPitch(d: Design, st: RunState): DesignPitch {
     })
   }
 
-  const specBits = d.spec.category === 'shoe'
-    ? `${f.toe_shape} toe · ${f.heel_height_mm}mm heel · ${f.panel_count} panels`
-    : `${f.setting_type} setting · ${f.stone_count} stones · ${f.metal}`
+  const specBits = `${f.toe_shape} toe · ${f.heel_height_mm}mm ${f.heel_type === 'sport_midsole' ? 'stack' : 'heel'} · ${f.panel_count} panels`
 
   return {
     design_id: d.spec.design_id,

@@ -1,6 +1,7 @@
-// ── 실제 리서치 — OpenAI Responses API + web_search ───────────────────
-// 사용자가 입력한 경쟁사를 실제로 검색해서 최근 제품과 인기 근거를 수집한다.
+// ── 실제 리서치 — OpenAI Responses API + web_search · 신발 전용 ────────
+// 사용자가 입력한 경쟁 라인을 실제로 검색해서 최근 제품과 인기 근거를 수집한다.
 // 판매 프록시는 여기서 만들지 않는다. 1회 검색으로는 시계열이 성립하지 않기 때문이다.
+// FootwearLineProfile이 검색어·필터·캐시 키 전부를 관통한다 (지시서 22장).
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -23,12 +24,15 @@ const COMPETITOR_SCHEMA = {
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['brand', 'model_name', 'price_krw', 'released', 'popularity_evidence', 'evidence_strength',
-          'rank_note', 'user_sentiment', 'praise_points', 'complaint_points', 'design_traits',
+        required: ['brand', 'brand_line', 'model_name', 'price_krw', 'released', 'popularity_evidence', 'evidence_strength',
+          'rank_note', 'rank_semantics', 'competitor_group', 'construction_tier',
+          'user_sentiment', 'praise_points', 'complaint_points', 'design_traits',
+          'offered_sizes', 'available_sizes', 'size_status', 'colorway_count',
           'image_urls', 'product_url', 'source_urls'],
         properties: {
           brand: { type: 'string' },
-          model_name: { type: 'string' },
+          brand_line: { type: 'string', description: '브랜드 안의 라인·컬렉션. 예: Performance Running, Lifestyle, Court. 모르면 빈 문자열' },
+          model_name: { type: 'string', description: '모델 패밀리 이름. 컬러웨이 하나하나를 별개 제품으로 내지 말 것' },
           price_krw: { type: 'integer', description: '원화 정가. 모르면 0' },
           released: { type: 'string', description: '출시 시점. 모르면 unknown' },
           popularity_evidence: {
@@ -37,11 +41,24 @@ const COMPETITOR_SCHEMA = {
           },
           evidence_strength: { type: 'string', enum: ['strong', 'moderate', 'weak', 'none'] },
           rank_note: { type: 'string', description: '판매 순위·랭킹 표기를 확인했으면 그대로 인용. 없으면 빈 문자열' },
+          rank_semantics: {
+            type: 'string', enum: ['verified_sales_rank', 'retailer_bestseller_membership', 'surface_position', 'marketplace_trade_rank', 'none'],
+            description: '그 순위가 무엇인지. 페이지 노출 위치(surface_position)를 판매 순위로 표기하면 안 된다',
+          },
+          competitor_group: {
+            type: 'string', enum: ['direct', 'commercial_leader', 'technical_authority', 'heritage_authority', 'directional_designer', 'aspirational', 'adjacent'],
+            description: '요청된 라인 프로필과의 관계. 공법·가격·용도가 다르면 제외하지 말고 aspirational/adjacent로 분류한다',
+          },
+          construction_tier: { type: 'string', description: '공법·기술 티어. 예: mass cemented, contemporary cemented, premium blake, goodyear welt, supercritical+plate' },
           user_sentiment: { type: 'string', enum: ['positive', 'mixed', 'negative', 'unknown'] },
           praise_points: { type: 'array', items: { type: 'string' }, description: '리뷰에서 반복되는 칭찬. 확인한 것만' },
-          complaint_points: { type: 'array', items: { type: 'string' }, description: '리뷰에서 반복되는 불만. 확인한 것만' },
-          design_traits: { type: 'array', items: { type: 'string' }, description: '눈에 보이는 디자인 특징 (실루엣·소재·컬러·부자재)' },
-          image_urls: { type: 'array', items: { type: 'string' }, description: '제품 사진 직링크(.jpg/.png/.webp). 확인한 것만' },
+          complaint_points: { type: 'array', items: { type: 'string' }, description: '리뷰에서 반복되는 불만. 핏·폭·힐 슬립·토 압박을 특히 살핀다' },
+          design_traits: { type: 'array', items: { type: 'string' }, description: '눈에 보이는 디자인 특징 (실루엣·라스트 볼륨·솔 구조·소재·클로저)' },
+          offered_sizes: { type: 'integer', description: '판매 페이지에 표시된 사이즈 수. 확인 못 하면 0' },
+          available_sizes: { type: 'integer', description: '그중 지금 구매 가능한 사이즈 수. 확인 못 하면 -1' },
+          size_status: { type: 'string', enum: ['full', 'partial', 'size_broken', 'sold_out', 'unknown'], description: '핵심 사이즈가 빠져 있으면 size_broken' },
+          colorway_count: { type: 'integer', description: '이 모델의 컬러웨이 수. 컬러웨이는 별개 디자인이 아니다. 모르면 0' },
+          image_urls: { type: 'array', items: { type: 'string' }, description: '제품 사진 직링크(.jpg/.png/.webp). 페이지의 og:image 주소도 좋다. 확인한 것만' },
           product_url: { type: 'string', description: '제품 상세 페이지 URL' },
           source_urls: { type: 'array', items: { type: 'string' } },
         },
@@ -51,6 +68,7 @@ const COMPETITOR_SCHEMA = {
   },
 }
 
+const IDX = { type: 'string', enum: ['high', 'medium', 'low', 'none'] }
 const TREND_SCHEMA = {
   type: 'object',
   additionalProperties: false,
@@ -61,16 +79,30 @@ const TREND_SCHEMA = {
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['label', 'axis', 'attribute', 'direction', 'observed_count', 'evidence', 'source_urls', 'confidence'],
+        required: ['label', 'axis', 'attribute', 'direction', 'observed_count', 'evidence', 'source_urls', 'confidence',
+          'co_occurring', 'commercial_index', 'cultural_index', 'forecast_index', 'feasibility_index',
+          'adoption_stage', 'last_change', 'bottom_tooling_change', 'upper_pattern_change'],
         properties: {
           label: { type: 'string', description: 'Signal name, in the requested output language' },
-          axis: { type: 'string', description: 'Attribute axis, in the requested output language (e.g. Toe shape, Sole thickness)' },
-          attribute: { type: 'string', description: '영문 속성 키' },
+          axis: { type: 'string', description: 'Attribute axis, in the requested output language (e.g. Toe shape, Sole thickness, Midsole and plate)' },
+          attribute: { type: 'string', description: '영문 속성 키 (snake_case)' },
           direction: { type: 'string', enum: ['rising', 'stable', 'declining'] },
           observed_count: { type: 'integer', description: '서로 다른 출처에서 확인된 횟수' },
           evidence: { type: 'array', items: { type: 'string' } },
           source_urls: { type: 'array', items: { type: 'string' } },
           confidence: { type: 'string', enum: ['high', 'medium', 'low'] },
+          co_occurring: {
+            type: 'array', items: { type: 'string' },
+            description: '함께 관측되는 속성 묶음. "청키 러닝화" 같은 뭉툭한 신호 금지 — high stack, wide platform, moderate rocker처럼 공존 속성으로 쪼갠다',
+          },
+          commercial_index: { ...IDX, description: '실제 판매·베스트셀러·재고·반복 출시 근거의 세기' },
+          cultural_index: { ...IDX, description: '검색·소셜·리세일·스타일링 근거의 세기' },
+          forecast_index: { ...IDX, description: '전시회·소재 트렌드·신진 브랜드·전문 전망 근거의 세기' },
+          feasibility_index: { ...IDX, description: '라스트·몰드·패턴·시험·원가 실현성. 신규 아웃솔 몰드가 필요하면 낮다' },
+          adoption_stage: { type: 'string', enum: ['emerging', 'growing', 'established', 'declining', 'unknown'], description: '1회 수집이면 상승·하락 판정 대신 unknown이 정직하다' },
+          last_change: { type: 'string', enum: ['not_required', 'modification', 'required', 'unknown'], description: '이 신호를 실행할 때 라스트 변경이 필요한가' },
+          bottom_tooling_change: { type: 'string', enum: ['not_required', 'modification', 'required', 'unknown'], description: '아웃솔·미드솔 몰드 변경이 필요한가' },
+          upper_pattern_change: { type: 'string', enum: ['minor', 'major', 'unknown'], description: '어퍼 패턴 변경의 크기' },
         },
       },
     },
@@ -81,6 +113,8 @@ const TREND_SCHEMA = {
 
 // 지시서 14장 · 리포트 문체 규격
 const reportStyle = (langName = 'English') => `Write in ${langName}. Style rules:
+- No markdown symbols anywhere in prose: no bold asterisks, no backticks, no bullet dashes, no heading hashes.
+  The only exception: body_markdown may start a section heading line with "## " — nothing else.
 - No emoji. Do not fall into repeated three-bullet groups. Avoid "the key is", "in conclusion", "not only but also", "it can be said that".
 - Vary paragraph length between two and seven sentences. Do not let equal-length paragraphs run in sequence.
 - Do not add a summary paragraph at the end.
@@ -95,7 +129,7 @@ const REPORT_SCHEMA = {
   properties: {
     title: { type: 'string' },
     executive_view: { type: 'string', description: '이 시즌에 무엇을 해야 하는지 3~5문장' },
-    body_markdown: { type: 'string', description: '## 소제목을 쓴 본문. 관측·해석·반대신호를 포함' },
+    body_markdown: { type: 'string', description: '## 소제목을 쓴 본문. 관측·해석·반대신호를 포함. 라스트·핏, 어퍼 구조, 솔·힐·트레드, 공법 절이 반드시 있어야 한다' },
     design_implications: {
       type: 'array',
       description: '디자인 스펙으로 옮길 수 있는 구체 지침',
@@ -103,7 +137,7 @@ const REPORT_SCHEMA = {
         type: 'object', additionalProperties: false,
         required: ['area', 'guidance', 'basis'],
         properties: {
-          area: { type: 'string', description: '실루엣 / 소재 / 컬러 / 부자재 / 비율 등' },
+          area: { type: 'string', description: '라스트·핏 / 실루엣 / 어퍼 / 솔·힐·트레드 / 소재 / 컬러 / 부자재 / 공법' },
           guidance: { type: 'string' },
           basis: { type: 'string', description: '어떤 관측에서 나왔는지' },
         },
@@ -193,16 +227,80 @@ async function ask(apiKey, { input, schema, name }) {
   return { data: JSON.parse(text), searches }
 }
 
+// 화면에는 영문으로 노출하지만, 국내 검색은 한글 브랜드명이 훨씬 잘 걸린다.
+// 캐시 키도 정규화한 이름으로 잡아 같은 조사를 두 번 돌리지 않는다.
+const BRAND_ALIAS = {
+  'nike': '나이키', 'adidas': '아디다스', 'asics': '아식스',
+  'new balance': '뉴발란스', 'newbalance': '뉴발란스', 'hoka': '호카',
+  'salomon': '살로몬', 'on': '온러닝', 'on running': '온러닝', 'brooks': '브룩스', 'saucony': '써코니',
+  'mizuno': '미즈노', 'puma': '푸마', 'converse': '컨버스', 'vans': '반스',
+  'dr. martens': '닥터마틴', 'dr martens': '닥터마틴', 'birkenstock': '버켄스탁',
+  'clarks': '클락스', 'ecco': '에코', 'camper': '캄퍼', 'timberland': '팀버랜드',
+}
+function canonBrand(b) {
+  const raw = String(b).trim()
+  // "Nike Performance Running"처럼 라인이 붙어 있으면 브랜드만 정규화하고 라인은 살린다
+  const lower = raw.toLowerCase()
+  for (const [en, ko] of Object.entries(BRAND_ALIAS)) {
+    if (lower === en) return ko
+    if (lower.startsWith(en + ' ')) return `${ko}${raw.slice(en.length)}`
+  }
+  return raw
+}
+
+// 카테고리·품목도 마찬가지다. 화면은 영문, 검색은 한글.
+const TERM_ALIAS = {
+  footwear: '신발', shoe: '신발', shoes: '신발',
+  'road daily trainer': '데일리 트레이너 러닝화', 'daily trainer': '데일리 트레이너 러닝화',
+  'max cushion': '맥스 쿠셔닝 러닝화', 'tempo / racing': '카본 레이싱화', racing: '레이싱화',
+  trail: '트레일 러닝화', court: '코트 스니커즈', 'lifestyle runner': '라이프스타일 러닝화 스니커즈',
+  chunky: '청키 스니커즈', sneakers: '스니커즈', sneaker: '스니커즈',
+  'penny loafer': '페니 로퍼', 'horsebit loafer': '홀스빗 로퍼', 'chunky loafer': '청키 로퍼', loafer: '로퍼',
+  derby: '더비 슈즈', oxford: '옥스퍼드 슈즈', 'monk strap': '몽크스트랩 슈즈',
+  pump: '펌프스', slingback: '슬링백', 'mary jane': '메리제인 슈즈', mule: '뮬',
+  'ballet flat': '발레 플랫', driving: '드라이빙 슈즈', espadrille: '에스파드류',
+  'ankle boot': '앵클 부츠', chelsea: '첼시 부츠', combat: '워커 부츠', 'knee-high': '롱부츠', hiking: '하이킹 부츠 등산화',
+  strappy: '스트랩 샌들', slide: '슬라이드', sport: '스포츠 샌들', gladiator: '글래디에이터 샌들',
+}
+function canonTerm(t) { return TERM_ALIAS[String(t).trim().toLowerCase()] ?? t }
+
+/** 라인 프로필 → 프롬프트 블록. 조사·필터·신호 생성이 전부 이 조건을 본다. */
+function lineBlock(line) {
+  if (!line) return ''
+  const u = (v) => v && v !== 'unknown' ? v : null
+  const rows = [
+    ['용도·환경', [u(line.useCase), u(line.climate)].filter(Boolean).join(' · ')],
+    ['타깃', u(line.targetConsumer)],
+    ['시즌', u(line.season)],
+    ['라스트·핏', [u(line.lastFamily), u(line.toeShape) && `${line.toeShape} toe`].filter(Boolean).join(' · ')],
+    ['어퍼', [u(line.upperOuter), u(line.closure) && `${line.closure} closure`, u(line.protection)].filter(Boolean).join(' · ')],
+    ['바텀', [u(line.midsole), u(line.plate) && line.plate !== 'none' && `${line.plate} plate`, u(line.outsole), u(line.stackBand) && `${line.stackBand} stack`, u(line.dropMm) && `drop ${line.dropMm}mm`, u(line.rocker) && line.rocker !== 'none' && `${line.rocker} rocker`, u(line.heel) && line.heel !== 'none' && `${line.heel} heel`].filter(Boolean).join(' · ')],
+    ['공법', [u(line.lasting), u(line.soleAttachment)].filter(Boolean).join(' + ')],
+    ['성능', [u(line.cushioning) && `cushioning ${line.cushioning}`, u(line.stability), u(line.wetGrip) === 'required' && 'wet grip required'].filter(Boolean).join(' · ')],
+    ['시장·채널', [...(line.markets ?? []), ...(line.channels ?? [])].join(' · ')],
+  ].filter(([, v]) => v)
+  if (!rows.length) return ''
+  return `\n조사 대상 신발 라인 정의 (이 조합이 곧 경쟁군이다 — 같은 외형이라도 이 조건이 다르면 다른 시장이다):
+${rows.map(([k, v]) => `- ${k}: ${v}`).join('\n')}
+프로필과 공법·가격·용도가 다른 제품은 버리지 말고 competitor_group을 aspirational 또는 adjacent로 분류한다.\n`
+}
+
+/** 캐시 키에 넣을 라인 지문 · 프로필이 바뀌면 조사도 다시 돈다 */
+function lineKey(line) {
+  if (!line) return ''
+  return createHash('sha256').update(JSON.stringify(line)).digest('hex').slice(0, 12)
+}
+
 /** 브랜드가 여러 곳이면 한 번에 묶지 않고 브랜드별로 나눠 병렬로 돈다.
  *  한 요청이 커지면 상류 연결이 먼저 끊기고, 한 브랜드 실패가 전체를 날린다. */
 export async function researchCompetitors(apiKey, root, opts) {
-  const { brands = [], categoryKo, typeKo, priceMin, priceMax, langName = 'English' } = opts
-  const key = createHash('sha256').update(JSON.stringify(['comp4', langName, brands, categoryKo, typeKo, priceMin, priceMax])).digest('hex').slice(0, 24)
+  const { brands = [], typeKo, priceMin, priceMax, adjacentBand = false, line, langName = 'English' } = opts
+  const key = createHash('sha256').update(JSON.stringify(['comp5ft', langName, brands, typeKo, priceMin, priceMax, adjacentBand, lineKey(line)])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
   const results = await Promise.allSettled(
-    brands.map(b => researchOneBrand(apiKey, root, { ...opts, brand: b , langName })),
+    brands.map(b => researchOneBrand(apiKey, root, { ...opts, brand: b, langName })),
   )
   const products = []
   const notes = []
@@ -221,64 +319,46 @@ export async function researchCompetitors(apiKey, root, opts) {
   return { ...out, cached: false }
 }
 
-// 화면에는 영문으로 노출하지만, 국내 검색은 한글 브랜드명이 훨씬 잘 걸린다.
-// 캐시 키도 정규화한 이름으로 잡아 같은 조사를 두 번 돌리지 않는다.
-const BRAND_ALIAS = {
-  'nike': '나이키', 'adidas': '아디다스', 'asics': '아식스',
-  'new balance': '뉴발란스', 'newbalance': '뉴발란스', 'hoka': '호카',
-  'tiffany': '티파니', 'tiffany & co.': '티파니', 'cartier': '까르띠에',
-  'pandora': '판도라', 'swarovski': '스와로브스키',
-}
-function canonBrand(b) { return BRAND_ALIAS[String(b).trim().toLowerCase()] ?? b }
-
-// 카테고리·품목도 마찬가지다. 화면은 영문, 검색은 한글.
-const TERM_ALIAS = {
-  footwear: '신발', shoe: '신발', shoes: '신발', jewelry: '주얼리', jewellery: '주얼리',
-  loafer: '로퍼', derby: '더비 슈즈', oxford: '옥스퍼드 슈즈', 'monk strap': '몽크스트랩 슈즈',
-  sneaker: '스니커즈', sneakers: '스니커즈', pump: '펌프스', slingback: '슬링백',
-  ballet: '발레 플랫', 'driving shoe': '드라이빙 슈즈', 'ankle boot': '앵클 부츠', chelsea: '첼시 부츠',
-  sandal: '샌들', slide: '슬라이드', stud: '스터드 귀걸이', hoop: '후프 귀걸이',
-  pendant: '펜던트 목걸이', 'tennis necklace': '테니스 목걸이', bangle: '뱅글', cuff: '커프',
-  'signet ring': '시그넷 링', 'solitaire ring': '솔리테어 링',
-}
-function canonTerm(t) { return TERM_ALIAS[String(t).trim().toLowerCase()] ?? t }
-
-async function researchOneBrand(apiKey, root, { brand: rawBrand, categoryKo: rawCat, typeKo: rawType, priceMin, priceMax, langName = 'English' }) {
+async function researchOneBrand(apiKey, root, { brand: rawBrand, typeKo: rawType, priceMin, priceMax, adjacentBand = false, line, langName = 'English' }) {
   const LANG = langName
   const brand = canonBrand(rawBrand)
-  const categoryKo = canonTerm(rawCat)
   const typeKo = canonTerm(rawType)
-  const key = createHash('sha256').update(JSON.stringify(['brand3', langName, brand, categoryKo, typeKo, priceMin, priceMax])).digest('hex').slice(0, 24)
+  const key = createHash('sha256').update(JSON.stringify(['brand4ft', langName, brand, typeKo, priceMin, priceMax, adjacentBand, lineKey(line)])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return JSON.parse(readFileSync(file, 'utf8'))
 
-  const input = `당신은 패션 브랜드의 상품기획 리서처입니다. 웹 검색으로 사실만 수집하세요.
+  const input = `당신은 신발 브랜드의 상품기획 리서처입니다. 웹 검색으로 사실만 수집하세요.
 
-대상 브랜드: ${brand}
-품목: ${categoryKo} / ${typeKo}
-자사 가격 밴드: ${priceMin.toLocaleString()}원 ~ ${priceMax.toLocaleString()}원
-
+대상: ${brand} (브랜드 전체가 아니라 이 품목과 맞는 라인을 본다 — 같은 브랜드라도 퍼포먼스 러닝과 라이프스타일은 별개 경쟁군이다)
+품목: ${typeKo}
+Primary 가격 밴드: ${priceMin.toLocaleString()}원 ~ ${priceMax.toLocaleString()}원 (같은 공법·기술 티어의 직접 비교 구간)
+${adjacentBand ? '한 단계 위·아래 티어도 참고용으로 1개까지 포함하되 competitor_group을 aspirational/adjacent로 분류합니다.' : '이 밴드 밖 제품은 넣지 않습니다.'}
+${lineBlock(line)}
 이 브랜드에서 최근 출시되었거나 현재 잘 팔리는 ${typeKo} 모델을 2~3개만 찾아주세요.
 브랜드 공식몰의 베스트셀러·랭킹 페이지와 리뷰를 함께 확인하세요. 검색은 8회 이내로 끝내세요.
 
 읽기 규칙 (반드시 지킬 것):
 - 화살표와 대시를 문장 연결에 쓰지 않는다. "->", "→", "—", " - " 금지. 문장으로 풀어 쓴다.
-  나쁨: "실버 하드웨어 -> 청키 체인 확대"
-  좋음: "실버 하드웨어가 자리를 잡으면서 청키 체인으로 넓어진다."
 - 개조식 나열 대신 완결된 문장을 쓴다. 각 문장은 주어와 서술어를 갖춘다.
 - 항목 이름 뒤에 콜론을 붙여 설명을 잇지 않는다. 이름과 설명은 별개 필드다.
 - 괄호 안에 출처 URL을 늘어놓지 않는다. 출처는 source_url 필드에만 넣는다.
 - 한 문장은 60자 안팎으로 끊는다. 쉼표로 세 번 이상 잇지 않는다.
 
-
 규칙:
 - 실제로 검색해서 확인한 것만 적습니다. 확인하지 못한 값은 지어내지 마세요.
-- price_krw는 한국 정가를 확인한 경우에만 넣고, 모르면 0으로 둡니다.
-- popularity_evidence에는 "베스트셀러 선정", "OO 어워드 수상", "품절", "재입고" 처럼 출처에서 확인된 사실만 적습니다. 판매량 추정치를 지어내지 마세요.
-- rank_note에는 "여성 러닝화 랭킹 3위" 처럼 사이트에 표기된 순위를 그대로 옮깁니다. 없으면 빈 문자열.
-- user_sentiment / praise_points / complaint_points는 실제 리뷰를 읽고 반복되는 내용만 적습니다. 리뷰를 못 찾으면 unknown과 빈 배열로 둡니다.
-- design_traits에는 사진과 상세 설명에서 확인되는 디자인 특징을 적습니다 (예: "두꺼운 EVA 미드솔", "메시 갑피에 TPU 오버레이").
-- image_urls에는 제품 사진의 직접 링크만 넣습니다. 페이지 주소가 아니라 이미지 파일 주소여야 합니다. 확실하지 않으면 빈 배열로 둡니다.
+- 모델 패밀리 하나가 한 항목입니다. 컬러웨이 10개를 제품 10개로 내지 말고 colorway_count에 수를 적으세요.
+- price_krw는 한국 정가를 확인한 경우에만 넣고, 모르면 0으로 둡니다. 세일가를 정가로 적지 마세요.
+- rank_note에는 사이트에 표기된 순위를 그대로 옮기고, rank_semantics로 그 순위의 의미를 분류합니다.
+  페이지에서 3번째로 노출된 것은 surface_position이지 판매 순위가 아닙니다.
+- 사이즈 재고를 확인하세요: 판매 페이지의 사이즈 선택 UI에서 제공 사이즈 수(offered_sizes)와
+  현재 구매 가능한 사이즈 수(available_sizes)를 셉니다. 핵심 사이즈가 빠져 있으면 size_status를 size_broken으로 둡니다.
+  사이즈 부족은 초기 생산량의 영향도 받으므로 판매량으로 해석하지 않습니다.
+- construction_tier에는 공법·기술 티어를 적습니다. 사진만으로 공법을 확정하지 말고, 공식 사양에서 확인한 것만 단정합니다.
+- user_sentiment / praise_points / complaint_points는 실제 리뷰에서 반복되는 내용만 적습니다.
+  핏이 크다/작다, 볼이 좁다, 힐 슬립, 토 압박 같은 핏 신호를 특히 찾으세요. 리뷰를 못 찾으면 unknown과 빈 배열로 둡니다.
+- design_traits에는 사진과 상세 설명에서 확인되는 디자인 특징을 적습니다 (예: "두꺼운 수퍼크리티컬 폼 미드솔", "메시 갑피에 TPU 오버레이", "라스트 볼륨이 낮고 토가 길다").
+- image_urls에는 제품 사진의 직접 링크를 넣습니다. 상세 페이지 HTML의 og:image 메타 태그 주소가 가장 안정적입니다.
+  페이지 주소가 아니라 이미지 파일 주소여야 하고, 모델당 2~3개를 넣으세요. 확실하지 않으면 빈 배열로 둡니다.
 - product_url에는 제품 상세 페이지 주소를 넣습니다.
 - In notes, list what you could not confirm and the limits of this pass. Write it in ${LANG}.
 - Search in Korean where that finds more, but every string you output must be written in ${LANG}. Keep brand and model names as they are officially written.`
@@ -289,42 +369,63 @@ async function researchOneBrand(apiKey, root, { brand: rawBrand, categoryKo: raw
   return out
 }
 
+// 조사 목적 → 하위 질문 설계에 쓰는 렌즈 (지시서 8장)
+const OBJECTIVE_LENS = {
+  live_commercial_pulse: '지금 어떤 모델·실루엣·가격대가 실제로 팔리는가 (베스트셀러 포함, 품절·재입고, 사이즈 재고)',
+  design_trends: '실루엣·라스트 볼륨·토 셰이프·어퍼 패널·클로저가 어떻게 변하는가',
+  materials_construction: '소재(가죽·메시·니트·필름)와 공법(시멘티드·블레이크·웰트·사출)이 어떻게 변하는가',
+  performance_technology: '폼·플레이트·멤브레인·구조 기술이 어떻게 확대되는가',
+  price_whitespace: '수요 대비 공급이 적은 가격·구조 조합은 무엇인가',
+  next_season_forecast: '아직 작지만 다음 시즌에 확산될 가능성이 있는 구조·소재는 무엇인가',
+}
+
 export async function researchTrends(apiKey, root, {
-  categoryKo: rawCat, typeKo: rawType, brands: rawBrands, season, priceBandKo, deep, deepModel, wantReport = true, depth = 4, onStep,
+  typeKo: rawType, brands: rawBrands, season, priceBandKo, deep, deepModel, wantReport = true, depth = 4, onStep,
+  objectives = [], line,
   langName = 'English',
 }) {
   const LANG = langName
-  const categoryKo = canonTerm(rawCat)
   const typeKo = canonTerm(rawType)
   const brands = (rawBrands ?? []).map(canonBrand)
   const useDeep = !!deep
   const key = createHash('sha256').update(JSON.stringify([
-    'trend5', LANG, categoryKo, typeKo, brands ?? [], season, priceBandKo ?? '',
+    'trend6ft', LANG, typeKo, brands ?? [], season, priceBandKo ?? '', [...objectives].sort(), lineKey(line),
     useDeep ? 'deep' : wantReport ? `multi${depth}` : 'fast',
   ])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
-  const input = `당신은 패션 브랜드의 트렌드 리서처입니다. 웹 검색으로 사실만 수집하세요.
+  const lenses = (objectives.length ? objectives : ['live_commercial_pulse', 'design_trends', 'next_season_forecast'])
+    .map(o => OBJECTIVE_LENS[o]).filter(Boolean)
 
-품목: ${categoryKo} / ${typeKo}
+  const input = `당신은 신발 브랜드의 트렌드 리서처입니다. 웹 검색으로 사실만 수집하세요.
+
+품목: ${typeKo}
 시즌: ${season}
 ${brands?.length ? `참고 브랜드: ${brands.join(', ')}` : ''}
+${lineBlock(line)}
+조사 렌즈 (사용자가 고른 조사 목적):
+${lenses.map((l, i) => `${i + 1}. ${l}`).join('\n')}
 
 이 품목의 디자인 트렌드 신호를 5~7개 찾아주세요. 신호는 "무엇이 어떻게 바뀌고 있다"는 관측이어야 하고,
-디자인 스펙으로 옮길 수 있을 만큼 구체적이어야 합니다. (예: 토 셰이프, 솔 두께, 힐 높이 밴드, 소재, 클로저, 하드웨어)
+디자인 스펙으로 옮길 수 있을 만큼 구체적이어야 합니다. (예: 토 셰이프, 라스트 볼륨, 솔 스택, 힐 높이 밴드, 미드솔 폼, 플레이트, 러그, 소재, 클로저)
 
 규칙:
 - 실제로 검색해서 확인한 것만 적습니다. 확인하지 못한 것은 넣지 마세요.
 - observed_count는 서로 다른 출처에서 확인된 횟수입니다. 부풀리지 마세요.
 - confidence는 출처가 3곳 이상이면 high, 1곳이면 low로 둡니다.
 - label과 axis는 반드시 ${LANG}로 씁니다. attribute만 영어 snake_case로 두세요 (기계가 쓰는 키라서 언어를 타면 안 됩니다).
-- 아래 예시는 영어로 적혀 있지만, 실제 출력은 ${LANG}로 씁니다.
+- 신호 하나는 뭉툭한 한 단어가 아니라 공존 속성 묶음이어야 합니다. co_occurring에 함께 관측되는 속성을 2~4개 적으세요.
+  나쁜 예: "Chunky running shoe". 좋은 예: label "High-stack platform trainer", co_occurring ["high stack", "wide platform", "moderate rocker", "segmented rubber"].
+- 하나의 트렌드 점수 대신 네 지수를 따로 판정합니다 (지어내지 말고 근거가 없으면 none):
+  commercial_index 실제 판매·베스트셀러·재고 / cultural_index 검색·소셜·리세일 / forecast_index 전시회·소재·전문 전망 / feasibility_index 라스트·몰드·패턴 실현성.
+- last_change / bottom_tooling_change / upper_pattern_change로 개발 변경 수준을 표시합니다. 문화적으로 강해도 신규 몰드가 필요하면 feasibility는 낮습니다.
+- 1회 수집으로 상승·하락 궤적을 단정하지 않습니다. adoption_stage가 애매하면 unknown으로 둡니다.
 - In report_perspective, say which market and viewpoint the material leans towards.
 - Search in Korean where that finds more, but every string you output must be written in ${LANG}.
 - 신호는 반드시 '제품에서 관측된 디자인 속성'이어야 합니다. 실제 판매 중인 제품 페이지·리뷰·기사에서 본 형태, 소재, 부자재, 비율, 컬러를 적으세요.
 - 데이터가 없다거나 확인이 어렵다는 서술은 신호가 아닙니다. 그런 내용은 notes에만 적고 signals에는 절대 넣지 마세요.
-- label은 디자인 속성 이름이어야 합니다. 좋은 예: 'Square toe', 'Chunky lug sole', 'Low block heel 25-35mm', 'Suede upper', 'Elastic gore closure', 'Metal hardware accent'.
+- label은 디자인 속성 이름이어야 합니다. 좋은 예: 'Elongated soft square toe', 'High-stack platform trainer', 'Low block heel 25-35mm', 'Suede upper', 'Elastic gore closure'.
 - 나쁜 예(넣지 말 것): 'No quantified shares', 'Access constraints', 'Data not available', 'GTM requirement'.
 - 정량 통계를 못 찾더라도, 개별 제품에서 반복 관측되는 속성이면 confidence를 low로 두고 신호로 올리세요.`
 
@@ -332,9 +433,14 @@ ${brands?.length ? `참고 브랜드: ${brands.join(', ')}` : ''}
   // ① 하위 질문 설계 → ② 질문별 개별 검색 → ③ 종합 보고서 → ④ 스키마 정리
   if (!useDeep && wantReport) {
     const planned = await ask(apiKey, {
-      input: `${categoryKo} / ${typeKo} · ${season} · 가격대 ${priceBandKo ?? '미지정'} 의 디자인 트렌드를 조사하려 합니다.
-서로 겹치지 않는 조사 하위 질문 ${depth}개를 만드세요. 각 질문은 웹에서 사실로 확인 가능한 것이어야 하고,
-디자인 스펙(실루엣·소재·부자재·컬러·비율)으로 옮길 수 있는 답이 나오는 질문이어야 합니다.`,
+      input: `${typeKo} · ${season} · 가격대 ${priceBandKo ?? '미지정'} 의 디자인 트렌드를 조사하려 합니다.
+${lineBlock(line)}
+조사 렌즈:
+${lenses.map((l, i) => `${i + 1}. ${l}`).join('\n')}
+
+서로 겹치지 않는 조사 하위 질문 ${depth}개를 만드세요. 각 질문은 위 렌즈 중 하나를 다루고, 웹에서 사실로 확인 가능한 것이어야 하고,
+디자인 스펙(라스트·실루엣·어퍼·솔·힐·트레드·소재·부자재·컬러·비율)으로 옮길 수 있는 답이 나오는 질문이어야 합니다.
+선택한 품목과 직접 관련된 질문이 대부분이어야 합니다 — 러닝화를 조사하는데 부츠·힐 질문을 만들면 안 됩니다.`,
       schema: {
         type: 'object', additionalProperties: false, required: ['questions'],
         properties: { questions: { type: 'array', items: { type: 'string' } } },
@@ -349,7 +455,7 @@ ${brands?.length ? `참고 브랜드: ${brands.join(', ')}` : ''}
     const settled = await Promise.allSettled(qs.map(q => ask(apiKey, {
       input: `웹 검색으로 다음 질문에 답하세요. 확인한 사실만 쓰고 출처 URL을 함께 남기세요.
 검색은 4회 이내로 끝내세요. 이미 아는 사실은 다시 검색하지 마세요.
-대상: ${categoryKo} / ${typeKo} · ${season} · 가격대 ${priceBandKo ?? '미지정'}
+대상: ${typeKo} · ${season} · 가격대 ${priceBandKo ?? '미지정'}
 질문: ${q}`,
       schema: {
         type: 'object', additionalProperties: false, required: ['answer', 'facts', 'sources'],
@@ -375,7 +481,9 @@ ${brands?.length ? `참고 브랜드: ${brands.join(', ')}` : ''}
     ).join('\n\n')
 
     const rep = await ask(apiKey, {
-      input: `아래 조사 결과만 근거로 ${categoryKo} / ${typeKo} (${season}, 가격대 ${priceBandKo ?? '미지정'}) 트렌드 trend report written in ${LANG}, using only the research below.
+      input: `아래 조사 결과만 근거로 ${typeKo} (${season}, 가격대 ${priceBandKo ?? '미지정'}) trend report written in ${LANG}, using only the research below.
+보고서 분량의 60~70%는 선택 품목의 직접 신호, 20~25%는 인접 계열, 10~15%만 신발 전체 매크로 맥락이어야 합니다.
+본문에는 라스트·핏 / 어퍼 구조 / 솔·힐·트레드 / 공법 절이 반드시 들어갑니다.
 
 ${reportStyle(LANG)}
 
@@ -388,6 +496,7 @@ ${digest}
 
     const structured = await ask(apiKey, {
       input: `아래 보고서에 적힌 내용만 사용해 신호 스키마로 정리하세요. 없는 내용을 만들지 마세요.
+신호마다 co_occurring 속성 묶음과 네 지수(commercial/cultural/forecast/feasibility), 라스트·몰드·패턴 변경 수준을 채웁니다.
 
 ${rep.data.body_markdown}
 

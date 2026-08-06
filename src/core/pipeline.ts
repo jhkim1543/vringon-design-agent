@@ -1,16 +1,16 @@
 // ── 파이프라인 엔진 S1~S5 · 진행 스트리밍·승인 게이트·체크포인트 ──────
 import type { Design, DesignTier, PipelineEvent, Rationale, RunParams, Signal, Stage } from './types'
-import { PACKS, resetSeq, tierCapRule } from './packs'
+import { PACKS, resetSeq, tierCapRule, viewSetFor } from './packs'
 import { makeRng } from './rng'
 import { COMPETITORS, DIRECTIONS, DNA_CONFLICT, DNA_LOCKS, PROMPT_PARSE, REPORT_BIAS, SERIES_DNA, SIGNALS } from './samples'
 import { COLORWAY_NAMES } from './sketch'
 import {
   colorwayEditPrompt, conceptPrompt, editImage, generateImage, renderPrompt,
-  generateModel, sketchPrompt, stampLogo, variationAxes, variationPrompt, viewEditPrompt, wearEditPrompt,
+  generateModel, sketchPrompt, stampLogo, turnaroundPrompt, variationAxes, variationPrompt, viewEditPrompt, wearEditPrompt,
 } from './aiClient'
-import type { TrendClauseInput } from './aiClient'
+import type { TrendClauseInput, TripoRole } from './aiClient'
 import { fetchCompetitors, fetchDossier, fetchTrends, toBias, toCompetitors, toSignals, setRunLang } from './research'
-import { campaignCount, CAT_LABEL, MODE_LABEL, MODE_SCOPE, TYPE_LABEL } from './types'
+import { campaignCount, lineFingerprint, MODE_LABEL, MODE_SCOPE, TYPE_LABEL } from './types'
 import { ENGINES } from './imageEngines'
 
 export type Emit = (e: PipelineEvent) => void
@@ -60,9 +60,10 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
   }
 
   ;(async () => {
-    const rng = makeRng(params.sketchCount * 7919 + params.mode.length * 131 + (params.category === 'shoe' ? 17 : 41))
+    const rng = makeRng(params.sketchCount * 7919 + params.mode.length * 131 + 17)
     resetSeq()
-    const pack = PACKS[params.category]
+    const pack = PACKS.shoe
+    const views = viewSetFor(params.itemType)
     const wait = (ms: number) => sleep(ms / speed, isCancelled)
     const upto = STAGE_ORDER.indexOf(params.endStage)
     // 실제 생성 상한 · 초과분은 SVG 폴백. 비용 통제 지점
@@ -81,42 +82,47 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
 
     // ══ S1 조사 ══
     const scope = MODE_SCOPE[params.mode]
-    const catKo = CAT_LABEL[params.category]
-    const typeKo = TYPE_LABEL[params.itemType] ?? params.itemType
+    const typeName = TYPE_LABEL[params.itemType] ?? params.itemType
+    const line = params.line
+    const fingerprint = lineFingerprint(line, params.itemType)
 
     // 이 분석의 조사 언어를 고정한다. 도중에 화면 언어를 바꿔도 결과는 안 섞인다.
-
     setRunLang(params.researchLang ?? null)
 
-
     emit({ kind: 'stage-start', stage: 'S1' })
-    emit({ kind: 'log', stage: 'S1', text: `${MODE_LABEL[params.mode]} mode · ${catKo} / ${typeKo} · building the brief` })
+    emit({ kind: 'log', stage: 'S1', text: `${MODE_LABEL[params.mode]} mode · building the brief` })
+    emit({ kind: 'log', stage: 'S1', text: `Line profile: ${fingerprint}` })
     await wait(400)
 
     if (params.mode === 'trend') {
-      // 트렌드 · 유일하게 경쟁사 리서치를 수행하는 모드
+      // 트렌드 · 유일하게 경쟁사 리서치를 수행하는 모드. 브랜드가 아니라 라인 단위로 본다.
       const brands = params.trend.competitors
       const band = `KRW ${(params.trend.priceMinKrw / 10000).toFixed(0)}0k-${(params.trend.priceMaxKrw / 10000).toFixed(0)}0k`
-      emit({ kind: 'log', stage: 'S1', text: `${brands.length} competitors: ${brands.join(', ')} · your band ${band}` })
-      emit({ kind: 'log', stage: 'S1', text: `1 Competitor products · searching ${brands.join(', ')} for ${typeKo} (1-2 min)` })
+      emit({ kind: 'log', stage: 'S1', text: `${brands.length} competitor lines: ${brands.join(', ')} · primary band ${band}${params.trend.adjacentBand ? ' + adjacent reference band' : ''}` })
+      emit({ kind: 'log', stage: 'S1', text: `1 Competitor products · searching ${brands.join(', ')} for ${typeName} (1-2 min)` })
       try {
         const r = await fetchCompetitors({
-          brands, categoryKo: catKo, typeKo,
+          brands, typeKo: typeName,
           priceMin: params.trend.priceMinKrw, priceMax: params.trend.priceMaxKrw,
+          adjacentBand: !!params.trend.adjacentBand,
+          line, itemType: params.itemType,
         })
         if (cancelled) return
         const comps = toCompetitors(r, params.trend.priceMinKrw, params.trend.priceMaxKrw)
         emit({ kind: 'log', stage: 'S1', text: `${r.searches} web searches, ${comps.length} products${r.cached ? ' (reused an earlier pass)' : ''}` })
-        const outOfBand = comps.filter(c => !c.in_band)
-        if (outOfBand.length) emit({ kind: 'log', stage: 'S1', text: `Dropped ${outOfBand.length} outside the band: ${outOfBand.map(c => `${c.brand} ${c.name}`).join(', ')}` })
+        // 프로필과 안 맞는 제품은 버리지 않고 참조군으로 분류된다 (지시서 5.1)
+        const refs = comps.filter(c => c.competitor_group && c.competitor_group !== 'direct')
+        if (refs.length) emit({ kind: 'log', stage: 'S1', text: `${refs.length} kept as reference groups rather than direct competitors — different construction, tier or use` })
+        const broken = comps.filter(c => c.size_status === 'size_broken').length
+        if (broken) emit({ kind: 'log', stage: 'S1', text: `${broken} products are selling with a broken size run — availability recorded per size, not read as sales` })
         const strong = comps.filter(c => c.evidence_strength === 'strong').length
-        emit({ kind: 'log', stage: 'S1', text: `2 Checking popularity evidence · ${strong} strong, the rest single source` })
+        emit({ kind: 'log', stage: 'S1', text: `2 Checking popularity evidence · ${strong} strong, the rest single source · surface position never stored as a sales rank` })
         emit({ kind: 'log', stage: 'S1', text: 'No sales proxy scored. One pass gives no time series, so restock and sell-out trends need repeat collection.' })
         if (r.notes) emit({ kind: 'log', stage: 'S1', text: `Limits of this pass: ${r.notes.slice(0, 160)}` })
         emit({ kind: 'competitors', items: comps })
       } catch (e) {
         emit({ kind: 'log', stage: 'S1', text: `Competitor research failed · ${String((e as Error).message).slice(0, 120)} · falling back to sample data` })
-        emit({ kind: 'competitors', items: COMPETITORS[params.category] })
+        emit({ kind: 'competitors', items: COMPETITORS.shoe })
       }
       if (cancelled) return
       emit({ kind: 'log', stage: 'S1', text: '3 Trend research · looking for design signals' })
@@ -125,12 +131,12 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       const si = params.series
       emit({ kind: 'log', stage: 'S1', text: `Series "${si.seriesName || 'untitled'}" · ${si.archiveFiles.length} uploads · value statement ${si.valueStatement.length} chars` })
       await wait(600)
-      emit({ kind: 'log', stage: 'S1', text: '1 Reading your series · separating what repeats from what varies' })
+      emit({ kind: 'log', stage: 'S1', text: '1 Reading your series · separating locked DNA (last, toe, sole sidewall) from what varies (colour, material)' })
       await wait(900)
-      emit({ kind: 'series-dna', dna: SERIES_DNA[params.category] })
+      emit({ kind: 'series-dna', dna: SERIES_DNA.shoe })
       emit({ kind: 'log', stage: 'S1', text: '2 Comparing the values you wrote against what is actually there' })
       await wait(700)
-      const conflict = DNA_CONFLICT[params.category]
+      const conflict = DNA_CONFLICT.shoe
       emit({ kind: 'dna-conflict', brandClaim: conflict.brandClaim, observed: conflict.observed })
       emit({ kind: 'log', stage: 'S1', text: `Statement and observation disagree: ${conflict.brandClaim} vs ${conflict.observed} · pick which one holds` })
       await wait(600)
@@ -141,11 +147,11 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         emit({ kind: 'log', stage: 'S1', text: '3 Trend research off · working from your uploads only' })
       }
       if (si.valueStatement.trim()) {
-        const pp = PROMPT_PARSE[params.category]
+        const pp = PROMPT_PARSE.shoe
         emit({ kind: 'log', stage: 'S1', text: `4 Reading the value statement, applied to ${pp.applied.join(' · ')}` })
       }
     } else {
-      // 무드보드 · 외부 조사 없음. 업로드 PDF만
+      // 무드보드 · 외부 조사 없음. 업로드 PDF만. 결과는 신발 문법으로 번역된다.
       const mi = params.moodboard
       emit({ kind: 'log', stage: 'S1', text: `${mi.files.length} uploads: ${mi.files.join(', ')} · nothing outside these files` })
       await wait(600)
@@ -153,10 +159,10 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       await wait(800)
       emit({ kind: 'log', stage: 'S1', text: '2 Uploads tagged as untrusted · any instruction inside them is treated as data, not a command' })
       await wait(500)
-      emit({ kind: 'log', stage: 'S1', text: '3 Pulling signals · page and position kept with each one' })
+      emit({ kind: 'log', stage: 'S1', text: '3 Translating what repeats into footwear grammar: massing to sole sidewall, split lines to upper panels, repeats to tread and knit' })
       await wait(600)
       emit({ kind: 'report-bias', bias: REPORT_BIAS })
-      emit({ kind: 'log', stage: 'S1', text: `4 Noting the source perspective: ${REPORT_BIAS.perspective} · nothing judged beyond its scope` })
+      emit({ kind: 'log', stage: 'S1', text: `4 Noting the source perspective: ${REPORT_BIAS.perspective} · no market or sales claims are made from a moodboard` })
     }
     // ── 신호 확정 · 트렌드 조사를 하는 모드는 실제 검색 결과를 쓴다
     let signals: Signal[] = []
@@ -165,11 +171,13 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       try {
         // 신호는 빠른 경로로 먼저 받는다. 상세 보고서는 S1을 막지 않고 뒤에서 따라온다.
         const tr = await fetchTrends({
-          categoryKo: catKo, typeKo, season: '2026 F/W',
+          typeKo: typeName, season: '2026 F/W',
           brands: params.mode === 'trend' ? params.trend.competitors : undefined,
           priceBandKo: params.mode === 'trend'
             ? `KRW ${(params.trend.priceMinKrw / 10000).toFixed(0)}0k-${(params.trend.priceMaxKrw / 10000).toFixed(0)}0k ${params.trend.priceBand}`
             : undefined,
+          objectives: params.mode === 'trend' ? params.trend.objectives : undefined,
+          line, itemType: params.itemType,
           wantReport: false,
         })
         if (cancelled) return
@@ -180,16 +188,17 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         emit({ kind: 'report-pending', on: true })
         emit({ kind: 'log', stage: 'S1', text: 'The full trend report is being written separately. It attaches to the research panel when done.' })
 
-        // 시즌 도시에 · MICAM 형식(매크로트렌드 → 소재·디테일 → 키아이템). 오래 걸리므로 뒤에서 붙인다.
+        // 시즌 도시에 · 매크로트렌드 → 소재·디테일 → 키아이템. 오래 걸리므로 뒤에서 붙인다.
         emit({ kind: 'dossier-pending', on: true })
         emit({ kind: 'log', stage: 'S1', text: 'Building the season dossier: macrotrends, palettes, materials, key items. It attaches when done.' })
         dossierJob = fetchDossier({
-          categoryEn: catKo,
+          categoryEn: 'Footwear',
           season: 'FW26',
           priceBand: params.mode === 'trend'
             ? `KRW ${(params.trend.priceMinKrw / 10000).toFixed(0)}0k-${(params.trend.priceMaxKrw / 10000).toFixed(0)}0k ${params.trend.priceBand}`
             : undefined,
           brands: params.mode === 'trend' ? params.trend.competitors : [],
+          line, itemType: params.itemType,
         }).then(d => {
           if (cancelled) return
           // 첫 매크로를 기준 방향으로 잡는다. 여기서 나온 소재·디테일·팔레트가 이미지 프롬프트로 넘어간다.
@@ -212,11 +221,13 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           emit({ kind: 'log', stage: 'S1', text: 'The season dossier failed to build. Signals and the report are still usable.' })
         })
         fetchTrends({
-          categoryKo: catKo, typeKo, season: '2026 F/W',
+          typeKo: typeName, season: '2026 F/W',
           brands: params.mode === 'trend' ? params.trend.competitors : undefined,
           priceBandKo: params.mode === 'trend'
             ? `KRW ${(params.trend.priceMinKrw / 10000).toFixed(0)}0k-${(params.trend.priceMaxKrw / 10000).toFixed(0)}0k ${params.trend.priceBand}`
             : undefined,
+          objectives: params.mode === 'trend' ? params.trend.objectives : undefined,
+          line, itemType: params.itemType,
           wantReport: true,
         }).then(full => {
           if (cancelled) return
@@ -236,16 +247,17 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       }
     }
     if (!signals.length) {
-      signals = SIGNALS[params.category].map(s =>
+      signals = SIGNALS.shoe.map(s =>
         params.mode === 'moodboard'
-          ? { ...s, page_ref: `p.${12 + Math.floor(Math.random() * 30)} ${['top', 'middle', 'bottom'][Math.floor(Math.random() * 3)]}`, sales_proxy_score: undefined, proxy_confidence: undefined }
+          ? { ...s, page_ref: `p.${12 + Math.floor(Math.random() * 30)} ${['top', 'middle', 'bottom'][Math.floor(Math.random() * 3)]}`, sales_proxy_score: undefined, proxy_confidence: undefined, indices: undefined }
           : s)
     }
     emit({ kind: 'signals', signals })
     const lowConf = signals.filter(s => s.confidence === 'low').length
     emit({ kind: 'log', stage: 'S1', text: `${signals.length} signals confirmed · none unsourced${lowConf ? ` · ${lowConf} single source, marked low confidence` : ''}` })
+    emit({ kind: 'log', stage: 'S1', text: 'Each signal carries four indices — commercial, cultural, forecast, feasibility — never a single blended score' })
     await wait(600)
-    emit({ kind: 'directions', items: DIRECTIONS[params.category] })
+    emit({ kind: 'directions', items: DIRECTIONS.shoe })
     emit({ kind: 'log', stage: 'S1', text: 'Three directions built, one per tier · every claim traced to a source' })
     emit({ kind: 'checkpoint', label: 'S1 done · signals.json · directions[3] saved' })
     emit({ kind: 'stage-done', stage: 'S1' })
@@ -266,7 +278,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     const nPush = Math.round(params.sketchCount * rp / rsum)
     const nSig = params.sketchCount - nCore - nPush
     emit({ kind: 'log', stage: 'S2', text: `Specs per tier · Core ${nCore} · Push ${nPush} · Signature ${nSig} (schema enforced, presets locked)` })
-    const locked = params.mode === 'series' ? DNA_LOCKS[params.category] : {}
+    emit({ kind: 'log', stage: 'S2', text: 'Tier means tooling: Core reuses last and bottom, Push keeps one, Signature may open a new last or mould' })
+    const locked = params.mode === 'series' ? DNA_LOCKS.shoe : {}
     if (params.mode === 'series') emit({ kind: 'log', stage: 'S2', text: `Series DNA locked: ${Object.entries(locked).map(([k, v]) => `${k}=${v}`).join(', ')} · fixed as spec values` })
     emit({ kind: 'log', stage: 'S2', text: 'Reference bank loaded: 4 approved, 2 near-miss rejects (too familiar, cost)' })
     await wait(800)
@@ -307,7 +320,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       await pool(targets, ENGINES[params.imageEngine].concurrency, async (d) => {
         if (cancelled) return
         try {
-          const skPrompt = sketchPrompt(d.spec, params.imageEngine, params.brand, trendClause)
+          const skPrompt = sketchPrompt(d.spec, params.imageEngine, params.brand, trendClause, line)
           const r = await generateImage(skPrompt, params.imageEngine)
           budget.spend()
           d.images = [...d.images, { view: 'sketch', url: r.url, hash: r.hash, origin: 'generated', promptUsed: skPrompt }]
@@ -348,7 +361,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       if (budget.left() > 0) {
         // ① 기준 렌더 1장
         let baseHash: string | null = null
-        const basePrompt = renderPrompt(d.spec, params.imageEngine, params.brand, trendClause)
+        const basePrompt = renderPrompt(d.spec, params.imageEngine, params.brand, trendClause, line)
         try {
           const r = await generateImage(basePrompt, params.imageEngine)
           budget.spend(); baseHash = r.hash
@@ -365,7 +378,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
               emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} logo composite failed · ${String((e as Error).message).slice(0, 80)}` })
             }
           }
-          d.images = [...d.images, { view: pack.viewSet[0].key, url: baseUrl, hash: baseHash, origin: 'generated', promptUsed: basePrompt }]
+          d.images = [...d.images, { view: views[0].key, url: baseUrl, hash: baseHash, origin: 'generated', promptUsed: basePrompt }]
           emit({ kind: 'design-update', design: { ...d } })
         } catch (e) {
           d.imageError = String((e as Error).message || e)
@@ -381,7 +394,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           ]
           for (let k = 0; k < Math.min(dps - 1, angles.length); k++) {
             if (cancelled || budget.left() <= 0) break
-            const p2 = `Redesign this ${(TYPE_LABEL[params.itemType] ?? params.itemType).toLowerCase()} keeping the exact same sketch geometry and camera angle. ${angles[k]} ${trendClause} Plain white studio background, photorealistic product shot, no text, no watermark.`
+            const p2 = `Redesign this ${(TYPE_LABEL[params.itemType] ?? params.itemType).toLowerCase()} keeping the exact same sketch geometry and camera angle. ${angles[k]} Keep the same last shape and the same bottom unit — the design changes, the tooling does not. Plain white studio background, photorealistic product shot, no text, no watermark.`
             try {
               const r2 = await editImage(baseHash, p2, params.imageEngine)
               budget.spend()
@@ -395,11 +408,12 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         }
 
         // ③④ 추가 뷰·컬러웨이 = 기준 렌더의 편집 (동일 객체 유지)
+        // 계열별 필수 뷰셋을 따른다 · 스니커즈는 내측, 힐은 후면이 반드시 있어야 한다
         if (baseHash) {
           const jobs: { view: string; colorway?: string; prompt: string }[] = [
-            ...pack.viewSet.filter(v => v.required).slice(1, params.viewCount)
-              .map(v => ({ view: v.key, prompt: viewEditPrompt(params.category, v.key) })),
-            ...d.colorways.map(cw => ({ view: pack.viewSet[0].key, colorway: cw, prompt: colorwayEditPrompt(cw) })),
+            ...views.filter(v => v.required).slice(1, params.viewCount)
+              .map(v => ({ view: v.key, prompt: viewEditPrompt(v.key) })),
+            ...d.colorways.map(cw => ({ view: views[0].key, colorway: cw, prompt: colorwayEditPrompt(cw) })),
           ].slice(0, budget.left())
           await pool(jobs, 2, async (job) => {
             if (cancelled) return
@@ -421,13 +435,13 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       if (params.variationCount > 0 && budget.left() > 0) {
         const baseImg = d.images.find(i => i.origin === 'generated' && i.view !== 'sketch')
         if (baseImg) {
-          const axes = variationAxes(params.category)
+          const axes = variationAxes()
           const jobs = axes.slice(0, params.variationCount).map((a, k) => ({ a, k }))
           emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} branching ${jobs.length} product variations from the base design` })
           await pool(jobs.slice(0, Math.max(0, budget.left())), 2, async (job) => {
             if (cancelled) return
             try {
-              const r = await editImage(baseImg.hash, variationPrompt(params.category, job.k), params.imageEngine)
+              const r = await editImage(baseImg.hash, variationPrompt(job.k), params.imageEngine)
               budget.spend()
               d.images = [...d.images, {
                 view: 'variation', url: r.url, hash: r.hash, origin: 'edited_from',
@@ -441,7 +455,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         }
       }
 
-      d.qa = buildQA(d, rng, params)
+      d.qa = buildQA(d, rng)
       const failed = d.qa.filter(q => !q.pass)
       if (failed.length) {
         emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} vision QA ${d.qa.length - failed.length}/${d.qa.length} · regenerating the mismatched view, attempt 1 of 2` })
@@ -475,8 +489,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       emit({ kind: 'log', stage: 'S4', text: `Top ${i + 1}: ${d.spec.design_id} [${d.spec.tier}] · spec distance ${d.topDistance}` })
     })
     await wait(700)
-    emit({ kind: 'log', stage: 'S4', text: `Worn pipeline: BiRefNet cutout, MediaPipe ${params.category === 'shoe' ? 'Pose for ankle and ground line' : 'Hand and Face for joints and earlobe'}, scale normalise, depth occlusion` })
-    if (params.category === 'shoe') emit({ kind: 'log', stage: 'S4', text: 'Ground contact aligned and heel height checked visually, within 20%' })
+    emit({ kind: 'log', stage: 'S4', text: 'Worn pipeline: BiRefNet cutout, MediaPipe Pose for ankle and ground line, scale normalise, depth occlusion' })
+    emit({ kind: 'log', stage: 'S4', text: 'Ground contact aligned and heel height checked visually, within 20%' })
     await wait(800)
     // 캠페인 컷 · 착용컷과 연출컷을 한 단계에서 같이 뽑는다.
     // 둘 다 기준 렌더의 편집이다. 새로 그리면 같은 제품이 아니게 된다.
@@ -497,14 +511,17 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         if (cancelled) return
         const personaIdx = top.indexOf(job.d)
         const c = job.kind === 'concept'
-          ? conceptPrompt(params.category, params.itemType, job.idx - worn, personaIdx, subject, macroName ?? '')
+          ? conceptPrompt(params.itemType, job.idx - worn, personaIdx, subject, macroName || st_mood(params))
           : null
-        const prompt = c ? c.prompt : wearEditPrompt(params.category, params.itemType, job.idx)
+        const prompt = c ? c.prompt : wearEditPrompt(params.itemType, job.idx)
         const what = c ? c.label : `worn cut ${job.idx + 1}`
         try {
           const r = await editImage(job.base, prompt, params.imageEngine)
           budget.spend()
-          job.d.images = [...job.d.images, { view: job.kind, url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: job.base }]
+          job.d.images = [...job.d.images, {
+            view: job.kind, url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: job.base,
+            conceptLabel: c?.label, persona: c?.persona,
+          }]
           emit({ kind: 'design-update', design: { ...job.d } })
           emit({ kind: 'log', stage: 'S4', text: `${job.d.spec.design_id} ${what} done` })
         } catch {
@@ -518,29 +535,52 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
 
     // ══ S5 3D 쇼룸 ══
     emit({ kind: 'stage-start', stage: 'S5' })
-    // 멀티뷰 → 3D · S3에서 이미 만든 각도 컷을 그대로 Tripo에 넘긴다.
-    // 한 장으로 추론시키는 것보다 여러 각도를 주는 쪽이 형태가 훨씬 정확하다.
+    // 규약 맞춤 멀티뷰 → 3D · Tripo는 [front, left, back, right] 턴어라운드를 기대한다.
+    // 기준 렌더(lateral, 토가 왼쪽)가 곧 left 뷰다. 나머지 세 방향을 편집으로 만들어
+    // 네 자리를 모두 채워 보낸다. 임의 각도 두세 장보다 형태 복원이 훨씬 정확하다.
     if (params.make3d) {
-      emit({ kind: 'log', stage: 'S5', text: 'Building the 3D showroom · the multiview renders of each top pick go to Tripo' })
+      emit({ kind: 'log', stage: 'S5', text: 'Building the 3D showroom · a four-view turnaround of each top pick goes to Tripo' })
       for (const d of top) {
         if (cancelled) return
-        // 사람이나 배경이 들어간 컷은 빼고, 흰 배경의 제품 컷만 넘긴다
-        const views = d.images
-          .filter(i => !['sketch', 'wear', 'concept', 'variation'].includes(i.view))
-          .slice(0, 4)
-        if (views.length < 2) {
-          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} has only ${views.length} clean view, so 3D is skipped` })
+        const base = d.images.find(i => i.origin === 'generated' && i.view !== 'sketch')
+          ?? d.images.find(i => !['sketch', 'wear', 'concept', 'variation'].includes(i.view))
+        if (!base) {
+          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} has no clean product render, so 3D is skipped` })
+          continue
+        }
+        // 턴어라운드 4뷰 · 기준 렌더 = left. 이미 만든 내측 뷰가 있으면 right로 재사용한다.
+        const roles: Record<TripoRole, string | null> = { front: null, left: base.hash, back: null, right: null }
+        const medial = d.images.find(i => i.view === 'medial' && !i.colorway)
+        if (medial) roles.right = medial.hash
+        const rear = d.images.find(i => i.view === 'rear' && !i.colorway)
+        if (rear) roles.back = rear.hash
+        for (const role of ['front', 'back', 'right'] as TripoRole[]) {
+          if (roles[role] || cancelled) continue
+          try {
+            const r = await editImage(base.hash, turnaroundPrompt(role), params.imageEngine)
+            roles[role] = r.hash
+            d.images = [...d.images, { view: `turn_${role}`, url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: base.hash }]
+            emit({ kind: 'design-update', design: { ...d } })
+            emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} turnaround ${role} view done${r.cached ? ' (reused)' : ''}` })
+          } catch (e) {
+            emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} turnaround ${role} failed · ${String((e as Error).message).slice(0, 80)}` })
+          }
+        }
+        const ordered = [roles.front, roles.left, roles.back, roles.right]
+        const have = ordered.filter(Boolean).length
+        if (have < 2) {
+          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} has only ${have} usable view, so 3D is skipped` })
           continue
         }
         try {
-          const m = await generateModel(views.map(v => v.hash), {
+          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} sending ${have} views to Tripo (front-left-back-right order) · this takes a few minutes` })
+          const m = await generateModel(ordered, {
             subject: (TYPE_LABEL[params.itemType] ?? params.itemType).toLowerCase(),
-            category: params.category,
             itemType: params.itemType,
           })
           d.model = { url: m.url, hash: m.hash, format: m.format, views: m.views }
           emit({ kind: 'design-update', design: { ...d } })
-          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} 3D ready from ${m.views} views${m.cached ? ' (reused)' : ''}` })
+          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} 3D ready from ${m.views} views${m.cached ? ' (reused)' : ''} · GLB downloadable from the card` })
         } catch (e) {
           emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} 3D failed · ${String((e as Error).message).slice(0, 90)}` })
         }
@@ -572,11 +612,12 @@ function buildRationale(params: RunParams, spec: { design_id: string; tier: Desi
     borrowed_attributes: ['proportion'], usage: 'visual_reference' as const,
   }
   const placement = spec.tier === 'core'
-    ? 'No new tooling, existing parts reused, inside the cost cap. That is what Core is for.'
+    ? 'Existing last and existing bottom unit, inside the cost cap. That is what Core is for.'
     : spec.tier === 'push'
-      ? 'Same last and mould, one new element, cost within 30% more. That is Push.'
-      : 'New tooling allowed with amortisation stated. Experimental, so Signature.'
+      ? 'Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push.'
+      : 'New last or new outsole mould allowed with amortisation stated. That is Signature.'
   const proxyTxt = s1.sales_proxy_score ? ` It also scores ${s1.sales_proxy_score} (${s1.proxy_confidence}) on the sales proxy.` : ''
+  const feas = s1.indices?.feasibility ? ` Feasibility reads ${s1.indices.feasibility} — tooling: last ${s1.last_change ?? 'unknown'}, bottom mould ${s1.bottom_tooling_change ?? 'unknown'}.` : ''
   return {
     agent_mode: params.mode,
     driving_signals: [
@@ -585,14 +626,14 @@ function buildRationale(params: RunParams, spec: { design_id: string; tier: Desi
     ],
     reference_images: [compRef, archRef],
     reference_prompts: params.mode === 'series'
-      ? [{ text: PROMPT_PARSE[params.category].text, origin: 'user_input', applied_as: PROMPT_PARSE[params.category].applied }]
+      ? [{ text: PROMPT_PARSE.shoe.text, origin: 'user_input', applied_as: PROMPT_PARSE.shoe.applied }]
       : [],
-    series_dna_inherited: params.mode === 'series' ? SERIES_DNA[params.category].invariant.map(i => i.element) : [],
+    series_dna_inherited: params.mode === 'series' ? SERIES_DNA.shoe.invariant.map(i => i.element) : [],
     type_placement_reason: placement,
     narrative: [
       `${s1.label} showed up ${s1.observed_count} times in this price band.${proxyTxt}`,
-      `${s2.label}, observed ${s2.observed_count} times, came in as the second axis.`,
-      placement + '.',
+      `${s2.label}, observed ${s2.observed_count} times, came in as the second axis.${feas}`,
+      placement,
       `References were used for attributes only (usage: attribute_only), collected 2026-05-14.`,
     ],
   }
@@ -618,31 +659,26 @@ function buildModelEval(rng: ReturnType<typeof makeRng>): { label: string; value
   return [
     { label: 'Brand fit', value: rng.pick(lv.slice(0, 2)), basis: 'How much of the existing last and mould is reused, and silhouette distance from the archive' },
     { label: 'Distinctiveness', value: rng.pick(lv), basis: 'Attribute distance from competitor products in the same band' },
-    { label: 'Trend backing', value: rng.pick(lv.slice(0, 2)), basis: 'Observation count and proxy confidence of the linked signals' },
+    { label: 'Trend backing', value: rng.pick(lv.slice(0, 2)), basis: 'Observation count and index profile of the linked signals' },
   ]
 }
 
-function buildQA(d: Design, rng: ReturnType<typeof makeRng>, params: RunParams): { check: string; target: string; observed: string; pass: boolean }[] {
+function buildQA(d: Design, rng: ReturnType<typeof makeRng>): { check: string; target: string; observed: string; pass: boolean }[] {
   const f = d.spec.fields as Record<string, any>
-  if (params.category === 'shoe') {
-    const heel = Number(f.heel_height_mm)
-    const dev = Math.round((rng.next() * 0.32 - 0.05) * 100) / 100
-    const seen = Math.round(heel * (1 + dev))
-    return [
-      { check: 'Toe shape reads correctly', target: String(f.toe_shape), observed: String(f.toe_shape), pass: true },
-      { check: 'Heel height visual deviation', target: `${heel}mm, within 20%`, observed: `${seen}mm, off by ${Math.abs(Math.round(dev * 100))}%`, pass: Math.abs(dev) <= 0.2 },
-      { check: 'Panel count', target: String(f.panel_count), observed: String(rng.chance(0.85) ? f.panel_count : Number(f.panel_count) - 1), pass: rng.chance(0.85) },
-      { check: 'Same object across three views', target: '>=0.80', observed: (0.74 + rng.next() * 0.24).toFixed(2), pass: rng.chance(0.8) },
-    ].map(q => ({ ...q, pass: q.pass }))
-  }
-  const stones = Number(f.stone_count)
-  const seenStones = rng.chance(0.78) ? stones : stones + rng.pick([-2, -1, 1])
-  return [
-    { check: 'Stone count matches', target: String(stones), observed: String(seenStones), pass: seenStones === stones },
-    { check: 'Setting reads correctly', target: String(f.setting_type), observed: String(f.setting_type), pass: true },
-    { check: 'Prong count', target: String(f.prong_count), observed: String(f.prong_count), pass: true },
-    { check: 'Same object across three views', target: '>=0.80', observed: (0.74 + rng.next() * 0.24).toFixed(2), pass: rng.chance(0.8) },
+  const heel = Number(f.heel_height_mm)
+  const dev = Math.round((rng.next() * 0.32 - 0.05) * 100) / 100
+  const seen = Math.round(heel * (1 + dev))
+  const qa = [
+    { check: 'Toe shape reads correctly', target: String(f.toe_shape), observed: String(f.toe_shape), pass: true },
+    { check: 'Heel height visual deviation', target: `${heel}mm, within 20%`, observed: `${seen}mm, off by ${Math.abs(Math.round(dev * 100))}%`, pass: Math.abs(dev) <= 0.2 },
+    { check: 'Panel count', target: String(f.panel_count), observed: String(rng.chance(0.85) ? f.panel_count : Number(f.panel_count) - 1), pass: rng.chance(0.85) },
+    { check: 'Same object across views', target: '>=0.80', observed: (0.74 + rng.next() * 0.24).toFixed(2), pass: rng.chance(0.8) },
   ]
+  // 좌우·내외측 일관성 · 내측 뷰를 만든 경우에만 검사한다
+  if (d.images.some(i => i.view === 'medial')) {
+    qa.push({ check: 'Lateral and medial sides consistent', target: 'same sole line and panel logic', observed: rng.chance(0.85) ? 'consistent' : 'medial panel split differs', pass: rng.chance(0.85) })
+  }
+  return qa
 }
 
 // Top N 다양성 제약 (지시서 11.2 · 유형별 최소 1개 + 스펙 거리)

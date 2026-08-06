@@ -3,10 +3,10 @@
 // 연결(edge)은 장식이 아니라 실제 데이터다. 디자인이 어떤 신호에서 나왔는지는
 // rationale.driving_signals에, 디렉션이 어떤 신호를 묶었는지는 signal_ids에 있다.
 import type { Design, RunState } from './types'
-import { MODE_LABEL, MODE_SCOPE, TIER_LABEL } from './types'
+import { COMP_GROUP_LABEL, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL } from './types'
 import { buildLocalPitch } from './pitch'
 import type { SeasonDossier } from './research'
-import { GRADE_LABEL, SOURCE_LABEL, metricText } from './research'
+import { GRADE_LABEL, shotUrl, SOURCE_LABEL, metricText } from './research'
 
 export type BoardNodeKind =
   | 'input' | 'research' | 'signal' | 'direction' | 'design' | 'selection' | 'appendix'
@@ -23,6 +23,10 @@ export interface BoardNode {
   imageUrl?: string
   /** 3D 모델 (GLB) · 보드에서 뷰어로 돌려 본다 */
   modelUrl?: string
+  /** 시즌 팔레트 · 글 대신 색으로 보인다 */
+  palette?: { name: string; hex: string }[]
+  /** 이 카드에 얽힌 실제 생성 프롬프트 발췌 · 스케치가 디자인이 된 근거 */
+  prompts?: string[]
   isPitch?: boolean         // 발표 근거 카드
 }
 
@@ -60,9 +64,10 @@ export function buildBoardModel(st: RunState): BoardModel {
 
   // ── 1 입력 ──────────────────────────────────────────────────────
   const inputBody: string[] = []
+  inputBody.push(`Line: ${lineFingerprint(p.line, p.itemType)}`)
   if (p.mode === 'trend') {
-    inputBody.push(`${p.trend.competitors.length} competitors: ${p.trend.competitors.join(', ')}`)
-    inputBody.push(`Your band KRW ${(p.trend.priceMinKrw / 10000).toFixed(0)}0k-${(p.trend.priceMaxKrw / 10000).toFixed(0)}0k · ${p.trend.priceBand}`)
+    inputBody.push(`${p.trend.competitors.length} competitor lines: ${p.trend.competitors.join(', ')}`)
+    inputBody.push(`Primary band KRW ${(p.trend.priceMinKrw / 10000).toFixed(0)}0k-${(p.trend.priceMaxKrw / 10000).toFixed(0)}0k · ${p.trend.priceBand}${p.trend.adjacentBand ? ' · adjacent band as reference' : ''}`)
   } else if (p.mode === 'series') {
     inputBody.push(`Series "${p.series.seriesName || 'untitled'}" · ${p.series.archiveFiles.length} designs`)
     if (p.series.valueStatement) inputBody.push(`Value: ${p.series.valueStatement.slice(0, 90)}`)
@@ -86,8 +91,7 @@ export function buildBoardModel(st: RunState): BoardModel {
       title: 'Competitor products',
       body: [
         `${st.competitors.length} collected · ${inBand.length} inside the band`,
-        ...(out.length ? [`${out.length} dropped: ${out.map(c => c.brand).join(', ')} (outside the band)`] : []),
-        ...inBand.slice(0, 3).map(c => `${c.brand} ${c.name} · KRW ${(c.price_krw / 10000).toFixed(0)}0k · proxy ${c.sales_proxy_score ?? 'not scored'}`),
+        ...(out.length ? [`${out.length} outside the band, kept as reference`] : []),
       ],
     })
     const noProxy = st.competitors.filter(c => c.observation_count < 2)
@@ -105,9 +109,28 @@ export function buildBoardModel(st: RunState): BoardModel {
       title: 'Trend research', body: ['Report search, then dedup and OEM grouping'],
     })
     researchIds = ['r-comp', 'r-proxy', 'r-trend']
-    edges.push({ from: 'in', to: 'r-comp', label: 'competitor list' })
+    edges.push({ from: 'in', to: 'r-comp', label: 'competitor lines' })
     edges.push({ from: 'r-comp', to: 'r-proxy', label: 'repeat observations' })
-    edges.push({ from: 'in', to: 'r-trend', label: 'category' })
+    edges.push({ from: 'in', to: 'r-trend', label: 'line profile' })
+    // 실제 수집한 제품 사진을 보드에 올린다 · 근거는 글이 아니라 사진으로 보인다
+    st.competitors.filter(c => c.image_urls?.length).slice(0, 6).forEach((c, k) => {
+      const id = `comp-shot-${k}`
+      nodes.push({
+        id, kind: 'research', column: 1, row: 3 + k,
+        title: `${c.brand} ${c.name}`,
+        body: [
+          [
+            c.price_krw > 0 ? `KRW ${(c.price_krw / 10000).toFixed(0)}0k` : 'price unknown',
+            c.competitor_group ? COMP_GROUP_LABEL[c.competitor_group] : '',
+            c.size_status === 'size_broken' ? 'size broken' : '',
+          ].filter(Boolean).join(' · '),
+          c.design_traits?.slice(0, 2).join(' · ') ?? '',
+        ].filter(Boolean),
+        imageUrl: shotUrl(c.image_urls![0], c.product_url),
+        tone: 'muted',
+      })
+      edges.push({ from: 'r-comp', to: id, dashed: true })
+    })
   } else if (p.mode === 'series') {
     nodes.push({
       id: 'r-dna', kind: 'research', column: 1, row: 0,
@@ -154,34 +177,34 @@ export function buildBoardModel(st: RunState): BoardModel {
   }
 
   // ── 시즌 도시에 · MICAM 형식의 매크로트렌드를 조사 열에 얹는다 ──────
+  // 경쟁 제품 사진 카드가 이미 3행부터 쓰고 있으면 그 아래로 내린다
+  const compShotRows = nodes.filter(n => n.id.startsWith('comp-shot-')).length
+  const dosRow = 3 + compShotRows
   const dossier = st.dossier as SeasonDossier | null
   if (dossier?.macrotrends?.length) {
     const pct = metricText
     nodes.push({
-      id: 'dos', kind: 'research', column: 1, row: 3,
+      id: 'dos', kind: 'research', column: 1, row: dosRow,
       title: `${dossier.season} · ${dossier.season_title}`,
       body: [
         dossier.powershift ? `Powershift: ${dossier.powershift}` : '',
         `${dossier.macrotrends.length} macrotrends · ${dossier.sources?.length ?? 0} sources · ${dossier.searches} searches`,
-        ...(dossier.yearly_context ?? []).slice(0, 3).map(y => `${y.season}: ${y.headline}`),
       ].filter(Boolean),
       tone: 'accent',
     })
     edges.push({ from: 'in', to: 'dos', label: 'season brief' })
 
+    // 매크로 카드는 요약 두 줄 + 팔레트 스와치까지만. 소재·디테일 수치는 리포트에 있다.
     dossier.macrotrends.forEach((m, i) => {
       const id = `macro-${i}`
       nodes.push({
-        id, kind: 'research', column: 1, row: 4 + i * 2,
+        id, kind: 'research', column: 1, row: dosRow + 1 + i * 2,
         title: `${m.name} · ${GRADE_LABEL[m.grade] ?? m.grade}`,
         body: [
           m.statement,
-          (m.sub_trends ?? []).join(' · '),
-          ...(m.drivers ?? []).slice(0, 3).map(d => `${d.label} ${pct(d)} · ${SOURCE_LABEL[d.source_kind] ?? d.source_kind}`),
-          (m.palette ?? []).length ? `Palette: ${m.palette.slice(0, 5).map(c => c.name).join(', ')}` : '',
-          (m.materials ?? []).length ? `Materials: ${m.materials.map(x => `${x.label} ${pct(x)}`).join(', ')}` : '',
-          (m.details ?? []).length ? `Details: ${m.details.map(x => `${x.label} ${pct(x)}`).join(', ')}` : '',
+          (m.drivers ?? []).slice(0, 2).map(d => `${d.label} ${pct(d)} · ${SOURCE_LABEL[d.source_kind] ?? d.source_kind}`).join('  ·  '),
         ].filter(Boolean),
+        palette: (m.palette ?? []).slice(0, 8).map(c => ({ name: c.name, hex: c.hex })),
       })
       edges.push({ from: 'dos', to: id, label: 'macrotrend' })
 
@@ -189,9 +212,9 @@ export function buildBoardModel(st: RunState): BoardModel {
       if (items.length) {
         const kid = `macro-${i}-items`
         nodes.push({
-          id: kid, kind: 'research', column: 1, row: 5 + i * 2,
+          id: kid, kind: 'research', column: 1, row: dosRow + 2 + i * 2,
           title: `${m.name} key items`,
-          body: items.map(k => `${k.name} (${k.segment}) ${k.metric ? pct(k.metric) : '—'} · ${GRADE_LABEL[k.grade] ?? k.grade}`),
+          body: items.map(k => `${k.name} (${k.segment}) ${k.metric ? pct(k.metric) : ''} ${GRADE_LABEL[k.grade] ?? k.grade}`.trim()),
           tone: 'muted',
         })
         edges.push({ from: id, to: kid, label: 'key items' })
@@ -242,15 +265,22 @@ export function buildBoardModel(st: RunState): BoardModel {
     const hero = d.images.find(im => im.view !== 'sketch') ?? d.images[0]
     const pit = pitchOf(d.spec.design_id)
     if (pit) {
-      // 카드 옆에 "왜 이 안인가"를 붙여, 발표할 때 카드만 보고도 말이 되게 한다
+      // 카드 옆에 "어떤 근거에서 이 스케치가 나왔고, 어떤 프롬프트가 디자인으로 만들었는지"를 붙인다.
+      // 발표할 때 카드만 보고도 계보가 말이 되게 하는 자리다.
+      const basePrompt = d.images.find(im => im.origin === 'generated' && im.view !== 'sketch')?.promptUsed
+      const variantPrompt = d.images.find(im => im.view === 'design')?.promptUsed
+      const cut = (s?: string) => s ? (s.length > 150 ? s.slice(0, 150) + '…' : s) : null
       nodes.push({
         id: `pitch-${d.spec.design_id}`, kind: 'selection', column: 4.5, row: i,
-        title: 'Why this one',
+        title: 'Why this sketch, and the prompt behind it',
         body: [
-          ...pit.why,
-          ...pit.feasibility,
-          ...(pit.objections.length ? [`Likely objection: ${pit.objections[0].q} - ${pit.objections[0].a}`] : []),
+          ...pit.why.slice(0, 2),
+          ...(pit.objections.length ? [`Likely objection: ${pit.objections[0].q} ${pit.objections[0].a}`] : []),
         ],
+        prompts: [
+          cut(basePrompt) ? `Render prompt: ${cut(basePrompt)}` : null,
+          cut(variantPrompt) ? `Variant prompt: ${cut(variantPrompt)}` : null,
+        ].filter((x): x is string => !!x),
         tone: 'muted',
         isPitch: true,
       })

@@ -5,20 +5,28 @@ import type { Lang } from './i18n'
 let runLang: Lang | null = null
 export function setRunLang(l: Lang | null) { runLang = l }
 // ── 리서치 클라이언트 · 서버가 웹 검색으로 실제 수집한 결과를 받는다 ──
-import type { CompetitorProduct, ReportBias, Signal } from './types'
+import type { CompetitorGroup, CompetitorProduct, FootwearLineProfile, ReportBias, ResearchObjective, Signal } from './types'
 
 export interface CompetitorProductRaw {
   brand: string
+  brand_line: string
   model_name: string
   price_krw: number
   released: string
   popularity_evidence: string[]
   evidence_strength: 'strong' | 'moderate' | 'weak' | 'none'
   rank_note: string
+  rank_semantics: 'verified_sales_rank' | 'retailer_bestseller_membership' | 'surface_position' | 'marketplace_trade_rank' | 'none'
+  competitor_group: CompetitorGroup
+  construction_tier: string
   user_sentiment: 'positive' | 'mixed' | 'negative' | 'unknown'
   praise_points: string[]
   complaint_points: string[]
   design_traits: string[]
+  offered_sizes: number
+  available_sizes: number
+  size_status: 'full' | 'partial' | 'size_broken' | 'sold_out' | 'unknown'
+  colorway_count: number
   image_urls: string[]
   product_url: string
   source_urls: string[]
@@ -41,8 +49,10 @@ export interface TrendReport {
   sources: string[]
 }
 
-/** 수집한 원격 이미지는 서버 캐시를 거쳐 불러온다 */
-export const shotUrl = (u: string) => `/api/shot?u=${encodeURIComponent(u)}`
+/** 수집한 원격 이미지는 서버 캐시를 거쳐 불러온다.
+ *  page를 함께 주면 직링크가 죽었을 때 서버가 페이지의 og:image로 폴백한다. */
+export const shotUrl = (u: string, page?: string) =>
+  `/api/shot?u=${encodeURIComponent(u)}${page ? `&p=${encodeURIComponent(page)}` : ''}`
 
 export interface TrendResearch {
   signals: {
@@ -54,6 +64,15 @@ export interface TrendResearch {
     evidence: string[]
     source_urls: string[]
     confidence: 'high' | 'medium' | 'low'
+    co_occurring: string[]
+    commercial_index: 'high' | 'medium' | 'low' | 'none'
+    cultural_index: 'high' | 'medium' | 'low' | 'none'
+    forecast_index: 'high' | 'medium' | 'low' | 'none'
+    feasibility_index: 'high' | 'medium' | 'low' | 'none'
+    adoption_stage: 'emerging' | 'growing' | 'established' | 'declining' | 'unknown'
+    last_change: 'not_required' | 'modification' | 'required' | 'unknown'
+    bottom_tooling_change: 'not_required' | 'modification' | 'required' | 'unknown'
+    upper_pattern_change: 'minor' | 'major' | 'unknown'
   }[]
   report_perspective: string
   notes: string
@@ -78,17 +97,46 @@ async function post<T>(url: string, body: unknown): Promise<T> {
   return j as T
 }
 
+/** 라인 프로필을 서버에 넘길 요약으로. 검색어·필터·캐시 키가 모두 이 값을 쓴다. */
+export function lineForServer(lp?: FootwearLineProfile, itemType?: string) {
+  if (!lp) return undefined
+  return {
+    itemType: itemType ?? '',
+    useCase: lp.product.useCase, targetConsumer: lp.product.targetConsumer,
+    season: lp.product.season, climate: lp.product.climate,
+    lastFamily: lp.lastFit.lastFamily, toeShape: lp.lastFit.toeShape,
+    upperOuter: lp.upper.outer, closure: lp.upper.closure, protection: lp.upper.protection,
+    midsole: lp.bottom.midsole, plate: lp.bottom.plate, outsole: lp.bottom.outsole,
+    stackBand: lp.bottom.stackBand, dropMm: lp.bottom.dropMm, rocker: lp.bottom.rocker, heel: lp.bottom.heel,
+    lasting: lp.construction.lasting, soleAttachment: lp.construction.soleAttachment,
+    cushioning: lp.performance.cushioning, stability: lp.performance.stability, wetGrip: lp.performance.wetGrip,
+    markets: lp.commercial.markets, channels: lp.commercial.channels,
+  }
+}
+
 export const fetchCompetitors = (b: {
-  brands: string[]; categoryKo: string; typeKo: string; priceMin: number; priceMax: number
-}) => post<CompetitorResearch>('/api/research/competitors', b)
+  brands: string[]; typeKo: string; priceMin: number; priceMax: number
+  adjacentBand?: boolean; line?: FootwearLineProfile; itemType?: string
+}) => post<CompetitorResearch>('/api/research/competitors', {
+  brands: b.brands, typeKo: b.typeKo, priceMin: b.priceMin, priceMax: b.priceMax,
+  adjacentBand: b.adjacentBand, line: lineForServer(b.line, b.itemType),
+})
 
 export const fetchTrends = (b: {
-  categoryKo: string; typeKo: string; brands?: string[]; season: string
+  typeKo: string; brands?: string[]; season: string
   priceBandKo?: string; wantReport?: boolean; depth?: number
-}) => post<TrendResearch>('/api/research/trends', b)
+  objectives?: ResearchObjective[]; line?: FootwearLineProfile; itemType?: string
+}) => post<TrendResearch>('/api/research/trends', {
+  typeKo: b.typeKo, brands: b.brands, season: b.season, priceBandKo: b.priceBandKo,
+  wantReport: b.wantReport, depth: b.depth, objectives: b.objectives,
+  line: lineForServer(b.line, b.itemType),
+})
 
 // ── 수집 결과 → 도메인 타입 ─────────────────────────────────────────
 // 판매 프록시는 만들지 않는다. 1회 수집으로는 시계열이 성립하지 않는다.
+const lvl = (v?: string): 'high' | 'medium' | 'low' | null =>
+  v === 'high' || v === 'medium' || v === 'low' ? v : null
+
 export function toCompetitors(r: CompetitorResearch, priceMin: number, priceMax: number): CompetitorProduct[] {
   const lo = priceMin * 0.7, hi = priceMax * 1.3
   return r.products.map((p, i) => ({
@@ -105,10 +153,18 @@ export function toCompetitors(r: CompetitorResearch, priceMin: number, priceMax:
     evidence_strength: p.evidence_strength,
     source_urls: p.source_urls,
     rank_note: p.rank_note,
+    rank_semantics: p.rank_semantics,
+    competitor_group: p.competitor_group,
+    brand_line: p.brand_line,
+    construction_tier: p.construction_tier,
     user_sentiment: p.user_sentiment,
     praise_points: p.praise_points,
     complaint_points: p.complaint_points,
     design_traits: p.design_traits,
+    offered_sizes: p.offered_sizes > 0 ? p.offered_sizes : undefined,
+    available_sizes: p.available_sizes >= 0 && p.offered_sizes > 0 ? p.available_sizes : undefined,
+    size_status: p.size_status,
+    colorway_count: p.colorway_count > 0 ? p.colorway_count : undefined,
     image_urls: p.image_urls,
     product_url: p.product_url,
   }))
@@ -135,6 +191,17 @@ export function toSignals(r: TrendResearch): Signal[] {
     dedup_group: `dg_${i + 1}`,
     oem_group: null,
     evidence: s.evidence,
+    co_occurring: s.co_occurring?.length ? s.co_occurring : undefined,
+    indices: {
+      commercial: lvl(s.commercial_index),
+      cultural: lvl(s.cultural_index),
+      forecast: lvl(s.forecast_index),
+      feasibility: lvl(s.feasibility_index),
+    },
+    adoption_stage: s.adoption_stage,
+    last_change: s.last_change,
+    bottom_tooling_change: s.bottom_tooling_change,
+    upper_pattern_change: s.upper_pattern_change,
   }))
 }
 
@@ -195,7 +262,11 @@ export interface SeasonDossier {
 
 export const fetchDossier = (b: {
   categoryEn: string; season: string; priceBand?: string; brands?: string[]
-}) => post<SeasonDossier>('/api/research/dossier', b)
+  line?: FootwearLineProfile; itemType?: string
+}) => post<SeasonDossier>('/api/research/dossier', {
+  categoryEn: b.categoryEn, season: b.season, priceBand: b.priceBand, brands: b.brands,
+  line: lineForServer(b.line, b.itemType),
+})
 
 export const GRADE_LABEL: Record<TrendGrade, string> = {
   edgy: 'Edgy', early_sign: 'Early sign', safe: 'Safe',

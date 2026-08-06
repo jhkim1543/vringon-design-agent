@@ -15,19 +15,21 @@ import { openDossierPdf, saveDossierHtml } from '../core/dossierPdf'
 import type { BoardEdits } from '../core/boardEdits'
 import { EMPTY_EDITS, loadEdits, newNoteId, saveEdits } from '../core/boardEdits'
 import type { BoardNode } from '../core/boardModel'
+import { plainProse } from '../core/prose'
 import { DesignCard } from './Card'
 import { Tag, ThemeToggle } from './bits'
 import { ModelViewer } from './ModelViewer'
 import { copyText, shareLink } from '../core/share'
 
-const COL_X = [0, 400, 800, 1180, 1600, 2320, 2740, 3160]
+// 노드를 키웠으므로 열 간격·행 높이도 같이 커진다. 붙여 두면 사진이 겹친다.
+const COL_X = [0, 490, 980, 1440, 1900, 2680, 3180, 3680]
 const colX = (c: number) => {
   const i = Math.floor(c)
   const base = COL_X[Math.min(i, COL_X.length - 1)]
   const next = COL_X[Math.min(i + 1, COL_X.length - 1)]
   return base + (c - i) * (next - base)
 }
-const ROW_Y = 150
+const ROW_Y = 172
 
 // ── 노드 렌더러 ──────────────────────────────────────────────────────
 // 편집 모드에서는 제목과 본문을 그 자리에서 고칠 수 있다.
@@ -83,15 +85,29 @@ function StepNode({ data }: { data: { n: BoardNode; ed?: NodeEdit } }) {
           onPointerDown={e => e.stopPropagation()}
           onClick={() => ed?.onHide(n.id)}>✕</button>
       )}
-      <EditableText className="bn-t" value={n.title} editing={editing}
+      <EditableText className="bn-t" value={plainProse(n.title)} editing={editing}
         onSave={v => ed?.onTitle(n.id, v)} />
       {/* 착용 컷처럼 이미지가 붙는 노드는 사진이 먼저 보여야 한다 */}
       {n.imageUrl && !n.modelUrl && <img className="bn-img" src={n.imageUrl} alt="" loading="lazy" />}
       {/* 3D는 카드 안에서 바로 돌려 본다 */}
-      {n.modelUrl && <ModelViewer url={n.modelUrl} poster={n.imageUrl} height={186} light={ed?.light} />}
+      {n.modelUrl && <ModelViewer url={n.modelUrl} poster={n.imageUrl} height={228} light={ed?.light} />}
+      {/* 팔레트는 글이 아니라 색으로 보인다 */}
+      {n.palette && n.palette.length > 0 && (
+        <div className="bn-pal">
+          {n.palette.slice(0, 8).map((c, i) => (
+            <span key={c.hex + i} title={c.name}><i style={{ background: c.hex }} />{c.name}</span>
+          ))}
+        </div>
+      )}
       <EditableText className="bn-body" multiline editing={editing}
-        value={n.body.join('\n')}
+        value={n.body.map(plainProse).join('\n')}
         onSave={v => ed?.onBody(n.id, v.split('\n').filter(x => x.trim()))} />
+      {/* 스케치가 디자인이 된 실제 프롬프트 · 근거는 이 카드가 들고 다닌다 */}
+      {n.prompts && n.prompts.length > 0 && (
+        <div className="bn-prompts">
+          {n.prompts.map((p, i) => <div key={i} className="bn-prompt">{p}</div>)}
+        </div>
+      )}
       <Handle type="source" position={Position.Right} />
     </div>
   )
@@ -101,7 +117,7 @@ function DesignFlowNode({ data }: { data: { n: BoardNode; st: RunState; onVerdic
   const { n, st, onVerdict } = data
   if (!n.design) return null
   return (
-    <div style={{ width: 268 }}>
+    <div style={{ width: 300 }}>
       <Handle type="target" position={Position.Left} />
       <DesignCard d={n.design} signals={st.signals} stagePassed={{ s3: true, s4: true }} onVerdict={onVerdict} />
       <Handle type="source" position={Position.Right} />
@@ -144,7 +160,7 @@ function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit): {
     nodes.push({
       id: `col-${c.key}`, type: 'column',
       position: { x: colX(i) - 24, y: -86 },
-      data: { title: c.title, note: c.note, h: Math.max(rows * ROW_Y + 150, 360), w: (i === 4 ? 660 : 356) },
+      data: { title: c.title, note: c.note, h: Math.max(rows * ROW_Y + 150, 360), w: (i === 4 ? 720 : 430) },
       selectable: false, draggable: false, zIndex: -1,
     })
   })
@@ -159,9 +175,11 @@ function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit): {
   }))
   ;[...visible, ...noteNodes].forEach(n => {
     const isDesign = n.kind === 'design' && !!n.design
-    const w = isDesign ? 268 : (n as any).isPitch ? 300 : 312
+    const w = isDesign ? 300 : (n as any).isPitch ? 360 : 384
     // 이미지가 붙는 노드는 사진 높이만큼 더 잡아야 연결선이 엉뚱한 데 붙지 않는다
-    const h = isDesign ? 430 : 44 + n.body.length * 20 + (n.imageUrl ? 186 : 0) + (n.modelUrl ? 200 : 0)
+    const h = isDesign ? 470
+      : 46 + n.body.length * 22 + (n.imageUrl ? 240 : 0) + (n.modelUrl ? 244 : 0)
+        + (n.palette?.length ? 30 : 0) + (n.prompts?.length ? n.prompts.length * 46 : 0)
     nodes.push({
       id: n.id,
       type: isDesign ? 'designFlow' : 'step',
@@ -325,7 +343,13 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
     setMiro({ busy: false, msg: ok ? t('Link copied. It opens this board in a browser that has this run.') : url })
   }, [runId])
 
-  const exportMiro = useCallback(async () => {
+  // Miro 토큰은 사용자마다 다르다. 이 브라우저에만 저장하고, 내보낼 때 요청에 실어 보낸다.
+  // 서버는 저장하지 않는다 — 데모를 쓰는 사람마다 자기 토큰으로 자기 팀에 보드를 만든다.
+  const [miroToken, setMiroToken] = useState<string>(() => localStorage.getItem('vringon.miroToken') ?? '')
+  const [miroModal, setMiroModal] = useState(false)
+  const [miroDraft, setMiroDraft] = useState('')
+
+  const exportMiro = useCallback(async (tokenOverride?: string) => {
     setMiro({ busy: true, msg: 'Converting board for Miro' })
     try {
       const model = buildBoardModel(st)
@@ -333,8 +357,9 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model,
+          token: tokenOverride ?? miroToken ?? undefined,
           meta: {
-            name: `VRINGON review · ${st.params.category === 'shoe' ? 'footwear' : 'jewelry'} ${new Date().toISOString().slice(0, 10)}`,
+            name: `VRINGON review · footwear ${new Date().toISOString().slice(0, 10)}`,
             description: 'The reasoning from research through to selection',
           },
         }),
@@ -344,20 +369,28 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
         setMiro({ busy: false, msg: `Miro board created · ${j.created.frames} frames · ${j.created.items} cards · ${j.created.connectors} connections` })
         if (j.viewLink) window.open(j.viewLink, '_blank', 'noopener')
       } else if (j.plan) {
-        const blob = new Blob([JSON.stringify(j.plan, null, 2)], { type: 'application/json' })
-        const a = document.createElement('a')
-        a.href = URL.createObjectURL(blob)
-        a.download = 'miro-board-plan.json'
-        a.click()
-        URL.revokeObjectURL(a.href)
-        setMiro({ busy: false, msg: `No Miro token, so the build plan was downloaded instead (${j.plan.counts.items} cards, ${j.plan.counts.connectors} connections)` })
+        // 토큰이 없다 · 파일을 떨구는 대신 연결 안내를 연다. 각자 자기 토큰으로 연결한다.
+        setMiro({ busy: false, msg: null })
+        setMiroModal(true)
       } else {
         setMiro({ busy: false, msg: j.error ?? 'Export failed' })
+        // 401/403 이면 토큰이 죽은 것 · 다시 연결하게 연다
+        if (/40[13]/.test(String(j.error ?? ''))) { setMiroToken(''); localStorage.removeItem('vringon.miroToken'); setMiroModal(true) }
       }
     } catch (e) {
       setMiro({ busy: false, msg: String((e as Error).message) })
     }
-  }, [st])
+  }, [st, miroToken])
+
+  const connectMiro = useCallback(() => {
+    const tk = miroDraft.trim()
+    if (!tk) return
+    localStorage.setItem('vringon.miroToken', tk)
+    setMiroToken(tk)
+    setMiroModal(false)
+    setMiroDraft('')
+    exportMiro(tk)
+  }, [miroDraft, exportMiro])
 
   const currentNode = present ? buildBoardModel(st).nodes.find(n => n.id === focusOrder[presentIdx]) : undefined
   const approved = st.designs.filter(d => d.verdict === 'approve').length
@@ -389,7 +422,7 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
                   onClick={() => saveDossierHtml(st)}>↓</button>
               </span>
             )}
-            <button className="btn btn-primary btn-sm" onClick={exportMiro} disabled={miro.busy}>
+            <button className="btn btn-primary btn-sm" onClick={() => exportMiro()} disabled={miro.busy}>
               {miro.busy ? t('Exporting') : t('Export to Miro')}
             </button>
           </div>
@@ -509,6 +542,41 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
               {TIER_LABEL[currentNode.design.spec.tier]} · {currentNode.design.rationale.type_placement_reason}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Miro 연결 · 토큰은 사용자마다 다르다. 이 브라우저에만 저장되고 서버에는 남지 않는다. */}
+      {miroModal && (
+        <div className="modal-back" onClick={() => setMiroModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
+            <div className="modal-h">
+              <div>
+                <h2>{t('Connect your Miro')}</h2>
+                <p className="hint">{t('Each person uses their own token, so the board lands in your team. The token stays in this browser only and is never stored on the server.')}</p>
+              </div>
+            </div>
+            <div style={{ padding: '4px 20px 8px', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.6 }}>
+              <div><b>1.</b> <a href="https://miro.com/app/settings/user-profile/apps" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-hi)' }}>miro.com/app/settings/user-profile/apps</a> {t('and press Create new app, then pick your team')}</div>
+              <div><b>2.</b> {t('Tick the boards:read and boards:write scopes, then press Install app and get OAuth token')}</div>
+              <div><b>3.</b> {t('Paste the token below')}</div>
+              <input className="input" type="password" placeholder={t('Miro access token')} autoFocus
+                value={miroDraft} onChange={e => setMiroDraft(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') connectMiro() }} />
+            </div>
+            <div className="modal-foot">
+              {miroToken && (
+                <button className="btn btn-ghost btn-sm"
+                  onClick={() => { localStorage.removeItem('vringon.miroToken'); setMiroToken(''); setMiro({ busy: false, msg: t('Miro disconnected on this browser.') }) }}>
+                  {t('Disconnect')}
+                </button>
+              )}
+              <button className="btn btn-ghost btn-sm" onClick={() => setMiroModal(false)}>{t('Cancel')}</button>
+              <button className="btn btn-primary" style={{ marginLeft: 'auto' }} disabled={!miroDraft.trim()}
+                onClick={connectMiro}>
+                {t('Connect and export')}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

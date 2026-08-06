@@ -66,26 +66,30 @@ async function poll(apiKey, taskId, onStep) {
   }
 }
 
-/** 멀티뷰 → 3D. views 는 png 버퍼 배열이고, 순서는 정면·좌·후·우 규약을 따른다.
- *  우리가 가진 각도가 그 규약과 정확히 같지는 않으므로, 빈 자리는 null 로 둔다. */
+/** 멀티뷰 → 3D. views 는 [front, left, back, right] 순서의 4칸 배열이다.
+ *  파이프라인이 규약에 맞는 턴어라운드 4뷰를 만들어 자리에 맞춰 넣는다.
+ *  없는 자리는 null — Tripo에는 빈 객체로 나간다. */
 export async function tripoMultiview(root, apiKey, { views, onStep }) {
   if (!apiKey) throw new Error('No TRIPO_API_KEY set')
-  const usable = views.filter(Boolean).slice(0, 4)
+  const slots = [...views.slice(0, 4)]
+  while (slots.length < 4) slots.push(null)
+  const usable = slots.filter(Boolean)
   if (!usable.length) throw new Error('no views to send')
 
+  // 캐시 키는 자리까지 포함한다 · 같은 넉 장이라도 순서가 다르면 다른 모델이다
   const hash = createHash('sha256')
-    .update(usable.map(v => createHash('sha256').update(v.buf).digest('hex')).join('|'))
+    .update(slots.map(v => v ? createHash('sha256').update(v.buf).digest('hex') : 'x').join('|'))
     .digest('hex').slice(0, 24)
   const out = join(modelDir(root), `${hash}.glb`)
   if (existsSync(out)) return { hash, format: 'glb', views: usable.length, cached: true }
 
   onStep?.('uploading', 0, 0)
-  const tokens = []
-  for (const v of usable) tokens.push({ type: 'png', file_token: await upload(apiKey, v.buf, v.name) })
-
-  // Tripo 멀티뷰는 [front, left, back, right] 순서를 기대한다.
-  // 우리가 가진 각도는 정면·사분·상단이라 뒤쪽이 없다. 없는 자리는 빈 객체로 둔다.
-  const files = [tokens[0] ?? {}, tokens[1] ?? {}, {}, tokens[2] ?? {}]
+  // [front, left, back, right] 자리 그대로 업로드한다
+  const files = []
+  for (const v of slots) {
+    if (!v) { files.push({}); continue }
+    files.push({ type: 'png', file_token: await upload(apiKey, v.buf, v.name) })
+  }
 
   const create = await fetch(`${BASE}/task`, {
     method: 'POST',

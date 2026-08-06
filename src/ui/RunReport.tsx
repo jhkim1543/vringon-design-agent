@@ -7,11 +7,12 @@ import type { ReactNode } from 'react'
 import type { RunState } from '../core/types'
 import { CAT_LABEL, TYPE_LABEL, MODE_LABEL } from '../core/types'
 import { GRADE_LABEL, shotUrl } from '../core/research'
+import { plainProse } from '../core/prose'
 import type { Macrotrend, SeasonDossier, TrendReport } from '../core/research'
 import { DeckViewer } from './DeckViewer'
 import { dossierDeckHtml, openDossierPdf, saveDossierHtml } from '../core/dossierPdf'
 import { openTrendReportPdf, saveTrendReportHtml, trendDeckHtml } from '../core/reportPdf'
-import { IcGem, IcReport, IcShoe, IcTrend } from './icons'
+import { IcReport, IcShoe, IcTrend } from './icons'
 
 const KRW = (n: number) => `₩${Math.round(n).toLocaleString('en-US')}`
 
@@ -92,7 +93,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
   // 덱은 st 가 바뀔 때만 다시 만든다. 매 렌더마다 만들면 iframe 이 계속 새로 뜬다.
   const trendDeck = useMemo(() => (report ? trendDeckHtml(st) : null), [report, st])
   const seasonDeck = useMemo(() => (d ? dossierDeckHtml(st) : null), [d, st])
-  const CatIcon = st.params.category === 'shoe' ? IcShoe : IcGem
+  const CatIcon = IcShoe
 
   return (
     <div className="rep">
@@ -106,7 +107,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
           </nav>
           <h1>{d?.season_title ?? `${t(CAT_LABEL[st.params.category])} ${t('macro trends')}`}</h1>
           <p className="rep-sub">{t(TYPE_LABEL[st.params.itemType])} {t('trend report')}</p>
-          <p className="rep-lede">{d?.season_narrative ?? report?.executive_view ?? t('The analysis is still filling in. Sections appear as they land.')}</p>
+          <p className="rep-lede">{plainProse(d?.season_narrative ?? report?.executive_view ?? '') || t('The analysis is still filling in. Sections appear as they land.')}</p>
           <div className="rep-stats">
             <div><b>{macros.length || '—'}</b><span>{t('Key macro trends')}</span></div>
             <div><b>{sourceCount || '—'}</b><span>{t('Data sources')}</span></div>
@@ -155,7 +156,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
                   </span>
                   <span className="rm-txt">
                     <b>{m.name}</b>
-                    <span className="rm-d">{m.statement}</span>
+                    <span className="rm-d">{plainProse(m.statement)}</span>
                     {(m.sub_trends ?? []).length > 0 && (
                       <span className="rm-subs">
                         {(m.sub_trends ?? []).slice(0, 4).map((s, i) => <i key={i}>{s}</i>)}
@@ -195,6 +196,30 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
         </section>
       )}
 
+      {/* ── 촬영·베리에이션 갤러리 · 리포트는 사진으로 읽혀야 한다 ── */}
+      {(() => {
+        const shots = st.designs.filter(x => !x.rejected)
+          .flatMap(x => x.images
+            .filter(i => ['wear', 'concept', 'variation'].includes(i.view) || i.colorway)
+            .map(i => ({ id: x.spec.design_id, im: i })))
+          .slice(0, 12)
+        if (shots.length < 3) return null
+        return (
+          <section className="rep-sect" id="sec-shots">
+            <div className="rep-head"><h2>{t('Campaign and variation gallery')}</h2></div>
+            <div className="rep-designs">
+              {shots.map((s, i) => (
+                <article className="rep-design" key={s.im.hash + i}>
+                  <span className="rd-shot"><img src={s.im.url} alt="" loading="lazy" /></span>
+                  <span className="rd-id">{s.id}<i className="rd-tier">{s.im.colorway ?? s.im.variantAxis ?? s.im.conceptLabel ?? s.im.view}</i></span>
+                </article>
+              ))}
+            </div>
+            <p className="hint" style={{ marginTop: 6 }}>{t('Every cut is an edit of the base render, so the product stays the same across the gallery. Worn shots are simulated.')}</p>
+          </section>
+        )
+      })()}
+
       {/* ── 경쟁 구도 ─────────────────────────────────────────── */}
       {brands.length > 0 && (
         <section className="rep-sect" id="sec-comp">
@@ -218,7 +243,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
                     <td className="rt-prods">
                       {b.items.slice(0, 3).map(p => (
                         <span className="rt-prod" key={p.product_id}>
-                          {p.image_urls?.[0] && <img src={shotUrl(p.image_urls[0])} alt=""
+                          {p.image_urls?.[0] && <img src={shotUrl(p.image_urls[0], p.product_url)} alt=""
                             onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />}
                           <span>
                             <b>{p.name}</b>

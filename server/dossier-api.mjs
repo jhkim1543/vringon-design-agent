@@ -158,6 +158,9 @@ export function tidyProse(v) {
       .replace(/\s+[—–]\s+/g, ', ')                  // 긴 대시는 쉼표로
       .replace(/(?<=\S)\s-\s(?=\S)/g, ', ')         // 문장 중간의 하이픈 연결
       .replace(/^\s*[-•*]\s+/gm, '')                 // 줄머리 불릿
+      .replace(/^#{1,6}\s+/gm, '')                   // 마크다운 헤딩 기호
+      .replace(/\*\*([^*]+)\*\*/g, '$1')             // 굵게 기호
+      .replace(/`([^`]+)`/g, '$1')                   // 코드 기호
       .replace(/[ \t]{2,}/g, ' ')
       .replace(/\s+([,.])/g, '$1')
       .trim()
@@ -184,10 +187,29 @@ export function nextSeason(s) {
   return half === 'SS' ? `FW${String(yy).padStart(2, '0')}` : `SS${String((yy + 1) % 100).padStart(2, '0')}`
 }
 
+/** 라인 프로필 → 도시에 프롬프트에 얹는 초점 블록. 선택 품목과 직접 연관된 분석이 대부분이어야 한다. */
+function lineFocus(line) {
+  if (!line) return ''
+  const u = (v) => v && v !== 'unknown' ? v : null
+  const bits = [
+    u(line.itemType) && `세부 유형 ${line.itemType}`,
+    u(line.useCase), u(line.targetConsumer),
+    u(line.lastFamily) && `라스트 ${line.lastFamily}`,
+    u(line.upperOuter) && `어퍼 ${line.upperOuter}`,
+    u(line.outsole) && `아웃솔 ${line.outsole}`,
+    u(line.soleAttachment) && `공법 ${line.soleAttachment}`,
+  ].filter(Boolean)
+  if (!bits.length) return ''
+  return `\n조사 초점 라인: ${bits.join(' · ')}
+매크로트렌드가 광범위하더라도 반드시 이 라인으로 번역합니다. 키 아이템과 스펙 구절의 60% 이상이 이 세부 유형과 직접 연관되어야 하고,
+선택 품목과 무관한 계열(예: 러닝을 조사하는데 힐·샌들 키 아이템)로 확산되면 안 됩니다.\n`
+}
+
 export async function researchDossier(deps, root, opts) {
   const { ask } = deps
-  const { categoryEn, season, priceBand, brands = [], deep = false, onStep, langName = 'English' } = opts
-  const key = createHash('sha256').update(JSON.stringify(['dossier4-forecast', langName, categoryEn, season, priceBand ?? '', brands, deep])).digest('hex').slice(0, 24)
+  const { categoryEn, season, priceBand, brands = [], deep = false, onStep, langName = 'English', line } = opts
+  const lineHash = line ? createHash('sha256').update(JSON.stringify(line)).digest('hex').slice(0, 12) : ''
+  const key = createHash('sha256').update(JSON.stringify(['dossier5ft', langName, categoryEn, season, priceBand ?? '', brands, deep, lineHash])).digest('hex').slice(0, 24)
   const file = join(dossierDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
@@ -200,6 +222,7 @@ export async function researchDossier(deps, root, opts) {
 이 문서는 **${FORECAST} 예측서**다. ${season}은 근거이지 주제가 아니다.
 대상 시즌: ${FORECAST} (예측)  ·  근거 시즌: ${season} (관측)
 품목: ${categoryEn}${priceBand ? ` · 가격대 ${priceBand}` : ''}${brands.length ? ` · 참고 브랜드 ${brands.join(', ')}` : ''}
+${lineFocus(line)}
 
 예측 방법:
 - ${season}에서 실제로 관측된 것(쇼, 리테일 랭킹, 품절, 검색량, 소재 조달)을 근거로 삼는다.

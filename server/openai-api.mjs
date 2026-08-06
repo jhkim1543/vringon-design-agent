@@ -213,25 +213,73 @@ export async function handleApi(req, res) {
   }
 
   // 수집한 제품 사진을 서버가 받아 캐시한다. 핫링크·CORS·만료 링크를 피한다.
+  // 직링크가 죽어 있으면 제품 페이지(p)의 og:image로 폴백한다 — 리서치가 물어온
+  // 이미지 주소는 자주 만료되므로, 페이지가 살아 있는 한 사진은 나와야 한다.
   if (path === '/api/shot') {
     const src = url.searchParams.get('u') || ''
+    const page = url.searchParams.get('p') || ''
     if (!/^https:\/\//.test(src)) { res.statusCode = 400; return res.end('bad url') }
     ensureShotCache()
-    const name = `${keyOf(['shot', src])}.img`
+    const name = `${keyOf(['shot2', src, page])}.img`
     const file = join(SHOT_DIR, name)
+    const miss = file + '.miss'
+    const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36'
+
+    const tryImage = async (imgUrl, referer) => {
+      const r = await fetch(imgUrl, {
+        headers: {
+          'User-Agent': UA,
+          Accept: 'image/avif,image/webp,image/*,*/*;q=0.8',
+          ...(referer ? { Referer: referer } : {}),
+        },
+        redirect: 'follow',
+        signal: AbortSignal.timeout(12_000),
+      })
+      if (!r.ok) throw new Error(String(r.status))
+      const type = r.headers.get('content-type') || ''
+      if (!type.startsWith('image/')) throw new Error('not image')
+      const buf = Buffer.from(await r.arrayBuffer())
+      if (buf.length > 8e6) throw new Error('too large')
+      if (buf.length < 1200) throw new Error('too small')   // 1px 추적 픽셀·플레이스홀더 차단
+      return { buf, type }
+    }
+
+    // 페이지에서 대표 이미지 주소를 찾는다: og:image → twitter:image → JSON-LD image
+    const fromPage = async (pageUrl) => {
+      const r = await fetch(pageUrl, {
+        headers: { 'User-Agent': UA, Accept: 'text/html,*/*;q=0.8' },
+        redirect: 'follow', signal: AbortSignal.timeout(12_000),
+      })
+      if (!r.ok) throw new Error(`page ${r.status}`)
+      const html = (await r.text()).slice(0, 600_000)
+      const metas = [
+        /<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["']/i,
+        /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["']/i,
+        /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i,
+        /"image"\s*:\s*"(https:[^"]+\.(?:jpe?g|png|webp)[^"]*)"/i,
+      ]
+      for (const re of metas) {
+        const m = re.exec(html)
+        if (m?.[1]) {
+          const u2 = m[1].replace(/&amp;/g, '&')
+          if (/^https:\/\//.test(u2)) return u2
+        }
+      }
+      throw new Error('no og:image')
+    }
+
     try {
       if (!existsSync(file)) {
-        const r = await fetch(src, {
-          headers: { 'User-Agent': 'Mozilla/5.0', Accept: 'image/avif,image/webp,image/*,*/*;q=0.8' },
-          redirect: 'follow',
-        })
-        if (!r.ok) throw new Error(String(r.status))
-        const type = r.headers.get('content-type') || ''
-        if (!type.startsWith('image/')) throw new Error('not image')
-        const buf = Buffer.from(await r.arrayBuffer())
-        if (buf.length > 8e6) throw new Error('too large')
-        writeFileSync(file, buf)
-        writeFileSync(file + '.type', type)
+        // 최근에 실패한 조합은 잠시 재시도하지 않는다 (매 렌더마다 원격을 두드리지 않게)
+        if (existsSync(miss) && Date.now() - Number(readFileSync(miss, 'utf8') || 0) < 3600_000) throw new Error('cached miss')
+        let got = null
+        try { got = await tryImage(src, page || undefined) } catch { /* 직링크 실패 → 페이지 폴백 */ }
+        if (!got && page && /^https:\/\//.test(page)) {
+          try { got = await tryImage(await fromPage(page), page) } catch { /* 페이지 폴백도 실패 */ }
+        }
+        if (!got) { writeFileSync(miss, String(Date.now())); throw new Error('unavailable') }
+        writeFileSync(file, got.buf)
+        writeFileSync(file + '.type', got.type)
       }
       const type = existsSync(file + '.type') ? readFileSync(file + '.type', 'utf8') : 'image/jpeg'
       res.setHeader('Content-Type', type)
@@ -277,7 +325,7 @@ export async function handleApi(req, res) {
       const b = await readBody(req)
       return json(res, 200, await researchSeasonDossier(DEEP_RESEARCH ? DEEP_KEY : API_KEY, ROOT, {
         categoryEn: b.categoryEn, season: b.season, priceBand: b.priceBand,
-        brands: b.brands ?? [], deep: DEEP_RESEARCH, langName: b.langName,
+        brands: b.brands ?? [], deep: DEEP_RESEARCH, langName: b.langName, line: b.line,
       }))
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
   }
@@ -299,14 +347,25 @@ export async function handleApi(req, res) {
   if (path === '/api/model/generate' && req.method === 'POST') {
     try {
       const b = await readBody(req)
-      const hashes = Array.isArray(b.hashes) ? b.hashes.filter(h => /^[a-f0-9]{8,64}$/.test(h)) : []
-      if (!hashes.length) return json(res, 400, { error: 'no view hashes given' })
+      // ordered: [front, left, back, right] 순서의 해시 4칸 (없는 자리는 null).
+      // 옛 클라이언트의 hashes 배열도 받아 첫 칸부터 채운다.
+      const okHash = h => typeof h === 'string' && /^[a-f0-9]{8,64}$/.test(h)
+      let slots
+      if (Array.isArray(b.ordered)) {
+        slots = b.ordered.slice(0, 4).map(h => okHash(h) ? h : null)
+        while (slots.length < 4) slots.push(null)
+      } else {
+        const hashes = Array.isArray(b.hashes) ? b.hashes.filter(okHash).slice(0, 4) : []
+        slots = [...hashes, null, null, null, null].slice(0, 4)
+      }
+      if (!slots.some(Boolean)) return json(res, 400, { error: 'no view hashes given' })
 
-      const views = hashes.map(h => {
+      const views = slots.map(h => {
+        if (!h) return null
         const p = join(CACHE_DIR, `${h}.png`)
         return existsSync(p) ? { buf: readFileSync(p), name: `${h}.png` } : null
-      }).filter(Boolean)
-      if (!views.length) return json(res, 404, { error: 'none of those views are in the cache' })
+      })
+      if (!views.some(Boolean)) return json(res, 404, { error: 'none of those views are in the cache' })
 
       const r = await tripoMultiview(ROOT, TRIPO_KEY, { views })
       return json(res, 200, { ...r, url: `/api/model/file/${r.hash}.${r.format}` })
@@ -325,20 +384,41 @@ export async function handleApi(req, res) {
 
   if (path === '/api/miro/export' && req.method === 'POST') {
     try {
-      const { model, meta } = await readBody(req)
+      const { model, meta, token } = await readBody(req)
       // 형태가 어긋나면 planMiroBoard 안에서 TypeError 가 나 원인이 안 보인다
       if (!model || !Array.isArray(model.columns) || !Array.isArray(model.nodes)) {
         return json(res, 400, { error: 'board model must have columns[] and nodes[]' })
       }
       const plan = planMiroBoard(model, meta ?? { name: 'VRINGON 품평 보드', description: '' })
-      if (!MIRO_TOKEN) {
+      // 사용자마다 토큰이 다르다. 요청에 실려 온 개인 토큰이 서버 환경값보다 우선한다.
+      // 토큰은 저장하지 않는다 — 이 요청 한 번에만 쓰인다.
+      const MIRO = (typeof token === 'string' && token.trim()) ? token.trim() : MIRO_TOKEN
+      if (!MIRO) {
         return json(res, 200, {
           mode: 'plan',
           plan,
           hint: 'MIRO_ACCESS_TOKEN을 .env에 넣으면 보드를 바로 생성합니다. 지금은 생성 계획만 반환했습니다.',
         })
       }
-      const out = await createMiroBoard(MIRO_TOKEN, plan)
+      // 로컬 캐시 이미지(/api/image/file/…, /api/shot?…)는 파일로 올린다.
+      // Miro는 URL을 자기 서버에서 가져가므로 localhost 주소는 절대 닿지 않는다.
+      const resolveLocal = (u) => {
+        try {
+          const m1 = /^\/api\/image\/file\/([a-f0-9]{8,64})\.png$/.exec(u)
+          if (m1) {
+            const p = join(CACHE_DIR, `${m1[1]}.png`)
+            return existsSync(p) ? readFileSync(p) : null
+          }
+          if (u.startsWith('/api/shot?')) {
+            const q = new URL('http://x' + u.slice(4)).searchParams
+            const name = `${keyOf(['shot2', q.get('u') || '', q.get('p') || ''])}.img`
+            const p = join(SHOT_DIR, name)
+            return existsSync(p) ? readFileSync(p) : null
+          }
+        } catch { /* 개별 이미지 실패는 건너뛴다 */ }
+        return null
+      }
+      const out = await createMiroBoard(MIRO, plan, resolveLocal)
       return json(res, 200, { mode: 'created', ...out })
     } catch (e) {
       return json(res, 500, { error: String(e.message || e) })

@@ -3,7 +3,7 @@
 import type { RunState } from './types'
 import { listRuns, saveRun } from './store'
 
-const SAMPLE_IDS = ['sample_shoe_trend', 'sample_sport_running', 'sample_jewel_ring', 'sample_jewel_hoop']
+const SAMPLE_IDS = ['sample_shoe_trend', 'sample_sport_running']
 
 export async function ensureSampleRuns() {
   const have = new Set(listRuns().map(r => r.id))

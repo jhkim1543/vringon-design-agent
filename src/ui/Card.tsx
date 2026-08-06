@@ -2,8 +2,8 @@
 import { t } from '../core/i18n'
 import { useState } from 'react'
 import type { Design, Signal } from '../core/types'
-import { TIER_LABEL, TYPE_LABEL, CAT_LABEL, VERDICT_TAGS } from '../core/types'
-import { PACKS } from '../core/packs'
+import { TIER_LABEL, TYPE_LABEL, VERDICT_TAGS } from '../core/types'
+import { viewSetFor } from '../core/packs'
 import { designSVG, svgDataUri } from '../core/sketch'
 import { Tag } from './bits'
 
@@ -17,10 +17,10 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
   const [showRationale, setShowRationale] = useState(false)
   const [pendingReject, setPendingReject] = useState(false)
   const [tags, setTags] = useState<string[]>([])
-  const pack = PACKS[d.spec.category]
+  const views = viewSetFor(d.spec.itemType)
   const rendered = stagePassed.s3 && !d.rejected && d.colorways.length >= 0 && d.qa.length > 0
-  const mainView = d.spec.category === 'shoe' ? 'lateral' : 'front'
-  const mainSvg = designSVG(d.spec, rendered ? 'render' : 'sketch', mainView as any)
+  const mainView = 'lateral'
+  const mainSvg = designSVG(d.spec, rendered ? 'render' : 'sketch', mainView)
   const f = d.spec.fields
   // 실제 생성 이미지 우선 · 렌더(기준뷰) > 스케치 > SVG 시뮬레이션 폴백
   const baseImg = d.images.find(i => i.view === mainView && !i.colorway)
@@ -28,9 +28,12 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
   const heroImg = baseImg ?? sketchImg
   const extraImgs = d.images.filter(i => i !== heroImg && i.view !== 'sketch')
 
-  const specSummary = d.spec.category === 'jewelry'
-    ? `${f.stone_count} stones · ${f.setting_type} · ${f.target_weight_g}g · ${f.min_wall_thickness_mm}mm wall`
-    : `${f.heel_height_mm}mm heel · ${f.panel_count} panels · ${f.toe_shape} · ${f.last_id}`
+  const specSummary = [
+    `${f.heel_height_mm}mm ${f.heel_type === 'sport_midsole' ? 'stack' : 'heel'}`,
+    `${f.panel_count} panels`, String(f.toe_shape), String(f.last_id),
+    f.midsole_foam ? String(f.midsole_foam) : null,
+    f.plate && f.plate !== 'none' ? `${f.plate} plate` : null,
+  ].filter(Boolean).join(' · ')
 
   const fails = d.ruleResults.filter(r => r.severity === 'fail')
   const warns = d.ruleResults.filter(r => r.severity === 'warn')
@@ -60,14 +63,14 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
                 </div>
               ))
               : (<>
-                {pack.viewSet.filter(v => v.required).slice(1).map(v => (
+                {views.filter(v => v.required).slice(1).map(v => (
                   <div className="v" key={v.key} title={v.label}>
                     <img src={svgDataUri(designSVG(d.spec, 'render', v.key as any))} alt={v.label} />
                   </div>
                 ))}
                 {d.colorways.map(cw => (
                   <div className="v" key={cw} title={`${cw} colourway`}>
-                    <img src={svgDataUri(designSVG(d.spec, 'render', mainView as any, cw))} alt={cw} />
+                    <img src={svgDataUri(designSVG(d.spec, 'render', mainView, cw))} alt={cw} />
                   </div>
                 ))}
               </>)}
@@ -79,8 +82,13 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
       <div className="body">
         <div className="idline">
           {d.spec.design_id}
-          <span className="muted">{CAT_LABEL[d.spec.category]}/{TYPE_LABEL[d.spec.itemType]}</span>
+          <span className="muted">{TYPE_LABEL[d.spec.itemType] ?? d.spec.itemType}</span>
           <Tag kind={d.spec.tier === 'signature' ? 'accent' : undefined}>{TIER_LABEL[d.spec.tier]}</Tag>
+          {d.model && (
+            <a className="tag tag-accent" href={d.model.url} download={`${d.spec.design_id}.glb`}
+              title={t('Download the 3D model (GLB)')}
+              onClick={e => e.stopPropagation()}>GLB ↓</a>
+          )}
         </div>
 
         {/* 설계 목표값 (AI 생성 스펙) · 한 줄 요약, 상세는 근거 패널 */}
@@ -149,12 +157,16 @@ export function RationalePanel({ d, signals }: { d: Design; signals: Signal[] })
         {d.rationale.driving_signals.map(ds => {
           const s = signals.find(x => x.signal_id === ds.signal_id)
           if (!s) return null
+          const idx = s.indices
           return (
             <div className="sig" key={ds.signal_id}>
               <Tag kind="accent">{s.signal_id}</Tag>
               <span>{s.label} · seen {s.observed_count}x · w={ds.weight}
                 {s.sales_proxy_score != null && ` · proxy ${s.sales_proxy_score} (${s.proxy_confidence})`}
                 {s.page_ref && ` · ${s.page_ref}`}
+                {idx && (idx.commercial || idx.cultural || idx.forecast || idx.feasibility) &&
+                  ` · C ${idx.commercial ?? '–'} / Cu ${idx.cultural ?? '–'} / F ${idx.forecast ?? '–'} / Fe ${idx.feasibility ?? '–'}`}
+                {s.co_occurring?.length ? ` · with ${s.co_occurring.slice(0, 3).join(', ')}` : ''}
                 {' '}{s.sources.slice(0, 2).map((u, i) => <a key={i} href={u} target="_blank" rel="noreferrer">[{i + 1}]</a>)}
               </span>
             </div>
