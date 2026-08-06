@@ -5,6 +5,18 @@
 
 export const JA: Record<string, string> = {
   // ── 공통 ────────────────────────────────────────────────────────
+  'Select': '選択',
+  'Lane': '列',
+  'Cancel': 'キャンセル',
+  'Click the board to place a note': 'ボードを押すとその位置にメモが置かれます',
+  'Click the board to add a lane': 'ボードを押すと列が追加されます',
+  'Delete this note': 'このメモを削除',
+  'Hide this card': 'このカードを隠す',
+  'Edit text': 'テキスト編集',
+  'cards': '枚のカード',
+  'approved': '承認',
+  'rejected': '不採用',
+  'Double-click any card to rewrite it': 'カードをダブルクリックで編集',
   'Forecast evidence': '予測の根拠',
   'Collected products': '収集した製品の原本',
   'Report text': 'レポート原文',

@@ -74,6 +74,18 @@ export function tf(s: string, vars: Record<string, string | number>): string {
 const KO: Record<string, string> = {
   // ── 공통 ────────────────────────────────────────────────────────
   // ── 위저드 · 질문 세 개로 나눈 화면 ──────────────────────────────
+  'Select': '선택',
+  'Lane': '칸',
+  'Cancel': '취소',
+  'Click the board to place a note': '보드를 누르면 그 자리에 메모가 놓입니다',
+  'Click the board to add a lane': '보드를 누르면 칸이 추가됩니다',
+  'Delete this note': '이 메모 삭제',
+  'Hide this card': '이 카드 숨기기',
+  'Edit text': '글 편집',
+  'cards': '개 카드',
+  'approved': '승인',
+  'rejected': '불채택',
+  'Double-click any card to rewrite it': '카드를 두 번 누르면 고칠 수 있습니다',
   'Forecast evidence': '예측 근거 상세',
   'Collected products': '수집된 제품 원본',
   'Report text': '리포트 원문',

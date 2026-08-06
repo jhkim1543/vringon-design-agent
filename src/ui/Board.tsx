@@ -8,7 +8,7 @@ import {
 } from '@xyflow/react'
 import type { Node, Edge, NodeChange } from '@xyflow/react'
 import type { RunState } from '../core/types'
-import { TIER_LABEL } from '../core/types'
+import { TIER_LABEL, TYPE_LABEL } from '../core/types'
 import { buildBoardModel } from '../core/boardModel'
 import { openTrendReportPdf, saveTrendReportHtml } from '../core/reportPdf'
 import { openDossierPdf, saveDossierHtml } from '../core/dossierPdf'
@@ -73,13 +73,15 @@ function EditableText({ value, onSave, className, multiline, editing }: {
 function StepNode({ data }: { data: { n: BoardNode; ed?: NodeEdit } }) {
   const { n, ed } = data
   const editing = !!ed?.editing
+  // 내가 붙인 메모는 편집 모드를 켜지 않아도 바로 지울 수 있어야 한다.
+  const isNote = n.tone === ('note' as typeof n.tone)
   return (
-    <div className={`bnode tone-${n.tone ?? 'neutral'}${editing ? ' editing' : ''}`}>
+    <div className={`bnode tone-${n.tone ?? 'neutral'}${editing ? ' editing' : ''}${isNote ? ' is-note' : ''}`}>
       <Handle type="target" position={Position.Left} />
-      {editing && (
-        <button className="bn-x" title="Hide this card"
+      {(editing || isNote) && (
+        <button className="bn-x" title={t(isNote ? 'Delete this note' : 'Hide this card')}
           onPointerDown={e => e.stopPropagation()}
-          onClick={() => ed?.onHide(n.id)}>{t('Hide')}</button>
+          onClick={() => ed?.onHide(n.id)}>✕</button>
       )}
       <EditableText className="bn-t" value={n.title} editing={editing}
         onSave={v => ed?.onTitle(n.id, v)} />
@@ -206,7 +208,10 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
     light,
     onTitle: (id, v) => setEdits(e => ({ ...e, titles: { ...e.titles, [id]: v } })),
     onBody: (id, v) => setEdits(e => ({ ...e, bodies: { ...e.bodies, [id]: v } })),
-    onHide: (id) => setEdits(e => ({ ...e, hidden: [...new Set([...e.hidden, id])] })),
+    // 내가 만든 메모는 지운다. 파이프라인이 만든 카드는 숨기기만 한다 (다시 계산하면 돌아온다)
+    onHide: (id) => setEdits(e => e.notes.some(n => n.id === id)
+      ? { ...e, notes: e.notes.filter(n => n.id !== id) }
+      : { ...e, hidden: [...new Set([...e.hidden, id])] }),
   }), [editing, light])
 
   const initial = useMemo(() => build(st, onVerdict, edits, ed), [st, onVerdict, edits, ed])
@@ -227,6 +232,10 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
 
   // 종류 필터 · 보드가 빽빽해지면 한 갈래만 따라가고 싶어진다
   const [kindFilter, setKindFilter] = useState<'all' | 'research' | 'design' | 'selection'>('all')
+  // 도구 · 'note'/'lane' 을 고른 뒤 보드를 누르면 그 자리에 놓인다.
+  // 실제로 동작하는 것만 둔다. 눌러도 아무 일 없는 도구는 만들지 않는다.
+  const [tool, setTool] = useState<'select' | 'note' | 'lane'>('select')
+  const [zoomPct, setZoomPct] = useState(100)
 
   useEffect(() => {
     // 열(column) 노드는 늘 남긴다. 빼면 화면이 뼈대를 잃는다.
@@ -262,15 +271,19 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
     }
   }, [])
 
-  // 메모 카드 · 빈 자리에 노란 카드를 하나 연다
-  const addNote = useCallback(() => {
+  // 메모 카드 · 누른 자리에 연다. 자리를 안 주면 흐름 오른쪽 끝에 쌓는다.
+  const addNote = useCallback((at?: { x: number; y: number }) => {
     const id = newNoteId()
     setEdits(e => {
       const col = Math.max(0, buildBoardModel(st).columns.length - 1)
       const row = e.notes.filter(n => n.column === col).length + 6
-      return { ...e, notes: [...e.notes, { id, column: col, row, title: 'Note', body: ['Double-click to write'] }] }
+      return {
+        ...e,
+        notes: [...e.notes, { id, column: col, row, title: 'Note', body: ['Double-click to write'] }],
+        // 위치를 함께 저장해야 누른 자리에 그대로 놓인다
+        positions: at ? { ...e.positions, [id]: at } : e.positions,
+      }
     })
-    setEditing(true)
   }, [st])
 
   // 칸 추가 · 흐름 오른쪽에 새 단계를 연다
@@ -351,62 +364,56 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
   const rejectedByUser = st.designs.filter(d => d.verdict === 'reject').length
 
   return (
-    <div className={`board ${light ? 'board-light' : ''}`} data-theme={light ? 'light' : 'dark'}>
+    <div className={`board ${light ? 'board-light' : ''}${tool !== 'select' ? ' placing' : ''}`} data-theme={light ? 'light' : 'dark'}>
       <div className="boardbar">
         {!present ? (<>
-          <span style={{ fontWeight: 700, fontSize: 13 }}>{t('Review board')}</span>
-          <span className="hint">{t('Input → Research → Signals → Directions → Designs → Picks')}</span>
-          <span className="bar-sep" />
-          <Tag kind="ok">{approved} approved</Tag>
-          <Tag kind="danger">{rejectedByUser} rejected</Tag>
-          <span className="bar-sep" />
-          {([['all', 'All'], ['research', 'Research'], ['design', 'Designs'], ['selection', 'Selection']] as const).map(([k, label]) => (
-            <button key={k} className={`btn btn-sm ${kindFilter === k ? 'btn-primary' : 'btn-ghost'}`}
-              onClick={() => setKindFilter(k)}>{t(label)}</button>
-          ))}
-          <span className="bar-sep" />
-          <button className="btn btn-ghost btn-sm" onClick={() => { setPresent(true); setPresentIdx(0) }}>{t('Present')}</button>
-          {/* 확대·축소는 상단에서도 바로 되게 둔다. 우하단 패널에만 의존하지 않는다 */}
-          <button className="btn btn-ghost btn-sm" onClick={() => rf.zoomOut({ duration: 200 })} title={t('Zoom out')}>{t('Zoom out')}</button>
-          <button className="btn btn-ghost btn-sm" onClick={() => rf.zoomIn({ duration: 200 })} title={t('Zoom in')}>{t('Zoom in')}</button>
-          <button className="btn btn-ghost btn-sm" onClick={() => rf.fitView({ duration: 400 })}>{t('Fit')}</button>
-          <button className={`btn btn-sm ${showEdges ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => setShowEdges(v => !v)} title={t('Show the lines between nodes')}>
-            {t('Links')} {t(showEdges ? 'On' : 'Off')}
-          </button>
-          <span className="bar-sep" />
-          <button className={`btn btn-sm ${editing ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => setEditing(v => !v)}
-            title="Double-click any card to rewrite it">
-            {t('Edit')} {t(editing ? 'On' : 'Off')}
-          </button>
-          <button className="btn btn-ghost btn-sm" onClick={addNote} title={t('Drop a note card on the board')}>{t('Add note')}</button>
-          <button className="btn btn-ghost btn-sm" onClick={addColumn} title={t('Open another lane on the right')}>{t('Add lane')}</button>
-          {(edits.notes.length > 0 || edits.hidden.length > 0 || Object.keys(edits.titles).length > 0) && (
-            <button className="btn btn-ghost btn-sm" onClick={resetEdits} title={t('Back to the generated board')}>{t('Reset edits')}</button>
-          )}
-          <ThemeToggle theme={light ? 'light' : 'dark'} onToggle={() => setLight(v => !v)} />
-          <button className="btn btn-ghost btn-sm" onClick={share} title={t('Copy a link to this board')}>{t('Share')}</button>
-          <button className="btn btn-primary btn-sm" onClick={exportMiro} disabled={miro.busy}>
-            {miro.busy ? t('Exporting') : t('Export to Miro')}
-          </button>
-          <button className="btn btn-ghost btn-sm" onClick={() => window.print()}>{t('Board PDF')}</button>
-          {/* 리포트는 인쇄(=PDF 저장)와 파일 저장 두 가지로 낸다.
-              인쇄 대화상자가 막힌 환경에서도 손에 남는 것이 있어야 한다. */}
-          {st.trendReport && (
-            <span className="btn-split">
-              <button className="btn btn-ghost btn-sm" onClick={() => openTrendReportPdf(st)}>{t('Report PDF')}</button>
-              <button className="btn btn-ghost btn-sm sq" title={t('Save as file')}
-                onClick={() => saveTrendReportHtml(st)}>↓</button>
-            </span>
-          )}
-          {st.dossier && (
-            <span className="btn-split">
-              <button className="btn btn-primary btn-sm" onClick={() => openDossierPdf(st)}>{t('Season dossier')}</button>
-              <button className="btn btn-primary btn-sm sq" title={t('Save as file')}
-                onClick={() => saveDossierHtml(st)}>↓</button>
-            </span>
-          )}
+          {/* ── 윗줄 · 정체와 내보내기 ─────────────────────── */}
+          <div className="bb-row bb-top">
+            <span className="bb-title">{t('Review board')}</span>
+            <span className="bb-sub">{t(TYPE_LABEL[st.params.itemType])} · {nodes.length} {t('cards')}</span>
+            <Tag kind="ok">{approved} {t('approved')}</Tag>
+            <Tag kind="danger">{rejectedByUser} {t('rejected')}</Tag>
+            <span className="bb-gap" />
+            <ThemeToggle theme={light ? 'light' : 'dark'} onToggle={() => setLight(v => !v)} />
+            <button className="btn btn-ghost btn-sm" onClick={share} title={t('Copy a link to this board')}>{t('Share')}</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => window.print()}>{t('Board PDF')}</button>
+            {!!st.trendReport && (
+              <span className="btn-split">
+                <button className="btn btn-ghost btn-sm" onClick={() => openTrendReportPdf(st)}>{t('Report PDF')}</button>
+                <button className="btn btn-ghost btn-sm sq" title={t('Save as file')}
+                  onClick={() => saveTrendReportHtml(st)}>↓</button>
+              </span>
+            )}
+            {!!st.dossier && (
+              <span className="btn-split">
+                <button className="btn btn-ghost btn-sm" onClick={() => openDossierPdf(st)}>{t('Season dossier')}</button>
+                <button className="btn btn-ghost btn-sm sq" title={t('Save as file')}
+                  onClick={() => saveDossierHtml(st)}>↓</button>
+              </span>
+            )}
+            <button className="btn btn-primary btn-sm" onClick={exportMiro} disabled={miro.busy}>
+              {miro.busy ? t('Exporting') : t('Export to Miro')}
+            </button>
+          </div>
+
+          {/* ── 아랫줄 · 지금 보이는 것과 조작 ─────────────── */}
+          <div className="bb-row bb-sub-row">
+            {([['all', 'All'], ['research', 'Research'], ['design', 'Designs'], ['selection', 'Selection']] as const).map(([k, label]) => (
+              <button key={k} className={`chipbtn ${kindFilter === k ? 'on' : ''}`}
+                onClick={() => setKindFilter(k)}>{t(label)}</button>
+            ))}
+            <span className="bar-sep" />
+            <button className={`chipbtn ${showEdges ? 'on' : ''}`}
+              onClick={() => setShowEdges(v => !v)} title={t('Show the lines between nodes')}>{t('Links')}</button>
+            <button className={`chipbtn ${editing ? 'on' : ''}`}
+              onClick={() => setEditing(v => !v)} title={t('Double-click any card to rewrite it')}>{t('Edit text')}</button>
+            {(edits.notes.length > 0 || edits.hidden.length > 0 || Object.keys(edits.titles).length > 0) && (
+              <button className="chipbtn" onClick={resetEdits} title={t('Back to the generated board')}>{t('Reset edits')}</button>
+            )}
+            <span className="bb-gap" />
+            <button className="chipbtn" onClick={() => { setPresent(true); setPresentIdx(0) }}>{t('Present')}</button>
+            <button className="chipbtn" onClick={() => rf.fitView({ duration: 400 })}>{t('Fit')}</button>
+          </div>
         </>) : (<>
           <span style={{ fontWeight: 700, fontSize: 13 }}>{presentIdx + 1} / {focusOrder.length}</span>
           <span className="hint">{currentNode?.title}</span>
@@ -430,8 +437,6 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
         fitView
         minZoom={0.04}
         maxZoom={4}
-        /* 캔버스 어디를 잡아도 끌리게 둔다. 왼쪽·가운데·오른쪽 버튼 모두 팬으로 쓴다. */
-        panOnDrag={[0, 1, 2]}
         zoomOnScroll
         zoomOnPinch
         zoomOnDoubleClick
@@ -440,9 +445,45 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
         selectionOnDrag={false}
         proOptions={{ hideAttribution: true }}
         colorMode={light ? 'light' : 'dark'}
+        onMove={(_, vp) => setZoomPct(Math.round(vp.zoom * 100))}
+        /* 도구를 고른 상태에서는 캔버스를 끄는 대신 놓는다 */
+        panOnDrag={tool === 'select' ? [0, 1, 2] : [1, 2]}
+        onPaneClick={(e) => {
+          if (tool === 'select') return
+          const at = rf.screenToFlowPosition({ x: e.clientX, y: e.clientY })
+          if (tool === 'note') addNote(at)
+          else addColumn()
+          setTool('select')        // 한 번 놓으면 손을 뗀다
+        }}
       >
         <Background color={light ? '#E3E7EC' : '#1C1C22'} gap={28} />
         <Controls showInteractive={false} />
+
+        {/* 도구 레일 · 실제로 무언가 일어나는 것만 둔다 */}
+        <div className="btools">
+          {([
+            ['select', t('Select'), 'M5 3.4 18 11.6l-5.4 1.2-2.4 5.2z'],
+            ['note', t('Note'), 'M5.4 4h13.2v10.4L14 19H5.4zM14 19v-4.6h4.6'],
+            ['lane', t('Lane'), 'M4.6 4h4.4v16H4.6zM10.8 4h4.4v16h-4.4zM17 4h2.4v16H17z'],
+          ] as const).map(([k, label, d]) => (
+            <button key={k} className={`btool ${tool === k ? 'on' : ''}`} title={label}
+              onClick={() => setTool(k)}>
+              <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
+                strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* 도구를 고른 동안 무엇을 하면 되는지 알려 준다 */}
+        {tool !== 'select' && (
+          <div className="btool-hint">
+            {t(tool === 'note' ? 'Click the board to place a note' : 'Click the board to add a lane')}
+            <button onClick={() => setTool('select')}>{t('Cancel')}</button>
+          </div>
+        )}
+
+        <div className="bzoom">{zoomPct}%</div>
         <MiniMap pannable zoomable
           nodeColor={light ? '#D5DAE2' : '#2A2E35'}
           maskColor={light ? 'rgba(240,242,245,.72)' : 'rgba(10,10,12,.72)'}

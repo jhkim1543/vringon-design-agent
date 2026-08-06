@@ -1179,3 +1179,88 @@ table.mini td b { color: var(--text); font-weight: 600; }
 .rep-hero-txt { min-width: 0; }
 .rep-tablewrap { max-width: 100%; }
 .dv, .dv-frame, .dv-stage { max-width: 100%; }
+
+
+/* 보드 툴바 · 2단 ────────────────────────────────────────────────
+   버튼 21개를 한 줄에 늘어놓으면 무엇이 무엇인지 안 읽힌다.
+   위는 이 보드가 무엇이고 어디로 내보내는가, 아래는 지금 무엇을 보는가. */
+.boardbar {
+  flex-direction: column; align-items: stretch; gap: 0; padding: 0;
+  width: auto; left: 12px; right: 12px;
+}
+.bb-row { display: flex; align-items: center; gap: 8px; padding: 9px 12px; flex-wrap: wrap; }
+.bb-top { border-bottom: 1px solid var(--line); }
+.bb-gap { flex: 1; }
+.bb-title { font-weight: 700; font-size: 13.5px; }
+.bb-sub { font-size: 12px; color: var(--text-3); }
+.board-light .bb-title { color: #181C20; }
+.board-light .bb-sub { color: #6B7178; }
+.board-light .bb-top { border-bottom-color: #E3E7EC; }
+
+/* 아랫줄 칩 · 버튼처럼 무겁지 않게 */
+.chipbtn {
+  padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line-2);
+  background: transparent; color: var(--text-2); font-size: 12.5px; font-weight: 600;
+  white-space: nowrap;
+}
+.chipbtn:hover { color: var(--text); border-color: var(--surface-4); }
+.chipbtn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+[data-theme="dark"] .chipbtn.on { background: #7481FF; border-color: #7481FF; color: #05070E; }
+.board-light .chipbtn { color: #565D63; border-color: #D8DDE4; }
+.board-light .chipbtn:hover { color: #181C20; border-color: #A8B0B8; }
+.board-light .chipbtn.on { background: #444AE8; border-color: #444AE8; color: #fff; }
+
+/* 좌측 도구 레일 */
+.btools {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%); z-index: 6;
+  display: flex; flex-direction: column; gap: 4px; padding: 6px;
+  border-radius: var(--r-card); border: 1px solid var(--line);
+  background: rgba(16, 16, 20, .92); backdrop-filter: blur(6px);
+}
+.board-light .btools { background: rgba(255, 255, 255, .95); border-color: #E3E7EC; }
+.btool {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  width: 56px; padding: 8px 4px; border-radius: var(--r-8);
+  color: var(--text-2); font-size: 10.5px; font-weight: 600; border: 1px solid transparent;
+}
+.btool:hover { color: var(--text); background: var(--panel-2); }
+.btool.on { background: var(--accent); color: #fff; }
+[data-theme="dark"] .btool.on { background: #7481FF; color: #05070E; }
+.board-light .btool { color: #565D63; }
+.board-light .btool:hover { color: #181C20; background: #F0F2F5; }
+.board-light .btool.on { background: #444AE8; color: #fff; }
+
+.btool-hint {
+  position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 7;
+  display: flex; align-items: center; gap: 12px; padding: 9px 14px;
+  border-radius: 999px; border: 1px solid var(--line);
+  background: rgba(16, 16, 20, .94); color: var(--text); font-size: 12.5px; font-weight: 600;
+}
+.board-light .btool-hint { background: rgba(255,255,255,.97); border-color: #E3E7EC; color: #181C20; }
+.btool-hint button { color: var(--text-3); font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.btool-hint button:hover { color: var(--text); }
+
+/* 확대율 */
+.bzoom {
+  position: absolute; right: 14px; bottom: 108px; z-index: 6;
+  padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line);
+  background: rgba(16,16,20,.9); color: var(--text-2);
+  font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums;
+}
+.board-light .bzoom { background: rgba(255,255,255,.94); border-color: #E3E7EC; color: #565D63; }
+
+/* 카드 삭제 버튼 · 우측 상단, 메모는 편집 모드 없이도 보인다 */
+.bnode { position: relative; }
+.bn-x {
+  position: absolute; top: 6px; right: 6px; z-index: 3;
+  width: 20px; height: 20px; display: grid; place-items: center;
+  border-radius: 999px; border: 1px solid var(--line-2);
+  background: var(--panel); color: var(--text-3); font-size: 11px; line-height: 1;
+  opacity: 0; transition: opacity .12s;
+}
+.bnode:hover .bn-x, .bnode.is-note .bn-x { opacity: 1; }
+.bn-x:hover { color: var(--danger); border-color: rgba(255,116,116,.5); }
+.board-light .bn-x { background: #fff; border-color: #E3E7EC; color: #6B7178; }
+
+/* 도구를 든 상태에서는 커서로 알려 준다 */
+.board.placing .react-flow__pane { cursor: crosshair; }
