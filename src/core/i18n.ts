@@ -74,6 +74,8 @@ export function tf(s: string, vars: Record<string, string | number>): string {
 const KO: Record<string, string> = {
   // ── 공통 ────────────────────────────────────────────────────────
   // ── 위저드 · 질문 세 개로 나눈 화면 ──────────────────────────────
+  'Report language': '리포트 언어',
+  'Research, signals and both PDFs come out in this language.': '조사·신호·PDF 두 종이 이 언어로 나옵니다.',
   'Select': '선택',
   'Lane': '칸',
   'Cancel': '취소',

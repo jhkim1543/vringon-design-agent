@@ -4,7 +4,7 @@
 //
 // 선택지는 아이콘 + 제목 + 한 줄로 읽는다. 고른 것만 accent 테두리와
 // 체크 배지를 달고, 나머지는 조용히 둔다.
-import { t } from '../core/i18n'
+import { getLang, t } from '../core/i18n'
 import { useEffect, useMemo, useState } from 'react'
 import { detectRuntime } from '../core/runtime'
 import type { Runtime } from '../core/runtime'
@@ -391,6 +391,17 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                 <div className="inrow">
                   <Seg options={[1, 2, 3, 4, 5] as const} value={p.topN as any} onChange={v => set('topN', Number(v))} />
                   <span className="hint">{t('At least one from each tier')}</span>
+                </div>
+              </div>
+              {/* 조사 결과를 어느 말로 쓸지. 화면 언어와 따로 고른다 —
+                  한국어 화면으로 보면서 영문 리포트를 뽑는 경우가 실제로 있다. */}
+              <div className="stack"><span className="lbl">{t('Report language')}</span>
+                <div className="inrow">
+                  <Seg options={['ko', 'ja', 'en'] as const}
+                    value={p.researchLang ?? getLang()}
+                    onChange={v => set('researchLang', v)}
+                    format={v => v === 'ko' ? '한국어' : v === 'ja' ? '日本語' : 'English'} />
+                  <span className="hint">{t('Research, signals and both PDFs come out in this language.')}</span>
                 </div>
               </div>
               <label className="checkline">

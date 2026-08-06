@@ -175,6 +175,8 @@ export interface RunParams {
   trend: TrendInput
   series: SeriesInput
   moodboard: MoodboardInput
+  /** 조사 결과를 쓸 언어. 화면 언어와 별개로 분석 시작 시 정한다. */
+  researchLang?: import('./i18n').Lang
   /** 브랜드 아이덴티티 · 모든 결과물에 공통으로 실린다 */
   brand?: import('./brand').BrandIdentity
 }

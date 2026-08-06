@@ -22,8 +22,8 @@ export const DECK_CSS = `
 
   /* 머리글 · 모든 슬라이드 공통 */
   .shead {
-    position: absolute; top: 0; left: 0; right: 0; height: 12mm;
-    display: flex; align-items: center; gap: 8mm; padding: 0 14mm;
+    position: absolute; top: 0; left: 0; right: 0; height: 9mm;
+    display: flex; align-items: center; gap: 6mm; padding: 0 9mm;
     font-size: 7pt; letter-spacing: .12em; text-transform: uppercase; color: #8A9099;
     border-bottom: .3mm solid #E3E7EC;
   }
@@ -31,10 +31,10 @@ export const DECK_CSS = `
   .shead .right { margin-left: auto; display: flex; align-items: center; gap: 4mm; }
   .shead .tagpill { background: #14181D; color: #fff; padding: 1mm 3mm; border-radius: 1mm; letter-spacing: .1em; }
 
-  .sbody { position: absolute; top: 12mm; left: 0; right: 0; bottom: 10mm; padding: 9mm 14mm 0; }
+  .sbody { position: absolute; top: 9mm; left: 0; right: 0; bottom: 7.5mm; padding: 6mm 9mm 0; }
   .sfoot {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 10mm;
-    display: flex; align-items: center; padding: 0 14mm; gap: 4mm;
+    position: absolute; bottom: 0; left: 0; right: 0; height: 7.5mm;
+    display: flex; align-items: center; padding: 0 9mm; gap: 4mm;
     font-size: 7pt; color: #A8AEB5; border-top: .3mm solid #E3E7EC;
   }
   .sfoot .pageno { margin-left: auto; font-weight: 700; color: #565D63; }

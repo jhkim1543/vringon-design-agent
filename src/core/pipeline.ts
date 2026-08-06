@@ -9,7 +9,7 @@ import {
   generateModel, sketchPrompt, stampLogo, variationAxes, variationPrompt, viewEditPrompt, wearEditPrompt,
 } from './aiClient'
 import type { TrendClauseInput } from './aiClient'
-import { fetchCompetitors, fetchDossier, fetchTrends, toBias, toCompetitors, toSignals } from './research'
+import { fetchCompetitors, fetchDossier, fetchTrends, toBias, toCompetitors, toSignals, setRunLang } from './research'
 import { campaignCount, CAT_LABEL, MODE_LABEL, MODE_SCOPE, TYPE_LABEL } from './types'
 import { ENGINES } from './imageEngines'
 
@@ -83,6 +83,11 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     const scope = MODE_SCOPE[params.mode]
     const catKo = CAT_LABEL[params.category]
     const typeKo = TYPE_LABEL[params.itemType] ?? params.itemType
+
+    // 이 분석의 조사 언어를 고정한다. 도중에 화면 언어를 바꿔도 결과는 안 섞인다.
+
+    setRunLang(params.researchLang ?? null)
+
 
     emit({ kind: 'stage-start', stage: 'S1' })
     emit({ kind: 'log', stage: 'S1', text: `${MODE_LABEL[params.mode]} mode · ${catKo} / ${typeKo} · building the brief` })

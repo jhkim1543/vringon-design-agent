@@ -5,6 +5,8 @@
 
 export const JA: Record<string, string> = {
   // ── 공통 ────────────────────────────────────────────────────────
+  'Report language': 'レポート言語',
+  'Research, signals and both PDFs come out in this language.': '調査・シグナル・2種のPDFがこの言語で出ます。',
   'Select': '選択',
   'Lane': '列',
   'Cancel': 'キャンセル',

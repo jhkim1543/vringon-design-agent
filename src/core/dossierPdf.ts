@@ -85,6 +85,9 @@ function buildDeck(st: RunState): { title: string; html: string } {
   const band = p.mode === 'trend'
     ? `KRW ${(p.trend.priceMinKrw / 10000).toFixed(0)}0k–${(p.trend.priceMaxKrw / 10000).toFixed(0)}0k · ${p.trend.priceBand}`
     : ''
+  // 예측 대상 시즌. 옛 도시에에는 없으므로 season 으로 떨어진다.
+  const fc = (d as { forecast_season?: string }).forecast_season ?? d.season
+
   const eyebrow = `${d.season} ${CAT_LABEL[p.category]} trends`
   const out: string[] = []
   let page = 0
@@ -295,6 +298,32 @@ function buildDeck(st: RunState): { title: string; html: string } {
           </div>`,
       }))
     }
+  })
+
+  // ── 6d 매크로별 다음 시즌 판단 · 이 문서의 결론에 해당한다
+  ;(d.macrotrends ?? []).forEach((m, i) => {
+    const call = (m as { next_season_call?: string }).next_season_call
+    const conf = (m as { confidence?: string }).confidence
+    if (!call) return
+    const c = MACRO_COLORS[i % MACRO_COLORS.length]
+    out.push(slide({
+      eyebrow, tag: `MACRO ${i + 1} · NEXT`, page: P(),
+      body: `<h3 class="sub">${esc(fc)} FORECAST</h3>
+        <h2 class="stitle" style="color:${c}">${esc(m.name)} <span class="thin">next season</span></h2>
+        <div class="cols" style="margin-top:4mm">
+          <div style="flex:1.3">
+            <p style="font-size:11pt;line-height:1.5">${esc(call)}</p>
+            ${conf ? `<div style="margin-top:4mm;display:inline-flex;align-items:center;gap:2mm;
+                  background:#EEF1F5;padding:1.4mm 3mm;border-radius:4mm;font-size:7.5pt;
+                  font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#40474F">
+                  CONFIDENCE ${esc(conf)}</div>` : ''}
+          </div>
+          <div style="flex:1">
+            <h3 class="sub">CARRIES OVER</h3>
+            ${(m.sub_trends ?? []).map(x => `<div style="font-size:9pt;padding:1.4mm 0;border-bottom:.2mm solid #E3E7EC">${esc(x)}</div>`).join('')}
+          </div>
+        </div>`,
+    }))
   })
 
   // ── 7 연도별 흐름 ─────────────────────────────────────────────

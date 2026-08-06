@@ -1,4 +1,9 @@
 import { getLang, LANG_NAME } from './i18n'
+import type { Lang } from './i18n'
+
+/** 이 분석이 쓰는 언어. 파이프라인이 시작할 때 한 번 정하고 끝까지 유지한다. */
+let runLang: Lang | null = null
+export function setRunLang(l: Lang | null) { runLang = l }
 // ── 리서치 클라이언트 · 서버가 웹 검색으로 실제 수집한 결과를 받는다 ──
 import type { CompetitorProduct, ReportBias, Signal } from './types'
 
@@ -61,11 +66,12 @@ export interface TrendResearch {
 }
 
 async function post<T>(url: string, body: unknown): Promise<T> {
-  // 조사 결과는 화면 언어로 써야 한다. 세 엔드포인트가 모두 이 함수를 지나므로
-  // 여기서 한 번만 실어 보낸다. 서버는 이 값을 캐시 키에도 넣는다.
+  // 조사 결과의 언어는 분석을 시작할 때 정한다. 화면 언어를 그때그때 따라가면
+  // 도중에 언어를 바꿨을 때 한 리포트 안에 두 언어가 섞인다.
+  const lang = runLang ?? getLang()
   const r = await fetch(url, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...(body as object), lang: getLang(), langName: LANG_NAME[getLang()] }),
+    body: JSON.stringify({ ...(body as object), lang, langName: LANG_NAME[lang] }),
   })
   const j = await r.json()
   if (!r.ok || j.error) throw new Error(j.error ?? `${url} ${r.status}`)
