@@ -61,11 +61,16 @@ export function buildLocalPitch(st: RunState): PitchDeck {
 
 function buildDesignPitch(d: Design, st: RunState): DesignPitch {
   const f = d.spec.fields as Record<string, unknown>
+  // 스펙을 실제로 정한 신호만 발표에 올린다. 예전 분석은 그 연결이 없어 전부 싣는다.
+  const traced = d.spec.hintApplied !== undefined
   const sigs = d.rationale.driving_signals
+    .filter(ds => !traced || ds.weight > 0)
     .map(ds => st.signals.find(s => s.signal_id === ds.signal_id))
     .filter(Boolean)
 
   const why: string[] = []
+  // 이 신호가 스펙의 어디를 정했는지 먼저 말한다. 관측 횟수는 그다음이다.
+  if (traced && d.rationale.narrative.length) why.push(d.rationale.narrative[0])
   sigs.forEach(s => {
     if (!s) return
     why.push(`${s.label} showed up ${s.observed_count} times. It is a shift on the ${s.axis} axis, and confidence is ${s.confidence}.`)

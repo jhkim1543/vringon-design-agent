@@ -75,7 +75,38 @@ function EditableText({ value, onSave, className, multiline, editing }: {
   )
 }
 
-function StepNode({ id, data, selected }: { id: string; data: { n: BoardNode; ed?: NodeEdit }; selected?: boolean }) {
+/** 카드 안 내용이 실제로 차지한 높이. 손잡이와 크기조절 선은 빼고 잰다.
+ *  글자 수로 높이를 추정하면 사진이 한 장만 늘어도 어긋난다. 그래서 재서 쓴다. */
+function contentHeight(el: HTMLElement | null): number {
+  if (!el) return 0
+  let bottom = 0
+  for (const c of Array.from(el.children) as HTMLElement[]) {
+    const cls = c.className.toString()
+    if (cls.includes('react-flow__handle') || cls.includes('resize')) continue
+    bottom = Math.max(bottom, c.offsetTop + c.offsetHeight)
+  }
+  return bottom ? Math.ceil(bottom + (parseFloat(getComputedStyle(el).paddingBottom) || 0)) : 0
+}
+
+/** 렌더가 끝난 뒤 실제 높이를 배치기에 돌려준다 */
+function useMeasure(ref: React.RefObject<HTMLElement>, id: string, report?: (id: string, h: number) => void, deps: unknown[] = []) {
+  useEffect(() => {
+    const el = ref.current
+    if (!el || !report) return
+    const send = () => { const h = contentHeight(el); if (h > 0) report(id, h) }
+    send()
+    const ro = new ResizeObserver(send)
+    ro.observe(el)
+    for (const c of Array.from(el.children)) ro.observe(c)
+    // 사진은 늦게 도착한다. 도착하면 카드가 커지고, 그때 다시 재야 한다.
+    const imgs = Array.from(el.querySelectorAll('img'))
+    imgs.forEach(i => i.addEventListener('load', send))
+    return () => { ro.disconnect(); imgs.forEach(i => i.removeEventListener('load', send)) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, report, ...deps])
+}
+
+function StepNode({ id, data, selected }: { id: string; data: { n: BoardNode; ed?: NodeEdit; onMeasure?: (id: string, h: number) => void }; selected?: boolean }) {
   const { n, ed } = data
   const editing = !!ed?.editing
   // 내가 붙인 메모는 편집 모드를 켜지 않아도 바로 지울 수 있어야 한다.
@@ -83,6 +114,7 @@ function StepNode({ id, data, selected }: { id: string; data: { n: BoardNode; ed
   // 칸 크기를 조절하면 3D 캔버스도 따라 커져야 한다 · 노드 높이를 재서 넘긴다
   const rootRef = useRef<HTMLDivElement>(null)
   const [mvH, setMvH] = useState(228)
+  useMeasure(rootRef, id, data.onMeasure, [n.body.length, n.imageUrl, n.modelUrl, n.prompts?.length, editing])
   useEffect(() => {
     if (!n.modelUrl || !rootRef.current) return
     const el = rootRef.current
@@ -134,11 +166,14 @@ function StepNode({ id, data, selected }: { id: string; data: { n: BoardNode; ed
   )
 }
 
-function DesignFlowNode({ id, data, selected }: { id: string; data: { n: BoardNode; st: RunState; onVerdict: any; ed?: NodeEdit }; selected?: boolean }) {
+function DesignFlowNode({ id, data, selected }: { id: string; data: { n: BoardNode; st: RunState; onVerdict: any; ed?: NodeEdit; onMeasure?: (id: string, h: number) => void }; selected?: boolean }) {
   const { n, st, onVerdict, ed } = data
+  const rootRef = useRef<HTMLDivElement>(null)
+  // 근거 패널을 펴면 카드가 두 배로 길어진다 · 그때마다 다시 재서 아래 칸을 밀어낸다
+  useMeasure(rootRef, id, data.onMeasure, [n.design?.images.length, n.design?.verdict])
   if (!n.design) return null
   return (
-    <div style={{ width: '100%', minWidth: 268 }}>
+    <div ref={rootRef} style={{ width: '100%', minWidth: 268, position: 'relative', height: '100%', overflow: 'hidden' }}>
       <NodeResizer isVisible={!!selected} minWidth={268} minHeight={380}
         lineClassName="bn-resize-line" handleClassName="bn-resize-handle"
         onResizeEnd={(_, p) => ed?.onSize(id, Math.round(p.width), Math.round(p.height))} />
@@ -162,7 +197,7 @@ function ColumnNode({ data }: { data: { title: string; note: string; h: number; 
 
 const nodeTypes = { step: StepNode, designFlow: DesignFlowNode, column: ColumnNode }
 
-function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit): { nodes: Node[]; edges: Edge[] } {
+function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit, measured: Record<string, number> = {}, onMeasure?: (id: string, h: number) => void): { nodes: Node[]; edges: Edge[] } {
   const model = buildBoardModel(st)
   const nodes: Node[] = []
   const hidden = new Set(edits.hidden)
@@ -183,14 +218,17 @@ function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit): {
     tone: 'note' as any,
   }))
 
-  /** 카드가 실제로 차지하는 크기. 사진이 붙으면 훌쩍 커진다. */
+  /** 카드가 실제로 차지하는 크기. 사진이 붙으면 훌쩍 커진다.
+   *  글자 수 추정은 첫 프레임에만 쓰고, 그다음부터는 카드가 재서 알려준 실제 높이를 쓴다. */
   const sizeOf = (n: BoardNode) => {
     const isDesign = n.kind === 'design' && !!n.design
     const sz = edits.sizes[n.id]
     const w = sz?.w ?? (isDesign ? 300 : (n as any).isPitch ? 360 : 384)
-    const h = sz?.h ?? (isDesign ? 470
+    const guess = isDesign ? 470
       : 46 + n.body.length * 22 + (n.imageUrl ? 240 : 0) + (n.modelUrl ? 244 : 0)
-        + (n.palette?.length ? 30 : 0) + (n.prompts?.length ? n.prompts.length * 46 : 0))
+        + (n.palette?.length ? 30 : 0) + (n.prompts?.length ? n.prompts.length * 46 : 0)
+    // 손으로 끌어 맞춘 크기가 있으면 그게 최우선. 넘치는 내용은 칸 안에서 잘린다.
+    const h = sz?.h ?? measured[n.id] ?? guess
     return { w, h, isDesign }
   }
 
@@ -234,7 +272,7 @@ function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit): {
         { type: 'target', position: Position.Left, x: 0, y: h / 2, width: 1, height: 1 },
         { type: 'source', position: Position.Right, x: w, y: h / 2, width: 1, height: 1 },
       ],
-      data: isDesign ? { n, st, onVerdict, ed } : { n, ed },
+      data: isDesign ? { n, st, onVerdict, ed, onMeasure } : { n, ed, onMeasure },
       position: edits.positions[n.id] ?? autoPos.get(n.id) ?? { x: colX(n.column), y: 0 },
     })
   }
@@ -280,7 +318,13 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
     onSize: (id, w, h) => setEdits(e => ({ ...e, sizes: { ...e.sizes, [id]: { w, h } } })),
   }), [editing, light])
 
-  const initial = useMemo(() => build(st, onVerdict, edits, ed), [st, onVerdict, edits, ed])
+  // 카드가 렌더된 뒤 실제 높이를 알려 준다. 그 높이로 다시 쌓아야 아래 칸이 안 겹친다.
+  const [measured, setMeasured] = useState<Record<string, number>>({})
+  const onMeasure = useCallback((id: string, h: number) => {
+    setMeasured(m => Math.abs((m[id] ?? 0) - h) > 6 ? { ...m, [id]: h } : m)
+  }, [])
+
+  const initial = useMemo(() => build(st, onVerdict, edits, ed, measured, onMeasure), [st, onVerdict, edits, ed, measured, onMeasure])
   const [nodes, setNodes] = useState<Node[]>(initial.nodes)
   const [present, setPresent] = useState(false)
   const [presentIdx, setPresentIdx] = useState(0)
@@ -311,12 +355,12 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
       selection: ['selection'],
     }
     const allow = KEEP[kindFilter]
-    setNodes(build(st, onVerdict, edits, ed).nodes
+    setNodes(build(st, onVerdict, edits, ed, measured, onMeasure).nodes
       // 종류는 data.n.kind 에 있다. data.kind 는 열 노드에만 없는 게 아니라 아예 없다.
       .filter(n => !allow || n.type === 'column'
         || allow.includes(String((n.data as { n?: BoardNode })?.n?.kind ?? '')))
       .map(n => positionsRef.current[n.id] ? { ...n, position: positionsRef.current[n.id] } : n))
-  }, [st, onVerdict, edits, ed, kindFilter])
+  }, [st, onVerdict, edits, ed, kindFilter, measured, onMeasure])
 
   // 노드 측정이 늦게 끝나는 환경에서도 첫 화면이 전체 흐름으로 맞춰지게 한다
   useEffect(() => {

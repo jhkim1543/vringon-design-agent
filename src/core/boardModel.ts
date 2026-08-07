@@ -291,13 +291,15 @@ export function buildBoardModel(st: RunState): BoardModel {
       body: d.metrics.map(m => `${m.label} ${m.value}`),
       design: d, imageUrl: hero?.url,
     })
-    // 어떤 신호에서 나왔는지 · 가중치가 곧 선 굵기
-    d.rationale.driving_signals.forEach(ds => {
+    // 어떤 신호에서 나왔는지 · 가중치가 곧 선 굵기.
+    // 스펙을 실제로 정한 신호만 선을 긋는다. 예전 분석은 그 연결이 없어 가중치를 안 믿는다.
+    const traced = d.spec.hintApplied !== undefined
+    d.rationale.driving_signals.filter(ds => !traced || ds.weight > 0).forEach(ds => {
       const dir = st.directions.find(x => x.signal_ids.includes(ds.signal_id))
       edges.push({
         from: dir ? `dir-${dir.id}` : `sg-${ds.signal_id}`,
         to: d.spec.design_id,
-        label: `${Math.round(ds.weight * 100)}%`,
+        label: traced ? `${Math.round(ds.weight * 100)}% of the spec` : `${Math.round(ds.weight * 100)}%`,
         weight: ds.weight,
       })
     })

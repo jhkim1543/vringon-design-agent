@@ -163,9 +163,12 @@ export function RationalePanel({ d, signals }: { d: Design; signals: Signal[] })
         ))}
       </div>
       <div>
-        <h5>{d.rationale.driving_signals.some(x => x.weight > 0)
-          ? t('Signals that set this spec, with sources')
-          : t('Nearest evidence, though none of it set a spec value here')}</h5>
+        {/* 예전 분석은 신호와 스펙이 이어져 있지 않았다. 그때 것을 정했다고 적으면 거짓말이 된다. */}
+        <h5>{d.spec.hintApplied === undefined
+          ? t('Signals behind this, with sources')
+          : d.rationale.driving_signals.some(x => x.weight > 0)
+            ? t('Signals that set this spec, with sources')
+            : t('Nearest evidence, though none of it set a spec value here')}</h5>
         {d.rationale.driving_signals.map(ds => {
           const s = signals.find(x => x.signal_id === ds.signal_id)
           if (!s) return null
@@ -173,7 +176,7 @@ export function RationalePanel({ d, signals }: { d: Design; signals: Signal[] })
           return (
             <div className="sig" key={ds.signal_id}>
               <Tag kind="accent">{s.signal_id}</Tag>
-              <span>{s.label} · seen {s.observed_count}x{ds.weight > 0 ? ` · ${Math.round(ds.weight * 100)}% of what the research fixed here` : ''}
+              <span>{s.label} · seen {s.observed_count}x{d.spec.hintApplied !== undefined && ds.weight > 0 ? ` · ${Math.round(ds.weight * 100)}% of what the research fixed here` : ''}
                 {s.sales_proxy_score != null && ` · proxy ${s.sales_proxy_score} (${s.proxy_confidence})`}
                 {s.page_ref && ` · ${s.page_ref}`}
                 {idx && (idx.commercial || idx.cultural || idx.forecast || idx.feasibility) &&

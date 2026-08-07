@@ -511,9 +511,12 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
               const outs = d.images.filter(i =>
                 (i.view === 'lateral' && !i.colorway) || i.view === 'design'
                 || (i.origin === 'generated' && !['sketch', 'sketch_var'].includes(i.view)))
-              // 이 스케치를 만든 근거 · 가중치 큰 신호부터
+              // 이 스케치를 만든 근거 · 가중치 큰 신호부터.
+              // 스펙을 실제로 정한 신호만 남긴다. 예전 분석에는 그 연결이 없어 가중치를 믿지 않는다.
+              const traced = d.spec.hintApplied !== undefined
               const evidence = (d.rationale?.driving_signals ?? [])
                 .slice()
+                .filter(x => !traced || x.weight > 0)
                 .sort((a, b) => b.weight - a.weight)
                 .map(x => st.signals.find(g => g.signal_id === x.signal_id)?.label)
                 .filter((x): x is string => !!x)
