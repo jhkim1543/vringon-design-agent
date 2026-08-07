@@ -50,14 +50,23 @@ async function resolveZone(key, configured) {
   } catch { return null }
 }
 
+// 자격 증명이 틀렸으면 남은 요청도 전부 틀린다. 한 번 확인하고 이 프로세스에서는 더 안 부른다.
+// 토큰을 새로 넣으면 서버를 다시 띄우므로 이 플래그도 같이 사라진다.
+let credentialsDead = false
+
 /** 막힌 주소를 언락커로 한 번 가져온다. 실패하면 던진다 — 호출자가 조용히 포기한다. */
 async function unlock(key, zone, url, wantBinary) {
+  if (credentialsDead) throw new Error('brightdata credentials rejected earlier')
   const r = await fetch(API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
     body: JSON.stringify({ zone, url, format: 'raw' }),
     signal: AbortSignal.timeout(60_000),
   })
+  if (r.status === 401 || r.status === 403) {
+    credentialsDead = true
+    console.warn('[shot] Bright Data rejected the token (%d). Falling back to plain fetch for the rest of this session. Put a fresh BRIGHTDATA_API_KEY in .env and restart to re-enable it.', r.status)
+  }
   if (!r.ok) throw new Error(`brightdata ${r.status}: ${(await r.text()).slice(0, 160)}`)
   if (!wantBinary) return await r.text()
   const type = r.headers.get('content-type') || ''
