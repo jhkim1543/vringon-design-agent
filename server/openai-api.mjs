@@ -10,6 +10,7 @@ import { DEEP_MODEL_DEFAULT, researchCompetitors, researchRetailPulse, researchT
 import { geminiEdit, geminiGenerate, geminiProbe, geminiShotPlan } from './gemini-api.mjs'
 import { compositeLogo, logoAvailable } from './logo-api.mjs'
 import { tripoMultiview, tripoProbe, readModel } from './tripo-api.mjs'
+import { brightdataProbe, unlockImage, unlockPage } from './brightdata.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..')
@@ -61,6 +62,10 @@ const DEEP_MODEL = env.OPENAI_DEEP_RESEARCH_MODEL || DEEP_MODEL_DEFAULT
 // Tripo · 멀티뷰에서 3D 모델을 만든다
 const TRIPO_KEY = env.TRIPO_API_KEY || ''
 
+// Bright Data · WAF에 막힌 스토어에서만 쓰는 유료 폴백 (호출당 과금)
+const BD_KEY = env.BRIGHTDATA_API_KEY || ''
+const BD_ZONE = env.BRIGHTDATA_ZONE || ''
+
 const SHOT_DIR = join(ROOT, '.cache', 'shots')
 
 function ensureCache() {
@@ -105,6 +110,9 @@ async function fetchWithBackoff(u, init, tries = 3) {
   return last
 }
 
+/** 벽에 막힌 응답인가 · 이때만 유료 언락커를 쓴다 */
+const isWalled = (status) => status === 403 || status === 429 || status === 401 || status === 503
+
 export async function fetchShotImage(imgUrl, referer) {
   const r = await fetchWithBackoff(imgUrl, {
     headers: {
@@ -115,6 +123,10 @@ export async function fetchShotImage(imgUrl, referer) {
     redirect: 'follow',
     signal: AbortSignal.timeout(12_000),
   })
+  if (!r.ok && isWalled(r.status) && BD_KEY) {
+    const got = await unlockImage(BD_KEY, BD_ZONE, imgUrl)
+    if (got) return got
+  }
   if (!r.ok) throw new Error(String(r.status))
   const type = r.headers.get('content-type') || ''
   if (!type.startsWith('image/')) throw new Error('not image')
@@ -146,8 +158,14 @@ export async function shotFromPage(pageUrl) {
     },
     redirect: 'follow', signal: AbortSignal.timeout(12_000),
   })
-  if (!r.ok) throw new Error(`page ${r.status}`)
-  const html = (await r.text()).slice(0, 900_000)
+  let html = null
+  if (r.ok) html = (await r.text()).slice(0, 900_000)
+  else if (isWalled(r.status) && BD_KEY) {
+    // 여기서만 돈을 쓴다 · 평범한 fetch로 이미 91%는 들어와 있다
+    const unlocked = await unlockPage(BD_KEY, BD_ZONE, pageUrl)
+    if (unlocked) html = unlocked.slice(0, 900_000)
+  }
+  if (!html) throw new Error(`page ${r.status}`)
   for (const re of PAGE_IMAGE_PATTERNS) {
     const m = re.exec(html)
     if (m?.[1]) {
@@ -291,6 +309,7 @@ export async function handleApi(req, res) {
       deepResearch: DEEP_RESEARCH, deepModel: DEEP_MODEL,
       geminiConnected: !!GEMINI_KEY,
       tripoConnected: !!TRIPO_KEY,
+      unlockerConnected: !!BD_KEY,
       engines: { fast: ENGINE.fast.model, detail: ENGINE.detail.model },
     })
   }
@@ -409,6 +428,11 @@ export async function handleApi(req, res) {
   // 3D 모델 · 이미 만들어 둔 멀티뷰를 Tripo에 넘긴다
   if (path === '/api/model/probe') {
     return json(res, 200, await tripoProbe(TRIPO_KEY))
+  }
+
+  // 언락커 진단 · 계정에 zone이 있어야 실제 요청이 나간다
+  if (path === '/api/shot/unlocker-check') {
+    return json(res, 200, await brightdataProbe(BD_KEY))
   }
 
   if (path === '/api/model/generate' && req.method === 'POST') {
