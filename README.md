@@ -39,11 +39,16 @@ keys.
 
 | Stage | What comes out |
 |---|---|
-| **Research** | Competitor lines with prices, size availability and evidence; trend signals with four indices; a season dossier |
-| **Sketches** | Specs per tier, footwear rule checks (last match, welt, shaft entry, stack limits), then black-ink technical sketches |
-| **Designs** | Family-specific view sets (sneakers get a medial view, heels a rear view), colourways as SKUs, product variations |
+| **Research** | Competitor lines with prices, size availability and evidence; department-store and luxury-retail bestsellers with photos; trend signals with four indices; a season dossier |
+| **Sketches** | Specs per tier, footwear rule checks (last match, welt, shaft entry, stack limits), then black-ink lateral sketches and ink variations off the same form |
+| **Designs** | Colour enters here: each sketch becomes a photograph, then family-specific view sets (sneakers get a medial view, heels a rear view), colourways as SKUs, product variations |
 | **Campaign shots** | Top picks scored, then worn on a virtual model and staged in studio and on location |
-| **3D showroom** | A four-view turnaround (front / left / back / right) goes to Tripo; you get a GLB you can turn and download |
+| **3D showroom** | A four-view turnaround becomes a 3D model you can turn on the board and download for CAD |
+
+Sketching and designing are separate on purpose. The form is settled in black ink, where a change is
+cheap and the eye is not distracted by colour; only then does each sketch get photographed. Because
+the render is an edit of the drawing rather than a fresh generation, the silhouette, panel lines and
+outsole carry through instead of drifting.
 
 Each stage is optional. The scope selector says what you get and what it costs before you start.
 Rule-rejected specs never reach image generation, identical prompts are served from disk cache, and
@@ -80,6 +85,10 @@ World Athletics eligibility warning (S-14).
   A culturally strong signal that needs a new mould shows exactly that tension.
 - **Co-occurring attributes.** "Chunky" is not a signal. "High stack + wide platform + moderate
   rocker + segmented rubber" is.
+- **What the floor is selling, regardless of who you named.** Alongside the brands you enter, every
+  run sweeps department-store and luxury-retail bestseller pages — Lotte, SSG, The Hyundai, MUSINSA,
+  MR PORTER, Harrods, Selfridges — and brings back whatever carried a bestseller flag at collection
+  time, with its photo, price and the exact rank wording. Those enter as commercial leaders.
 
 ## Three agent modes
 
@@ -110,21 +119,31 @@ photo pages: observed competitor products and the run's own renders, views and c
 
 ## The review board
 
-Left to right: Input → Research → Signals → Directions → Designs → Selection → Variations →
-Campaign shots → 3D showroom. Collected competitor product photos sit in the research lane; the
+Left to right: Input → Research → Signals → Directions → Sketches → Designs → Selection →
+Variations → Campaign shots → 3D showroom. Collected competitor product photos sit in the research lane; the
 line profile fingerprint sits on the input card. The connections are data, not decoration —
 line weight into a design card is the signal's weight in `rationale.driving_signals`.
 
-Pan and zoom anywhere. Turn on **Edit** to rewrite any card in place, drop note cards, add lanes,
-or hide what you do not want to present — saved per run. Exports to Miro, or to PDF.
+Pan and zoom anywhere. Select a card and drag a corner to resize it; photos and the 3D viewer grow
+with the card, and the size is remembered per run. Turn on **Edit** to rewrite any card in place,
+drop note cards, add lanes, or hide what you do not want to present. Card text is kept to what a
+photo cannot say.
+
+**Export to Miro** asks for your own token the first time — Miro settings, Your apps, create an app
+with `boards:read` and `boards:write`, install it to your team, paste the token. It stays in your
+browser and never reaches the server, so each person's board lands in their own team. Locally cached
+photos are uploaded as files rather than linked, since Miro fetches URLs from its own servers.
 
 ## 3D that follows the convention
 
-Tripo's multiview endpoint expects a `[front, left, back, right]` turnaround. The base lateral
-render *is* the left view; the other three are edits of it — same shoe, camera rotated, orthographic,
-white background. All four slots go up in order, so the reconstruction gets real coverage instead
-of guessing the back of the shoe from a single photo. The GLB is viewable on the card and board,
-and downloadable from both the card chip and the viewer.
+Reconstruction expects a `[front, left, back, right]` turnaround. The base lateral render *is* the
+left view; the other three are edits of it — same shoe, camera rotated, orthographic, white
+background. All four slots go up in order, so the model gets real coverage instead of guessing the
+back of the shoe from a single photo. The result is viewable on the card and board, and downloadable
+for CAD from both the card chip and the viewer.
+
+The UI never names the service behind it. A designer needs to know a 3D model comes out, not which
+vendor makes it.
 
 ---
 
@@ -169,9 +188,19 @@ differently — one wants short noun phrases, the other wants material and finis
 ### Competitor photos
 
 Research returns direct image links, which rot. The `/api/shot` proxy fetches and caches each one
-server-side; if the direct link is dead it loads the product page and falls back to its `og:image`.
-The UI walks the remaining candidates before giving up, so a card with a live product page almost
-always has a photo.
+server-side; if the direct link is dead it loads the product page and reads its `og:image`, falling
+back through `twitter:image`, `image_src`, preload hints, `itemprop` and JSON-LD. Requests queue per
+host with a gap and retry on 429, since consecutive hits draw rate limits. A 403 is a wall and is not
+retried.
+
+`node tools/shot-audit.mjs` measures the hit rate across every product ever collected, host by host.
+On the last run: 91% (53 direct, 26 via the page, 8 blocked). Every failure was a product whose
+research pass returned no image URL, or an expired one, sitting behind a storefront WAF — the image
+CDNs themselves are open. So the research prompt requires at least one image URL per product rather
+than a scraping subscription.
+
+Samples ship their photos as files. `node tools/freeze-sample-shots.mjs` pulls every remote reference
+local, because the static build has no proxy and remote links would show nothing.
 
 ---
 
