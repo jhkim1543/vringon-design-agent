@@ -550,7 +550,9 @@
     "rubber sidewalls",
     "premium metal hardware at vamp"
    ],
-   "image_urls": [],
+   "image_urls": [
+    "/samples/aa1d29a38876435d5a8c1931.png"
+   ],
    "product_url": "https://www.nike.com/t/air-jordan-mule-womens-shoes-3CckSCSb/HJ4292-001"
   },
   {
@@ -589,7 +591,9 @@
     "chunky platform with rubber sidewalls",
     "charm‑inspired hardware details"
    ],
-   "image_urls": [],
+   "image_urls": [
+    "/samples/c5757b82040490bba63a6198.png"
+   ],
    "product_url": "https://www.nike.com/t/air-jordan-mule-se-womens-shoes-YkM2qmCb/IV5071-001"
   },
   {
@@ -633,7 +637,9 @@
     "rubber outsole",
     "slip‑on oriented profile with elevated platform look"
    ],
-   "image_urls": [],
+   "image_urls": [
+    "/samples/548c1d305dc9c9fe1d1e34c4.png"
+   ],
    "product_url": "https://www.nike.com/kr/t/%EC%97%90%EC%96%B4%EB%A7%A5%EC%8A%A4-%ED%8E%98%EB%85%B8%EB%A9%94%EB%82%98-%EC%97%AC%EC%84%B1-%EC%8B%A0%EB%B0%9C-UpuvrBOB/IV4690-099"
   },
   {
@@ -667,9 +673,7 @@
     "Low-profile silhouette"
    ],
    "image_urls": [
-    "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/bc47cd6eed3047adad83665bf0390d67_9366/Black_KJ5786_01_00_standard.jpg",
-    "https://assets.adidas.com/videos/w_500%2Cf_auto%2Cq_auto/bcba06b53a2d4b2cb63f888a133d41ae_d98c/Black_KJ5786_video.jpg",
-    "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/df0869f724c84fe0bd9a5652394c25f1_9366/Black_KJ5786_02_standard_hover.jpg"
+    "/samples/1ffd49ee7002aafbb6225ae5.jpg"
    ],
    "product_url": "https://www.adidas.co.kr/%ED%95%B8%EB%93%9C%EB%B3%BC-%EC%8A%A4%ED%8E%98%EC%A7%80%EC%95%8C-%EB%A1%9C%ED%8D%BC/KJ5786.html"
   },
@@ -706,9 +710,7 @@
     "Low-profile silhouette"
    ],
    "image_urls": [
-    "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/b2500fcca1114879a4b0b5b9199e92c1_9366/Brown_KJ2533_01_00_standard.jpg",
-    "https://assets.adidas.com/videos/w_500%2Cf_auto%2Cq_auto/b749b53a31044c8cbfd709a892fcf97a_d98c/Brown_KJ2533_video.jpg",
-    "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/2718b42a28c444e18259cb992b856ed6_9366/Brown_KJ2533_02_standard_hover.jpg"
+    "/samples/337297b8323bfae82ab4d314.jpg"
    ],
    "product_url": "https://www.adidas.co.kr/%ED%95%B8%EB%93%9C%EB%B3%BC-%EC%8A%A4%ED%8E%98%EC%A7%80%EC%95%8C-%EB%A1%9C%ED%8D%BC/KJ2533.html"
   },
@@ -752,8 +754,7 @@
     "Slip-on loafer construction"
    ],
    "image_urls": [
-    "https://walking.asics.com/images/item/1231A225-200/1231A225-200_c200_a001_sm.jpg",
-    "https://walking.asics.com/images/item/1231A225-200/1231A225-200_c200_a001_ps.jpg"
+    "/samples/2e84d69d6dc04fd8b4bfd48c.jpg"
    ],
    "product_url": "https://walking.asics.com/items/1231A225-200"
   },
@@ -789,7 +790,7 @@
     "Made in Japan"
    ],
    "image_urls": [
-    "https://walking.asics.com/images/item/1232A079-001/1232A079-001_c001_a001_pm.jpg"
+    "/samples/534855810e4e4208394494bd.jpg"
    ],
    "product_url": "https://walking.asics.com/items/1232A079-001"
   },
@@ -830,7 +831,7 @@
     "Made in Japan"
    ],
    "image_urls": [
-    "https://walking.asics.com/images/item/1231A155-001/1231A155-001_c001_a001_pm.jpg"
+    "/samples/8475dddbdd90769f6e59f5f7.jpg"
    ],
    "product_url": "https://walking.asics.com/items/1231A155-001"
   }
@@ -3642,5 +3643,5 @@
  "finished": true,
  "sample": true,
  "sampleTitle": "Sample · FW26 loafer, full pipeline",
- "savedAtISO": "2026-08-03T17:12:02.104Z"
+ "savedAtISO": "2026-08-07T11:02:15.928Z"
 }

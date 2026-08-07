@@ -58,7 +58,7 @@ const COMPETITOR_SCHEMA = {
           available_sizes: { type: 'integer', description: '그중 지금 구매 가능한 사이즈 수. 확인 못 하면 -1' },
           size_status: { type: 'string', enum: ['full', 'partial', 'size_broken', 'sold_out', 'unknown'], description: '핵심 사이즈가 빠져 있으면 size_broken' },
           colorway_count: { type: 'integer', description: '이 모델의 컬러웨이 수. 컬러웨이는 별개 디자인이 아니다. 모르면 0' },
-          image_urls: { type: 'array', items: { type: 'string' }, description: '제품 사진 직링크(.jpg/.png/.webp). 페이지의 og:image 주소도 좋다. 확인한 것만' },
+          image_urls: { type: 'array', items: { type: 'string' }, description: '제품 사진 직링크. 모든 제품에 최소 1개 필수. 상세 페이지의 og:image 메타 태그 값이 가장 확실하다' },
           product_url: { type: 'string', description: '제품 상세 페이지 URL' },
           source_urls: { type: 'array', items: { type: 'string' } },
         },
@@ -295,7 +295,7 @@ function lineKey(line) {
  *  한 요청이 커지면 상류 연결이 먼저 끊기고, 한 브랜드 실패가 전체를 날린다. */
 export async function researchCompetitors(apiKey, root, opts) {
   const { brands = [], typeKo, priceMin, priceMax, adjacentBand = false, line, langName = 'English' } = opts
-  const key = createHash('sha256').update(JSON.stringify(['comp6ft', langName, brands, typeKo, priceMin, priceMax, adjacentBand, lineKey(line)])).digest('hex').slice(0, 24)
+  const key = createHash('sha256').update(JSON.stringify(['comp7ft', langName, brands, typeKo, priceMin, priceMax, adjacentBand, lineKey(line)])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
@@ -323,7 +323,7 @@ async function researchOneBrand(apiKey, root, { brand: rawBrand, typeKo: rawType
   const LANG = langName
   const brand = canonBrand(rawBrand)
   const typeKo = canonTerm(rawType)
-  const key = createHash('sha256').update(JSON.stringify(['brand5ft', langName, brand, typeKo, priceMin, priceMax, adjacentBand, lineKey(line)])).digest('hex').slice(0, 24)
+  const key = createHash('sha256').update(JSON.stringify(['brand6ft', langName, brand, typeKo, priceMin, priceMax, adjacentBand, lineKey(line)])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return JSON.parse(readFileSync(file, 'utf8'))
 
@@ -360,8 +360,11 @@ ${lineBlock(line)}
 - user_sentiment / praise_points / complaint_points는 실제 리뷰에서 반복되는 내용만 적습니다.
   핏이 크다/작다, 볼이 좁다, 힐 슬립, 토 압박 같은 핏 신호를 특히 찾으세요. 리뷰를 못 찾으면 unknown과 빈 배열로 둡니다.
 - design_traits에는 사진과 상세 설명에서 확인되는 디자인 특징을 적습니다 (예: "두꺼운 수퍼크리티컬 폼 미드솔", "메시 갑피에 TPU 오버레이", "라스트 볼륨이 낮고 토가 길다").
-- image_urls에는 제품 사진의 직접 링크를 넣습니다. 상세 페이지 HTML의 og:image 메타 태그 주소가 가장 안정적입니다.
-  페이지 주소가 아니라 이미지 파일 주소여야 하고, 모델당 2~3개를 넣으세요. 확실하지 않으면 빈 배열로 둡니다.
+- image_urls는 **모든 제품에 최소 1개**가 있어야 합니다. 사진 없는 항목은 벤치마크에서 쓸모가 없습니다.
+  상세 페이지 HTML의 og:image 메타 태그 값을 그대로 옮기는 것이 가장 확실합니다. 그 태그는 거의 모든 쇼핑몰에 있습니다.
+  og:image가 없으면 상세 페이지의 대표 상품 이미지 파일 주소(.jpg/.png/.webp/.avif)를 찾아 넣습니다.
+  페이지 주소가 아니라 이미지 파일 주소여야 하고, 가능하면 모델당 2~3개를 넣어 하나가 만료돼도 남게 합니다.
+  어떤 제품의 이미지 주소를 끝내 못 찾으면, 그 제품을 빼고 사진을 찾을 수 있는 다른 모델로 대체하세요.
 - product_url에는 제품 상세 페이지 주소를 넣습니다.
 - In notes, list what you could not confirm and the limits of this pass. Write it in ${LANG}.
 - Search in Korean where that finds more, but every string you output must be written in ${LANG}. Keep brand and model names as they are officially written.`
@@ -409,7 +412,7 @@ const PULSE_SCHEMA = {
 export async function researchRetailPulse(apiKey, root, { typeKo: rawType, line, langName = 'English' }) {
   const LANG = langName
   const typeKo = canonTerm(rawType)
-  const key = createHash('sha256').update(JSON.stringify(['pulse1ft', LANG, typeKo, lineKey(line)])).digest('hex').slice(0, 24)
+  const key = createHash('sha256').update(JSON.stringify(['pulse2ft', LANG, typeKo, lineKey(line)])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
@@ -425,7 +428,8 @@ ${lineBlock(line)}
 - rank_note에는 사이트 표기를 그대로 옮기고, rank_semantics로 의미를 분류합니다.
   숫자 순위가 있으면 verified_sales_rank가 아니라, 그 순위가 "판매량 기준"이라고 명시된 경우에만 verified로 둡니다.
   단순 노출 순서는 surface_position입니다.
-- image_urls가 비는 제품은 목록에서 뺍니다. 상세 페이지의 og:image 메타 태그 주소가 가장 안정적입니다.
+- image_urls가 비는 제품은 목록에서 뺍니다. 상세 페이지 HTML의 og:image 메타 태그 값을 그대로 옮기는 것이 가장 확실하고,
+  없으면 대표 상품 이미지 파일 주소(.jpg/.png/.webp/.avif)를 찾습니다. 가능하면 2개 이상 넣습니다.
 - 해외몰 가격은 원화로 대략 환산해 price_krw에 넣고 notes에 원통화 금액을 남깁니다.
 - 검색은 10회 이내. Search in Korean where that finds more, but every string you output must be written in ${LANG}.`
 

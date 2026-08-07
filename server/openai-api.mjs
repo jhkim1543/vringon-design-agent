@@ -73,8 +73,40 @@ function ensureShotCache() {
 // ── 수집 사진 내려받기 · /api/shot 프록시와 샘플 동결이 같은 경로를 쓴다 ──
 const SHOT_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36'
 
-async function fetchShotImage(imgUrl, referer) {
-  const r = await fetch(imgUrl, {
+// 한 호스트를 연달아 두드리면 429가 돌아온다 (ECCO가 그랬다).
+// 호스트별로 줄을 세우고 최소 간격을 둔다. 서로 다른 호스트는 그대로 병렬이다.
+const hostQueue = new Map()
+function hostOf(u) { try { return new URL(u).host } catch { return '?' } }
+function throttled(u, fn) {
+  const h = hostOf(u)
+  const prev = hostQueue.get(h) ?? Promise.resolve()
+  const next = prev.then(async () => {
+    await new Promise(r => setTimeout(r, 350))
+    return fn()
+  }, async () => {
+    await new Promise(r => setTimeout(r, 350))
+    return fn()
+  })
+  // 큐는 성공·실패와 무관하게 이어져야 한다. 결과는 호출자에게만 던진다.
+  hostQueue.set(h, next.catch(() => {}))
+  return next
+}
+
+/** 429는 잠깐 기다리면 대개 풀린다. 403은 봇 차단이라 재시도해도 소용없다. */
+async function fetchWithBackoff(u, init, tries = 3) {
+  let last
+  for (let i = 0; i < tries; i++) {
+    const r = await throttled(u, () => fetch(u, init))
+    if (r.status !== 429) return r
+    last = r
+    const ra = Number(r.headers.get('retry-after'))
+    await new Promise(res => setTimeout(res, Number.isFinite(ra) && ra > 0 ? Math.min(ra, 5) * 1000 : 1200 * (i + 1)))
+  }
+  return last
+}
+
+export async function fetchShotImage(imgUrl, referer) {
+  const r = await fetchWithBackoff(imgUrl, {
     headers: {
       'User-Agent': SHOT_UA,
       Accept: 'image/avif,image/webp,image/*,*/*;q=0.8',
@@ -92,28 +124,40 @@ async function fetchShotImage(imgUrl, referer) {
   return { buf, type }
 }
 
-// 페이지에서 대표 이미지 주소를 찾는다: og:image → twitter:image → JSON-LD image
-async function shotFromPage(pageUrl) {
-  const r = await fetch(pageUrl, {
-    headers: { 'User-Agent': SHOT_UA, Accept: 'text/html,*/*;q=0.8' },
+// 페이지에서 대표 이미지 주소를 찾는다.
+// og:image가 표준이지만 없는 곳이 있어(까르띠에) 다른 관례까지 훑는다.
+const PAGE_IMAGE_PATTERNS = [
+  /<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["']/i,
+  /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["']/i,
+  /<meta[^>]+name=["']twitter:image(?::src)?["'][^>]+content=["']([^"']+)["']/i,
+  /<link[^>]+rel=["']image_src["'][^>]+href=["']([^"']+)["']/i,
+  /<link[^>]+rel=["']preload["'][^>]+as=["']image["'][^>]+href=["']([^"']+)["']/i,
+  /<meta[^>]+itemprop=["']image["'][^>]+content=["']([^"']+)["']/i,
+  /"(?:image|contentUrl|thumbnailUrl)"\s*:\s*"(https:[^"]+?\.(?:jpe?g|png|webp|avif)[^"]*)"/i,
+  /"(?:image|contentUrl)"\s*:\s*\[\s*"(https:[^"]+?)"/i,
+]
+
+export async function shotFromPage(pageUrl) {
+  const r = await fetchWithBackoff(pageUrl, {
+    headers: {
+      'User-Agent': SHOT_UA,
+      Accept: 'text/html,application/xhtml+xml,*/*;q=0.8',
+      'Accept-Language': 'ko-KR,ko;q=0.9,en;q=0.8',
+    },
     redirect: 'follow', signal: AbortSignal.timeout(12_000),
   })
   if (!r.ok) throw new Error(`page ${r.status}`)
-  const html = (await r.text()).slice(0, 600_000)
-  const metas = [
-    /<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["']/i,
-    /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["']/i,
-    /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i,
-    /"image"\s*:\s*"(https:[^"]+\.(?:jpe?g|png|webp)[^"]*)"/i,
-  ]
-  for (const re of metas) {
+  const html = (await r.text()).slice(0, 900_000)
+  for (const re of PAGE_IMAGE_PATTERNS) {
     const m = re.exec(html)
     if (m?.[1]) {
-      const u2 = m[1].replace(/&amp;/g, '&')
+      let u2 = m[1].replace(/&amp;/g, '&').trim()
+      if (u2.startsWith('//')) u2 = 'https:' + u2
+      if (u2.startsWith('/')) { try { u2 = new URL(u2, pageUrl).href } catch { /* 무시 */ } }
       if (/^https:\/\//.test(u2)) return u2
     }
   }
-  throw new Error('no og:image')
+  throw new Error('no page image')
 }
 
 /** 캐시에 있으면 그대로, 없으면 내려받아 캐시한다. 실패는 1시간 동안 기억한다.
