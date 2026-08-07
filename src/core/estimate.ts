@@ -53,7 +53,8 @@ export function estimate(p: RunParams): Estimate {
   const budget = p.imageBudget
   const realS2 = Math.min(wantS2, budget)
   const realS3 = Math.min(wantS3, Math.max(0, budget - realS2))
-  const realS4 = Math.min(campaignImgs, Math.max(0, budget - realS2 - realS3))
+  // 캠페인 컷과 턴어라운드는 최종 후보의 산출물이라 상한과 무관하게 생성된다
+  const realS4 = campaignImgs
   const realS5 = models * 3                     // 턴어라운드 3컷 × 최종 후보 · 상한과 무관
 
   const eng = ENGINES[p.imageEngine]
@@ -117,11 +118,12 @@ export function cumulative(p: RunParams): { stage: Stage; label: string; minutes
   })
 }
 
-/** 스콥 선택지에 붙는 설명. "S3까지"가 아니라 "무엇까지 나오는가"로 읽혀야 한다. */
+/** 스콥 선택지에 붙는 설명. "S3까지"가 아니라 "무엇까지 나오는가"로 읽혀야 한다.
+ *  디자이너가 읽는 자리다. 어떤 도구로 만드는지는 알 필요가 없다 — 무엇이 손에 들어오는지만 쓴다. */
 export const SCOPE_COPY: Record<Stage, { title: string; gets: string }> = {
-  S1: { title: 'Research only', gets: 'Competitors, trend signals and the season dossier. No images.' },
-  S2: { title: 'Sketches', gets: 'Everything above, plus specs, rule checks and hand-drawn sketches.' },
-  S3: { title: 'Designs', gets: 'Sketches turned into finished renders, extra views and product variations.' },
-  S4: { title: 'Campaign shots', gets: 'Top picks scored, then worn on a virtual model and staged in studio and on location.' },
-  S5: { title: '3D showroom', gets: 'A four-view turnaround of each pick goes to Tripo. You get a GLB you can turn and download.' },
+  S1: { title: 'Research only', gets: 'Competitor products, trend signals, season forecast.' },
+  S2: { title: 'Sketches', gets: 'Black-ink technical sheets, checked against your tooling.' },
+  S3: { title: 'Designs', gets: 'Sketches in colour, extra views, colourways, variations.' },
+  S4: { title: 'Campaign shots', gets: 'Picks worn on a model and staged on set.' },
+  S5: { title: '3D showroom', gets: 'A 3D model of each pick, to turn and download.' },
 }

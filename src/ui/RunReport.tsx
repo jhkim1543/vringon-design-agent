@@ -5,7 +5,7 @@ import { t } from '../core/i18n'
 import { useMemo } from 'react'
 import type { ReactNode } from 'react'
 import type { RunState } from '../core/types'
-import { CAT_LABEL, TYPE_LABEL, MODE_LABEL } from '../core/types'
+import { CAT_LABEL, COMP_GROUP_LABEL, TYPE_LABEL, MODE_LABEL } from '../core/types'
 import { GRADE_LABEL, shotUrl } from '../core/research'
 import { plainProse } from '../core/prose'
 import type { Macrotrend, SeasonDossier, TrendReport } from '../core/research'
@@ -42,7 +42,8 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
   // 히어로 이미지는 이번 분석이 실제로 만든 렌더를 쓴다
   const hero = useMemo(() => {
     for (const x of [...top, ...st.designs]) {
-      const im = x.images.find(i => i.origin === 'generated' && i.view !== 'sketch')
+      const im = x.images.find(i => i.view === 'lateral' && !i.colorway)
+        ?? x.images.find(i => i.origin === 'generated' && !['sketch', 'sketch_var'].includes(i.view))
       if (im) return im.url
     }
     return null
@@ -179,12 +180,31 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
           </div>
           <div className="rep-designs">
             {shown.map(x => {
-              const im = x.images.find(i => i.origin === 'generated' && i.view !== 'sketch') ?? x.images[0]
+              const im = x.images.find(i => i.view === 'lateral' && !i.colorway)
+                ?? x.images.find(i => !['sketch', 'sketch_var'].includes(i.view)) ?? x.images[0]
+              // 머천다이저가 라인 리뷰 전에 봐야 하는 숫자: 원가 추정과 밴드 중간가 기준 마진 (Gemini QA 지적)
+              const cogs = x.cost?.estimated_total_krw
+              const bandMid = (st.params.trend.priceMinKrw + st.params.trend.priceMaxKrw) / 2
+              const margin = cogs && bandMid ? Math.round((1 - cogs / bandMid) * 100) : null
               return (
                 <article className="rep-design" key={x.spec.design_id}>
                   <span className="rd-shot">{im ? <img src={im.url} alt="" /> : null}</span>
                   <span className="rd-id">{x.spec.design_id}<i className={`rd-tier t-${x.spec.tier}`}>{t(x.spec.tier)}</i></span>
                   <span className="rd-spec">{x.metrics.slice(0, 2).map(m => `${m.label} ${m.value}`).join(' · ')}</span>
+                  {/* CMF 한 줄 · 부품별 소재 스택과 컬러웨이 (지시서 17장, Gemini QA 지적) */}
+                  <span className="rd-spec">
+                    CMF · {[
+                      x.spec.fields.upper_material && `upper ${x.spec.fields.upper_material}`,
+                      x.spec.fields.midsole_foam && `midsole ${x.spec.fields.midsole_foam}`,
+                      x.spec.fields.heel_type === 'sport_midsole' ? 'rubber outsole' : x.spec.fields.heel_type && `${String(x.spec.fields.heel_type).replace('_', ' ')} heel`,
+                    ].filter(Boolean).join(' · ')}
+                    {x.colorways.length ? ` · ${t('colourways')}: original, ${x.colorways.join(', ')}` : ''}
+                  </span>
+                  {cogs ? (
+                    <span className="rd-spec">
+                      COGS ≈ {KRW(cogs)}{margin != null && margin > -100 ? ` · ${margin}% ${t('gross at band mid')} ${KRW(bandMid)}` : ''}
+                    </span>
+                  ) : null}
                   <span className="rd-chips">
                     <i className={x.rejected ? 'bad' : ''}>{x.rejected ? t('Rule reject') : t('Passed rules')}</i>
                     {x.qa.length > 0 && <i>QA {x.qa.filter(q => q.pass).length}/{x.qa.length}</i>}
@@ -220,7 +240,63 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
         )
       })()}
 
-      {/* ── 경쟁 구도 ─────────────────────────────────────────── */}
+      {/* ── 지금 팔리는 것 · 백화점·명품몰 베스트셀러는 사진으로 먼저 읽힌다 ── */}
+      {(() => {
+        const pulse = st.competitors.filter(c => c.retailer && c.image_urls?.length)
+        if (!pulse.length) return null
+        return (
+          <section className="rep-sect" id="sec-pulse">
+            <div className="rep-head"><h2>{t('Selling now at the department stores')}</h2></div>
+            <div className="rep-designs">
+              {pulse.slice(0, 8).map(c => (
+                <article className="rep-design" key={c.product_id}>
+                  <span className="rd-shot">
+                    <img src={shotUrl(c.image_urls![0], c.product_url)} alt=""
+                      onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+                  </span>
+                  <span className="rd-id">{c.brand} {c.name}<i className="rd-tier">{c.retailer}</i></span>
+                  <span className="rd-spec">
+                    {[c.price_krw > 0 ? KRW(c.price_krw) : null, c.rank_note].filter(Boolean).join(' · ')}
+                  </span>
+                </article>
+              ))}
+            </div>
+            <p className="hint" style={{ marginTop: 6 }}>{t('Products flagged as bestsellers on department-store and luxury retail pages at collection time. A page position is never read as a sales rank.')}</p>
+          </section>
+        )
+      })()}
+
+      {/* ── 경쟁 구도 · 표보다 사진이 먼저 온다 ────────────────── */}
+      {(() => {
+        // 브랜드 조사에서 온 제품 사진 · 백화점 펄스와 겹치지 않게 뺀다
+        const rivals = st.competitors.filter(c => !c.retailer && c.image_urls?.length)
+        if (!rivals.length) return null
+        return (
+          <section className="rep-sect" id="sec-rivals">
+            <div className="rep-head"><h2>{t('Competitor products')}</h2></div>
+            <div className="rep-designs">
+              {rivals.slice(0, 12).map(c => (
+                <article className="rep-design" key={c.product_id}>
+                  <span className="rd-shot">
+                    <img src={shotUrl(c.image_urls![0], c.product_url)} alt="" loading="lazy"
+                      onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+                  </span>
+                  <span className="rd-id">{c.brand} {c.name}
+                    {c.competitor_group && <i className="rd-tier">{t(COMP_GROUP_LABEL[c.competitor_group])}</i>}
+                  </span>
+                  <span className="rd-spec">
+                    {[
+                      c.price_krw > 0 ? KRW(c.price_krw) : null,
+                      c.size_status === 'size_broken' ? t('size broken') : null,
+                    ].filter(Boolean).join(' · ')}
+                  </span>
+                </article>
+              ))}
+            </div>
+          </section>
+        )
+      })()}
+
       {brands.length > 0 && (
         <section className="rep-sect" id="sec-comp">
           <div className="rep-head"><h2>{t('Competitive landscape')}</h2></div>

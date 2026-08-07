@@ -530,9 +530,20 @@ button { cursor: pointer; background: none; border: none; }
 .bcol-n { font-size: 11.5px; color: var(--text-3); }
 
 .bnode {
-  width: 384px; background: var(--panel); border: 1px solid var(--line-2);
+  /* 크기는 React Flow 노드 박스가 정한다 · 모서리를 끌면 이 박스가 커지고 카드가 채운다 */
+  width: 100%; height: 100%; min-width: 300px;
+  background: var(--panel); border: 1px solid var(--line-2);
   border-radius: var(--r-card); padding: 14px 14px; font-size: 12.5px;
   border-left: 3px solid var(--line-2);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+/* 칸을 키우면 글이 아니라 사진이 커진다 */
+.bnode .bn-t, .bnode .bn-body, .bnode .bn-pal, .bnode .bn-prompts { flex: 0 0 auto; }
+/* 크기 조절 손잡이 · 칸을 고르면 모서리에 나타난다 */
+.bn-resize-line { border-color: var(--accent) !important; }
+.bn-resize-handle {
+  width: 10px !important; height: 10px !important; border-radius: 3px !important;
+  background: var(--accent) !important; border: 2px solid var(--panel) !important;
 }
 .bnode .bn-t { font-weight: 700; font-size: 14.5px; color: var(--text); margin-bottom: 5px; line-height: 1.4; }
 .bnode .bn-b { color: var(--text-2); line-height: 1.6; }
@@ -751,9 +762,9 @@ table.mini td b { color: var(--text); font-weight: 600; }
 .modal.gate .modal-h { padding-bottom: 4px; }
 .modal.gate .hint { line-height: 1.7; }
 
-/* 보드 노드 안 이미지 · 사진이 먼저 읽혀야 한다 */
+/* 보드 노드 안 이미지 · 사진이 먼저 읽히고, 칸을 키우면 사진이 따라 커진다 */
 .bnode .bn-img {
-  display: block; width: 100%; height: 226px; object-fit: cover;
+  display: block; width: 100%; flex: 1 1 226px; min-height: 140px; object-fit: cover;
   border-radius: var(--r-8); margin: 4px 0 8px; background: #0E0E12;
 }
 .board-light .bnode .bn-img { background: #F0F2F5; }

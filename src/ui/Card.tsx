@@ -96,11 +96,12 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
           {d.spec.fieldsLocked.length > 0 && <> · <span style={{ color: 'var(--accent-hi)' }}>🔒 DNA {d.spec.fieldsLocked.length}</span></>}
         </div>
 
+        {/* 룰 코드는 바이어에게 무의미하다 · 칩에 사유를 함께 싣는다 (Gemini QA 지적) */}
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           {fails.length === 0
             ? <Tag kind="ok">{t('Passed rules')}</Tag>
-            : fails.map(r => <Tag kind="danger" key={r.rule}>{r.rule}</Tag>)}
-          {warns.map(r => <Tag kind="warn" key={r.rule}>{r.rule}</Tag>)}
+            : fails.map(r => <span key={r.rule} title={r.message}><Tag kind="danger">{r.rule} · {r.message.split('.')[0]}</Tag></span>)}
+          {warns.map(r => <span key={r.rule} title={r.message}><Tag kind="warn">{r.rule}</Tag></span>)}
           {d.qa.length > 0 && <Tag kind={qaPass === d.qa.length ? 'ok' : 'warn'}>QA {qaPass}/{d.qa.length}</Tag>}
         </div>
 

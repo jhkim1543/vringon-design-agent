@@ -95,21 +95,26 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                   <div className="cc-main">
                     <div className="cc-head">
                       <b>{c.brand}</b> {c.name}
+                      {c.retailer && <Tag kind="accent">{c.retailer}</Tag>}
                       {c.competitor_group && c.competitor_group !== 'direct' &&
-                        <Tag kind="warn">{COMP_GROUP_LABEL[c.competitor_group]}</Tag>}
+                        <Tag kind={c.retailer ? 'ok' : 'warn'}>{COMP_GROUP_LABEL[c.competitor_group]}</Tag>}
                       {c.competitor_group === 'direct' && <Tag kind="ok">{COMP_GROUP_LABEL.direct}</Tag>}
                       {!c.in_band && <Tag kind="warn">Out of band</Tag>}
                     </div>
+                    {/* 미확인 값은 줄에서 뺀다 · unknown이 나열되면 바이어 톤이 무너진다 (Gemini QA) */}
                     <div className="cc-meta">
-                      {c.price_krw > 0 ? `₩${(c.price_krw / 10000).toFixed(1)}0,000` : 'Price unknown'}
-                      {c.construction_tier && <> · {c.construction_tier}</>}
+                      {[
+                        c.price_krw > 0 ? `₩${(c.price_krw / 10000).toFixed(1)}0,000` : null,
+                        c.construction_tier && c.construction_tier !== 'unknown'
+                          ? plainProse(c.construction_tier).slice(0, 90) : null,
+                        c.evidence_strength && c.evidence_strength !== 'none' ? c.evidence_strength : null,
+                      ].filter(Boolean).join(' · ') || 'confirmed on the product page only'}
                       {c.rank_note && <> · <span className="cc-rank">{c.rank_note}</span>
                         {c.rank_semantics && c.rank_semantics !== 'none' && <span className="hint"> ({RANK_SEM[c.rank_semantics]})</span>}</>}
-                      {c.evidence_strength && <> · {c.evidence_strength}</>}
                     </div>
-                    {(c.offered_sizes || c.size_status) && (
+                    {(c.offered_sizes && c.available_sizes != null) || (c.size_status && c.size_status !== 'unknown') || (c.colorway_count ?? 0) > 1 ? (
                       <div className="cc-meta">
-                        {c.offered_sizes ? `sizes ${c.available_sizes ?? '?'} of ${c.offered_sizes} in stock` : ''}
+                        {c.offered_sizes && c.available_sizes != null ? `sizes ${c.available_sizes} of ${c.offered_sizes} in stock` : ''}
                         {c.size_status && c.size_status !== 'unknown' && (
                           <> · <Tag kind={c.size_status === 'size_broken' || c.size_status === 'sold_out' ? 'warn' : 'ok'}>
                             {c.size_status.replace('_', ' ')}
@@ -117,7 +122,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                         )}
                         {typeof c.colorway_count === 'number' && c.colorway_count > 1 && <> · {c.colorway_count} colourways, one design</>}
                       </div>
-                    )}
+                    ) : null}
                     {c.proxy_signals[0] && <div className="cc-ev">{c.proxy_signals[0]}</div>}
                     {c.design_traits?.length ? (
                       <div className="cc-traits">
@@ -305,6 +310,8 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
     { id: 'sec-report', label: 'Trend report', on: !!st.trendReport },
     { id: 'sec-macros', label: 'Key macro trends', on: !!(st.dossier as { macrotrends?: unknown[] } | null)?.macrotrends?.length },
     { id: 'sec-designs', label: 'Top trending designs', on: st.designs.length > 0 },
+    { id: 'sec-pulse', label: 'Selling now', on: st.competitors.some(c => c.retailer && c.image_urls?.length) },
+    { id: 'sec-rivals', label: 'Competitor products', on: st.competitors.some(c => !c.retailer && c.image_urls?.length) },
     { id: 'sec-shots', label: 'Campaign gallery', on: st.designs.some(d => d.images.some(i => ['wear', 'concept', 'variation'].includes(i.view))) },
     { id: 'sec-comp', label: 'Competitive landscape', on: st.competitors.length > 0 },
     { id: 'sec-season', label: 'Season report', on: !!st.dossier },
@@ -496,10 +503,12 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
               <span className="hint">{st.designs.length} {t('sketches')} · {st.designs.filter(d => !d.rejected).length} {t('passed')}</span>
             </div>
             {st.designs.map(d => {
-              const sketch = d.images.find(i => i.view === 'sketch')
-              // 기준 렌더 + 트렌드 프롬프트 변주가 이 스케치에서 나온 디자인들이다
+              // 흑백 단계: 기준 외형 + 잉크 변형들 · 컬러 단계: 각 스케치가 사진이 된 디자인들
+              const sketches = d.images.filter(i => i.view === 'sketch' || i.view === 'sketch_var')
+              const sketch = sketches[0]
               const outs = d.images.filter(i =>
-                (i.origin === 'generated' && i.view !== 'sketch') || i.view === 'design')
+                (i.view === 'lateral' && !i.colorway) || i.view === 'design'
+                || (i.origin === 'generated' && !['sketch', 'sketch_var'].includes(i.view)))
               // 이 스케치를 만든 근거 · 가중치 큰 신호부터
               const evidence = (d.rationale?.driving_signals ?? [])
                 .slice()
@@ -511,6 +520,11 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                 <article className={`skrow ${d.rejected ? 'rejected' : ''}`} key={d.spec.design_id}>
                   <div className="sk-src">
                     <span className="sk-shot">{sketch ? <img src={sketch.url} alt="" loading="lazy" /> : <span className="sk-none">{t('Diagram')}</span>}</span>
+                    {sketches.slice(1).map((sv, i2) => (
+                      <span className="sk-shot" key={sv.hash + i2} title={t('Ink variation, same form')}>
+                        <img src={sv.url} alt="" loading="lazy" />
+                      </span>
+                    ))}
                     <b>{d.spec.design_id}</b>
                     <span className="sk-tier">{t(TIER_LABEL[d.spec.tier] ?? d.spec.tier)}</span>
                     {evidence.length > 0 && (

@@ -693,7 +693,7 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
               <div className="stack"><span className="lbl">{t('3D showroom')}</span>
                 <div className="inrow">
                   <Seg options={['Off', 'On'] as const} value={p.make3d ? 'On' : 'Off'} onChange={v => set('make3d', v === 'On')} />
-                  <span className="hint">{t('Each top pick gets a four-view turnaround, then Tripo builds a GLB you can turn and download.')}</span>
+                  <span className="hint">{t('Final picks only. Turn it on the board, download it for CAD.')}</span>
                 </div>
               </div>
               <div className="stack"><span className="lbl">{t('Model')}</span>

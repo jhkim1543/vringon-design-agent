@@ -295,7 +295,7 @@ function lineKey(line) {
  *  한 요청이 커지면 상류 연결이 먼저 끊기고, 한 브랜드 실패가 전체를 날린다. */
 export async function researchCompetitors(apiKey, root, opts) {
   const { brands = [], typeKo, priceMin, priceMax, adjacentBand = false, line, langName = 'English' } = opts
-  const key = createHash('sha256').update(JSON.stringify(['comp5ft', langName, brands, typeKo, priceMin, priceMax, adjacentBand, lineKey(line)])).digest('hex').slice(0, 24)
+  const key = createHash('sha256').update(JSON.stringify(['comp6ft', langName, brands, typeKo, priceMin, priceMax, adjacentBand, lineKey(line)])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
@@ -323,7 +323,7 @@ async function researchOneBrand(apiKey, root, { brand: rawBrand, typeKo: rawType
   const LANG = langName
   const brand = canonBrand(rawBrand)
   const typeKo = canonTerm(rawType)
-  const key = createHash('sha256').update(JSON.stringify(['brand4ft', langName, brand, typeKo, priceMin, priceMax, adjacentBand, lineKey(line)])).digest('hex').slice(0, 24)
+  const key = createHash('sha256').update(JSON.stringify(['brand5ft', langName, brand, typeKo, priceMin, priceMax, adjacentBand, lineKey(line)])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return JSON.parse(readFileSync(file, 'utf8'))
 
@@ -348,6 +348,9 @@ ${lineBlock(line)}
 - 실제로 검색해서 확인한 것만 적습니다. 확인하지 못한 값은 지어내지 마세요.
 - 모델 패밀리 하나가 한 항목입니다. 컬러웨이 10개를 제품 10개로 내지 말고 colorway_count에 수를 적으세요.
 - price_krw는 한국 정가를 확인한 경우에만 넣고, 모르면 0으로 둡니다. 세일가를 정가로 적지 마세요.
+- 한국 정가를 못 찾으면 브랜드의 다른 지역 공식몰 정가를 찾아 notes에 통화와 함께 남기고, price_krw는 0으로 둡니다.
+- 가격도 공법·기술 티어도 사이즈 재고도 하나도 확인하지 못한 제품은 목록에 넣지 않습니다.
+  빈 값투성이 항목은 벤치마크를 오염시킵니다 — 확인된 제품 2개가 미확인 제품 3개보다 낫습니다.
 - rank_note에는 사이트에 표기된 순위를 그대로 옮기고, rank_semantics로 그 순위의 의미를 분류합니다.
   페이지에서 3번째로 노출된 것은 surface_position이지 판매 순위가 아닙니다.
 - 사이즈 재고를 확인하세요: 판매 페이지의 사이즈 선택 UI에서 제공 사이즈 수(offered_sizes)와
@@ -367,6 +370,69 @@ ${lineBlock(line)}
   const out = { ...data, searches }
   writeFileSync(file, JSON.stringify(out))
   return out
+}
+
+// ── 백화점·명품몰 상업 펄스 (지시서 12.2 데이터 소스 계층 6·7) ─────────
+// 사용자가 입력한 브랜드와 무관하게, 조사 시점에 백화점·명품 리테일러가
+// "베스트셀러·판매 랭킹"으로 표기한 제품을 그대로 수집한다. 노출 위치는 판매 순위가 아니다.
+const PULSE_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['products', 'notes'],
+  properties: {
+    products: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['retailer', 'brand', 'model_name', 'price_krw', 'rank_note', 'rank_semantics',
+          'construction_tier', 'design_traits', 'image_urls', 'product_url', 'source_urls'],
+        properties: {
+          retailer: { type: 'string', description: '수집처. 예: 롯데백화점몰, SSG 신세계백화점, 더현대닷컴, Harrods, Selfridges, MR PORTER, NET-A-PORTER' },
+          brand: { type: 'string' },
+          model_name: { type: 'string' },
+          price_krw: { type: 'integer', description: '원화 환산가. 해외몰이면 대략 환산하고 notes에 원통화를 남긴다. 모르면 0' },
+          rank_note: { type: 'string', description: '사이트에 표기된 그대로. 예: "여성 스니커즈 베스트 3위", "Best Seller 배지"' },
+          rank_semantics: { type: 'string', enum: ['verified_sales_rank', 'retailer_bestseller_membership', 'surface_position', 'none'] },
+          construction_tier: { type: 'string', description: '확인된 공법·기술 티어. 모르면 빈 문자열' },
+          design_traits: { type: 'array', items: { type: 'string' } },
+          image_urls: { type: 'array', items: { type: 'string' }, description: '제품 사진 직링크 또는 og:image. 사진 없는 항목은 넣지 말 것' },
+          product_url: { type: 'string' },
+          source_urls: { type: 'array', items: { type: 'string' } },
+        },
+      },
+    },
+    notes: { type: 'string' },
+  },
+}
+
+export async function researchRetailPulse(apiKey, root, { typeKo: rawType, line, langName = 'English' }) {
+  const LANG = langName
+  const typeKo = canonTerm(rawType)
+  const key = createHash('sha256').update(JSON.stringify(['pulse1ft', LANG, typeKo, lineKey(line)])).digest('hex').slice(0, 24)
+  const file = join(cacheDir(root), `${key}.json`)
+  if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
+
+  const input = `당신은 신발 MD입니다. 웹 검색으로, 조사 시점 기준 백화점·명품 리테일러가 실제로
+"베스트셀러 / 판매 랭킹 / 인기 순위"로 표기한 ${typeKo} 제품을 수집하세요.
+${lineBlock(line)}
+확인할 곳 (이 중 접근되는 곳 위주로, 국내 2곳 이상 + 해외 명품 리테일러 1곳 이상):
+- 국내: 롯데백화점몰(el)lotte), SSG 신세계백화점, 더현대닷컴, 무신사(랭킹)
+- 해외 명품: MR PORTER, NET-A-PORTER, Harrods, Selfridges, FARFETCH (bestseller/popular 정렬·배지)
+
+규칙:
+- 4~6개 제품만. 반드시 랭킹·베스트셀러 표기가 실제로 붙은 제품이어야 합니다.
+- rank_note에는 사이트 표기를 그대로 옮기고, rank_semantics로 의미를 분류합니다.
+  숫자 순위가 있으면 verified_sales_rank가 아니라, 그 순위가 "판매량 기준"이라고 명시된 경우에만 verified로 둡니다.
+  단순 노출 순서는 surface_position입니다.
+- image_urls가 비는 제품은 목록에서 뺍니다. 상세 페이지의 og:image 메타 태그 주소가 가장 안정적입니다.
+- 해외몰 가격은 원화로 대략 환산해 price_krw에 넣고 notes에 원통화 금액을 남깁니다.
+- 검색은 10회 이내. Search in Korean where that finds more, but every string you output must be written in ${LANG}.`
+
+  const { data, searches } = await ask(apiKey, { input, schema: PULSE_SCHEMA, name: 'retail_pulse' })
+  const out = { ...data, searches, collected_at: new Date().toISOString().slice(0, 10) }
+  writeFileSync(file, JSON.stringify(out))
+  return { ...out, cached: false }
 }
 
 // 조사 목적 → 하위 질문 설계에 쓰는 렌즈 (지시서 8장)

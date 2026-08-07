@@ -122,6 +122,57 @@ export const fetchCompetitors = (b: {
   adjacentBand: b.adjacentBand, line: lineForServer(b.line, b.itemType),
 })
 
+// ── 백화점·명품몰 베스트셀러 펄스 ───────────────────────────────────
+export interface RetailPulseRaw {
+  retailer: string
+  brand: string
+  model_name: string
+  price_krw: number
+  rank_note: string
+  rank_semantics: 'verified_sales_rank' | 'retailer_bestseller_membership' | 'surface_position' | 'none'
+  construction_tier: string
+  design_traits: string[]
+  image_urls: string[]
+  product_url: string
+  source_urls: string[]
+}
+export interface RetailPulse {
+  products: RetailPulseRaw[]
+  notes: string
+  searches: number
+  collected_at: string
+  cached?: boolean
+}
+
+export const fetchRetailPulse = (b: { typeKo: string; line?: FootwearLineProfile; itemType?: string }) =>
+  post<RetailPulse>('/api/research/pulse', { typeKo: b.typeKo, line: lineForServer(b.line, b.itemType) })
+
+/** 펄스 제품 → 경쟁 제품 목록에 합쳐 넣는다. 백화점 베스트셀러는 commercial_leader다. */
+export function pulseToCompetitors(r: RetailPulse, startIdx: number): CompetitorProduct[] {
+  return r.products.filter(p => p.image_urls?.length).map((p, i) => ({
+    product_id: `pl_${startIdx + i + 1}`,
+    brand: p.brand,
+    name: p.model_name,
+    price_krw: p.price_krw,
+    sales_proxy_score: null,
+    proxy_signals: p.rank_note ? [p.rank_note] : [],
+    observation_count: 1,
+    observation_window: `${r.collected_at}, single pass`,
+    confidence: 'none' as const,
+    in_band: true,
+    evidence_strength: 'strong' as const,
+    source_urls: p.source_urls,
+    rank_note: p.rank_note,
+    rank_semantics: p.rank_semantics,
+    competitor_group: 'commercial_leader' as const,
+    construction_tier: p.construction_tier || undefined,
+    design_traits: p.design_traits,
+    image_urls: p.image_urls,
+    product_url: p.product_url,
+    retailer: p.retailer,
+  }))
+}
+
 export const fetchTrends = (b: {
   typeKo: string; brands?: string[]; season: string
   priceBandKo?: string; wantReport?: boolean; depth?: number

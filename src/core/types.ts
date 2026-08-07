@@ -562,6 +562,8 @@ export interface CompetitorProduct {
   size_status?: 'full' | 'partial' | 'size_broken' | 'sold_out' | 'unknown'
   /** 같은 모델의 컬러웨이 수 · 컬러웨이 10개는 디자인 10개가 아니다 */
   colorway_count?: number
+  /** 백화점·명품몰 베스트셀러 수집처 · 롯데백화점, SSG, Harrods 등 (지시서 12.2) */
+  retailer?: string
 }
 
 export interface Direction {

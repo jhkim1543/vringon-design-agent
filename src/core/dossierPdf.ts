@@ -35,10 +35,10 @@ function imagePool(st: RunState) {
   return {
     concept: pick('concept'),
     wear: pick('wear'),
-    render: all.filter(i => i.origin === 'generated' && i.view !== 'sketch').map(i => i.url),
+    render: all.filter(i => (i.view === 'lateral' && !i.colorway) || (i.origin === 'generated' && i.view !== 'sketch' && i.view !== 'sketch_var')).map(i => i.url),
     variation: pick('variation'),
     sketch: pick('sketch'),
-    any: all.filter(i => i.view !== 'sketch').map(i => i.url),
+    any: all.filter(i => i.view !== 'sketch' && i.view !== 'sketch_var').map(i => i.url),
   }
 }
 

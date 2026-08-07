@@ -1,0 +1,4086 @@
+{
+ "params": {
+  "mode": "trend",
+  "category": "shoe",
+  "itemType": "running",
+  "line": {
+   "product": {
+    "useCase": "running",
+    "environment": "urban",
+    "targetConsumer": "unisex",
+    "season": "FW26",
+    "climate": "all_season"
+   },
+   "lastFit": {
+    "lastFamily": "performance running, medium volume",
+    "baseSize": "unknown",
+    "width": "unknown",
+    "toeShape": "round",
+    "toeVolume": "medium",
+    "heelHold": "secure",
+    "existingLastReuse": false
+   },
+   "upper": {
+    "outer": "engineered mesh",
+    "lining": "moisture-management textile",
+    "reinforcement": "light",
+    "closure": "lace",
+    "protection": "none"
+   },
+   "bottom": {
+    "midsole": "supercritical foam",
+    "plate": "none",
+    "outsole": "segmented rubber",
+    "stackBand": "high",
+    "dropMm": "6-10",
+    "rocker": "moderate",
+    "heel": "none",
+    "existingBottomReuse": false
+   },
+   "construction": {
+    "lasting": "strobel",
+    "soleAttachment": "cemented"
+   },
+   "performance": {
+    "weightTargetG": "240-285 (US M9)",
+    "cushioning": "high",
+    "stability": "neutral_stable",
+    "wetGrip": "required",
+    "flexibility": "moderate"
+   },
+   "commercial": {
+    "markets": [
+     "KR"
+    ],
+    "channels": [
+     "DTC"
+    ]
+   }
+  },
+  "endStage": "S5",
+  "sketchCount": 6,
+  "tierRatio": [
+   1,
+   1,
+   1
+  ],
+  "renderRatio": 0.5,
+  "viewCount": 3,
+  "colorwayCount": 1,
+  "topN": 1,
+  "designsPerSketch": 2,
+  "variationCount": 2,
+  "campaignShots": 2,
+  "make3d": true,
+  "approvalGate": false,
+  "imageEngine": "fast",
+  "imageBudget": 24,
+  "trend": {
+   "competitors": [
+    "ASICS",
+    "HOKA",
+    "Nike Running"
+   ],
+   "priceBand": "contemporary",
+   "priceMinKrw": 150000,
+   "priceMaxKrw": 220000,
+   "adjacentBand": true,
+   "objectives": [
+    "live_commercial_pulse",
+    "design_trends",
+    "next_season_forecast"
+   ]
+  },
+  "series": {
+   "seriesName": "",
+   "archiveFiles": [],
+   "valueStatement": "",
+   "trendSearch": true
+  },
+  "moodboard": {
+   "files": [],
+   "notes": ""
+  },
+  "linePreset": "road_daily",
+  "researchLang": "en"
+ },
+ "stageStatus": {
+  "S1": "done",
+  "S2": "done",
+  "S3": "done",
+  "S4": "done",
+  "S5": "done"
+ },
+ "logs": [
+  {
+   "stage": "S1",
+   "text": "Trend mode · building the brief",
+   "t": 1786065553993
+  },
+  {
+   "stage": "S1",
+   "text": "Line profile: Road daily trainer · running · unisex · performance running, medium volume · engineered mesh upper · segmented rubber · cemented · FW26",
+   "t": 1786065553993
+  },
+  {
+   "stage": "S1",
+   "text": "3 competitor lines: ASICS, HOKA, Nike Running · primary band KRW 150k-220k + adjacent reference band",
+   "t": 1786065554696
+  },
+  {
+   "stage": "S1",
+   "text": "1 Competitor products · searching ASICS, HOKA, Nike Running for Road daily trainer (1-2 min)",
+   "t": 1786065554696
+  },
+  {
+   "stage": "S1",
+   "text": "Also sweeping department-store and luxury-retail bestseller pages: Lotte, SSG, The Hyundai, MR PORTER, Harrods",
+   "t": 1786065554696
+  },
+  {
+   "stage": "S1",
+   "text": "Department-store pulse: 5 bestseller-flagged products with photos from Selfridges, MUSINSA (KICKS), SSG.COM (Shinsegae Dept. — Gwangju ‘Y‑Concept’ seller), MR PORTER (for image/tech reference; overseas luxury) (32 searches)",
+   "t": 1786066054541
+  },
+  {
+   "stage": "S1",
+   "text": "64 web searches, 14 products (reused an earlier pass)",
+   "t": 1786066054541
+  },
+  {
+   "stage": "S1",
+   "text": "10 kept as reference groups rather than direct competitors — different construction, tier or use",
+   "t": 1786066054541
+  },
+  {
+   "stage": "S1",
+   "text": "2 Checking popularity evidence · 8 strong, the rest single source · surface position never stored as a sales rank",
+   "t": 1786066054541
+  },
+  {
+   "stage": "S1",
+   "text": "No sales proxy scored. One pass gives no time series, so restock and sell-out trends need repeat collection.",
+   "t": 1786066054541
+  },
+  {
+   "stage": "S1",
+   "text": "Limits of this pass: ASICS: Scope and limits. I focused on ASICS KR DTC pages checked on 2026-08-06. I confirmed prices and core tech from official product or content pages. I could",
+   "t": 1786066054541
+  },
+  {
+   "stage": "S1",
+   "text": "3 Trend research · looking for design signals",
+   "t": 1786066054541
+  },
+  {
+   "stage": "S1",
+   "text": "The full trend report is being written separately. It attaches to the research panel when done.",
+   "t": 1786066054565
+  },
+  {
+   "stage": "S1",
+   "text": "Building the season dossier: macrotrends, palettes, materials, key items. It attaches when done.",
+   "t": 1786066054565
+  },
+  {
+   "stage": "S1",
+   "text": "15 web searches, 6 signals (reused an earlier pass) · each linked to a source",
+   "t": 1786066054565
+  },
+  {
+   "stage": "S1",
+   "text": "6 signals confirmed · none unsourced",
+   "t": 1786066054565
+  },
+  {
+   "stage": "S1",
+   "text": "Each signal carries four indices — commercial, cultural, forecast, feasibility — never a single blended score",
+   "t": 1786066054565
+  },
+  {
+   "stage": "S1",
+   "text": "Design prompts now carry the PLATED DAILY direction: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape",
+   "t": 1786066054588
+  },
+  {
+   "stage": "S1",
+   "text": "Season dossier ready · 4 macrotrends, 15 sources (91 searches)",
+   "t": 1786066054588
+  },
+  {
+   "stage": "S1",
+   "text": "Trend report done · 7 implications from 38 searches",
+   "t": 1786066054886
+  },
+  {
+   "stage": "S1",
+   "text": "Three directions built, one per tier · every claim traced to a source",
+   "t": 1786066055698
+  },
+  {
+   "stage": "S2",
+   "text": "Sketch prompts carry the season direction from the dossier",
+   "t": 1786066055698
+  },
+  {
+   "stage": "S2",
+   "text": "Specs per tier · Core 2 · Push 2 · Signature 2 (schema enforced, presets locked)",
+   "t": 1786066055698
+  },
+  {
+   "stage": "S2",
+   "text": "Tier means tooling: Core reuses last and bottom, Push keeps one, Signature may open a new last or mould",
+   "t": 1786066055698
+  },
+  {
+   "stage": "S2",
+   "text": "Reference bank loaded: 4 approved, 2 near-miss rejects (too familiar, cost)",
+   "t": 1786066055698
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-C01 [core] rule reject · S-04",
+   "t": 1786066056701
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-C02 [core] passed rules, queued for sketch",
+   "t": 1786066057696
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-P03 [push] passed rules, queued for sketch",
+   "t": 1786066058689
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-P04 [push] passed rules, queued for sketch",
+   "t": 1786066059701
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-S05 [signature] rule reject · S-04",
+   "t": 1786066060696
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-S06 [signature] passed rules, queued for sketch",
+   "t": 1786066061689
+  },
+  {
+   "stage": "S2",
+   "text": "4 of 6 specs passed · 2 rejected early · rejects are never rendered",
+   "t": 1786066062702
+  },
+  {
+   "stage": "S2",
+   "text": "Sketching 4 base forms · black ink only, colour never enters this stage",
+   "t": 1786066062702
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-C02 base form sketched (reused)",
+   "t": 1786066062763
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-P03 base form sketched (reused)",
+   "t": 1786066062763
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-P04 base form sketched (reused)",
+   "t": 1786066062763
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-S06 base form sketched (reused)",
+   "t": 1786066062763
+  },
+  {
+   "stage": "S2",
+   "text": "Branching 1 black-ink variations from each base form · same silhouette and outsole, different upper takes",
+   "t": 1786066062763
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-C02 sketch variation 1 of 1 done",
+   "t": 1786066098239
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-P03 sketch variation 1 of 1 done",
+   "t": 1786066099937
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-S06 sketch variation 1 of 1 done",
+   "t": 1786066136171
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-P04 sketch variation 1 of 1 done",
+   "t": 1786066136495
+  },
+  {
+   "stage": "S3",
+   "text": "50% move to render · 2 selected",
+   "t": 1786066136495
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-S06 colour enters here: the black-ink sheet becomes a photoreal render, then 2 more views as edits",
+   "t": 1786066136495
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-S06 sketch variation 1 coloured into a design",
+   "t": 1786066201727
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-S06 branching 2 product variations from the base design",
+   "t": 1786066266080
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-S06 vision QA 3/5 · regenerating the mismatched view, attempt 1 of 2",
+   "t": 1786066300037
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-S06 QA passed after regeneration",
+   "t": 1786066300691
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C02 colour enters here: the black-ink sheet becomes a photoreal render, then 2 more views as edits",
+   "t": 1786066300691
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C02 sketch variation 1 coloured into a design",
+   "t": 1786066360246
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C02 branching 2 product variations from the base design",
+   "t": 1786066423026
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C02 vision QA 4/5 · regenerating the mismatched view, attempt 1 of 2",
+   "t": 1786066459113
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C02 failed twice, flagged as a view mismatch and kept visible",
+   "t": 1786066459696
+  },
+  {
+   "stage": "S4",
+   "text": "Scoring metrics. Deterministic numbers and model judgement stay separate and are never summed.",
+   "t": 1786066459696
+  },
+  {
+   "stage": "S4",
+   "text": "Top 1: SH-26FW-C02 [core] · spec distance 0.54",
+   "t": 1786066460695
+  },
+  {
+   "stage": "S4",
+   "text": "Worn pipeline: BiRefNet cutout, MediaPipe Pose for ankle and ground line, scale normalise, depth occlusion",
+   "t": 1786066461689
+  },
+  {
+   "stage": "S4",
+   "text": "Ground contact aligned and heel height checked visually, within 20%",
+   "t": 1786066461689
+  },
+  {
+   "stage": "S4",
+   "text": "2 campaign cuts per top pick · 1 worn, 1 staged · caption forced: simulated wear, the real fit may differ",
+   "t": 1786066462695
+  },
+  {
+   "stage": "S4",
+   "text": "SH-26FW-C02 Virtual fitting done",
+   "t": 1786066498155
+  },
+  {
+   "stage": "S4",
+   "text": "SH-26FW-C02 worn cut 1 done",
+   "t": 1786066500736
+  },
+  {
+   "stage": "S5",
+   "text": "Building the 3D showroom · a four-view turnaround of each top pick goes to Tripo",
+   "t": 1786066500736
+  },
+  {
+   "stage": "S5",
+   "text": "SH-26FW-C02 turnaround front view done",
+   "t": 1786066530338
+  },
+  {
+   "stage": "S5",
+   "text": "SH-26FW-C02 turnaround back view done",
+   "t": 1786066567075
+  },
+  {
+   "stage": "S5",
+   "text": "SH-26FW-C02 sending 4 views to Tripo (front-left-back-right order) · this takes a few minutes",
+   "t": 1786066567075
+  },
+  {
+   "stage": "S5",
+   "text": "SH-26FW-C02 3D ready from 4 views · GLB downloadable from the card",
+   "t": 1786066694179
+  },
+  {
+   "stage": "S5",
+   "text": "Assembling the board · five lanes: brief, Core, Push, Signature, appendix",
+   "t": 1786066694179
+  },
+  {
+   "stage": "S5",
+   "text": "Writing the talk track from rationale: trend evidence, brand fit, objections, sources",
+   "t": 1786066694693
+  }
+ ],
+ "signals": [
+  {
+   "signal_id": "sg_001",
+   "attribute": "segmented_full_rubber_outsole",
+   "label": "Segmented full-coverage rubber outsole",
+   "axis": "Outsole rubber",
+   "observed_count": 6,
+   "sources": [
+    "https://www.roadtrailrun.com/2023/10/nike-vomero-17-multi-tester-review-12.html",
+    "https://www.runningwarehouse.com/reviews/nike-shoe-reviews/nike-vomero-17.html",
+    "https://corp3.asics.com/en/press/article/move-your-mind-in-plush-comfort-with-the-new-asics-gel-nimbustm-26-shoe-",
+    "https://www.livescience.com/health/exercise/nike-invincible-3-review",
+    "https://www.runningwarehouse.com/catpage-MRFNIKEVOM.html"
+   ],
+   "price_bands": [],
+   "confidence": "high",
+   "direction": "rising",
+   "first_seen": "2026-08-06",
+   "dedup_group": "dg_1",
+   "oem_group": null,
+   "evidence": [
+    "Nike Vomero 17 uses multiple forefoot rubber islands with a perimeter heel patch; reviewers highlight the segmentation aiding transitions and strong grip.",
+    "Reviewers call the Vomero 17’s outsole full-length and very grippy versus minimal-rubber designs common a few years ago.",
+    "ASICS GEL-Nimbus 26 combines AHARPLUS with HYBRID ASICSGRIP rubber to improve traction and durability on wet roads.",
+    "Nike Invincible 3 updated its waffle outsole with slightly deeper lugs for better traction versus prior versions.",
+    "Commercial signal: Nike’s Vomero Plus/18 are listed as Best Sellers at Running Warehouse with limited sizes left, indicating strong sell-through in this outsole pattern class."
+   ],
+   "co_occurring": [
+    "segmented rubber",
+    "decoupled heel",
+    "flex grooves"
+   ],
+   "indices": {
+    "commercial": "high",
+    "cultural": "medium",
+    "forecast": "medium",
+    "feasibility": "high"
+   },
+   "adoption_stage": "established",
+   "last_change": "not_required",
+   "bottom_tooling_change": "modification",
+   "upper_pattern_change": "minor"
+  },
+  {
+   "signal_id": "sg_002",
+   "attribute": "wide_base_sidewalls_neutral_stability",
+   "label": "Wide-base sidewalls neutral stability",
+   "axis": "Midsole geometry",
+   "observed_count": 4,
+   "sources": [
+    "https://www.nike.com/a/nike-invincible-3-release",
+    "https://corp.asics.com/en/press/article/the-new-asics-novablasttm-4-shoe-will-add-bounce-to-your-step-as-you-move-your-mind",
+    "https://www.doctorsofrunning.com/2023/11/asics-gel-nimbus-26-review-2023.html",
+    "https://www.outdoorgearlab.com/reviews/shoes-and-boots/running-shoes-men/asics-gel-nimbus-26"
+   ],
+   "price_bands": [],
+   "confidence": "high",
+   "direction": "rising",
+   "first_seen": "2026-08-06",
+   "dedup_group": "dg_2",
+   "oem_group": null,
+   "evidence": [
+    "Nike Invincible 3 adds a wider heel/midsole platform and a smaller, better-placed heel clip to keep the foot centered without posts.",
+    "ASICS Novablast 4 introduces a new heel construction for a more supportive ride within a neutral trainer.",
+    "ASICS GEL-Nimbus 26 is reviewed as a ‘stable neutral’ due to its wide sole flare, rearfoot sidewalls and rocker balancing the soft ride.",
+    "Independent reviews note Nimbus 26’s wide platform feels inherently stable on smooth roads."
+   ],
+   "co_occurring": [
+    "wide platform",
+    "midsole sidewalls",
+    "smaller heel clip",
+    "neutral_stable"
+   ],
+   "indices": {
+    "commercial": "medium",
+    "cultural": "medium",
+    "forecast": "medium",
+    "feasibility": "medium"
+   },
+   "adoption_stage": "growing",
+   "last_change": "not_required",
+   "bottom_tooling_change": "modification",
+   "upper_pattern_change": "minor"
+  },
+  {
+   "signal_id": "sg_003",
+   "attribute": "engineered_upper_gusseted_tongue",
+   "label": "Engineered knit/woven upper with gusseted tongue",
+   "axis": "Upper pattern",
+   "observed_count": 4,
+   "sources": [
+    "https://news-emea.asics.com/latest-news/back-with-a-bounce--asics-launches-the-new-novablast--4-shoe/s/eec49708-a320-40f1-81a4-8a5946a236a6",
+    "https://nz.hoka.com/products/m-clifton-9-1127895-blcks-blcks",
+    "https://www.asics.com/au/en-au/p/1011B887-020.html",
+    "https://www.nike.com/a/nike-invincible-3-release"
+   ],
+   "price_bands": [],
+   "confidence": "high",
+   "direction": "rising",
+   "first_seen": "2026-08-06",
+   "dedup_group": "dg_3",
+   "oem_group": null,
+   "evidence": [
+    "ASICS Novablast 4 moves to an engineered woven upper with an upgraded gusseted ‘tongue wing’ to reduce tongue movement and improve midfoot hold.",
+    "HOKA Clifton 9 specifies an engineered knit upper and a gusseted tongue, with fewer overlays and a plusher heel.",
+    "ASICS Novablast 4 LE notes its engineered mesh approach reduces the need for additional overlays while maintaining fit.",
+    "Nike Invincible 3 uses a zonal Flyknit upper for a snug, breathable lockdown around a wide platform."
+   ],
+   "co_occurring": [
+    "engineered upper",
+    "gusseted tongue",
+    "reduced overlays",
+    "padded heel collar"
+   ],
+   "indices": {
+    "commercial": "high",
+    "cultural": "medium",
+    "forecast": "medium",
+    "feasibility": "high"
+   },
+   "adoption_stage": "established",
+   "last_change": "not_required",
+   "bottom_tooling_change": "not_required",
+   "upper_pattern_change": "minor"
+  },
+  {
+   "signal_id": "sg_004",
+   "attribute": "wet_grip_oriented_outsole",
+   "label": "Wet‑grip oriented rubber compounds and patterns",
+   "axis": "Outsole compounds & pattern",
+   "observed_count": 4,
+   "sources": [
+    "https://corp3.asics.com/en/press/article/move-your-mind-in-plush-comfort-with-the-new-asics-gel-nimbustm-26-shoe-",
+    "https://www.livescience.com/health/exercise/nike-invincible-3-review",
+    "https://www.runningwarehouse.com/reviews/nike-shoe-reviews/nike-vomero-17.html",
+    "https://www.doctorsofrunning.com/2024/02/asics-gel-cumulus-26-2024-surprisingly.html"
+   ],
+   "price_bands": [],
+   "confidence": "high",
+   "direction": "rising",
+   "first_seen": "2026-08-06",
+   "dedup_group": "dg_4",
+   "oem_group": null,
+   "evidence": [
+    "ASICS GEL-Nimbus 26 introduces HYBRID ASICSGRIP combined with AHARPLUS to boost traction and durability on wet roads.",
+    "Nike Invincible 3’s outsole gets slightly deeper waffle lugs to improve traction versus prior versions.",
+    "Reviewers note the Vomero 17’s full-coverage, grippy rubber gives confident road traction compared with lighter rubberized-foam outsoles.",
+    "By contrast, ASICS GEL-Cumulus 26’s rubberized EVA ‘Fluidride’ outsole is frequently reported as only average on wet roads, underscoring traction compounds as a differentiator."
+   ],
+   "co_occurring": [
+    "HYBRID ASICSGRIP/AHARPLUS",
+    "deeper waffle lugs",
+    "segmented rubber"
+   ],
+   "indices": {
+    "commercial": "medium",
+    "cultural": "medium",
+    "forecast": "medium",
+    "feasibility": "high"
+   },
+   "adoption_stage": "growing",
+   "last_change": "not_required",
+   "bottom_tooling_change": "modification",
+   "upper_pattern_change": "minor"
+  },
+  {
+   "signal_id": "sg_005",
+   "attribute": "dual_density_peba_top_layer",
+   "label": "Dual‑density midsoles with PEBA/supercritical top layer",
+   "axis": "Midsole materials & construction",
+   "observed_count": 4,
+   "sources": [
+    "https://www.runningwarehouse.com/reviews/nike-shoe-reviews/nike-vomero-17.html",
+    "https://www.runnersworld.com/gear/a61764314/hoka-skyward-x-review/",
+    "https://www.runnersworld.com/gear/a46762781/super-trainers-illegal-running-shoes/",
+    "https://www.nike.com/t/vomero-plus-mens-road-running-shoes-5npsVBwT/IQ0605-701"
+   ],
+   "price_bands": [],
+   "confidence": "high",
+   "direction": "rising",
+   "first_seen": "2026-08-06",
+   "dedup_group": "dg_5",
+   "oem_group": null,
+   "evidence": [
+    "Nike Vomero 17 stacks a plush ZoomX (PEBA) top layer over firmer Cushlon 3.0 for a stable, soft daily ride.",
+    "HOKA Skyward X combines PEBA foam on top of a (supercritical) EVA carrier with a plate, exemplifying super‑trainer layering applied to high‑stack training.",
+    "Runners World documents that ‘super’ trainer foams are commonly PEBA-based (e.g., ZoomX, FF Turbo) as brands port race‑foam feel to trainers.",
+    "Retail descriptions for Vomero lines emphasize large ZoomX stacks in daily trainers, showing this construction is not limited to racers."
+   ],
+   "co_occurring": [
+    "dual density",
+    "PEBA layer",
+    "high stack",
+    "neutral_stable"
+   ],
+   "indices": {
+    "commercial": "high",
+    "cultural": "high",
+    "forecast": "medium",
+    "feasibility": "medium"
+   },
+   "adoption_stage": "growing",
+   "last_change": "not_required",
+   "bottom_tooling_change": "modification",
+   "upper_pattern_change": "minor"
+  },
+  {
+   "signal_id": "sg_006",
+   "attribute": "drop_alignment_6_to_10mm",
+   "label": "6–10 mm heel‑to‑toe drop alignment in high‑stack trainers",
+   "axis": "Midsole geometry (drop)",
+   "observed_count": 4,
+   "sources": [
+    "https://www.asics.com/on/demandware.store/Sites-asics-au-Site/en_AU/Product-Variation?pid=AOP_1011B693-021",
+    "https://www.nike.com/t/pegasus-41-prm-mens-road-running-shoes-R6tpoXaD/HQ2938-800?nikemt=true",
+    "https://www.nike.com/t/vomero-premium-mens-road-running-shoes-l11miwwa/HQ2050-102",
+    "https://cl.hoka.com/p/hoka-clifton-10-black-white/"
+   ],
+   "price_bands": [],
+   "confidence": "high",
+   "direction": "rising",
+   "first_seen": "2026-08-06",
+   "dedup_group": "dg_6",
+   "oem_group": null,
+   "evidence": [
+    "ASICS Novablast 4 spec lists 8 mm drop in men’s sizing (41.5/33.5 mm stack), aligning with mid‑drop daily trainer norms.",
+    "Nike Pegasus 41 lists a 10 mm drop with ReactX and Air Zoom units, reinforcing mid‑drop as the line’s standard.",
+    "Nike Vomero 17/Plus specifies a 10 mm drop in product detail pages across regions, pairing mid‑drop with high ZoomX stacks.",
+    "HOKA Clifton 10 raises drop to 8 mm (from 5 mm), signaling a shift of a core HOKA daily trainer into the 6–10 mm band."
+   ],
+   "co_occurring": [
+    "high stack",
+    "moderate rocker",
+    "neutral_stable"
+   ],
+   "indices": {
+    "commercial": "high",
+    "cultural": "medium",
+    "forecast": "medium",
+    "feasibility": "medium"
+   },
+   "adoption_stage": "growing",
+   "last_change": "modification",
+   "bottom_tooling_change": "required",
+   "upper_pattern_change": "minor"
+  }
+ ],
+ "competitors": [
+  {
+   "product_id": "pl_10",
+   "brand": "HOKA",
+   "name": "Clifton 9 GTX Knitted Trainers (GREY SKIES)",
+   "price_krw": 194000,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "Bestseller (badge on PDP)"
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-07, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "strong",
+   "source_urls": [
+    "https://www.selfridges.com/HK/en/product/hoka-clifton-9-gtx-knitted-trainers_R04567849/"
+   ],
+   "rank_note": "Bestseller (badge on PDP)",
+   "rank_semantics": "retailer_bestseller_membership",
+   "competitor_group": "commercial_leader",
+   "construction_tier": "strobel + cemented (assumed typical)",
+   "design_traits": [
+    "engineered knit/mesh upper",
+    "lace closure",
+    "GORE‑TEX laminate",
+    "EVA high‑stack midsole",
+    "segmented rubber outsole",
+    "moderate rocker",
+    "drop ≈5 mm",
+    "competitor_group: adjacent"
+   ],
+   "image_urls": [
+    "https://www.selfridges.com/HK/en/product/hoka-clifton-9-gtx-knitted-trainers_R04567849/"
+   ],
+   "product_url": "https://www.selfridges.com/HK/en/product/hoka-clifton-9-gtx-knitted-trainers_R04567849/",
+   "retailer": "Selfridges"
+  },
+  {
+   "product_id": "pl_11",
+   "brand": "HOKA",
+   "name": "Bondi 9 Wide – Black/Black (1162013‑BBLC)",
+   "price_krw": 229000,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "Top 10 running shoes (sales‑amount basis, 2025‑09‑01~09‑09) — rank #1"
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-07, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "strong",
+   "source_urls": [
+    "https://www.musinsa.com/content/1415922625571882682",
+    "https://www.musinsa.com/products/5298347"
+   ],
+   "rank_note": "Top 10 running shoes (sales‑amount basis, 2025‑09‑01~09‑09) — rank #1",
+   "rank_semantics": "verified_sales_rank",
+   "competitor_group": "commercial_leader",
+   "construction_tier": "strobel + cemented (assumed typical)",
+   "design_traits": [
+    "engineered mesh upper",
+    "lace closure",
+    "EVA high‑stack midsole",
+    "segmented rubber outsole",
+    "moderate rocker",
+    "drop 4 mm",
+    "competitor_group: adjacent"
+   ],
+   "image_urls": [
+    "https://www.musinsa.com/products/5298347"
+   ],
+   "product_url": "https://www.musinsa.com/products/5298347",
+   "retailer": "MUSINSA (KICKS)"
+  },
+  {
+   "product_id": "pl_12",
+   "brand": "ASICS",
+   "name": "GEL‑NIMBUS 27 – Black/Lake Grey (1011B957‑002)",
+   "price_krw": 209000,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "Top 10 running shoes (sales‑amount basis, 2025‑09‑01~09‑09) — rank #4"
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-07, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "strong",
+   "source_urls": [
+    "https://www.musinsa.com/content/1415922625571882682",
+    "https://www.musinsa.com/products/5266523"
+   ],
+   "rank_note": "Top 10 running shoes (sales‑amount basis, 2025‑09‑01~09‑09) — rank #4",
+   "rank_semantics": "verified_sales_rank",
+   "competitor_group": "commercial_leader",
+   "construction_tier": "strobel + cemented (assumed typical)",
+   "design_traits": [
+    "engineered mesh upper",
+    "lace closure",
+    "FF BLAST+ ECO high‑cushion midsole",
+    "segmented rubber outsole",
+    "moderate rocker",
+    "drop 8 mm",
+    "competitor_group: adjacent"
+   ],
+   "image_urls": [
+    "https://www.musinsa.com/products/5266523"
+   ],
+   "product_url": "https://www.musinsa.com/products/5266523",
+   "retailer": "MUSINSA (KICKS)"
+  },
+  {
+   "product_id": "pl_13",
+   "brand": "FESSURA",
+   "name": "RACE 01 Carbon Plate Running Shoes (FR01084SA, unisex)",
+   "price_krw": 329000,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "Seller ‘Best’ list — position 04 (storewide best)"
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-07, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "strong",
+   "source_urls": [
+    "https://www.ssg.com/sellerhome/130100.ssg",
+    "https://www.ssg.com/search.ssg?_mpop=no&count=30&display=list&filterSiteNo=6009&page=37&query=%EB%9F%AC%EB%8B%9D%ED%99%94&siteTabNo=6005&target=mobile&viewType=lst"
+   ],
+   "rank_note": "Seller ‘Best’ list — position 04 (storewide best)",
+   "rank_semantics": "surface_position",
+   "competitor_group": "commercial_leader",
+   "construction_tier": "strobel + cemented (assumed; carbon plated)",
+   "design_traits": [
+    "engineered mesh upper",
+    "lace closure",
+    "carbon plate",
+    "mid/high stack midsole",
+    "segmented rubber outsole",
+    "moderate rocker",
+    "competitor_group: aspirational"
+   ],
+   "image_urls": [
+    "https://www.ssg.com/search.ssg?_mpop=no&count=30&display=list&filterSiteNo=6009&page=37&query=%EB%9F%AC%EB%8B%9D%ED%99%94&siteTabNo=6005&target=mobile&viewType=lst"
+   ],
+   "product_url": "https://www.ssg.com/sellerhome/130100.ssg",
+   "retailer": "SSG.COM (Shinsegae Dept. — Gwangju ‘Y‑Concept’ seller)"
+  },
+  {
+   "product_id": "pl_14",
+   "brand": "On",
+   "name": "Cloudmonster – Rubber‑Trimmed Mesh Running Sneakers (Black)",
+   "price_krw": 221000,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "Listed under ‘running shoes’; no bestseller badge on PDP at time of check"
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-07, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "strong",
+   "source_urls": [
+    "https://www.mrporter.com/en-us/mens/product/on/sport/running-shoes/cloudmonster-rubber-trimmed-mesh-running-sneakers/1647597342044303",
+    "https://www.mrporter.com/en-us/mens/product/on/sport/running-shoes/cloudmonster-rubber-trimmed-mesh-running-sneakers/46376663163010316"
+   ],
+   "rank_note": "Listed under ‘running shoes’; no bestseller badge on PDP at time of check",
+   "rank_semantics": "none",
+   "competitor_group": "commercial_leader",
+   "design_traits": [
+    "engineered mesh upper",
+    "lace closure",
+    "Helion ‘superfoam’ + Double CloudTec high‑stack midsole",
+    "segmented rubber outsole",
+    "rockered forefoot",
+    "drop ≈6 mm",
+    "competitor_group: adjacent"
+   ],
+   "image_urls": [
+    "https://www.mrporter.com/en-us/mens/product/on/sport/running-shoes/cloudmonster-rubber-trimmed-mesh-running-sneakers/1647597342044303"
+   ],
+   "product_url": "https://www.mrporter.com/en-us/mens/product/on/sport/running-shoes/cloudmonster-rubber-trimmed-mesh-running-sneakers/1647597342044303",
+   "retailer": "MR PORTER (for image/tech reference; overseas luxury)"
+  },
+  {
+   "product_id": "cp_1",
+   "brand": "ASICS",
+   "name": "Novablast 6",
+   "price_krw": 179000,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "The NOVABLAST collection lists Novablast 6 in multiple variants, and the listing showed several items as sold out on 2026-08-06. ([asics.co.kr](https://www.asics.co.kr/c/novablast?code=00270006&iframe=&page=1&popup=&utm_source=openai))",
+    "The Women Running Shoes listing shows Novablast 6 Women, and every size on that card was marked sold out in the snapshot. This signals demand but is not a sales guarantee. ([asics.co.kr](https://www.asics.co.kr/c/w-running-shoes?utm_source=openai))"
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-06, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "moderate",
+   "source_urls": [
+    "https://asics.co.kr/p/AKR_112630211-002",
+    "https://asics.co.kr/c/novablast-5?code=002000100001&iframe=&page=1&popup=",
+    "https://www.asics.co.kr/c/w-running-shoes"
+   ],
+   "rank_note": "The NOVABLAST collection offers a Sales Popularity sort, but no explicit rank number is displayed as of 2026-08-06.",
+   "rank_semantics": "none",
+   "competitor_group": "direct",
+   "brand_line": "NOVABLAST",
+   "construction_tier": "The shoe uses an FF BLAST MAX foam midsole and an ASICSGRIP rubber outsole. There is no plate listed in the official spec. ([asics.co.kr](https://asics.co.kr/p/AKR_112630211-002?utm_source=openai))",
+   "user_sentiment": "unknown",
+   "praise_points": [],
+   "complaint_points": [],
+   "design_traits": [
+    "The upper is an engineered woven material with a lace closure, as listed in the spec. ([asics.co.kr](https://asics.co.kr/p/AKR_112630211-002?utm_source=openai))",
+    "The midsole is a high volume foam unit labeled FF BLAST MAX. ([asics.co.kr](https://asics.co.kr/p/AKR_112630211-002?utm_source=openai))",
+    "The outsole specifies ASICSGRIP rubber for traction. ([asics.co.kr](https://asics.co.kr/p/AKR_112630211-002?utm_source=openai))"
+   ],
+   "size_status": "unknown",
+   "colorway_count": 4,
+   "image_urls": [],
+   "product_url": "https://asics.co.kr/p/AKR_112630211-002"
+  },
+  {
+   "product_id": "cp_2",
+   "brand": "ASICS",
+   "name": "GEL-Nimbus 28",
+   "price_krw": 199000,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "A dedicated GEL-NIMBUS 28 collection is active on the KR DTC site with many variants and colors. ([asics.co.kr](https://asics.co.kr/c/gel_nimbus?code=00270002&iframe=&page=1&popup=&utm_source=openai))",
+    "The product page for a men’s colorway was live with an extensive size list on 2026-08-06. ([asics.co.kr](https://www.asics.co.kr/p/AKR_112630225-004?utm_source=openai))"
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-06, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "moderate",
+   "source_urls": [
+    "https://asics.co.kr/c/gel_nimbus?code=00270002&iframe=&page=1&popup=",
+    "https://m.asics.co.kr/c/sports_gel-nimbus28",
+    "https://m.asics.co.kr/goods/view_contents?no=21827&view_preload=1&zoom=1",
+    "https://www.asics.co.kr/p/AKR_112630225-004"
+   ],
+   "rank_note": "The GEL-NIMBUS 28 collection supports a Sales Popularity sort, but no numeric rank is shown as of 2026-08-06.",
+   "rank_semantics": "none",
+   "competitor_group": "direct",
+   "brand_line": "GEL-NIMBUS",
+   "construction_tier": "The midsole pairs FF BLAST PLUS cushioning with PureGEL, and the outsole combines ASICSGRIP with AHAR LO. ([m.asics.co.kr](https://m.asics.co.kr/goods/view_contents?no=21827&view_preload=1&zoom=1))",
+   "user_sentiment": "unknown",
+   "praise_points": [],
+   "complaint_points": [],
+   "design_traits": [
+    "The upper uses an engineered knit with a standard lace closure. ([asics.co.kr](https://www.asics.co.kr/p/AKR_112630225-004?utm_source=openai))",
+    "The cushioning stack uses FF BLAST PLUS with a PureGEL insert. ([m.asics.co.kr](https://m.asics.co.kr/goods/view_contents?no=21827&view_preload=1&zoom=1))",
+    "The outsole lists ASICSGRIP and AHAR LO compounds. ([m.asics.co.kr](https://m.asics.co.kr/goods/view_contents?no=21827&view_preload=1&zoom=1))"
+   ],
+   "offered_sizes": 12,
+   "available_sizes": 11,
+   "size_status": "partial",
+   "colorway_count": 5,
+   "image_urls": [],
+   "product_url": "https://www.asics.co.kr/p/AKR_112630225-004"
+  },
+  {
+   "product_id": "cp_3",
+   "brand": "ASICS",
+   "name": "Superblast 3",
+   "price_krw": 259000,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "The KR DTC product page is live with full technical specs and pricing, which indicates an actively sold model. ([asics.co.kr](https://asics.co.kr/p/AKR_112630203-001?utm_source=openai))"
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-06, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "weak",
+   "source_urls": [
+    "https://asics.co.kr/p/AKR_112630203-001",
+    "https://asics.co.kr/p/AKR_112610215-400"
+   ],
+   "rank_note": "There is no bestseller or rank badge on the KR DTC product page as of 2026-08-06.",
+   "rank_semantics": "none",
+   "competitor_group": "aspirational",
+   "brand_line": "SUPERBLAST",
+   "construction_tier": "The midsole stacks FF LEAP with FF BLAST PLUS, and the outsole lists ASICSGRIP with AHAR LO. ([asics.co.kr](https://asics.co.kr/p/AKR_112630203-001?utm_source=openai))",
+   "user_sentiment": "unknown",
+   "praise_points": [],
+   "complaint_points": [],
+   "design_traits": [
+    "The shoe uses a very high stack dual-foam midsole for daily training. ([asics.co.kr](https://asics.co.kr/p/AKR_112630203-001?utm_source=openai))",
+    "The outsole specifies ASICSGRIP with AHAR LO rubber. ([asics.co.kr](https://asics.co.kr/p/AKR_112630203-001?utm_source=openai))"
+   ],
+   "size_status": "unknown",
+   "image_urls": [],
+   "product_url": "https://asics.co.kr/p/AKR_112630203-001"
+  },
+  {
+   "product_id": "cp_4",
+   "brand": "HOKA",
+   "name": "Clifton 11",
+   "price_krw": 0,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "It appears in the HOKA AU Best Sellers collection.",
+    "It is promoted on regional homepages as a current style."
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-06, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "moderate",
+   "source_urls": [
+    "https://au.hoka.com/products/clifton-11-1176572-gctc-gctc",
+    "https://au.hoka.com/categories/best-sellers"
+   ],
+   "rank_note": "It appears on the HOKA AU Best Sellers page without a numbered rank.",
+   "rank_semantics": "retailer_bestseller_membership",
+   "competitor_group": "adjacent",
+   "brand_line": "Performance Running",
+   "construction_tier": "CMEVA midsole with no plate.",
+   "user_sentiment": "unknown",
+   "praise_points": [],
+   "complaint_points": [],
+   "design_traits": [
+    "The shoe uses an engineered mesh upper.",
+    "The midsole is compression molded EVA.",
+    "The geometry uses Smooth MetaRocker.",
+    "The heel uses a rearfoot‑focused Active Foot Frame.",
+    "The outsole uses abrasion rubber placed in zones."
+   ],
+   "offered_sizes": 15,
+   "size_status": "unknown",
+   "image_urls": [
+    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/https%3A//s3.ap-southeast-2.amazonaws.com/media.au.hoka.com/products/a5fd5f01-73f2-42f0-88bf-099981471527/a3247973/1176572-gctc_gctc_01.jpg",
+    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/https%3A//s3.ap-southeast-2.amazonaws.com/media.au.hoka.com/products/a5fd5f01-73f2-42f0-88bf-099981471527/94d2efe7/1176572-gctc_gctc_02.jpg",
+    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/https%3A//s3.ap-southeast-2.amazonaws.com/media.au.hoka.com/products/a5fd5f01-73f2-42f0-88bf-099981471527/3fe8434d/1176572-gctc_gctc_03.jpg"
+   ],
+   "product_url": "https://au.hoka.com/products/clifton-11-1176572-gctc-gctc"
+  },
+  {
+   "product_id": "cp_5",
+   "brand": "HOKA",
+   "name": "Mach 6",
+   "price_krw": 0,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "All sizes are marked Out of Stock on the HOKA AU product page for the Black color."
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-06, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "weak",
+   "source_urls": [
+    "https://au.hoka.com/products/m-mach-6-1147790-bblc-bblc",
+    "https://nz.hoka.com/products/w-mach-6-1147810-bblc-bblc"
+   ],
+   "rank_note": "",
+   "rank_semantics": "none",
+   "competitor_group": "adjacent",
+   "brand_line": "Performance Running",
+   "construction_tier": "Supercritical EVA midsole with no plate.",
+   "user_sentiment": "unknown",
+   "praise_points": [],
+   "complaint_points": [],
+   "design_traits": [
+    "The shoe uses a creel jacquard mesh upper with zonal breathability.",
+    "The midsole uses supercritical foam for high energy return.",
+    "The outsole has strategic rubber coverage in segments.",
+    "The tongue is anatomical with a dual internal gusset."
+   ],
+   "offered_sizes": 15,
+   "available_sizes": 0,
+   "size_status": "sold_out",
+   "image_urls": [
+    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/7765ead5-cce5-4b47-93aa-1b9fc1bbab4b/d6ddac10/1147790-bblc_bblc_01.jpg",
+    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/7765ead5-cce5-4b47-93aa-1b9fc1bbab4b/1388cfd5/1147790-bblc_bblc_02.jpg"
+   ],
+   "product_url": "https://au.hoka.com/products/m-mach-6-1147790-bblc-bblc"
+  },
+  {
+   "product_id": "cp_6",
+   "brand": "HOKA",
+   "name": "Skyward X",
+   "price_krw": 0,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "All sizes are marked Out of Stock on the HOKA AU product page for the Clear Sea and Alpine Blue color."
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-06, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "weak",
+   "source_urls": [
+    "https://au.hoka.com/products/m-skyward-x-1147911-cslp-cslp",
+    "https://au.hoka.com/blog/the-rundown-performance-running"
+   ],
+   "rank_note": "",
+   "rank_semantics": "none",
+   "competitor_group": "aspirational",
+   "brand_line": "Performance Running",
+   "construction_tier": "PEBA core with supercritical EVA frame and a carbon plate.",
+   "user_sentiment": "unknown",
+   "praise_points": [],
+   "complaint_points": [],
+   "design_traits": [
+    "The midsole stacks a soft PEBA layer above a supercritical EVA frame.",
+    "The shoe uses a convex carbon fiber plate as a suspension element.",
+    "The ride is positioned as very plush and lively for easy miles."
+   ],
+   "offered_sizes": 15,
+   "available_sizes": 0,
+   "size_status": "sold_out",
+   "image_urls": [
+    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/4e3ab4bd-343c-4c4e-af94-71aa0f8b131a/b63b1bab/1147911-cslp_cslp_01.jpg",
+    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/4e3ab4bd-343c-4c4e-af94-71aa0f8b131a/9ebc3b11/1147911-cslp_cslp_02.jpg",
+    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/4e3ab4bd-343c-4c4e-af94-71aa0f8b131a/734b5563/1147911-cslp_cslp_03.jpg"
+   ],
+   "product_url": "https://au.hoka.com/products/m-skyward-x-1147911-cslp-cslp"
+  },
+  {
+   "product_id": "cp_7",
+   "brand": "Nike",
+   "name": "Vomero 18",
+   "price_krw": 189000,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "Womens Road Running category marks Vomero 18 as Bestseller.",
+    "Product page shows 4.7 stars from 460 reviews today."
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-06, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "strong",
+   "source_urls": [
+    "https://www.nike.com/kr/w/women-road-running-shoes-37v7jz5e1x6z8kwewzy7ok",
+    "https://www.nike.com/kr/t/%EB%82%98%EC%9D%B4%ED%82%A4-%EB%B3%B4%EB%A9%94%EB%A1%9C-18-%EC%97%AC%EC%84%B1-%EB%A1%9C%EB%93%9C-%EB%9F%AC%EB%8B%9D%ED%99%94-t2gD5z3G/HM6804-402",
+    "https://about.nike.com/es-419/newsroom/releases/vomero-18-brings-maximum-cushioning-to-nikes-new-road-running-lineup"
+   ],
+   "rank_note": "Category listing shows the tag Bestseller on Vomero 18.",
+   "rank_semantics": "retailer_bestseller_membership",
+   "competitor_group": "direct",
+   "brand_line": "Running",
+   "construction_tier": "ZoomX supercritical + ReactX, no plate",
+   "user_sentiment": "positive",
+   "praise_points": [
+    "Soft cushioning noted repeatedly in reviews.",
+    "Comfortable for daily use appears often."
+   ],
+   "complaint_points": [
+    "Toe box feels narrow appears in multiple reviews."
+   ],
+   "design_traits": [
+    "Engineered mesh upper with padded tongue and collar.",
+    "Dual-density ZoomX over ReactX midsole, high stack.",
+    "Waffle rubber outsole with flex grooves.",
+    "10 mm drop and MR-10 last fit."
+   ],
+   "offered_sizes": 9,
+   "available_sizes": 9,
+   "size_status": "full",
+   "image_urls": [
+    "https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/db0f5f2b-0144-43b7-8c4c-ddc03578b2d5/W%2BNIKE%2BVOMERO%2B18.png",
+    "https://static.nike.com/a/images/t_PDP_144_v1/f_auto%2Cq_auto%3Aeco%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/46925fa3-c5ad-4a2b-86eb-102c2742bd6a/W%2BNIKE%2BVOMERO%2B18.png"
+   ],
+   "product_url": "https://www.nike.com/kr/t/%EB%82%98%EC%9D%B4%ED%82%A4-%EB%B3%B4%EB%A9%94%EB%A1%9C-18-%EC%97%AC%EC%84%B1-%EB%A1%9C%EB%93%9C-%EB%9F%AC%EB%8B%9D%ED%99%94-t2gD5z3G/HM6804-402"
+  },
+  {
+   "product_id": "cp_8",
+   "brand": "Nike",
+   "name": "Structure Plus",
+   "price_krw": 209000,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "Product page shows active reviews today.",
+    "Featured in Men Road Running selection pages."
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-06, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "strong",
+   "source_urls": [
+    "https://www.nike.com/kr/t/%EB%82%98%EC%9D%B4%ED%82%A4-%EC%8A%A4%ED%8A%B8%EB%9F%AD%EC%B2%98-%ED%94%8C%EB%9F%AC%EC%8A%A4-%EB%82%A8%EC%84%B1-%EB%A1%9C%EB%93%9C-%EB%9F%AC%EB%8B%9D%ED%99%94-xhR97O1N/II7192-100",
+    "https://about.nike.com/en/newsroom/releases/nike-structure-plus-official-images",
+    "https://www.nike.com/kr/w/men-road-running-shoes-37v7jz8kwewznik1zy7ok"
+   ],
+   "rank_note": "",
+   "rank_semantics": "none",
+   "competitor_group": "direct",
+   "brand_line": "Running",
+   "construction_tier": "ZoomX supercritical + ReactX, no plate",
+   "user_sentiment": "positive",
+   "praise_points": [
+    "Strong midfoot and arch support recurs in reviews.",
+    "Comfortable cushioning cited by multiple users."
+   ],
+   "complaint_points": [],
+   "design_traits": [
+    "Engineered mesh upper with midfoot support band.",
+    "ZoomX on ReactX double-stack midsole, high stack.",
+    "Dual-compound rubber outsole, soft forefoot and hard heel.",
+    "10 mm drop and reflective details."
+   ],
+   "offered_sizes": 11,
+   "available_sizes": 11,
+   "size_status": "full",
+   "image_urls": [
+    "https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/aa001ff5-8d32-45f1-bba8-d4e66914d478/NIKE%2BSTRUCTURE%2BPLUS%2BRR.png",
+    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto%2Cq_auto%3Aeco%2Cc_scale%2Cw_300%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/f2d80603-e8b2-4cbe-af5f-ffbd00cb6255/NIKE%2BSTRUCTURE%2BPLUS%2BRR.png"
+   ],
+   "product_url": "https://www.nike.com/kr/t/%EB%82%98%EC%9D%B4%ED%82%A4-%EC%8A%A4%ED%8A%B8%EB%9F%AD%EC%B2%98-%ED%94%8C%EB%9F%AC%EC%8A%A4-%EB%82%A8%EC%84%B1-%EB%A1%9C%EB%93%9C-%EB%9F%AC%EB%8B%9D%ED%99%94-xhR97O1N/II7192-100"
+  },
+  {
+   "product_id": "cp_9",
+   "brand": "Nike",
+   "name": "Pegasus 42",
+   "price_krw": 169000,
+   "sales_proxy_score": null,
+   "proxy_signals": [
+    "Pegasus collection shows Pegasus 42 tagged Bestseller.",
+    "Product page shows active review feed today."
+   ],
+   "observation_count": 1,
+   "observation_window": "2026-08-06, single pass",
+   "confidence": "none",
+   "in_band": true,
+   "evidence_strength": "strong",
+   "source_urls": [
+    "https://www.nike.com/kr/w/pegasus-1n3adz4g797z6s5r5z8nexh",
+    "https://www.nike.com/kr/t/%EB%82%98%EC%9D%B4%ED%82%A4-%ED%8E%98%EA%B0%80%EC%88%98%EC%8A%A5-42-%EC%97%AC%EC%84%B1-%EB%A1%9C%EB%93%9C-%EB%9F%AC%EB%8B%9D%ED%99%94-wsTF7yIV/IB1881-102",
+    "https://www.nike.com/kr/a/pegasus-42-release-date"
+   ],
+   "rank_note": "Collection listing shows the tag Bestseller on Pegasus 42.",
+   "rank_semantics": "retailer_bestseller_membership",
+   "competitor_group": "adjacent",
+   "brand_line": "Running",
+   "construction_tier": "ReactX + full-length Air Zoom, non-supercritical",
+   "user_sentiment": "positive",
+   "praise_points": [
+    "Comfortable for walking and running noted by users.",
+    "Fit reported true to size by multiple reviewers."
+   ],
+   "complaint_points": [],
+   "design_traits": [
+    "Lightweight mesh upper with roomier toe box.",
+    "Full-length curved Air Zoom over ReactX midsole.",
+    "Waffle rubber outsole with flex grooves.",
+    "10 mm drop and MR-10 2.0 last."
+   ],
+   "offered_sizes": 9,
+   "available_sizes": 9,
+   "size_status": "full",
+   "image_urls": [
+    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto%2Cq_auto%3Aeco%2Cc_scale%2Cw_300%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/96c6cccf-7291-4fbf-a44b-af5f3d1e3760/W%2BNIKE%2BAIR%2BZOOM%2BPEGASUS%2B42.png",
+    "https://static.nike.com/a/images/w_1536%2Cc_auto%2Car_4%3A5%2Cf_auto%2Cq_auto/90f144b6-6839-45ba-9854-8f014a4cd433/image.jpg"
+   ],
+   "product_url": "https://www.nike.com/kr/t/%EB%82%98%EC%9D%B4%ED%82%A4-%ED%8E%98%EA%B0%80%EC%88%98%EC%8A%A4-42-%EC%97%AC%EC%84%B1-%EB%A1%9C%EB%93%9C-%EB%9F%AC%EB%8B%9D%ED%99%94-wsTF7yIV/IB1881-102"
+  }
+ ],
+ "directions": [
+  {
+   "id": "dir_1",
+   "title": "Square toe with a low block heel",
+   "summary": "The two strongest signals in this band, combined. It runs on the existing LST-2024-11 last, so development stays cheap.",
+   "signal_ids": [
+    "sg_014",
+    "sg_031"
+   ]
+  },
+  {
+   "id": "dir_2",
+   "title": "Chunky sole, played for volume",
+   "summary": "The chunky sole scores high culturally, pulled back to a volume that fits the brand. The new outsole mould, one per size, is the cost to watch — feasibility is the low index here.",
+   "signal_ids": [
+    "sg_027",
+    "sg_042"
+   ]
+  },
+  {
+   "id": "dir_3",
+   "title": "Soft classic, refined",
+   "summary": "Keeps the classic penny silhouette and improves the fit with suede and a gore panel. Restock signals back this one, so it is the safe axis.",
+   "signal_ids": [
+    "sg_042",
+    "sg_038"
+   ]
+  }
+ ],
+ "seriesDna": null,
+ "dnaConflict": null,
+ "reportBias": {
+  "publisher": "Web, collected 2026-08-06 across 15 searches",
+  "perspective": "Global DTC and review-led perspective for performance road running trainers (Asics, Hoka, Nike Running), with signals applicable to KR DTC FW26 assortments. Sources lean toward official brand product pages, specialist retailers, and independent review outlets.",
+  "notes": [
+   "Competitor-group fit vs. your spec: Primary matches include Nike Vomero 17/Plus (high-stack, 10 mm drop, segmented rubber, ZoomX PEBA; strong sell-through). Adjacent: ASICS GEL-Nimbus 26 (high-stack neutral with HYBRID ASICSGRIP/AHARPLUS; FF BLAST PLUS ECO not explicitly marketed as supercritical), ASICS Novablast 4 (engineered woven upper, 8 mm drop; foam not marketed as supercritical), HOKA Mach 6 (super critical foam but 5 mm drop), Aspirational: HOKA Skyward X (PEBA + supercritical EVA with plate; price-point and plate exceed typical daily-trainer profile). The commercial indices reference visible Best Seller flags and limited sizes on Running Warehouse at crawl time. Wet-grip is a core KR FW need; ASICS’ HYBRID ASICSGRIP/AHARPLUS messaging appears consistently across regions. Where stack/drop figures differ by gender/region, I used the most widely published men’s specs on official or retailer pages at the time of collection (August 2026)."
+  ]
+ },
+ "trendReport": {
+  "title": "FW26 Daily Trainer Running Shoes in KRW 150k–220k: KR DTC–anchored Trend Report",
+  "executive_view": "As of August 6, 2026, PUMA Magnify NITRO 3 is the clearest in‑scope daily trainer in Korea’s DTC channel, with NITROFOAM, a 40/30 mm stack, 10 mm drop, PUMAGRIP outsole, and 260 g stated weight at UK8, priced at KRW 199,000. Adidas Supernova Rise 3 sits in the same price neighborhood at KRW 159,000 with 37/29 mm stack, 8 mm drop, LIGHTTRAXION rubber, and explicit wide‑fit SKUs, but its midsole is not framed as supercritical, so it is tagged adjacent. ASICS NOVABLAST 5 shows an 8 mm drop and 255 g weight with engineered jacquard mesh and brand‑level materials indicating strong performance including Korea, yet its foam is not labeled supercritical and KR DTC page‑level badges are not captured in this dataset, so it remains adjacent. Broader form and fit moves in major franchises point to more forefoot rocker and roomier toe boxes, while emergent features such as wet‑grip rubber callouts and aggressive rocker geometries from aspirational or adjacent lines are likely to keep diffusing into this tier through FW26.",
+  "body_markdown": "## Direct demand and spec signals in KR DTC as of 2026-08-06\nPUMA Magnify NITRO 3 matches the requested FW26 daily trainer profile within KRW 150k–220k and is explicitly positioned for training runs. The KR PDP states NITROFOAM, a 40 mm heel and 30 mm forefoot stack with a 10 mm drop, PUMAGRIP rubber for varied‑surface grip including wet conditions, 260 g at UK8, and a KRW 199,000 price. Category context on PUMA Korea’s NITRO listing shows sold‑out labels on select racing SKUs, a directional signal that the NITRO family is drawing demand, though this is an indirect indicator for Magnify specifically. Rocker figures and outsole segmentation counts are not published on the PDP, so those remain unverified here.\n\nAdidas Supernova Rise 3 is sold in Korea as a daily runner with a popular‑sort option visible at category level and a separate Everyday Running collection that also frames Supernova for daily use. The KR PDP confirms an 8 mm drop with 37/29 mm stack and a LIGHTTRAXION outsole, and it lists wide‑fit SKUs; weight is not disclosed on the page referenced. Because the midsole is called Dreamstrike+ without a supercritical claim, it is treated as adjacent to the strict spec lens.\n\nASICS NOVABLAST 5 is positioned as a high‑cushion neutral daily trainer with an 8 mm drop, 255 g stated weight, and an engineered jacquard mesh upper on the official PDP cited. Brand materials discuss strong performance of the NOVABLAST 5 line globally with Korea included among performing regions, but the KR page‑level badges or restock logs were not captured in this dataset. Rubber compound naming is not specified in the PDP, and heel and forefoot stack figures were not found in the referenced page. As with Supernova Rise 3, the foam is not labeled supercritical in the cited sources, so it is kept adjacent for this exercise.\n\n## Last and fit\nMagnify NITRO 3 does not publish last width or toe box dimensions on the KR PDP, and there is no explicit wide‑fit option shown in the referenced link, so width availability should be treated as unknown. Adidas Supernova Rise 3 explicitly offers a wide‑fit SKU in Korea, signaling that wide variants are active in this daily trainer price tier. Where toe shape language is absent, any anatomic claims would be speculative, and are withheld here.\n\nShape and fit moves across major franchises point toward more forefoot room and an uptick in toe spring. Nike’s KR materials for Pegasus 42 state a wider toe box via an updated MR‑10 2.0 last and greater forefoot curvature than the prior model, and they cite 10 mm offset and about 300 g at 280 mm as context.\n\n## Upper structure\nMagnify NITRO 3 lists an engineered knit upper with laces and targeted PWRTAPE overlays on the KR PDP, so the overlay story is explicit and performance‑framed rather than decorative. Supernova Rise 3 lists a textile and synthetic upper with laces, with no knit gauge or reinforcement counts disclosed; the wide‑fit SKU suggests the upper pattern was graded for added forefoot volume. NOVABLAST 5 specifies an engineered jacquard mesh with laces, and ASICS communications elsewhere in the GEL‑NIMBUS 27 franchise highlight knit collars and targeted ventilation as a broader brand direction. Where exact mesh gauge and overlay thickness are absent, no numeric calls can be made from these pages.\n\nAdjacency and aspirational signals suggest 3D‑engineered textiles and minimalist film or heat‑bonded overlays are continuing to move downmarket. Adidas STRUNG remains a data‑driven, thread‑mapped upper concentrated in top Adizero models, and On’s LightSpray upper shows how sparse part counts can drive mass down aggressively; both are present mainly above this price band today.\n\n## Sole, heel, and tread\nMagnify NITRO 3 publishes a 40/30 mm stack, 10 mm drop, and PUMAGRIP rubber with wet‑surface language; official rocker numbers and the exact segmentation map are not provided. Supernova Rise 3 confirms 37/29 mm and an 8 mm drop with LIGHTTRAXION rubber, again without a segmentation or groove‑depth spec. NOVABLAST 5 lists an 8 mm drop and 255 g, but heel and forefoot stack values and rubber compound naming are not in the referenced PDP, and rocker metrics are also absent. Across the three, the quantifiable geometry sits in a 37–40 mm heel range with 8–10 mm drop, which aligns with the target brief and implies a moderate rocker experience, though only Nike’s Pegasus 42 text explicitly claims a stronger forefoot rocker among the broader franchises.\n\nFor wet‑grip positioning, PUMAGRIP and LIGHTTRAXION are the clearest named compounds in‑scope for this tier. Continental Rubber is highlighted elsewhere by adidas for marathon models as a wet and dry solution in higher‑tier product, and it commonly appears as a halo technology for grip narratives. On’s Cloudmonster 3 line shows an aggressively curved rocker paired with dual‑density foam and reworked bottom units, but those numbers live above or adjacent to this Korean daily trainer price tier.\n\n## Construction\nNone of the three referenced PDPs explicitly state construction method, so strobel plus cemented cannot be confirmed at SKU level from these links. The lens for this report targets strobel plus cemented for this tier, but that remains an unverified assumption for the specific models cited and is identified here as a data gap pending teardown or brand confirmation.\n\n## Adjacent and aspirational spillovers to monitor for FW26\nOn’s Cloudmonster 3 presents dual‑density Helion foam, a triple‑layer CloudTec bottom, an aggressively curved rocker, 35/29 mm stack, 6 mm drop, and 295 g at men’s US 8.5 with a US price of 190 dollars, placing it adjacent to this segment by price and intent. Cloudmonster 3 Hyper adds Helion HF, described by the brand as a Pebax hyper foam, with 39.5/33.5 mm, 6 mm drop, and 274 g at US 8.5, reaching 220 dollars. A LightSpray variant pushes part count reduction and mass to 205 g with a 45/39 mm stack and 6 mm drop at 330 dollars, which is aspirational and limited. Brooks Hyperion Elite 4 declares nitrogen‑infused DNA FLASH v2 cushioning at 8 mm drop and 221.1 g, reinforcing the visibility of supercritical or gas‑processed foams as a performance story even when racing‑centric.\n\nAdidas frames Continental Rubber as an all‑conditions outsole solution for marathon models and continues pushing 3D‑engineered STRUNG uppers at the top of Adizero, signaling potential grip and upper‑engineering narratives that can trickle into daily trainers. These examples suggest a sustained diffusion of wet‑grip nomenclature and more assertive rocker geometries into mid‑price daily trainers, though the precise curvature or decoupling specs remain unpublished for the in‑scope KR PDPs.\n\n## Macro context and shape evolution across major franchises\nNike’s Pegasus 42 in Korea documents a wider toe box via a new MR‑10 2.0 last and increased forefoot curvature compared with the prior model, while holding a 10 mm offset and roughly 300 g at 280 mm, reinforcing the direction toward more forefoot rocker and roomier fit. ASICS’ GEL‑NIMBUS 27 press notes about a 2 mm overall midsole thickness increase versus the previous generation with FF BLAST PLUS ECO and a knit‑treated tongue and collar, which aligns with softer upper interfaces and incremental stack growth in mainstream neutral trainers.\n\nAttempts to quantify KR DTC review counts, sell‑out speed, and restock frequency for FW26 refreshes relative to SS25–SS26 were not successful in this dataset. HOKA Clifton 10 and 11 provide published and reviewed stack numbers that illustrate how large stack jumps can happen between generations, but those figures are outside the KR DTC scope captured here and do not substitute for Korean sell‑through logs.",
+  "design_implications": [
+   {
+    "area": "라스트·핏",
+    "guidance": "Offer a standard last plus a true wide‑fit SKU and message forefoot room explicitly in copy and imagery.",
+    "basis": "Adidas Supernova Rise 3 KR PDP shows a wide‑fit option, and Nike’s Pegasus 42 KR materials describe a wider toe box with an updated MR‑10 2.0 last."
+   },
+   {
+    "area": "솔·힐·트레드",
+    "guidance": "Target heel and forefoot stacks in the 37–40 mm and 29–30 mm band with an 8–10 mm drop and a clearly named wet‑grip rubber compound.",
+    "basis": "Magnify NITRO 3 states 40/30 mm with a 10 mm drop and PUMAGRIP wet‑surface language; Supernova Rise 3 publishes 37/29 mm with an 8 mm drop and LIGHTTRAXION."
+   },
+   {
+    "area": "어퍼",
+    "guidance": "Use an engineered mesh or knit with targeted tape or film overlays that are performance‑named and visually minimal, and avoid heavy multi‑panel constructions.",
+    "basis": "Magnify NITRO 3 cites engineered knit with PWRTAPE overlays; NOVABLAST 5 cites engineered jacquard mesh; Nike notes a softer, more breathable mesh on Pegasus 42."
+   },
+   {
+    "area": "소재",
+    "guidance": "If a supercritical midsole is feasible at cost, keep a single‑compound ride story but consider a visual sidewall cue or naming convention to communicate the foam; if not, double down on a grip‑named rubber.",
+    "basis": "NITROFOAM is explicitly called out on Magnify NITRO 3, while Supernova Rise 3 does not claim supercritical and instead leans on LIGHTTRAXION; adjacent On models surface dual‑density and Pebax narratives."
+   },
+   {
+    "area": "실루엣",
+    "guidance": "Express a moderate rocker with visible forefoot curvature in profile photography without over‑promising curvature metrics that are not published.",
+    "basis": "Pegasus 42 copy in Korea claims increased toe spring; On Cloudmonster 3 describes an aggressively curved rocker, which is adjacent by price and can be visually referenced with restraint."
+   },
+   {
+    "area": "공법",
+    "guidance": "Proceed with strobel plus cemented if that is the intended build, but plan a teardown or brand confirmation before making public claims in PDP copy.",
+    "basis": "Construction is not disclosed for Magnify NITRO 3, Supernova Rise 3, or NOVABLAST 5 in the cited PDPs; the lens targets strobel plus cemented, but this remains unverified here."
+   },
+   {
+    "area": "솔·힐·트레드",
+    "guidance": "Publish mass alongside size context and aim for 255–295 g depending on sample size, while prioritizing grip messaging over outsole segmentation details if those are not standardized.",
+    "basis": "Magnify NITRO 3 lists 260 g at UK8; NOVABLAST 5 lists 255 g; On Cloudmonster 3 lists 295 g at men’s US 8.5. Size bases vary, so disclosure standards matter."
+   }
+  ],
+  "open_questions": [
+   "Can construction for Magnify NITRO 3, Supernova Rise 3, and NOVABLAST 5 be formally confirmed as strobel plus cemented, or do any use partial board or other variants in this price tier?",
+   "What are the rocker radius or curvature metrics for Magnify NITRO 3 and Supernova Rise 3, and can those be published in KR PDPs without adding lab burden?",
+   "How do PUMAGRIP and LIGHTTRAXION compare on wet granite or tile in controlled A/B tests relevant to Korea’s monsoon season, and can a simple friction claim be standardized for copy?",
+   "Will a wide‑fit SKU meaningfully expand conversion in KR for this band, given Supernova’s offer, and what size‑run depth is required to avoid chronic stockouts?",
+   "Is there room to include a visible midsole cue for supercritical processing at this price without triggering cost or durability trade‑offs, or should the grip story remain primary?",
+   "Can KR DTC review widgets and restock logs be captured at launch windows to quantify FW26 refresh performance versus SS25–SS26 for the same lines?"
+  ],
+  "sources": [
+   "https://kr.puma.com/kr/ko/pd/%EB%A7%A4%EA%B7%B8%EB%8B%88%ED%8C%8C%EC%9D%B4-%EB%82%98%EC%9D%B4%ED%8A%B8%EB%A1%9C-3-%3Cbr%3Emagnify-nitro-3/311046.html",
+   "https://kr.puma.com/kr/ko/%EB%82%A8%EC%84%B1/%EC%8B%A0%EB%B0%9C/%EB%82%98%EC%9D%B4%ED%8A%B8%EB%A1%9C",
+   "https://www.adidas.co.kr/%EC%8A%88%ED%8D%BC%EB%85%B8%EB%B0%94-%EB%9D%BC%EC%9D%B4%EC%A6%88-3-%EC%99%80%EC%9D%B4%EB%93%9C-%EB%9F%AC%EB%8B%9D%ED%99%94/JQ5953.html",
+   "https://www.adidas.co.kr/supernova-running-shoes",
+   "https://www.adidas.co.kr/everyday-running-shoes",
+   "https://www.asics.com/us/en-us/novablast--5/p/ANA_1011B974-250.html",
+   "https://assets.asics.com/system/media_libraries/25718/file.pdf",
+   "https://assets.asics.com/system/libraries/4038/ASICS%20Integrated%20report%202024.pdf",
+   "https://www.nike.com/kr/t/%EB%82%98%EC%9D%B4%ED%82%A4-%ED%8E%98%EA%B0%80%EC%88%98%EC%8A%A4-42-%EB%82%A8%EC%84%B1-%EB%A1%9C%EB%93%9C-%EB%9F%AC%EB%8B%9D%ED%99%94-hzTwdMlw/IB1873-105",
+   "https://about.nike.com/ko/newsroom/releases/42",
+   "https://www.nike.com/kr/a/pegasus-42-release-date",
+   "https://assets.asics.com/system/media_libraries/22047/file.pdf",
+   "https://press.on-running.com/on-unveils-the-next-generation-of-the-cloudmonster-collection-with-the-cloudmonster-3-cloudmonster-3-hyper-and-lightspray-cloudmonster-3-hyper",
+   "https://press.on-running.com/cloudmonster-hyper",
+   "https://www.adidas.com/us/men-running-marathon-shoes",
+   "https://www.adidas.com/us/adizero-adios-pro-4-shoes/KJ7036.html",
+   "https://news.adidas.com/adizero-range/wired-for-speed--adidas-unveils-the-boundary-breaking-adizero-prime-x-strung/s/05e42d73-36f9-46ce-9d3a-f55e4bff6f12",
+   "https://www.brooksrunning.com/en_us/featured/unisex-running-shoes/hyperion-elite-4/1000461D488.070.html",
+   "https://nz.hoka.com/products/clifton-11-x-wide-1177541-fmm-fmm",
+   "https://believeintherun.com/shoe-reviews/hoka-clifton-11-review/",
+   "https://au.hoka.com/products/m-clifton-10-wide-1162032-nmd-nmd",
+   "https://nz.hoka.com/blog/introducing-the-clifton-10"
+  ]
+ },
+ "reportPending": false,
+ "dossier": {
+  "season": "FW26",
+  "forecast_season": "SS27",
+  "evidence_season": "FW26",
+  "season_title": "SS27 Performance Running Footwear",
+  "powershift": "SS27 moves race tech into mid priced daily trainers and scales geometry, mesh and grip for summer miles.",
+  "season_narrative": "FW26 shows daily trainers in this band maturing. Runners now expect bounce, guidance, and grip in one package. The upper stays as engineered mesh and the outsole stays segmented for flex. Retail flags confirm these setups in core models. ([about.nike.com](https://about.nike.com/en/newsroom/releases/nike-pegasus-41-official-images?utm_source=openai))\n\nPlates migrate from race to training with less drama. Zoom Fly 6 cements the plated trainer as a mainstream choice. HOKA refines the Skyward X into a daily‑miles tool. SS27 scales plates into calmer rides and wider bases. Expect plate messaging to shift from speed to ease. ([about.nike.com](https://about.nike.com/en/newsroom/releases/zoom-fly-6-official-images?utm_source=openai))\n\nSuperfoams spread across price points in our band. Nike extends ReactX beyond elite lines into the Pegasus core. ASICS grows FF BLAST MAX and updates Novablast again. HOKA holds the Mach 6 with supercritical foam for tempo and daily runs. SS27 focuses on resilience and lower weight per unit of bounce. ([nike.com](https://www.nike.com/a/pegasus-41-release-info/?msockid=3485fc0be51d6ac33c6deac7e4ed6b70&utm_source=openai))\n\nStability pivots to geometry rather than posts. ASICS leads with 4D GUIDANCE that adapts under load. Similar ideas appear in rival frames that guide rather than force. SS27 generalizes wide basenets, beveled heels, and lateral guidance lines in neutral and light‑support trainers. ([corp.asics.com](https://corp.asics.com/en/press/article/experience-stability-and-advanced-comfort-in-every-step-with-asics%27-gel-kayanotm-31-shoe?utm_source=openai))\n\nWet‑surface credibility becomes a purchase filter. ASICS highlights ASICSGRIP on race models and filters it downstream. Nike pushes traction language on new and updated platforms. SS27 brings tackier compounds and finer lug maps to road trainers without extra weight. The four macro themes are PLATED DAILY, SUPERFOAM SPREAD, GEOMETRY STABILITY, and WET GRIP. ([corp.asics.com](https://corp.asics.com/jp/press/article/2024-02-28?utm_source=openai))",
+  "macrotrends": [
+   {
+    "name": "PLATED DAILY",
+    "statement": "SS27 turns plated tempo shoes into default daily trainers for everyday miles.",
+    "narrative": "FW26 showed a clear shift as plated trainers moved from niche to normal. Retail guides now frame nylon‑plate models as do‑everything shoes, not just workout tools. SS27 scales this stance across price points and genders. ([tomsguide.com](https://www.tomsguide.com/best-picks/best-running-shoes?utm_source=openai))\nBrands leaned into softer, more forgiving plate systems. Adidas extended EnergyRods into Boston 13 for daily training, while Saucony’s winged nylon plate stayed central to Speed 4 and informed Speed 5 talk tracks. SS27 broadens partial or composite plates to temper stiffness for daily wear. ([adidas.com](https://www.adidas.com/us/adizero-boston-13-shoes/JR4793.html?utm_source=openai))\nUpper and outsole tooling caught up with everyday use. Zonal engineered mesh and gusseted tongues improved lockdown, and lattice or zonal rubber layouts raised durability without bulk. SS27 products standardize these solutions on performance running lasts. ([rei.com](https://www.rei.com/product/235308/hoka-mach-x-2-road-running-shoes-mens?utm_source=openai))",
+    "sub_trends": [
+     "Nylon plate daily trainer",
+     "Forked or partial plate",
+     "Engineered mesh lockdown",
+     "Segmented durable rubber"
+    ],
+    "drivers": [
+     {
+      "label": "Nylon-plate framed as all-run daily in 2026 guides",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "consumer",
+      "source_url": "https://www.tomsguide.com/best-picks/best-running-shoes",
+      "observed_note": "2026 buyer’s lists describe Endorphin Speed 5’s nylon plate as suitable for every kind of run."
+     },
+     {
+      "label": "Plated trainers flagged as best sellers at retail",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.runningwarehouse.com/catpage-MBESTUSE.html",
+      "observed_note": "Running Warehouse shows Zoom Fly 6 with a Best Seller badge within training categories."
+     },
+     {
+      "label": "Trade previews position super-trainers for everyday runs",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "shows",
+      "source_url": "https://www.runnersworld.com/gear/a69661889/2026-running-shoes-preview/",
+      "observed_note": "The Running Event 2026 preview highlights everyday‑run super‑trainers and plate‑derived tooling."
+     }
+    ],
+    "palette": [
+     {
+      "name": "Safety Yellow",
+      "pantone_tcx": "",
+      "hex": "#D6FF00"
+     },
+     {
+      "name": "Tranquil Teal",
+      "pantone_tcx": "",
+      "hex": "#138E8E"
+     },
+     {
+      "name": "Vizi Orange",
+      "pantone_tcx": "",
+      "hex": "#FF6A00"
+     },
+     {
+      "name": "Vizi Blue",
+      "pantone_tcx": "",
+      "hex": "#0077FF"
+     },
+     {
+      "name": "Racer Blue",
+      "pantone_tcx": "",
+      "hex": "#2458FF"
+     },
+     {
+      "name": "Gum Brown",
+      "pantone_tcx": "",
+      "hex": "#C48C54"
+     },
+     {
+      "name": "Shadow Grey",
+      "pantone_tcx": "",
+      "hex": "#7A7D80"
+     },
+     {
+      "name": "Volt Green",
+      "pantone_tcx": "",
+      "hex": "#CEFF0C"
+     },
+     {
+      "name": "Pure Platinum",
+      "pantone_tcx": "",
+      "hex": "#E6E6EA"
+     }
+    ],
+    "materials": [
+     {
+      "label": "Winged nylon or polyamide plates for daily training",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.prnewswire.com/news-releases/saucony-unveils-updated-endorphin-speed-4-302076035.html",
+      "observed_note": "Saucony specifies a winged nylon plate on Speed 4, positioned as the accessible daily in the range."
+     },
+     {
+      "label": "PEBA-on-EVA sandwich with composite plate",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.roadrunnersports.com/product/46478",
+      "observed_note": "Mach X 2 copy calls out a PEBA top layer, EVA frame, and an extended Pebax plate for propulsion."
+     },
+     {
+      "label": "Engineered mesh with zonal reinforcements and tape",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "shows",
+      "source_url": "https://about.puma.com/en/newsroom/product-and-brand-news/2024/03-06-2024-puma-drops-two-new-deviate-shoes-destined-deliver",
+      "observed_note": "Puma details lightweight engineered mesh backed by PWRTAPE for targeted support on Deviate models."
+     },
+     {
+      "label": "Segmented high‑abrasion rubber outsoles",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.runningwarehouse.com/Saucony_Endorphin_Speed_4/descpage-S4ESM13.html?from=repeat",
+      "observed_note": "Retail copy cites a lattice XT‑900 rubber layout for traction and protection without full‑coverage weight."
+     }
+    ],
+    "details": [
+     {
+      "label": "Gusseted thin tongues to stabilize midfoot",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.rei.com/product/235308/hoka-mach-x-2-road-running-shoes-mens",
+      "observed_note": "REI lists a gusseted tongue on Mach X 2 to secure lockdown during faster efforts."
+     },
+     {
+      "label": "Internal fit bands or ghillie‑style loops",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.nike.com/sg/t/downshifter-13-road-running-shoes-4Gw85J/FD6454-003",
+      "observed_note": "Nike Downshifter 13 notes an updated internal fit band to stabilize the upper over mesh."
+     },
+     {
+      "label": "Reflective films integrated into woven uppers",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "social",
+      "source_url": "https://believeintherun.com/shoe-reviews/hoka-mach-x-2-review/",
+      "observed_note": "Reviewers point out reflective elements in Mach X 2’s thin woven upper for everyday safety."
+     },
+     {
+      "label": "Weight‑relief rubber webs in outsoles",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "shows",
+      "source_url": "https://about.nike.com/en/newsroom/releases/zoom-fly-6-official-images",
+      "observed_note": "Nike states a thin web of rubber on Zoom Fly 6 for grip with minimal mass."
+     }
+    ],
+    "key_items": [
+     {
+      "segment": "women",
+      "name": "The Nylon‑Plated Daily",
+      "description": "A light trainer uses a winged nylon plate for smooth pop. The ride stays forgiving for easy runs and tempo. The upper is zonal mesh with a connected fit. SS27 pushes wider size runs and fresh color drops for weekly rotation.",
+      "metric": {
+       "label": "Nylon plate adoption in daily trainers",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.fleetfeet.com/products/womens-saucony-endorphin-speed-4",
+       "observed_note": "Fleet Feet positions Speed 4 as a shoe to push the pace on daily runs and stocks many colorways."
+      },
+      "grade": "safe",
+      "silhouette_spec": "toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber"
+     },
+     {
+      "segment": "women",
+      "name": "The Woven Lockdown Trainer",
+      "description": "A PEBA‑on‑EVA stack pairs with a Pebax plate for snap. A thin woven upper with a gusseted tongue locks the midfoot. The rocker eases turnover on daily miles. SS27 normalizes plated feel for everyday pacing.",
+      "metric": {
+       "label": "Gusseted woven uppers in plated trainers",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.rei.com/product/235308/hoka-mach-x-2-road-running-shoes-mens",
+       "observed_note": "Mach X 2 lists a gusseted tongue and woven upper, signaling everyday‑use lockdown."
+      },
+      "grade": "safe",
+      "silhouette_spec": "toe semi-curved • heel 7–9 mm drop • material PEBA top sheet, EVA carrier, Pebax plate • closure flat laces, gusseted tongue • upper woven mesh with reflective hits • outsole zonal rubber coverage"
+     },
+     {
+      "segment": "women",
+      "name": "The Rod‑Ready Tempo Trainer",
+      "description": "EnergyRods sit underfoot to cue a snappy toe‑off. The platform rides firmer than max‑cushion peers. Breathable mesh and a midfoot hold suit uptempo days. SS27 frames it as a daily‑to‑tempo bridge.",
+      "metric": {
+       "label": "EnergyRods used for training, not just race",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.adidas.com/us/adizero-boston-13-shoes/JR4793.html",
+       "observed_note": "Adidas describes Boston 13 as a pinnacle training shoe with re‑engineered EnergyRods."
+      },
+      "grade": "early_sign",
+      "silhouette_spec": "toe semi-curved • heel 6–8 mm drop • material Lightstrike Pro foams with glass‑fiber rods • closure flat laces • upper engineered mesh with targeted support • outsole durable rubber in heel/forefoot pods"
+     },
+     {
+      "segment": "men",
+      "name": "The Zoom‑Fly Workhorse",
+      "description": "A carbon Flyplate migrates into a trainer brief. The midsole mixes ZoomX with training foam for range. A thin rubber web balances grip and weight. SS27 makes plated tempo feel part of the weekday kit.",
+      "metric": {
+       "label": "Plated trainer as Best Seller at specialty",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.runningwarehouse.com/catpage-MBESTUSE.html",
+       "observed_note": "Zoom Fly 6 appears with a Best Seller note inside training categories."
+      },
+      "grade": "safe",
+      "silhouette_spec": "toe semi-curved • heel 8–10 mm drop • material ZoomX plus SR‑02 with carbon plate • closure flat laces • upper engineered mesh sock‑liner feel • outsole thin rubber web pattern"
+     },
+     {
+      "segment": "men",
+      "name": "The Wave‑Plate Cruiser",
+      "description": "A full‑length thermoplastic Wave plate adds guidance. The ride stays stable for daily mix‑pace runs. The upper vents well for summer mileage. SS27 leans on partial plates to tame stiffness.",
+      "metric": {
+       "label": "Wave plate used in mainstream daily models",
+       "yoy_percent": null,
+       "magnitude": "steady",
+       "source_kind": "market",
+       "source_url": "https://vnm.mizuno.com/products/wave-rider-30-j1gm2620-2026aw",
+       "observed_note": "Mizuno highlights a full‑length Wave Plate in Wave Rider 30 for daily jogging."
+      },
+      "grade": "stable",
+      "silhouette_spec": "toe semi-curved • heel 10–12 mm drop • material EVA blend with full‑length Wave plate • closure flat laces • upper engineered mesh • outsole blown rubber forefoot, carbon rubber heel"
+     },
+     {
+      "segment": "men",
+      "name": "The Composite‑Plate Daily Nitro",
+      "description": "A composite plate teams with nitrogen‑infused foams. The feel is lively yet controlled on commutes. Engineered mesh and midfoot reinforcement secure the fit. SS27 extends this recipe to core color lines.",
+      "metric": {
+       "label": "Composite plate daily trainers in circulation",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://us.puma.com/us/en/pd/deviate-nitro-3-mens-running-shoes/309707",
+       "observed_note": "Puma Deviate Nitro 3 features engineered mesh and plate‑aided propulsion positioned for training."
+      },
+      "grade": "safe",
+      "silhouette_spec": "toe semi-curved • heel 6–8 mm drop • material Nitro foams with PWRPLATE • closure flat laces • upper engineered mesh with PWRTAPE • outsole segmented PUMAGRIP rubber"
+     },
+     {
+      "segment": "kids",
+      "name": "The Junior Mesh‑Lock Runner",
+      "description": "A big‑kids Pegasus uses engineered mesh for breath. The fit band and rubber coverage support school‑to‑track days. The ride is balanced for growing feet. SS27 brings adult‑grade uppers to junior lasts.",
+      "metric": {
+       "label": "Engineered mesh and full rubber for kids daily",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.nike.com/t/pegasus-41-big-kids-road-running-shoes-fctJhk/FN5041-001",
+       "observed_note": "Nike lists engineered mesh uppers for the Big Kids Pegasus 41 with durable outsole coverage."
+      },
+      "grade": "stable",
+      "silhouette_spec": "toe round • heel 8–10 mm drop • material EVA midsole • closure flat laces • upper engineered mesh with internal fit band • outsole full rubber with flex grooves"
+     },
+     {
+      "segment": "kids",
+      "name": "The Junior Rider‑Inspired Daily",
+      "description": "A junior model borrows Rider geometry and cushioning. The focus is smooth transition and durable grip. The mesh upper breathes for playground to practice. SS27 keeps the look aligned to adult pairs.",
+      "metric": {
+       "label": "Rider Jr lineage toward adult Wave feel",
+       "yoy_percent": null,
+       "magnitude": "steady",
+       "source_kind": "market",
+       "source_url": "https://mizuno.com.au/products/enerzy-rider-jr",
+       "observed_note": "Mizuno positions Enerzy Rider Jr as a junior running shoe inspired by Wave Rider features."
+      },
+      "grade": "stable",
+      "silhouette_spec": "toe round • heel 8–10 mm drop • material EVA‑based midsole with guidance geometry • closure flat laces or straps by size • upper breathable mesh • outsole rubber with toe cap"
+     },
+     {
+      "segment": "kids",
+      "name": "The Cosmic Lockdown Runner",
+      "description": "A kids‑first runner adds haptic printing to guard mesh. A full rubber outsole manages schoolyard wear. The entry and pull tab suit independent use. SS27 spreads protective prints across junior runs.",
+      "metric": {
+       "label": "Protective prints and full rubber in kids run",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "shows",
+       "source_url": "https://about.nike.com/en/newsroom/releases/kids-cosmic-runner",
+       "observed_note": "Nike’s Cosmic Runner debuts layered haptic printing and full rubber outsole for kids."
+      },
+      "grade": "safe",
+      "silhouette_spec": "toe round • heel 6–8 mm drop • material EVA midsole • closure easy laces with pull tab • upper mesh with haptic print guards • outsole full rubber"
+     }
+    ],
+    "grade": "safe",
+    "next_season_call": "FW27 moderates stiffness and widens partial‑plate use. Foam-led stacks stay in focus while forked or slotted plates appear in more daily models. Outsoles gain thicker segmented coverage for wet grip, with mesh prints replacing heavy overlays, as seen in 2026 rollouts.",
+    "confidence": "medium"
+   },
+   {
+    "name": "SUPERFOAM SPREAD",
+    "statement": "SS27 spreads supercritical foams into mid‑priced unisex performance running trainers.",
+    "narrative": "FW26 pushed supercritical foams into daily trainers. Mach 6 lists a supercritical EVA midsole at 140 USD. Velocity Nitro 3 uses nitrogen‑infused NITROFOAM at similar prices. Rebel v4 adds a PEBA blend to FuelCell. SS27 turns this spread into the running mainstream. ([rei.com](https://www.rei.com/product/C11894/hoka-mach-6-road-running-shoes-mens?utm_source=openai))\nContainment gets bolder in SS27. Brands raise sidewalls to seat feet inside soft foam. HOKA names this approach Active Foot Frame. Dual‑density stacks tune rebound and control. Mach X 3 pairs a PEBA top with a firmer base. Tempus keeps a PEBA core inside a PWRRUN frame. ([hoka.mx](https://hoka.mx/pages/tecnologia-hoka?utm_source=openai))\nWeight control steers outsole and upper choices. Mach 6 returns to strategic, segmented rubber for durability. Creel jacquard uppers with gusseted tongues lock the midfoot. SS27 color stories keep hi‑vis limes and tangerines with utility greys. ([rei.com](https://www.rei.com/learn/expert-advice/hoka-mach-6-tested-review.html?utm_source=openai))",
+    "sub_trends": [
+     "Supercritical EVA or PEBA blend",
+     "Dual density layering",
+     "High sidewall containment",
+     "Medium volume performance last"
+    ],
+    "drivers": [
+     {
+      "label": "Consumer search interest gravitates to mid‑priced superfoams",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "consumer",
+      "source_url": "https://www.rtings.com/running-shoes/reviews/best/running",
+      "observed_note": "Best‑of 2026 lists include Mach 6 and Velocity Nitro."
+     },
+     {
+      "label": "Social chatter around Mach 6 supercritical foam surges",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "social",
+      "source_url": "https://www.youtube.com/watch?v=PwXaKB5uiZA",
+      "observed_note": "A 2025 Mach 6 review draws strong views and comments."
+     },
+     {
+      "label": "Shows spotlight PEBA beyond racers at TRE",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "shows",
+      "source_url": "https://www.youtube.com/watch?v=o4jSBlaHFKY",
+      "observed_note": "TRE 2024 preview shows Rebel v4 with a PEBA blend."
+     }
+    ],
+    "palette": [
+     {
+      "name": "Lime Punch",
+      "pantone_tcx": "13-0550 TCX",
+      "hex": "#C0D725"
+     },
+     {
+      "name": "Spectra Yellow",
+      "pantone_tcx": "14-0957 TCX",
+      "hex": "#F7B718"
+     },
+     {
+      "name": "Vibrant Orange",
+      "pantone_tcx": "16-1364 TCX",
+      "hex": "#FF7420"
+     },
+     {
+      "name": "Classic Blue",
+      "pantone_tcx": "19-4052 TCX",
+      "hex": "#0F4C81"
+     },
+     {
+      "name": "Ultimate Gray",
+      "pantone_tcx": "17-5104 TCX",
+      "hex": "#939597"
+     },
+     {
+      "name": "Aqua Sky",
+      "pantone_tcx": "14-4811 TCX",
+      "hex": "#7BC4C4"
+     },
+     {
+      "name": "Greenery",
+      "pantone_tcx": "15-0343 TCX",
+      "hex": "#88B04B"
+     },
+     {
+      "name": "Snow White",
+      "pantone_tcx": "11-0602 TCX",
+      "hex": "#F2F0EB"
+     },
+     {
+      "name": "Ultra Violet",
+      "pantone_tcx": "18-3838 TCX",
+      "hex": "#6B5B95"
+     }
+    ],
+    "materials": [
+     {
+      "label": "SCF EVA midsoles enter daily trainers",
+      "yoy_percent": null,
+      "magnitude": "surging",
+      "source_kind": "market",
+      "source_url": "https://www.rei.com/product/C11894/hoka-mach-6-road-running-shoes-mens",
+      "observed_note": "Mach 6 product copy names SCF EVA midsole."
+     },
+     {
+      "label": "PEBA/EVA FuelCell blends scale down in price",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.roadtrailrun.com/2024/01/new-balance-fuelcell-rebel-v4-multi_8.html",
+      "observed_note": "Rebel v4 is cited with a PEBA/EVA blend."
+     },
+     {
+      "label": "Nitrogen‑infused NITROFOAM normalizes in trainers",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://us.puma.com/us/en/pd/tenis-f1%C2%AE-velocity-nitro%E2%84%A2-3/308441",
+      "observed_note": "PUMA lists NITROFOAM as nitrogen‑infused."
+     },
+     {
+      "label": "Full Pebax midsole appears in non‑plated trainers",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.topoathletic.com/mens-specter-2%3Fsrsltid%3DAfmBOoqMzxyzZKXBapjS5RIv3otUJgOeo2aMgnSpHvVLO7gOqWHlI_-H",
+      "observed_note": "Specter 2 states a fully Pebax Powered midsole."
+     }
+    ],
+    "details": [
+     {
+      "label": "High sidewall containment frames soft foam",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://hoka.mx/pages/tecnologia-hoka",
+      "observed_note": "Active Foot Frame wraps the foot with raised walls."
+     },
+     {
+      "label": "Dual‑density layering for tuned rebound and control",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.rei.com/product/249186/hoka-mach-x-3-road-running-shoes-womens",
+      "observed_note": "REI lists a PEBA top on a firmer base."
+     },
+     {
+      "label": "Segmented rubber coverage for light durability",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.rei.com/learn/expert-advice/hoka-mach-6-tested-review.html",
+      "observed_note": "Mach 6 returns to strategic rubber zones."
+     },
+     {
+      "label": "Creel jacquard uppers with gusseted tongues",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.runningwarehouse.com/reviews/HOKA-Shoe-Reviews/hoka-mach-6.html",
+      "observed_note": "Review calls out creel mesh and internal gusset."
+     }
+    ],
+    "key_items": [
+     {
+      "segment": "women",
+      "name": "THE SIDEWALL DAILY TRAINER (W)",
+      "description": "A light daily trainer seats the foot inside foam. The ride stays lively yet directed by tall sidewalls. Breathable creel mesh holds shape in heat. It reads fast and clean for mixed‑pace runs. SS27 puts this as the new default workhorse.",
+      "metric": {
+       "label": "SCF EVA midsole validated in Mach 6 price band",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.rei.com/product/C11894/hoka-mach-6-road-running-shoes-mens",
+       "observed_note": "REI lists SCF EVA in Mach 6 at 140 USD."
+      },
+      "grade": "safe",
+      "silhouette_spec": "round toe; 5 mm drop; engineered mesh; gusseted tongue; segmented rubber; cemented; high sidewalls; SCF EVA midsole"
+     },
+     {
+      "segment": "women",
+      "name": "THE PEBA BLEND SPEED TRAINER (W)",
+      "description": "A nimble uptempo shoe uses a PEBA/EVA blend. The platform widens for stability at daily paces. Mesh is minimal with welded eyestays and a gusset. SS27 shifts PEBA feel to the 150–220k KRW band. It lands as a fast do‑it‑all pick.",
+      "metric": {
+       "label": "PEBA/EVA FuelCell blend adoption in Rebel v4",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.roadtrailrun.com/2024/01/new-balance-fuelcell-rebel-v4-multi_8.html",
+       "observed_note": "RTR cites a 20% PEBA, 80% EVA blend."
+      },
+      "grade": "safe",
+      "silhouette_spec": "rounded toe; 6–8 mm drop; engineered mesh; no‑sew overlays; segmented rubber; cemented; PEBA/EVA midsole"
+     },
+     {
+      "segment": "women",
+      "name": "THE DUAL‑DENSITY GUIDANCE TRAINER (W)",
+      "description": "A PEBA core is framed by a firmer carrier. The geometry rolls smoothly without plates. The rim adds guidance under fresh superfoams. SS27 broadens this to neutral‑plus buyers. It bridges speed days and base miles.",
+      "metric": {
+       "label": "PEBA core with PWRRUN frame in Tempus line",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.saucony.com/en/tempus/52000M.html",
+       "observed_note": "Page states PB core inside a PWRRUN frame."
+      },
+      "grade": "safe",
+      "silhouette_spec": "round toe; 8 mm drop; engineered mesh; internal heel counter; segmented rubber; cemented; PEBA core with EVA frame"
+     },
+     {
+      "segment": "men",
+      "name": "THE SUPERCRITICAL NITRO DAILY (M)",
+      "description": "A balanced trainer leans on NITROFOAM bounce. Rubber pods keep grip in wet commutes. Mesh breathes and holds midfoot shape. SS27 scales this spec across color runs. It anchors the value end of superfoams.",
+      "metric": {
+       "label": "NITROFOAM nitrogen‑infused cushioning in Velocity",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://us.puma.com/us/en/pd/tenis-f1%C2%AE-velocity-nitro%E2%84%A2-3/308441",
+       "observed_note": "PUMA lists NITROFOAM features on Velocity."
+      },
+      "grade": "big",
+      "silhouette_spec": "rounded toe; 8–10 mm drop; engineered mesh; gusseted tongue; segmented rubber; cemented; nitrogen‑infused foam"
+     },
+     {
+      "segment": "men",
+      "name": "THE CLIP‑CONTAINED MAX‑BOUNCE (M)",
+      "description": "A wide midsole and heel clip tame soft foam. The ride stays plush for high‑mile days. Uppers favor clean meshes with padded collars. SS27 keeps this as the cushion hero. It suits recovery and commuter runs.",
+      "metric": {
+       "label": "Heel clip and wider base stabilize ZoomX Invincible 3",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.nike.com/a/nike-invincible-3-release?msockid=03f925651f2068571d6133d51e36694f",
+       "observed_note": "Nike notes a smaller, precise heel clip."
+      },
+      "grade": "safe",
+      "silhouette_spec": "round toe; 9 mm drop; engineered mesh; padded collar; segmented rubber; cemented; external clip with high sidewalls"
+     },
+     {
+      "segment": "men",
+      "name": "THE FULL‑PEBA TRAINER (M)",
+      "description": "A non‑plated Pebax midsole enters daily use. Cushion is light and snappy with fast rebound. Uppers keep overlays sparse and breathable. SS27 brings this spec to 170 USD class. It targets uptempo long runs.",
+      "metric": {
+       "label": "Full Pebax midsole in mid‑price training shoes",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.runningwarehouse.com/%7BTopo_Athletic_Specter_2/descpage-TO2SPM2.html",
+       "observed_note": "RW lists a full Pebax midsole at 169.95 USD."
+      },
+      "grade": "early_sign",
+      "silhouette_spec": "rounded toe; 5 mm drop; engineered mesh; minimal overlays; segmented rubber; cemented; full Pebax midsole"
+     },
+     {
+      "segment": "kids",
+      "name": "THE YOUTH NITRO TRAINER (K)",
+      "description": "Kids get light bounce without weight. A NITRO heel helps easy rolling. Rubber lasts for playground wear. SS27 sees more junior sizes in bright highs. Fit favors secure midfoot hold.",
+      "metric": {
+       "label": "Youth Electrify Nitro uses NITRO with ProFoamLite",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://ca.puma.com/ca/en/pd/electrify-nitro-2-running-shoes-youth/378200",
+       "observed_note": "Page shows NITRO with a firmer carrier foam."
+      },
+      "grade": "safe",
+      "silhouette_spec": "rounded toe; low drop; engineered mesh; padded collar; segmented rubber; cemented; NITRO heel with EVA carrier"
+     },
+     {
+      "segment": "kids",
+      "name": "THE GS ENERGISED RIDER (K)",
+      "description": "Geometry grows taller for bounce at low speeds. Uppers are simple meshes for heat and comfort. Rubber maps to high‑wear zones for school use. SS27 adds livelier colors with reflectivity. Fit uses a kids‑specific last.",
+      "metric": {
+       "label": "Novablast GS uses tall geometry and Amplifoam Plus",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.asics.com/ca/en-ca/novablast-6-gs-1014a396-700",
+       "observed_note": "ASICS cites kids last and cushioned midsole."
+      },
+      "grade": "safe",
+      "silhouette_spec": "rounded toe; ~8 mm drop; engineered mesh; standard tongue; segmented rubber; cemented; tall midsole geometry"
+     },
+     {
+      "segment": "kids",
+      "name": "THE BUILT‑IN HEEL‑LOCK YOUTH (K)",
+      "description": "A built‑in heel lock steadies soft foam. The stance feels sure for playground sprints. Mesh breathes and dries fast after rain. SS27 fuses this lock with brighter trims. It stays light and durable.",
+      "metric": {
+       "label": "Youth NITRO model adds built‑in heel lock",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://store-in.puma.com/puma-store-green-city-square-bathinda-sports-apparel-hi-street-bathinda-300915/ProductDetails/4065452433420",
+       "observed_note": "Store page lists a built‑in heel lock."
+      },
+      "grade": "early_sign",
+      "silhouette_spec": "rounded toe; low drop; engineered mesh; built‑in heel lock; segmented rubber; cemented; soft foam with firm rim"
+     }
+    ],
+    "grade": "big",
+    "next_season_call": "SS27 broadens supercritical and PEBA foams across daily trainers. AW27 holds volumes steady while frames and sidewalls thicken, and plain EVA fades from hero price points, because FW26 demand rewarded bouncier foams and rubbered outsoles. ([s25.q4cdn.com](https://s25.q4cdn.com/376120126/files/doc_earnings/2024/q4/transcript/CORRECTED-TRANSCRIPT-_Deckers-Outdoor-Corp-DECK-US-Q4-2024-Earnings-Call.pdf?utm_source=openai))",
+    "confidence": "medium"
+   },
+   {
+    "name": "GEOMETRY STABILITY",
+    "statement": "SS27 makes geometry‑based stability the neutral default in performance running through wide bases, guided sidewalls, decoupled heels, and smooth rockers.",
+    "narrative": "FW26 proved sculpted midsoles can guide without hard posts. HOKA normalized Active Foot Frame sidewalls and Meta‑Rocker across core models. ASICS moved Kayano to 4D GUIDANCE with a wider base and flared geometry. SS27 scales these ideas into everyday trainers. ([vn.hoka.com](https://vn.hoka.com/pages/hoka-technology?utm_source=openai))\nRetail and media in 2026 spotlight stability as comfort tech. Nike frames stability with a soft rocker and wider platform in InfinityRN 4. Running Warehouse and major guides push stability picks to the front page. SS27 turns these cues into the default brief. ([nike.com](https://www.nike.com/my/t/infinityrn-4-road-running-shoes-mLRjcz?utm_source=openai))\nRunway validated geometry as a style narrative, not a niche. Onitsuka Tiger FW26 showed squared toes and bold flares on sneakers. Brooks keeps segmented crash pads common in daily trainers. SS27 pairs these with decoupled landings for smoother transitions. ([vogue.com](https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/onitsuka-tiger?utm_source=openai))",
+    "sub_trends": [
+     "Wide platform flares",
+     "Guidance sidewalls",
+     "Decoupled heel crash pad",
+     "Rocker for smooth transition"
+    ],
+    "drivers": [
+     {
+      "label": "Retail stability categories and best‑seller flags concentrate visibility",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.runningwarehouse.com/catpage-MSROAD.html",
+      "observed_note": "Stability category shows best‑seller badges on models like ASICS GEL‑Kayano in July and August 2026. ([runningwarehouse.com](https://www.runningwarehouse.com/catpage-MSROAD.html?utm_source=openai))"
+     },
+     {
+      "label": "Stability language proliferates in social commerce listings",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "social",
+      "source_url": "https://shop.tiktok.com/us/k/best-stability-running-shoes",
+      "observed_note": "Multiple TikTok Shop hubs surface “best stability running shoes” and list HOKA Arahi 8 variants. ([shop.tiktok.com](https://shop.tiktok.com/us/k/best-stability-running-shoes?utm_source=openai))"
+     },
+     {
+      "label": "Shows highlight geometric sneaker shapes on FW26 runways",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "shows",
+      "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/onitsuka-tiger",
+      "observed_note": "Onitsuka Tiger FW26 presents squared Mexico 66 styles, signaling geometry as a headline. ([vogue.com](https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/onitsuka-tiger?utm_source=openai))"
+     }
+    ],
+    "palette": [
+     {
+      "name": "Graphite Smoke",
+      "pantone_tcx": "",
+      "hex": "#2F2F30"
+     },
+     {
+      "name": "Oyster Mushroom",
+      "pantone_tcx": "",
+      "hex": "#D7D2C7"
+     },
+     {
+      "name": "Coconut Mist",
+      "pantone_tcx": "",
+      "hex": "#EEECE4"
+     },
+     {
+      "name": "Volt Signal",
+      "pantone_tcx": "",
+      "hex": "#C9FF0A"
+     },
+     {
+      "name": "Cobalt Pulse",
+      "pantone_tcx": "",
+      "hex": "#1E4C9A"
+     },
+     {
+      "name": "Hazard Orange",
+      "pantone_tcx": "",
+      "hex": "#FF6A00"
+     },
+     {
+      "name": "Lime Fog",
+      "pantone_tcx": "",
+      "hex": "#B7D67A"
+     },
+     {
+      "name": "Sky Shift",
+      "pantone_tcx": "",
+      "hex": "#8EC5E8"
+     },
+     {
+      "name": "Rose Dust",
+      "pantone_tcx": "",
+      "hex": "#E7B7A3"
+     }
+    ],
+    "materials": [
+     {
+      "label": "Engineered mesh uppers (double or creel jacquard)",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.rei.com/product/249138/hoka-arahi-8-road-running-shoes-mens",
+      "observed_note": "Retail specs for Arahi 8 list double jacquard mesh with recycled content. ([rei.com](https://www.rei.com/product/249138/hoka-arahi-8-road-running-shoes-mens?msockid=10a23e185a1360fb1c8528ab5b1e6120&utm_source=openai))"
+     },
+     {
+      "label": "Supercritical foam midsoles for light, stable platforms",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://au.hoka.com/products/m-mach-6-1147790-wky-wky",
+      "observed_note": "Mach 6 product copy highlights a supercritical foam midsole used for daily training. ([au.hoka.com](https://au.hoka.com/products/m-mach-6-1147790-wky-wky?utm_source=openai))"
+     },
+     {
+      "label": "Nike ReactX high‑return foam in rocker platforms",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://about.nike.com/en/newsroom/releases/nike-reactx-foam-infinity-rn-4-official-images/InfinityRN-4-with-Nike-ReactX-foam",
+      "observed_note": "Nike states ReactX improves energy return versus React and debuts on InfinityRN 4. ([about.nike.com](https://about.nike.com/en/newsroom/releases/nike-reactx-foam-infinity-rn-4-official-images/InfinityRN-4-with-Nike-ReactX-foam?utm_source=openai))"
+     },
+     {
+      "label": "Hybrid, segmented rubber outsoles for smooth transitions",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.brooksrunning.com/en_us/mens/shoes/road-running-shoes/ghost-15/110393.html",
+      "observed_note": "Brooks describes its Segmented Crash Pad as an integrated shock‑absorber system. ([brooksrunning.com](https://www.brooksrunning.com/en_us/mens/shoes/road-running-shoes/ghost-15/110393.html?dwvar_110393_color=136&utm_source=openai))"
+     }
+    ],
+    "details": [
+     {
+      "label": "Raised midsole sidewalls that cradle the foot",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://vn.hoka.com/pages/hoka-technology",
+      "observed_note": "HOKA explains Active Foot Frame as walls that secure the foot from both sides. ([vn.hoka.com](https://vn.hoka.com/pages/hoka-technology?utm_source=openai))"
+     },
+     {
+      "label": "Flared platform edges to widen the base of support",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.asics.com/nz/en-nz/media/wysiwyg/pdf/AS-0429_TechSheets_SS25_Performance_Run.pdf",
+      "observed_note": "Kayano tech sheet calls out wider basenets and flared midsole geometry. ([asics.com](https://www.asics.com/nz/en-nz/media/wysiwyg/pdf/AS-0429_TechSheets_SS25_Performance_Run.pdf?utm_source=openai))"
+     },
+     {
+      "label": "Decoupled heel crash pads for softer landings",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.fleetfeet.com/products/womens-hoka-kawana",
+      "observed_note": "Fleet Feet highlights the SwallowTail heel and extended crash pad on Kawana. ([fleetfeet.com](https://www.fleetfeet.com/products/womens-hoka-kawana?utm_source=openai))"
+     },
+     {
+      "label": "Gusseted tongues and supportive collars for lock‑in",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.runningshoesguru.com/reviews/road/nike-infinity-rn4-review/",
+      "observed_note": "Reviews note semi‑gusseted tongues and padded collars on InfinityRN 4. ([runningshoesguru.com](https://www.runningshoesguru.com/reviews/road/nike-infinity-rn4-review/?utm_source=openai))"
+     }
+    ],
+    "key_items": [
+     {
+      "segment": "women",
+      "name": "THE STABILITY ROCKER DAILY",
+      "description": "A daily trainer that feels soft yet directed. The rocker rolls the stride without fighting foot motion. A wide midfoot and forefoot calm lateral wobble on long days. SS27 positions this as the default couch‑to‑10K pick.",
+      "metric": {
+       "label": "Rocker platform adoption in Nike InfinityRN 4",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.nike.com/my/t/infinityrn-4-road-running-shoes-mLRjcz",
+       "observed_note": "Nike’s copy calls out a rocker‑shaped ReactX base and supportive fit. ([nike.com](https://www.nike.com/my/t/infinityrn-4-road-running-shoes-mLRjcz?utm_source=openai))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "round anatomical toe; beveled decoupled heel; engineered mesh; flat laces with semi‑gusseted tongue; reflective micro‑piping"
+     },
+     {
+      "segment": "women",
+      "name": "THE GUIDANCE SIDEWALL JOGGER",
+      "description": "Sidewalls act like a bucket seat to center the foot. A flared base adds calm on uneven city paths. The ride feels neutral even for light pronators. SS27 expands sizes and widths for inclusive fit.",
+      "metric": {
+       "label": "Active Foot Frame and H‑Frame in Arahi 8",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.rei.com/product/249138/hoka-arahi-8-road-running-shoes-mens",
+       "observed_note": "Retail pages list Active Foot Frame and H‑Frame stability. ([rei.com](https://www.rei.com/product/249138/hoka-arahi-8-road-running-shoes-mens?msockid=10a23e185a1360fb1c8528ab5b1e6120&utm_source=openai))"
+      },
+      "grade": "big",
+      "silhouette_spec": "roomy round toe; moderate rocker; double jacquard mesh; flat lace with padded collar; medial‑lateral raised sidewalls"
+     },
+     {
+      "segment": "women",
+      "name": "THE CRASH‑PAD CRUISER",
+      "description": "A decoupled heel softens impact at slower paces. Segmented rubber smooths the handoff to midfoot. The feel is forgiving without a hard post. SS27 standardizes this for recovery runs.",
+      "metric": {
+       "label": "Extended crash pad geometry on HOKA Kawana",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.fleetfeet.com/products/womens-hoka-kawana",
+       "observed_note": "SwallowTail geometry and crash pad are emphasized in copy. ([fleetfeet.com](https://www.fleetfeet.com/products/womens-hoka-kawana?utm_source=openai))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "rounded toe; extended swallowtail heel; engineered mesh with no‑sew overlays; flat stretch lace; segmented rubber pods"
+     },
+     {
+      "segment": "men",
+      "name": "THE WIDE‑BASE TRAINER",
+      "description": "A broadened midsole platform brings calm cadence. Flared geometry stabilizes under fresh foam. Transitions stay smooth with a gentle rocker. SS27 cements this as the all‑miles workhorse.",
+      "metric": {
+       "label": "4D GUIDANCE with wider basenets in Kayano 31",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.asics.com/nz/en-nz/media/wysiwyg/pdf/AS-0429_TechSheets_SS25_Performance_Run.pdf",
+       "observed_note": "ASICS lists wider base and flared midsole as stability method. ([asics.com](https://www.asics.com/nz/en-nz/media/wysiwyg/pdf/AS-0429_TechSheets_SS25_Performance_Run.pdf?utm_source=openai))"
+      },
+      "grade": "big",
+      "silhouette_spec": "generous round toe; beveled heel; technical engineered mesh; flat lace with asym tongue wing; hybrid rubber outsole"
+     },
+     {
+      "segment": "men",
+      "name": "THE SEGMENTED TRANSITION",
+      "description": "Crash‑pad segmentation breaks impact into smaller bites. The shoe feels easy from landing to toe‑off. Stability comes from geometry rather than posts. SS27 keeps this as the trusted neutral pick.",
+      "metric": {
+       "label": "Segmented Crash Pad in Brooks Ghost 15",
+       "yoy_percent": null,
+       "magnitude": "steady",
+       "source_kind": "market",
+       "source_url": "https://www.brooksrunning.com/en_us/mens/shoes/road-running-shoes/ghost-15/110393.html",
+       "observed_note": "Brooks describes the Segmented Crash Pad as a smooth‑transition system. ([brooksrunning.com](https://www.brooksrunning.com/en_us/mens/shoes/road-running-shoes/ghost-15/110393.html?dwvar_110393_color=136&utm_source=openai))"
+      },
+      "grade": "stable",
+      "silhouette_spec": "rounded toe; standard bevel heel; engineered mesh with 3D print; flat lace; full‑contact segmented rubber"
+     },
+     {
+      "segment": "men",
+      "name": "THE ROCKER TEMPO SUPPORT",
+      "description": "A livelier rocker adds snap without twitchiness. Supercritical foam lightens the load on tempo days. Sidewall shaping keeps form tidy as fatigue sets in. SS27 broadens this into mid‑price tiers.",
+      "metric": {
+       "label": "Supercritical foam and rocker in Mach 6",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://au.hoka.com/products/m-mach-6-1147790-wky-wky",
+       "observed_note": "Mach 6 lists supercritical midsole and a speed‑focused rocker. ([au.hoka.com](https://au.hoka.com/products/m-mach-6-1147790-wky-wky?utm_source=openai))"
+      },
+      "grade": "early_sign",
+      "silhouette_spec": "tapered round toe; beveled rocker heel; creel jacquard mesh; flat lace with gusset; durable rubber coverage forefoot‑heel"
+     },
+     {
+      "segment": "kids",
+      "name": "THE JR SIDEWALL SUPPORT",
+      "description": "Stability arrives as gentle guidance for growth. A supportive frame centers the foot during school runs. Cushion stays soft for all‑day wear. SS27 pushes kid‑right stability as a norm.",
+      "metric": {
+       "label": "LITETRUSS support in GT‑1000 GS",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://outlet.asics.com/ie/en-ie/gt-1000-12-gs/p/1014A296-002.html",
+       "observed_note": "ASICS notes LITETRUSS support to increase stability for kids. ([outlet.asics.com](https://outlet.asics.com/ie/en-ie/gt-1000-12-gs/p/1014A296-002.html?utm_source=openai))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "rounded toe; gentle heel bevel; engineered mesh with overlays; easy flat lace; hard‑wearing rubber"
+     },
+     {
+      "segment": "kids",
+      "name": "THE KIDS ROCKER RIDE",
+      "description": "A mild rocker smooths playground sprints. Cushion is plush without bulk. The geometry helps early runners find rhythm. SS27 makes this the default junior daily.",
+      "metric": {
+       "label": "Early‑stage Meta‑Rocker in Clifton Youth",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://nz.hoka.com/products/k-clifton-9-youth-1131170-bwht-bwht",
+       "observed_note": "HOKA sizes down Clifton with the same geometry language. ([nz.hoka.com](https://nz.hoka.com/products/k-clifton-9-youth-1131170-bwht-bwht?utm_source=openai))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "rounded toe; early rocker heel; engineered mesh; elastic‑friendly flat lace; rubber outsole with flex grooves"
+     },
+     {
+      "segment": "kids",
+      "name": "THE WIDE‑HEEL GRIPPER",
+      "description": "A winged heel foam cups quick cuts in PE class. Full rubber coverage keeps traction high. The step‑in is simple for busy mornings. SS27 scales this as a durable school runner.",
+      "metric": {
+       "label": "Wing‑like heel foam stability in Flex Runner kids",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.nike.com/t/flex-runner-2-little-kids-shoes-5nS0pV/DJ6040-400",
+       "observed_note": "Nike describes heel foam wings for extra stability in kids. ([nike.com](https://www.nike.com/t/flex-runner-2-little-kids-shoes-5nS0pV/DJ6040-400?utm_source=openai))"
+      },
+      "grade": "early_sign",
+      "silhouette_spec": "rounded toe; beveled heel; mesh bootie with PU overlays; easy‑on stretch gore plus pull tabs; grippy full rubber"
+     }
+    ],
+    "grade": "big",
+    "next_season_call": "Compared with FW26, SS27 pushes geometry from support lines into neutral icons. Wide bases and sidewalls spread across mid‑price daily trainers, while hard medial posts continue to fade. Decoupled heels and segmented rubber move down‑range fastest, based on 2026 retail copy and tech sheets. ([runningwarehouse.com](https://www.runningwarehouse.com/catpage-MSROAD.html?utm_source=openai))",
+    "confidence": "high"
+   },
+   {
+    "name": "WET GRIP",
+    "statement": "SS27 scales wet‑grip rubber in segmented road outsoles.",
+    "narrative": "FW26 made wet‑traction a visible spec on road trainers. Nike’s Storm‑Tread and ASICS’ HYBRID ASICSGRIP with AHARPLUS appeared in mainstream models, while HOKA brought weather‑ready traction pods to road GTX. SS27 spreads these wet‑road rubbers across core daily trainers. ([nike.com](https://www.nike.com/a/best-shoes-for-rain?utm_source=openai))\nDesign shifts in FW26 favor siped channels, sticky forefoot pods, and decoupled heels. Met‑head flex segmentation moved from patents and niche soles into everyday geometries. SS27 elevates these details into standard segmented maps tuned for wet contact. ([nike.com](https://www.nike.com/sg/t/air-zoom-pegasus-39-shield-weatherised-road-running-shoes-dcpVxH/DO7625-002?utm_source=openai))\nConsumer and culture signals align. Strava’s 2025 report shows more all‑weather participation, and FW26 runway coverage spotlights sporty trainers, priming traction stories. SS27 commercializes rain‑ready runners beyond winterized capsules. ([press.strava.com](https://press.strava.com/en-gb/articles/strava-releases-12th-annual-year-in-sport-trend-report-2025?utm_source=openai))",
+    "sub_trends": [
+     "Forefoot high grip compound",
+     "Heel AHAR or carbon rubber",
+     "Siped water channels",
+     "Met head flex segmentation"
+    ],
+    "drivers": [
+     {
+      "label": "US search interest in waterproof running shoes",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "consumer",
+      "source_url": "https://trends.google.com/trends/?geo=US",
+      "observed_note": "Google Trends shows higher Q4 2025–Q1 2026 peaks vs 2024."
+     },
+     {
+      "label": "Rain‑run traction talk in social threads",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "social",
+      "source_url": "https://www.reddit.com/r/AskRunningShoeGeeks/comments/1v6a3x5/what_shoes_are_we_wearing_in_the_rain/",
+      "observed_note": "2026 threads ask for wet‑road grip and GTX vs non‑GTX."
+     },
+     {
+      "label": "FW26 shows normalize sporty trainers",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "shows",
+      "source_url": "https://www.vogue.co.uk/article/autumn-2026-trending-trainers",
+      "observed_note": "Vogue FW26 coverage spotlights trainers on runways."
+     }
+    ],
+    "palette": [
+     {
+      "name": "Storm Tide Blue",
+      "pantone_tcx": "",
+      "hex": "#1E6FB7"
+     },
+     {
+      "name": "Wet Asphalt",
+      "pantone_tcx": "",
+      "hex": "#2E2F36"
+     },
+     {
+      "name": "Channel Aqua",
+      "pantone_tcx": "",
+      "hex": "#66C5DA"
+     },
+     {
+      "name": "Volt Splash",
+      "pantone_tcx": "",
+      "hex": "#B8FF00"
+     },
+     {
+      "name": "Harbor Mist",
+      "pantone_tcx": "",
+      "hex": "#B4B7BA"
+     },
+     {
+      "name": "Signal Orange",
+      "pantone_tcx": "",
+      "hex": "#FF6A3D"
+     },
+     {
+      "name": "Deep Navy",
+      "pantone_tcx": "",
+      "hex": "#0C2745"
+     },
+     {
+      "name": "Mint Foam",
+      "pantone_tcx": "",
+      "hex": "#BCE9DA"
+     },
+     {
+      "name": "Midsole White",
+      "pantone_tcx": "",
+      "hex": "#F2F2F0"
+     }
+    ],
+    "materials": [
+     {
+      "label": "HYBRID ASICSGRIP with AHARPLUS heel zones",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://corp.asics.com//en/press/article/experience-stability-and-advanced-comfort-in-every-step-with-asics%27-gel-kayanotm-31-shoe",
+      "observed_note": "Kayano 31 states ASICSGRIP plus AHARPLUS for grip and wear."
+     },
+     {
+      "label": "Storm‑Tread wet‑weather rubber",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.nike.com/a/best-shoes-for-rain",
+      "observed_note": "Nike explains lugs and a water channel for wet roads."
+     },
+     {
+      "label": "Durabrasion rubber with traction pods",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.rei.com/product/235944/hoka-clifton-9-gtx-road-running-shoes-mens",
+      "observed_note": "Clifton 9 GTX lists weather‑ready traction pods for wet use."
+     },
+     {
+      "label": "Vibram Megagrip compounds",
+      "yoy_percent": null,
+      "magnitude": "steady",
+      "source_kind": "market",
+      "source_url": "https://www.vibram.com/uk/partnerships-1/PAR_Hoka.html",
+      "observed_note": "Vibram notes best‑in‑class wet and dry grip on partner shoes."
+     }
+    ],
+    "details": [
+     {
+      "label": "Siped water channels in outsole",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.nike.com/a/best-shoes-for-rain",
+      "observed_note": "Storm‑Tread adds micro‑grooves and a water channel for grip."
+     },
+     {
+      "label": "Segmented crash pads and decoupled heel",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.brooksrunning.com/en_us/ghost-16/1104181D157.110.html",
+      "observed_note": "Ghost 16 markets segmented crash pad for smooth transitions."
+     },
+     {
+      "label": "Met‑head flex segmentation",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "shows",
+      "source_url": "https://patents.justia.com/patent/20240016256",
+      "observed_note": "Recent patents map pods to first, fourth, fifth met heads."
+     },
+     {
+      "label": "Heel AHAR+/carbon zones for wet durability",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://assets.contentstack.io/v3/assets/bltd427b71c2e191abd/blt27964f5beef828d6/6698f20d1e4e7edc0db693c9/AW24_TechBrochure_LR.pdf",
+      "observed_note": "ASICS AW24 sheets pair solid forefoot with AHAR+ rearfoot."
+     }
+    ],
+    "key_items": [
+     {
+      "segment": "women",
+      "name": "THE STORM‑CHANNEL RACER",
+      "description": "A daily road trainer that keeps grip in showers. The ride feels stable as siped channels shed water on contact. The mesh stays breathable without soaking the sock. SS27 favors this template for spring rains.",
+      "metric": {
+       "label": "Storm‑Tread rubber cited for wet roads",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.nike.com/a/best-shoes-for-rain",
+       "observed_note": "Nike details wet‑grip channels and multi‑directional lugs."
+      },
+      "grade": "safe",
+      "silhouette_spec": "toe round anatomical; heel 8–10 mm neutral; upper engineered mesh with DWR; closure ghillie lacing with reflective hits; outsole segmented rubber with siped water channels; construction cemented"
+     },
+     {
+      "segment": "women",
+      "name": "THE HYBRID‑HEEL STABILITY",
+      "description": "A stability trainer that mixes sticky forefoot with AHAR+ heel. The geometry balances soft landings and firm traction in rain. SS27 expands hybrid rubber zoning into women’s stability cores.",
+      "metric": {
+       "label": "Hybrid ASICSGRIP with AHARPLUS heel",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://corp.asics.com//en/press/article/experience-stability-and-advanced-comfort-in-every-step-with-asics%27-gel-kayanotm-31-shoe",
+       "observed_note": "ASICS confirms hybrid outsole for grip and durability."
+      },
+      "grade": "safe",
+      "silhouette_spec": "toe semi‑round; heel guidance rail feel; upper engineered mesh with PU print; outsole segmented with sticky forefoot pods and AHAR+ heel plug; construction cemented"
+     },
+     {
+      "segment": "women",
+      "name": "THE MET‑FLEX TEMPO",
+      "description": "A tempo‑ready neutral with met‑head segmentation. The forefoot bends along the met arc for wet contact time. SS27 adopts mapped flex to keep tack without stiffness.",
+      "metric": {
+       "label": "Met‑head flex groove mapping",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "shows",
+       "source_url": "https://patents.justia.com/patent/20240016256",
+       "observed_note": "Patent shows pods aligned to 1st and 4th–5th met heads."
+      },
+      "grade": "early_sign",
+      "silhouette_spec": "toe rounded racer; heel 6–8 mm; upper engineered mesh mono‑filament; outsole segmented forefoot pods with lateral and longitudinal grooves; construction cemented"
+     },
+     {
+      "segment": "men",
+      "name": "THE WEATHER‑POD ROAD SHIELD",
+      "description": "A cushioned road GTX option for shoulder seasons. Traction pods bite wet pavement without heavy lugging. SS27 mainstreams weather‑pods beyond niche SKUs.",
+      "metric": {
+       "label": "Traction pods on Clifton 9 GTX",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.rei.com/product/235944/hoka-clifton-9-gtx-road-running-shoes-mens",
+       "observed_note": "REI copy notes weather‑ready traction pods for wet roads."
+      },
+      "grade": "safe",
+      "silhouette_spec": "toe round; heel 5 mm; upper engineered mesh with GTX Invisible Fit; outsole Durabrasion rubber with segmented pods; construction cemented"
+     },
+     {
+      "segment": "men",
+      "name": "THE AHAR‑PLUG DAILY",
+      "description": "A stability daily trainer that pairs sticky toe with AHAR+ heel. The shoe resists heel wear on slick paths. SS27 rolls this mix into more price‑point trainers.",
+      "metric": {
+       "label": "AHARPLUS heel plug adoption",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://assets.asics.com/system/media_libraries/17037/file.pdf",
+       "observed_note": "Nimbus 26 uses ASICSGRIP with AHARPLUS in heel and toe zones."
+      },
+      "grade": "safe",
+      "silhouette_spec": "toe semi‑round; heel 8–10 mm; upper engineered mesh with stitched toe cap; outsole segmented rubber with AHAR+ heel zone; construction cemented"
+     },
+     {
+      "segment": "men",
+      "name": "THE WAF‑FLEX PEG TRAINER",
+      "description": "A neutral Pegasus‑style with flex grooves and sticky options. The outsole mixes waffle texture and wet‑tuned grooves. SS27 keeps Shield and GTX variants in core color runs.",
+      "metric": {
+       "label": "Pegasus flex grooves and Storm‑Tread GTX",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.nike.com/gb/t/pegasus-41-gore-tex-waterproof-road-running-shoes-AVzKtMAM/FQ1356-002",
+       "observed_note": "Pegasus 41 GTX lists Storm‑Tread for wet weather traction."
+      },
+      "grade": "stable",
+      "silhouette_spec": "toe round; heel 10 mm; upper engineered mesh with midfoot band; outsole segmented waffle with flex grooves; construction cemented"
+     },
+     {
+      "segment": "kids",
+      "name": "THE STORM‑READY GS RUNNER",
+      "description": "A kids’ runner that brings siped grip to school commutes. The upper resists splashes while Storm‑Tread keeps footing sure. SS27 extends utility builds to GS sizes.",
+      "metric": {
+       "label": "Storm‑Tread in big kids Utility model",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.nike.com/t/star-runner-utility-big-kids-running-shoes-LfxvHb1X/IO2338-002",
+       "observed_note": "Product page cites splash‑proof upper and Storm‑Tread grip."
+      },
+      "grade": "safe",
+      "silhouette_spec": "toe round; heel 8–10 mm; upper engineered mesh with splash guard; closure lace with easy pull; outsole segmented rubber with siping; construction cemented"
+     },
+     {
+      "segment": "kids",
+      "name": "THE MINI‑CLIFTON WET DAY",
+      "description": "A lightweight kids’ road shoe with higher abrasion rubber. The geometry and pods help confidence on damp paths. SS27 adds reflective pops and darker mud‑friendly colors.",
+      "metric": {
+       "label": "Clifton kids with high‑abrasion rubber",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://au.hoka.com/products/k-clifton-9-youth-1131170-bwht-bwht",
+       "observed_note": "Kids Clifton notes high‑abrasion rubber outsole for wear."
+      },
+      "grade": "early_sign",
+      "silhouette_spec": "toe round; heel 5 mm; upper engineered mesh with toe bumper; outsole segmented rubber pods; construction cemented"
+     },
+     {
+      "segment": "kids",
+      "name": "THE GS STABILITY GRIP",
+      "description": "A grade‑school stability runner with toe rubber stitch. The outsole wrap and rubber maps aid wet playground grip. SS27 grows durable toe‑heel mapping in kids’ SKUs.",
+      "metric": {
+       "label": "Medial wrap and toe stitch durability",
+       "yoy_percent": null,
+       "magnitude": "steady",
+       "source_kind": "market",
+       "source_url": "https://www.asics.com/us/en-us/gt-1000-13-grade-school/p/ANA_1014A343-001.html",
+       "observed_note": "GT‑1000 GS lists medial wrap and toe rubber stitch."
+      },
+      "grade": "stable",
+      "silhouette_spec": "toe semi‑round; heel 8 mm; upper engineered mesh with stitched toe; outsole segmented solid rubber; construction cemented"
+     }
+    ],
+    "grade": "safe",
+    "next_season_call": "Compared with FW26, SS27 reduces heavy membranes and scales wet‑grip rubbers, siping, and heel AHAR plugs across core daily trainers. Expect broader Shield and GTX options to drop lighter uppers and keep Storm‑Tread or hybrid ASICSGRIP maps for spring rains.",
+    "confidence": "medium"
+   }
+  ],
+  "yearly_context": [
+   {
+    "season": "SS25",
+    "headline": "Daily trainers start borrowing plates and max‑foam tactically.",
+    "what_changed": "Compared to FW24, plates leave the race niche and appear in cushioned daily mileage shoes, led by Skyward X.",
+    "source_url": "https://www.prnewswire.com/news-releases/hoka-announces-the-launch-of-skyward-x-the-next-big-innovation-in-running-302127154.html"
+   },
+   {
+    "season": "FW25",
+    "headline": "Superfoams become baseline in the core daily tier.",
+    "what_changed": "Compared to SS25, Nike brings ReactX to Pegasus and centers energy‑return claims in the mass line.",
+    "source_url": "https://www.nike.com/a/pegasus-41-release-info/?msockid=3485fc0be51d6ac33c6deac7e4ed6b70"
+   },
+   {
+    "season": "SS26",
+    "headline": "Plated trainers normalize as everyday tempo tools.",
+    "what_changed": "Compared to FW25, Zoom Fly 6 sits as a mainstream pick and shows best‑seller flags on retail.",
+    "source_url": "https://www.runningwarehouse.com/catpage-MBESTUSE.html"
+   },
+   {
+    "season": "FW26",
+    "headline": "Refinement beats novelty in plates and traction.",
+    "what_changed": "Compared to SS26, HOKA debuts Skyward X 2 with a re‑worked plate for smoother daily miles.",
+    "source_url": "https://www.cleveland.com/shopping/2026/05/hoka-just-refined-its-most-luxurious-road-running-shoe-with-launch-of-skyward-x-2.html"
+   }
+  ],
+  "method_note": "I anchored on FW26 observations from brand releases, retail best‑seller flags, and runway coverage. I prioritized long lead indicators such as midsole platform rollouts, outsole compound claims, and geometry patents made visible in tech sheets. I verified upper material and outsole layout on brand product pages. Where year‑over‑year percentages were not public, I used in‑stock tags, best‑seller badges, update cadence, and show mentions as direction signals. All statements map back to unisex performance running within KRW 150k–220k pricing by selecting Pegasus, Novablast, Mach, Zoom Fly, and Skyward families.",
+  "open_questions": [
+   "Will ASICS extend ASICSGRIP or hybrid rubber mixes to Novablast grade road trainers in SS27 without raising price?",
+   "Will Nike cascade ReactX to more mid‑tier models in the 150k–220k KRW band before summer?",
+   "Will HOKA keep supercritical midsoles while improving cold‑wet grip without Vibram licensing on road shoes?",
+   "Will plated daily trainers adopt softer rockers and wider basenets to reduce fatigue at easy paces?",
+   "Will retailers rank wet‑traction claims higher in navigation filters for spring buys?"
+  ],
+  "sources": [
+   {
+    "title": "HOKA® Announces the Launch of Skyward X",
+    "url": "https://www.prnewswire.com/news-releases/hoka-announces-the-launch-of-skyward-x-the-next-big-innovation-in-running-302127154.html",
+    "used_for": "Plated daily trainer emergence in mass training."
+   },
+   {
+    "title": "HOKA Skyward X 2 launch coverage",
+    "url": "https://www.cleveland.com/shopping/2026/05/hoka-just-refined-its-most-luxurious-road-running-shoe-with-launch-of-skyward-x-2.html",
+    "used_for": "FW26 refinement of plated daily trainers."
+   },
+   {
+    "title": "Nike Zoom Fly 6 official images and details",
+    "url": "https://about.nike.com/en/newsroom/releases/zoom-fly-6-official-images",
+    "used_for": "Mainstream plated trainer positioning and outsole language."
+   },
+   {
+    "title": "Running Warehouse Best Sellers page",
+    "url": "https://www.runningwarehouse.com/catpage-MBESTUSE.html",
+    "used_for": "Market signal that Zoom Fly 6 is flagged as Best Seller."
+   },
+   {
+    "title": "Nike Pegasus 41 technology brief",
+    "url": "https://www.nike.com/a/pegasus-41-release-info/?msockid=3485fc0be51d6ac33c6deac7e4ed6b70",
+    "used_for": "ReactX energy‑return claims and engineered mesh upper update."
+   },
+   {
+    "title": "Nike Pegasus 41 product page",
+    "url": "https://www.nike.com/t/pegasus-41-prm-mens-road-running-shoes-R6tpoXaD/HQ2938-800?nikemt=true",
+    "used_for": "Engineered mesh and ReactX in‑line copy confirmation."
+   },
+   {
+    "title": "ASICS Novablast 5 product page",
+    "url": "https://www.asics.com/us/en-us/novablast--5/p/ANA_1011B974-403.html",
+    "used_for": "Engineered jacquard mesh and FF BLAST MAX in daily trainer."
+   },
+   {
+    "title": "ASICS press release Novablast 5",
+    "url": "https://corp.asics.com/en/press/article/experience-the-unique-combination-of-speed-and-bounce-in-the-new-novablasttm-5-running-shoe",
+    "used_for": "Foam platform positioning within ASICS daily category."
+   },
+   {
+    "title": "ASICS press release Novablast 6",
+    "url": "https://corp.asics.com/en/press/article/the-new-novablasttm-6-shoe-is-here-delivering-more-energy-for-body-and-mind",
+    "used_for": "Latest upper and outsole updates ahead of SS27 buys."
+   },
+   {
+    "title": "HOKA Mach 6 official product page",
+    "url": "https://nz.hoka.com/products/m-mach-6-1147790-bwht-bwht",
+    "used_for": "Supercritical foam midsole and strategic rubber coverage."
+   },
+   {
+    "title": "HOKA Mach 6 REI tested review",
+    "url": "https://www.rei.com/learn/expert-advice/hoka-mach-6-tested-review.html",
+    "used_for": "Durability and outsole coverage confirmation."
+   },
+   {
+    "title": "ASICS GEL‑KAYANO 31 press release",
+    "url": "https://corp.asics.com/en/press/article/experience-stability-and-advanced-comfort-in-every-step-with-asics%27-gel-kayanotm-31-shoe",
+    "used_for": "Geometry stability via 4D GUIDANCE SYSTEM."
+   },
+   {
+    "title": "ASICS SS25 tech sheets",
+    "url": "https://www.asics.com/nz/en-nz/media/wysiwyg/pdf/AS-0429_TechSheets_SS25_Performance_Run.pdf",
+    "used_for": "Outsole compounds and geometry notes used as lead indicators."
+   },
+   {
+    "title": "Nike Alphafly 3 official images and outsole claims",
+    "url": "https://about.nike.com/en/newsroom/releases/nike-alphafly-3-official-images-release-date",
+    "used_for": "Road traction language and continuous bottom update."
+   },
+   {
+    "title": "Kiko Kostadinov Fall 2026 runway with ASICS",
+    "url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/kiko-kostadinov",
+    "used_for": "Show‑side confirmation of tech sneaker presence."
+   }
+  ],
+  "searches": 91,
+  "collected_at": "2026-08-06",
+  "cached": true
+ },
+ "dossierPending": false,
+ "designs": [
+  {
+   "spec": {
+    "design_id": "SH-26FW-C01",
+    "tier": "core",
+    "category": "shoe",
+    "itemType": "running",
+    "fields": {
+     "last_id": "LST-CRT-01",
+     "is_new_last": false,
+     "toe_shape": "almond",
+     "heel_height_mm": 32,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cemented",
+     "is_new_outsole_mold": false,
+     "panel_count": 6,
+     "closure": "lace",
+     "upper_material": "suede 1.4mm",
+     "upper_thickness_mm": 0.8,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "none",
+     "drop_mm": 6
+    },
+    "fieldsLocked": []
+   },
+   "ruleResults": [
+    {
+     "rule": "S-04",
+     "severity": "fail",
+     "message": "Toe shape almond does not match last LST-CRT-01 (round)."
+    }
+   ],
+   "rejected": true,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 12000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 9700
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (0 moulds)",
+      "krw": 0
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 0,
+     "mold_count_required": 0,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 0
+    },
+    "estimated_total_krw": 54000,
+    "estimated_band_krw": [
+     46440,
+     65137
+    ],
+    "cap_ratio": 0.93,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "trend",
+    "driving_signals": [
+     {
+      "signal_id": "sg_005",
+      "weight": 0.4
+     },
+     {
+      "signal_id": "sg_003",
+      "weight": 0.25
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_778",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "dual_density_peba_top_layer",
+       "engineered_upper_gusseted_tongue"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_966",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [],
+    "series_dna_inherited": [],
+    "type_placement_reason": "Existing last and existing bottom unit, inside the cost cap. That is what Core is for.",
+    "narrative": [
+     "Dual‑density midsoles with PEBA/supercritical top layer showed up 4 times in this price band.",
+     "Engineered knit/woven upper with gusseted tongue, observed 4 times, came in as the second axis. Feasibility reads medium — tooling: last not_required, bottom mould modification.",
+     "Existing last and existing bottom unit, inside the cost cap. That is what Core is for.",
+     "References were used for attributes only (usage: attribute_only), collected 2026-05-14."
+    ]
+   },
+   "qa": [],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "7% under"
+    },
+    {
+     "label": "New moulds",
+     "value": "0"
+    },
+    {
+     "label": "Signals observed",
+     "value": "8"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "High",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "High",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "High",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [],
+   "images": [],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-C02",
+    "tier": "core",
+    "category": "shoe",
+    "itemType": "running",
+    "fields": {
+     "last_id": "LST-RUN-02",
+     "is_new_last": false,
+     "toe_shape": "round",
+     "heel_height_mm": 40,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cemented",
+     "is_new_outsole_mold": false,
+     "panel_count": 5,
+     "closure": "lace",
+     "upper_material": "synthetic 1.1mm",
+     "upper_thickness_mm": 1.2,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "supercritical EVA",
+     "plate": "none",
+     "drop_mm": 10
+    },
+    "fieldsLocked": []
+   },
+   "ruleResults": [],
+   "rejected": false,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 5500
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (supercritical EVA)",
+      "krw": 10500
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 9000
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (0 moulds)",
+      "krw": 0
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 0,
+     "mold_count_required": 0,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 0
+    },
+    "estimated_total_krw": 50800,
+    "estimated_band_krw": [
+     43688,
+     61388
+    ],
+    "cap_ratio": 0.88,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "trend",
+    "driving_signals": [
+     {
+      "signal_id": "sg_003",
+      "weight": 0.4
+     },
+     {
+      "signal_id": "sg_001",
+      "weight": 0.25
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_580",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "engineered_upper_gusseted_tongue",
+       "segmented_full_rubber_outsole"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_683",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [],
+    "series_dna_inherited": [],
+    "type_placement_reason": "Existing last and existing bottom unit, inside the cost cap. That is what Core is for.",
+    "narrative": [
+     "Engineered knit/woven upper with gusseted tongue showed up 4 times in this price band.",
+     "Segmented full-coverage rubber outsole, observed 6 times, came in as the second axis. Feasibility reads high — tooling: last not_required, bottom mould not_required.",
+     "Existing last and existing bottom unit, inside the cost cap. That is what Core is for.",
+     "References were used for attributes only (usage: attribute_only), collected 2026-05-14."
+    ]
+   },
+   "qa": [
+    {
+     "check": "Toe shape reads correctly",
+     "target": "round",
+     "observed": "round",
+     "pass": true
+    },
+    {
+     "check": "Heel height visual deviation",
+     "target": "40mm, within 20%",
+     "observed": "41mm, off by 3%",
+     "pass": true
+    },
+    {
+     "check": "Panel count",
+     "target": "5",
+     "observed": "4",
+     "pass": false
+    },
+    {
+     "check": "Same object across views",
+     "target": ">=0.80",
+     "observed": "0.82",
+     "pass": true
+    },
+    {
+     "check": "Lateral and medial sides consistent",
+     "target": "same sole line and panel logic",
+     "observed": "medial panel split differs",
+     "pass": true
+    }
+   ],
+   "viewMismatch": true,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "12% under"
+    },
+    {
+     "label": "New moulds",
+     "value": "0"
+    },
+    {
+     "label": "Signals observed",
+     "value": "10"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "Medium",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "Low",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "Medium",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [
+    "gold"
+   ],
+   "images": [
+    {
+     "view": "sketch",
+     "url": "/samples/4d59c2fa365bd3cbaa72ca42.png",
+     "hash": "4d59c2fa365bd3cbaa72ca42",
+     "origin": "generated",
+     "promptUsed": "road running daily trainer with engineered mesh upper, cushioned rocker midsole and segmented rubber outsole. a technical three-view sheet on one page: a large lateral profile as the main view, with a smaller top-down view showing the opening and toe shape, and a smaller outsole view showing the tread pattern, arranged cleanly beside it. round toe, 40mm thick cushioned midsole, a substantial mid-height stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 5 panels, synthetic 1.1mm upper, matte technical synthetic with a uniform surface, lace closure, supercritical EVA midsole. black and white technical line drawing, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. No logo, no text, no lettering anywhere on the product.. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
+    },
+    {
+     "view": "sketch_var",
+     "url": "/samples/40a9b9c1b2e7137c7aeb4955.png",
+     "hash": "40a9b9c1b2e7137c7aeb4955",
+     "origin": "edited_from",
+     "editedFrom": "4d59c2fa365bd3cbaa72ca42",
+     "promptUsed": "This is one more black-ink technical sketch of the SAME shoe form. Keep the exact silhouette, proportions, midsole geometry and outsole tread of the original sheet. Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines. Same one-page three-view layout, same black ink line style on white paper, no colour, no shading. No text, no numbers, no labels, no logo."
+    },
+    {
+     "view": "lateral",
+     "url": "/samples/e6c3054415a183f71a3ac90f.png",
+     "hash": "e6c3054415a183f71a3ac90f",
+     "origin": "generated",
+     "promptUsed": "Turn the main lateral view of this technical sketch sheet into a photorealistic studio product photograph of the exact same shoe. Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole tread pattern exactly as drawn. Materials: round toe, 40mm thick cushioned midsole, a substantial mid-height stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 5 panels, synthetic 1.1mm upper, matte technical synthetic with a uniform surface, lace closure, supercritical EVA midsole. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. Strict lateral side view, toe pointing to the left and heel on the right, seamless white background, soft even studio light, sharp focus, real material texture. Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human."
+    },
+    {
+     "view": "design",
+     "url": "/samples/e6a13448a3272b1ccd9ee448.png",
+     "hash": "e6a13448a3272b1ccd9ee448",
+     "origin": "edited_from",
+     "editedFrom": "40a9b9c1b2e7137c7aeb4955",
+     "promptUsed": "Turn the main lateral view of this technical sketch sheet into a photorealistic studio product photograph of the exact same shoe. Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole tread pattern exactly as drawn. Materials: round toe, 40mm thick cushioned midsole, a substantial mid-height stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 5 panels, synthetic 1.1mm upper, matte technical synthetic with a uniform surface, lace closure, supercritical EVA midsole. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. Strict lateral side view, toe pointing to the left and heel on the right, seamless white background, soft even studio light, sharp focus, real material texture. Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human."
+    },
+    {
+     "view": "medial",
+     "url": "/samples/cbb72be18838c451aa1dc18f.png",
+     "hash": "cbb72be18838c451aa1dc18f",
+     "origin": "edited_from",
+     "editedFrom": "e6c3054415a183f71a3ac90f"
+    },
+    {
+     "view": "q34",
+     "url": "/samples/652b8a206c591717f2bca406.png",
+     "hash": "652b8a206c591717f2bca406",
+     "origin": "edited_from",
+     "editedFrom": "e6c3054415a183f71a3ac90f"
+    },
+    {
+     "view": "lateral",
+     "colorway": "gold",
+     "url": "/samples/efe48b93db9dbec70d1d31ed.png",
+     "hash": "efe48b93db9dbec70d1d31ed",
+     "origin": "edited_from",
+     "editedFrom": "e6c3054415a183f71a3ac90f"
+    },
+    {
+     "view": "variation",
+     "url": "/samples/16ee315410451db995cf234c.png",
+     "hash": "16ee315410451db995cf234c",
+     "origin": "edited_from",
+     "editedFrom": "e6c3054415a183f71a3ac90f",
+     "variantOf": "SH-26FW-C02",
+     "variantAxis": "Sole rebuild"
+    },
+    {
+     "view": "variation",
+     "url": "/samples/af3fad0f634ebf23c30d7800.png",
+     "hash": "af3fad0f634ebf23c30d7800",
+     "origin": "edited_from",
+     "editedFrom": "e6c3054415a183f71a3ac90f",
+     "variantOf": "SH-26FW-C02",
+     "variantAxis": "Material swap"
+    },
+    {
+     "view": "concept",
+     "url": "/samples/2c2b0aed8074fe32af30c0ce.png",
+     "hash": "2c2b0aed8074fe32af30c0ce",
+     "origin": "edited_from",
+     "editedFrom": "e6c3054415a183f71a3ac90f",
+     "conceptLabel": "Virtual fitting",
+     "persona": "Morning runner"
+    },
+    {
+     "view": "wear",
+     "url": "/samples/e3e413140733d1f10e789878.png",
+     "hash": "e3e413140733d1f10e789878",
+     "origin": "edited_from",
+     "editedFrom": "e6c3054415a183f71a3ac90f"
+    },
+    {
+     "view": "turn_front",
+     "url": "/samples/645e29a039800eb925c3914d.png",
+     "hash": "645e29a039800eb925c3914d",
+     "origin": "edited_from",
+     "editedFrom": "e6c3054415a183f71a3ac90f"
+    },
+    {
+     "view": "turn_back",
+     "url": "/samples/95cc275d97103a1935a02e43.png",
+     "hash": "95cc275d97103a1935a02e43",
+     "origin": "edited_from",
+     "editedFrom": "e6c3054415a183f71a3ac90f"
+    }
+   ],
+   "isTop": true,
+   "topDistance": 0.54,
+   "model": {
+    "url": "/samples/6cf04b957321edf96001b919.glb",
+    "hash": "6cf04b957321edf96001b919",
+    "format": "glb",
+    "views": 4
+   }
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-P03",
+    "tier": "push",
+    "category": "shoe",
+    "itemType": "running",
+    "fields": {
+     "last_id": "LST-RUN-07",
+     "is_new_last": false,
+     "toe_shape": "round",
+     "heel_height_mm": 30,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cemented",
+     "is_new_outsole_mold": false,
+     "panel_count": 7,
+     "closure": "lace",
+     "upper_material": "synthetic 1.1mm",
+     "upper_thickness_mm": 1,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "supercritical EVA",
+     "plate": "none",
+     "drop_mm": 6
+    },
+    "fieldsLocked": []
+   },
+   "ruleResults": [],
+   "rejected": false,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 5500
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (supercritical EVA)",
+      "krw": 10500
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 10400
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (0 moulds)",
+      "krw": 0
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 0,
+     "mold_count_required": 0,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 0
+    },
+    "estimated_total_krw": 52200,
+    "estimated_band_krw": [
+     44892,
+     62969
+    ],
+    "cap_ratio": 0.9,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "trend",
+    "driving_signals": [
+     {
+      "signal_id": "sg_002",
+      "weight": 0.4
+     },
+     {
+      "signal_id": "sg_001",
+      "weight": 0.25
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_750",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "wide_base_sidewalls_neutral_stability",
+       "segmented_full_rubber_outsole"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_603",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [],
+    "series_dna_inherited": [],
+    "type_placement_reason": "Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push.",
+    "narrative": [
+     "Wide-base sidewalls neutral stability showed up 4 times in this price band.",
+     "Segmented full-coverage rubber outsole, observed 6 times, came in as the second axis. Feasibility reads medium — tooling: last not_required, bottom mould modification.",
+     "Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push.",
+     "References were used for attributes only (usage: attribute_only), collected 2026-05-14."
+    ]
+   },
+   "qa": [],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "10% under"
+    },
+    {
+     "label": "New moulds",
+     "value": "0"
+    },
+    {
+     "label": "Signals observed",
+     "value": "10"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "High",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "High",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "Medium",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [],
+   "images": [
+    {
+     "view": "sketch",
+     "url": "/samples/9af1ec6b52090f386e4e1b94.png",
+     "hash": "9af1ec6b52090f386e4e1b94",
+     "origin": "generated",
+     "promptUsed": "road running daily trainer with engineered mesh upper, cushioned rocker midsole and segmented rubber outsole. a technical three-view sheet on one page: a large lateral profile as the main view, with a smaller top-down view showing the opening and toe shape, and a smaller outsole view showing the tread pattern, arranged cleanly beside it. round toe, 30mm thick cushioned midsole, a low-profile stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, synthetic 1.1mm upper, matte technical synthetic with a uniform surface, lace closure, supercritical EVA midsole. black and white technical line drawing, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. No logo, no text, no lettering anywhere on the product.. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
+    },
+    {
+     "view": "sketch_var",
+     "url": "/samples/8a7ee8812fc54929f3a41e2d.png",
+     "hash": "8a7ee8812fc54929f3a41e2d",
+     "origin": "edited_from",
+     "editedFrom": "9af1ec6b52090f386e4e1b94",
+     "promptUsed": "This is one more black-ink technical sketch of the SAME shoe form. Keep the exact silhouette, proportions, midsole geometry and outsole tread of the original sheet. Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines. Same one-page three-view layout, same black ink line style on white paper, no colour, no shading. No text, no numbers, no labels, no logo."
+    }
+   ],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-P04",
+    "tier": "push",
+    "category": "shoe",
+    "itemType": "running",
+    "fields": {
+     "last_id": "LST-CRT-01",
+     "is_new_last": false,
+     "toe_shape": "round",
+     "heel_height_mm": 39,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cemented",
+     "is_new_outsole_mold": false,
+     "panel_count": 7,
+     "closure": "lace",
+     "upper_material": "suede 1.4mm",
+     "upper_thickness_mm": 1.2,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "none",
+     "drop_mm": 7
+    },
+    "fieldsLocked": []
+   },
+   "ruleResults": [],
+   "rejected": false,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 12000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 10400
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (0 moulds)",
+      "krw": 0
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 0,
+     "mold_count_required": 0,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 0
+    },
+    "estimated_total_krw": 54700,
+    "estimated_band_krw": [
+     47042,
+     66703
+    ],
+    "cap_ratio": 0.94,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "trend",
+    "driving_signals": [
+     {
+      "signal_id": "sg_001",
+      "weight": 0.4
+     },
+     {
+      "signal_id": "sg_002",
+      "weight": 0.25
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_798",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "segmented_full_rubber_outsole",
+       "wide_base_sidewalls_neutral_stability"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_956",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [],
+    "series_dna_inherited": [],
+    "type_placement_reason": "Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push.",
+    "narrative": [
+     "Segmented full-coverage rubber outsole showed up 6 times in this price band.",
+     "Wide-base sidewalls neutral stability, observed 4 times, came in as the second axis. Feasibility reads high — tooling: last not_required, bottom mould modification.",
+     "Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push.",
+     "References were used for attributes only (usage: attribute_only), collected 2026-05-14."
+    ]
+   },
+   "qa": [],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "6% under"
+    },
+    {
+     "label": "New moulds",
+     "value": "0"
+    },
+    {
+     "label": "Signals observed",
+     "value": "10"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "Medium",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "Medium",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "High",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [],
+   "images": [
+    {
+     "view": "sketch",
+     "url": "/samples/fba3ce6a68045e90afe9bd04.png",
+     "hash": "fba3ce6a68045e90afe9bd04",
+     "origin": "generated",
+     "promptUsed": "road running daily trainer with engineered mesh upper, cushioned rocker midsole and segmented rubber outsole. a technical three-view sheet on one page: a large lateral profile as the main view, with a smaller top-down view showing the opening and toe shape, and a smaller outsole view showing the tread pattern, arranged cleanly beside it. round toe, 39mm thick cushioned midsole, a substantial mid-height stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, suede 1.4mm upper, brushed suede with a clearly readable napped texture, lace closure, EVA midsole. black and white technical line drawing, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. No logo, no text, no lettering anywhere on the product.. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
+    },
+    {
+     "view": "sketch_var",
+     "url": "/samples/903bee41d52fbfe1716fb519.png",
+     "hash": "903bee41d52fbfe1716fb519",
+     "origin": "edited_from",
+     "editedFrom": "fba3ce6a68045e90afe9bd04",
+     "promptUsed": "This is one more black-ink technical sketch of the SAME shoe form. Keep the exact silhouette, proportions, midsole geometry and outsole tread of the original sheet. Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines. Same one-page three-view layout, same black ink line style on white paper, no colour, no shading. No text, no numbers, no labels, no logo."
+    }
+   ],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-S05",
+    "tier": "signature",
+    "category": "shoe",
+    "itemType": "running",
+    "fields": {
+     "last_id": "LST-RUN-02",
+     "is_new_last": false,
+     "toe_shape": "pointed",
+     "heel_height_mm": 33,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cemented",
+     "is_new_outsole_mold": true,
+     "panel_count": 5,
+     "closure": "lace",
+     "upper_material": "knit 0.8mm",
+     "upper_thickness_mm": 0.8,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "PEBA blend",
+     "plate": "none",
+     "drop_mm": 10
+    },
+    "fieldsLocked": []
+   },
+   "ruleResults": [
+    {
+     "rule": "S-04",
+     "severity": "fail",
+     "message": "Toe shape pointed does not match last LST-RUN-02 (round)."
+    }
+   ],
+   "rejected": true,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 6000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (PEBA blend)",
+      "krw": 14500
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 9000
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (11 moulds)",
+      "krw": 3117
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 9350000,
+     "mold_count_required": 11,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 3117
+    },
+    "estimated_total_krw": 58417,
+    "estimated_band_krw": [
+     50239,
+     70898
+    ],
+    "cap_ratio": 1.01,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "trend",
+    "driving_signals": [
+     {
+      "signal_id": "sg_004",
+      "weight": 0.4
+     },
+     {
+      "signal_id": "sg_002",
+      "weight": 0.25
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_421",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "wet_grip_oriented_outsole",
+       "wide_base_sidewalls_neutral_stability"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_759",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [],
+    "series_dna_inherited": [],
+    "type_placement_reason": "New last or new outsole mould allowed with amortisation stated. That is Signature.",
+    "narrative": [
+     "Wet‑grip oriented rubber compounds and patterns showed up 4 times in this price band.",
+     "Wide-base sidewalls neutral stability, observed 4 times, came in as the second axis. Feasibility reads high — tooling: last not_required, bottom mould modification.",
+     "New last or new outsole mould allowed with amortisation stated. That is Signature.",
+     "References were used for attributes only (usage: attribute_only), collected 2026-05-14."
+    ]
+   },
+   "qa": [],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "1% over"
+    },
+    {
+     "label": "New moulds",
+     "value": "11"
+    },
+    {
+     "label": "Signals observed",
+     "value": "8"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "Medium",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "Medium",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "High",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [],
+   "images": [],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-S06",
+    "tier": "signature",
+    "category": "shoe",
+    "itemType": "running",
+    "fields": {
+     "last_id": "LST-RUN-05",
+     "is_new_last": false,
+     "toe_shape": "round",
+     "heel_height_mm": 30,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cemented",
+     "is_new_outsole_mold": false,
+     "panel_count": 7,
+     "closure": "lace",
+     "upper_material": "engineered mesh 0.9mm",
+     "upper_thickness_mm": 1.1,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "none",
+     "drop_mm": 7
+    },
+    "fieldsLocked": []
+   },
+   "ruleResults": [],
+   "rejected": false,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 7000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 10400
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (0 moulds)",
+      "krw": 0
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 0,
+     "mold_count_required": 0,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 0
+    },
+    "estimated_total_krw": 49700,
+    "estimated_band_krw": [
+     42742,
+     59675
+    ],
+    "cap_ratio": 0.86,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "trend",
+    "driving_signals": [
+     {
+      "signal_id": "sg_005",
+      "weight": 0.4
+     },
+     {
+      "signal_id": "sg_001",
+      "weight": 0.25
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_395",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "dual_density_peba_top_layer",
+       "segmented_full_rubber_outsole"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_400",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [],
+    "series_dna_inherited": [],
+    "type_placement_reason": "New last or new outsole mould allowed with amortisation stated. That is Signature.",
+    "narrative": [
+     "Dual‑density midsoles with PEBA/supercritical top layer showed up 4 times in this price band.",
+     "Segmented full-coverage rubber outsole, observed 6 times, came in as the second axis. Feasibility reads medium — tooling: last not_required, bottom mould modification.",
+     "New last or new outsole mould allowed with amortisation stated. That is Signature.",
+     "References were used for attributes only (usage: attribute_only), collected 2026-05-14."
+    ]
+   },
+   "qa": [
+    {
+     "check": "Toe shape reads correctly",
+     "target": "round",
+     "observed": "round",
+     "pass": true
+    },
+    {
+     "check": "Heel height visual deviation",
+     "target": "30mm, within 20%",
+     "observed": "32mm, off by 6%",
+     "pass": true
+    },
+    {
+     "check": "Panel count",
+     "target": "7",
+     "observed": "7",
+     "pass": true
+    },
+    {
+     "check": "Same object across views",
+     "target": ">=0.80",
+     "observed": "0.94",
+     "pass": true
+    },
+    {
+     "check": "Lateral and medial sides consistent",
+     "target": "same sole line and panel logic",
+     "observed": "consistent",
+     "pass": true
+    }
+   ],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "14% under"
+    },
+    {
+     "label": "New moulds",
+     "value": "0"
+    },
+    {
+     "label": "Signals observed",
+     "value": "10"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "Medium",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "Medium",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "High",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [
+    "gold"
+   ],
+   "images": [
+    {
+     "view": "sketch",
+     "url": "/samples/0ec45fb3edea522f1b751a2f.png",
+     "hash": "0ec45fb3edea522f1b751a2f",
+     "origin": "generated",
+     "promptUsed": "road running daily trainer with engineered mesh upper, cushioned rocker midsole and segmented rubber outsole. a technical three-view sheet on one page: a large lateral profile as the main view, with a smaller top-down view showing the opening and toe shape, and a smaller outsole view showing the tread pattern, arranged cleanly beside it. round toe, 30mm thick cushioned midsole, a low-profile stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, engineered mesh 0.9mm upper, engineered mesh with an open breathable weave, lace closure, EVA midsole. black and white technical line drawing, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. No logo, no text, no lettering anywhere on the product.. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
+    },
+    {
+     "view": "sketch_var",
+     "url": "/samples/5a257727ec0ffc7705a1ae63.png",
+     "hash": "5a257727ec0ffc7705a1ae63",
+     "origin": "edited_from",
+     "editedFrom": "0ec45fb3edea522f1b751a2f",
+     "promptUsed": "This is one more black-ink technical sketch of the SAME shoe form. Keep the exact silhouette, proportions, midsole geometry and outsole tread of the original sheet. Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines. Same one-page three-view layout, same black ink line style on white paper, no colour, no shading. No text, no numbers, no labels, no logo."
+    },
+    {
+     "view": "lateral",
+     "url": "/samples/3975f022e291900626506f77.png",
+     "hash": "3975f022e291900626506f77",
+     "origin": "generated",
+     "promptUsed": "Turn the main lateral view of this technical sketch sheet into a photorealistic studio product photograph of the exact same shoe. Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole tread pattern exactly as drawn. Materials: round toe, 30mm thick cushioned midsole, a low-profile stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, engineered mesh 0.9mm upper, engineered mesh with an open breathable weave, lace closure, EVA midsole. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. Strict lateral side view, toe pointing to the left and heel on the right, seamless white background, soft even studio light, sharp focus, real material texture. Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human."
+    },
+    {
+     "view": "design",
+     "url": "/samples/95f8a4ef040cf77ad854c6b0.png",
+     "hash": "95f8a4ef040cf77ad854c6b0",
+     "origin": "edited_from",
+     "editedFrom": "5a257727ec0ffc7705a1ae63",
+     "promptUsed": "Turn the main lateral view of this technical sketch sheet into a photorealistic studio product photograph of the exact same shoe. Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole tread pattern exactly as drawn. Materials: round toe, 30mm thick cushioned midsole, a low-profile stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, engineered mesh 0.9mm upper, engineered mesh with an open breathable weave, lace closure, EVA midsole. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. Strict lateral side view, toe pointing to the left and heel on the right, seamless white background, soft even studio light, sharp focus, real material texture. Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human."
+    },
+    {
+     "view": "medial",
+     "url": "/samples/f95efe9a92666f3a956abc1d.png",
+     "hash": "f95efe9a92666f3a956abc1d",
+     "origin": "edited_from",
+     "editedFrom": "3975f022e291900626506f77"
+    },
+    {
+     "view": "q34",
+     "url": "/samples/bd1937d741e34e7c9baabb57.png",
+     "hash": "bd1937d741e34e7c9baabb57",
+     "origin": "edited_from",
+     "editedFrom": "3975f022e291900626506f77"
+    },
+    {
+     "view": "lateral",
+     "colorway": "gold",
+     "url": "/samples/4034c197f2605af263eefd6c.png",
+     "hash": "4034c197f2605af263eefd6c",
+     "origin": "edited_from",
+     "editedFrom": "3975f022e291900626506f77"
+    },
+    {
+     "view": "variation",
+     "url": "/samples/954c7ebff34cf216ab92849f.png",
+     "hash": "954c7ebff34cf216ab92849f",
+     "origin": "edited_from",
+     "editedFrom": "3975f022e291900626506f77",
+     "variantOf": "SH-26FW-S06",
+     "variantAxis": "Material swap"
+    },
+    {
+     "view": "variation",
+     "url": "/samples/f2ac610382f09392152989d0.png",
+     "hash": "f2ac610382f09392152989d0",
+     "origin": "edited_from",
+     "editedFrom": "3975f022e291900626506f77",
+     "variantOf": "SH-26FW-S06",
+     "variantAxis": "Sole rebuild"
+    }
+   ],
+   "isTop": false
+  }
+ ],
+ "checkpoints": [
+  "S1 done · signals.json · directions[3] saved",
+  "S2 done · specs, sketches and rationale saved. You can resume at S3 days later.",
+  "S3 done · renders, colourways and QA results saved",
+  "S4 done · Top N and campaign shots saved",
+  "S5 done · 3D showroom, board and PDF export ready"
+ ],
+ "finished": true,
+ "sample": true,
+ "sampleTitle": "Road daily trainer · full run with 3D",
+ "savedAtISO": "2026-08-07T01:39:07.542Z"
+}

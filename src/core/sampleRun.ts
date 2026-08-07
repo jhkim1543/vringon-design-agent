@@ -3,7 +3,7 @@
 import type { RunState } from './types'
 import { listRuns, saveRun } from './store'
 
-const SAMPLE_IDS = ['sample_shoe_trend', 'sample_sport_running']
+const SAMPLE_IDS = ['sample_running_full', 'sample_shoe_trend', 'sample_sport_running']
 
 export async function ensureSampleRuns() {
   const have = new Set(listRuns().map(r => r.id))
@@ -33,7 +33,7 @@ export async function ensureSampleRuns() {
 
 function firstThumb(st: RunState): string | undefined {
   for (const d of st.designs) {
-    const im = d.images.find(i => i.view !== 'sketch') ?? d.images[0]
+    const im = d.images.find(i => i.view !== 'sketch' && i.view !== 'sketch_var') ?? d.images[0]
     if (im) return im.url
   }
   return undefined

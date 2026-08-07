@@ -26,10 +26,12 @@ export interface BoardEdits {
   hidden: string[]
   /** 옮긴 위치 */
   positions: Record<string, { x: number; y: number }>
+  /** 드래그로 조절한 칸 크기 · 없으면 기본 추정 크기를 쓴다 */
+  sizes: Record<string, { w: number; h: number }>
 }
 
 export const EMPTY_EDITS: BoardEdits = {
-  titles: {}, bodies: {}, notes: [], extraColumns: [], hidden: [], positions: {},
+  titles: {}, bodies: {}, notes: [], extraColumns: [], hidden: [], positions: {}, sizes: {},
 }
 
 const KEY = (runId: string) => `vringon.board.${runId}`

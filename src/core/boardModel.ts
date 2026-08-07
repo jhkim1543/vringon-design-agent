@@ -55,11 +55,12 @@ export function buildBoardModel(st: RunState): BoardModel {
     { key: 'research', title: '2 · Research', note: scope.competitor ? 'What the agent collected' : scope.trend ? 'Trend research' : 'Your uploads, read' },
     { key: 'signal', title: '3 · Signals', note: 'Observations with a source' },
     { key: 'direction', title: '4 · Directions', note: 'Signals combined' },
-    { key: 'design', title: '5 · Designs', note: 'Spec, rules, image' },
-    { key: 'selection', title: '6 · Selection', note: 'Metrics and calls' },
-    { key: 'variation', title: '7 · Variations', note: 'One sketch, several products' },
-    { key: 'campaign', title: '8 · Campaign shots', note: 'Worn on a model, staged on set' },
-    { key: 'showroom', title: '9 · 3D showroom', note: 'Turn it, or open it full size' },
+    { key: 'sketchlane', title: '5 · Sketches', note: 'One form, black ink only' },
+    { key: 'design', title: '6 · Designs', note: 'Colour enters here' },
+    { key: 'selection', title: '7 · Selection', note: 'Metrics and calls' },
+    { key: 'variation', title: '8 · Variations', note: 'One design, several products' },
+    { key: 'campaign', title: '9 · Campaign shots', note: 'Worn on a model, staged on set' },
+    { key: 'showroom', title: '10 · 3D showroom', note: 'Turn it, or open it full size' },
   ]
 
   // ── 1 입력 ──────────────────────────────────────────────────────
@@ -86,51 +87,44 @@ export function buildBoardModel(st: RunState): BoardModel {
   if (p.mode === 'trend') {
     const inBand = st.competitors.filter(c => c.in_band)
     const out = st.competitors.filter(c => !c.in_band)
-    nodes.push({
-      id: 'r-comp', kind: 'research', column: 1, row: 0,
-      title: 'Competitor products',
-      body: [
-        `${st.competitors.length} collected · ${inBand.length} inside the band`,
-        ...(out.length ? [`${out.length} outside the band, kept as reference`] : []),
-      ],
-    })
+    // 조사 레인의 주인공은 제품 사진이다. 요약 카드는 한 줄로 줄인다.
     const noProxy = st.competitors.filter(c => c.observation_count < 2)
     nodes.push({
-      id: 'r-proxy', kind: 'research', column: 1, row: 1,
-      title: 'Sales proxy',
+      id: 'r-comp', kind: 'research', column: 1, row: 0,
+      title: 'What the market is selling',
       body: [
-        'Restock count, days out of stock, colourway spread',
-        noProxy.length ? `${noProxy.length} seen only once, no time series, so no score` : 'All seen at least twice',
-      ],
-      tone: 'warn',
+        `${st.competitors.length} products · ${inBand.length} in band${out.length ? ` · ${out.length} reference` : ''}`,
+        noProxy.length ? 'Single pass, so no sales ranking is inferred' : '',
+      ].filter(Boolean),
+      tone: 'accent',
     })
-    nodes.push({
-      id: 'r-trend', kind: 'research', column: 1, row: 2,
-      title: 'Trend research', body: ['Report search, then dedup and OEM grouping'],
-    })
-    researchIds = ['r-comp', 'r-proxy', 'r-trend']
+    researchIds = ['r-comp', 'r-trend']
     edges.push({ from: 'in', to: 'r-comp', label: 'competitor lines' })
-    edges.push({ from: 'r-comp', to: 'r-proxy', label: 'repeat observations' })
-    edges.push({ from: 'in', to: 'r-trend', label: 'line profile' })
-    // 실제 수집한 제품 사진을 보드에 올린다 · 근거는 글이 아니라 사진으로 보인다
-    st.competitors.filter(c => c.image_urls?.length).slice(0, 6).forEach((c, k) => {
+    // 실제 수집한 제품 사진을 보드에 올린다 · 근거는 글이 아니라 사진으로 보인다.
+    // 백화점·명품몰 베스트셀러(retailer가 붙은 것)가 먼저 온다 — 지금 팔리는 것부터.
+    const withShots = st.competitors.filter(c => c.image_urls?.length)
+    const shotPick = [...withShots.filter(c => c.retailer), ...withShots.filter(c => !c.retailer)].slice(0, 14)
+    shotPick.forEach((c, k) => {
       const id = `comp-shot-${k}`
       nodes.push({
-        id, kind: 'research', column: 1, row: 3 + k,
+        id, kind: 'research', column: 1, row: 1 + k,
         title: `${c.brand} ${c.name}`,
-        body: [
-          [
-            c.price_krw > 0 ? `KRW ${(c.price_krw / 10000).toFixed(0)}0k` : 'price unknown',
-            c.competitor_group ? COMP_GROUP_LABEL[c.competitor_group] : '',
-            c.size_status === 'size_broken' ? 'size broken' : '',
-          ].filter(Boolean).join(' · '),
-          c.design_traits?.slice(0, 2).join(' · ') ?? '',
-        ].filter(Boolean),
+        // 가격과 어디서 팔리는지 한 줄. 나머지는 사진이 말한다.
+        body: [[
+          c.price_krw > 0 ? `KRW ${(c.price_krw / 10000).toFixed(0)}0k` : '',
+          c.retailer ? `${c.retailer} bestseller` : (c.competitor_group ? COMP_GROUP_LABEL[c.competitor_group] : ''),
+          c.size_status === 'size_broken' ? 'size broken' : '',
+        ].filter(Boolean).join(' · ')].filter(Boolean),
         imageUrl: shotUrl(c.image_urls![0], c.product_url),
-        tone: 'muted',
+        tone: c.retailer ? 'accent' : 'neutral',
       })
       edges.push({ from: 'r-comp', to: id, dashed: true })
     })
+    nodes.push({
+      id: 'r-trend', kind: 'research', column: 1, row: 1 + shotPick.length,
+      title: 'Trend research', body: [`${st.signals.length} signals, each with a source`],
+    })
+    edges.push({ from: 'in', to: 'r-trend', label: 'line profile' })
   } else if (p.mode === 'series') {
     nodes.push({
       id: 'r-dna', kind: 'research', column: 1, row: 0,
@@ -179,46 +173,31 @@ export function buildBoardModel(st: RunState): BoardModel {
   // ── 시즌 도시에 · MICAM 형식의 매크로트렌드를 조사 열에 얹는다 ──────
   // 경쟁 제품 사진 카드가 이미 3행부터 쓰고 있으면 그 아래로 내린다
   const compShotRows = nodes.filter(n => n.id.startsWith('comp-shot-')).length
-  const dosRow = 3 + compShotRows
+  const dosRow = 2 + compShotRows
   const dossier = st.dossier as SeasonDossier | null
   if (dossier?.macrotrends?.length) {
     const pct = metricText
     nodes.push({
       id: 'dos', kind: 'research', column: 1, row: dosRow,
       title: `${dossier.season} · ${dossier.season_title}`,
-      body: [
-        dossier.powershift ? `Powershift: ${dossier.powershift}` : '',
-        `${dossier.macrotrends.length} macrotrends · ${dossier.sources?.length ?? 0} sources · ${dossier.searches} searches`,
-      ].filter(Boolean),
+      body: [dossier.powershift ? dossier.powershift : `${dossier.macrotrends.length} directions`],
       tone: 'accent',
     })
     edges.push({ from: 'in', to: 'dos', label: 'season brief' })
 
-    // 매크로 카드는 요약 두 줄 + 팔레트 스와치까지만. 소재·디테일 수치는 리포트에 있다.
+    // 매크로 카드는 한 줄 + 팔레트 스와치. 수치와 근거는 리포트에 있다.
     dossier.macrotrends.forEach((m, i) => {
       const id = `macro-${i}`
       nodes.push({
-        id, kind: 'research', column: 1, row: dosRow + 1 + i * 2,
+        id, kind: 'research', column: 1, row: dosRow + 1 + i,
         title: `${m.name} · ${GRADE_LABEL[m.grade] ?? m.grade}`,
         body: [
           m.statement,
-          (m.drivers ?? []).slice(0, 2).map(d => `${d.label} ${pct(d)} · ${SOURCE_LABEL[d.source_kind] ?? d.source_kind}`).join('  ·  '),
+          (m.key_items ?? []).slice(0, 3).map(k => k.name).join(' · '),
         ].filter(Boolean),
         palette: (m.palette ?? []).slice(0, 8).map(c => ({ name: c.name, hex: c.hex })),
       })
       edges.push({ from: 'dos', to: id, label: 'macrotrend' })
-
-      const items = (m.key_items ?? []).slice(0, 3)
-      if (items.length) {
-        const kid = `macro-${i}-items`
-        nodes.push({
-          id: kid, kind: 'research', column: 1, row: dosRow + 2 + i * 2,
-          title: `${m.name} key items`,
-          body: items.map(k => `${k.name} (${k.segment}) ${k.metric ? pct(k.metric) : ''} ${GRADE_LABEL[k.grade] ?? k.grade}`.trim()),
-          tone: 'muted',
-        })
-        edges.push({ from: id, to: kid, label: 'key items' })
-      }
     })
   }
 
@@ -236,7 +215,7 @@ export function buildBoardModel(st: RunState): BoardModel {
     })
     // 신호의 출처 노드 연결 · 프록시가 붙은 신호는 프록시 노드에서 온다
     const src = p.mode === 'trend'
-      ? (s.sales_proxy_score != null ? 'r-proxy' : 'r-trend')
+      ? 'r-trend'
       : p.mode === 'series' ? (researchIds.includes('r-trend') ? 'r-trend' : 'r-dna')
       : 'r-pdf'
     edges.push({ from: src, to: `sg-${s.signal_id}`, dashed: s.confidence === 'low' })
@@ -261,8 +240,28 @@ export function buildBoardModel(st: RunState): BoardModel {
   const deck = buildLocalPitch(st)
   const pitchOf = (id: string) => deck.designPitches.find(x => x.design_id === id)
 
+  // ── 5 스케치 레인 · 외형이 잡히는 흑백 단계. 색이 들어간 디자인과 명확히 갈라 보인다
+  let skRow = 0
+  alive.forEach(d => {
+    const sketches = d.images.filter(im => im.view === 'sketch' || im.view === 'sketch_var')
+    sketches.forEach((im, k) => {
+      const id = `sk-${d.spec.design_id}-${k}`
+      nodes.push({
+        id, kind: 'design', column: 4, row: skRow++,
+        title: `${d.spec.design_id} · ${k === 0 ? 'Base form' : `Ink variation ${k}`}`,
+        body: [k === 0 ? 'Form decided here' : 'Same form, different upper'],
+        imageUrl: im.url,
+        tone: 'muted',
+      })
+      const dir = st.directions.find(x => d.rationale.driving_signals.some(ds => x.signal_ids.includes(ds.signal_id)))
+      if (k === 0 && dir) edges.push({ from: `dir-${dir.id}`, to: id, label: 'form' })
+      if (k > 0) edges.push({ from: `sk-${d.spec.design_id}-0`, to: id, label: 'ink variation', dashed: true })
+      edges.push({ from: id, to: d.spec.design_id, label: k === 0 ? 'coloured' : undefined })
+    })
+  })
+
   alive.forEach((d, i) => {
-    const hero = d.images.find(im => im.view !== 'sketch') ?? d.images[0]
+    const hero = d.images.find(im => !['sketch', 'sketch_var'].includes(im.view)) ?? d.images[0]
     const pit = pitchOf(d.spec.design_id)
     if (pit) {
       // 카드 옆에 "어떤 근거에서 이 스케치가 나왔고, 어떤 프롬프트가 디자인으로 만들었는지"를 붙인다.
@@ -271,7 +270,7 @@ export function buildBoardModel(st: RunState): BoardModel {
       const variantPrompt = d.images.find(im => im.view === 'design')?.promptUsed
       const cut = (s?: string) => s ? (s.length > 150 ? s.slice(0, 150) + '…' : s) : null
       nodes.push({
-        id: `pitch-${d.spec.design_id}`, kind: 'selection', column: 4.5, row: i,
+        id: `pitch-${d.spec.design_id}`, kind: 'selection', column: 5.5, row: i,
         title: 'Why this sketch, and the prompt behind it',
         body: [
           ...pit.why.slice(0, 2),
@@ -287,7 +286,7 @@ export function buildBoardModel(st: RunState): BoardModel {
       edges.push({ from: d.spec.design_id, to: `pitch-${d.spec.design_id}`, label: 'reasoning', dashed: true })
     }
     nodes.push({
-      id: d.spec.design_id, kind: 'design', column: 4, row: i,
+      id: d.spec.design_id, kind: 'design', column: 5, row: i,
       title: `${d.spec.design_id} · ${TIER_LABEL[d.spec.tier]}`,
       body: d.metrics.map(m => `${m.label} ${m.value}`),
       design: d, imageUrl: hero?.url,
@@ -305,7 +304,7 @@ export function buildBoardModel(st: RunState): BoardModel {
   })
   if (rejected.length) {
     nodes.push({
-      id: 'rejected', kind: 'design', column: 4, row: alive.length,
+      id: 'rejected', kind: 'design', column: 5, row: alive.length,
       title: `${rejected.length} rejected on rules`,
       body: rejected.slice(0, 4).map(d =>
         `${d.spec.design_id} · ${d.ruleResults.filter(r => r.severity === 'fail').map(r => r.rule).join(', ')}`),
@@ -317,7 +316,7 @@ export function buildBoardModel(st: RunState): BoardModel {
   const top = st.designs.filter(d => d.isTop)
   if (top.length) {
     nodes.push({
-      id: 'top', kind: 'selection', column: 5, row: 0,
+      id: 'top', kind: 'selection', column: 6, row: 0,
       title: `Top ${top.length}`,
       body: [
         ...top.map(d => `${d.spec.design_id} · ${TIER_LABEL[d.spec.tier]} · distance ${d.topDistance ?? 'n/a'}`),
@@ -333,31 +332,28 @@ export function buildBoardModel(st: RunState): BoardModel {
     top.forEach((d) => {
       const worn = d.images.filter(im => im.view === 'wear')
       const concepts = d.images.filter(im => im.view === 'concept')
+      // 사진이 주인공이다 · 설명은 사진이 말하지 못하는 것만 한 줄
       const frames = [
-        ...worn.map(im => ({ im, label: 'Virtual fitting', note: 'Simulated wear. The real fit may differ.' })),
-        ...concepts.map(im => ({ im, label: im.conceptLabel ?? 'Concept', note: im.persona ? `Virtual model: ${im.persona}` : 'Staged for the concept, not a real shoot.' })),
+        ...worn.map(im => ({ im, label: 'Worn', note: 'Simulated wear' })),
+        ...concepts.map(im => ({ im, label: im.conceptLabel ?? 'Concept', note: im.persona ?? '' })),
       ]
       if (d.model) {
         const id = `model-${d.spec.design_id}`
         nodes.push({
-          id, kind: 'selection', column: 8, row: showroomRow++,
+          id, kind: 'selection', column: 9, row: showroomRow++,
           title: `${d.spec.design_id} · 3D`,
-          body: [
-            `Built from ${d.model.views} views of this design, not from one photo.`,
-            'Drag to turn it. Scroll to zoom. Click the image to open it full size.',
-            ...(d.model.note ? [d.model.note] : []),
-          ],
+          body: ['Drag to turn'],
           modelUrl: d.model.url,
-          imageUrl: (d.images.find(i => i.origin === 'generated' && i.view !== 'sketch') ?? d.images[0])?.url,
+          imageUrl: (d.images.find(i => i.view === 'lateral' && !i.colorway) ?? d.images[0])?.url,
         })
-        edges.push({ from: 'top', to: id, label: '3D showroom' })
+        edges.push({ from: 'top', to: id, label: '3D' })
       }
       frames.forEach((fr, k) => {
         const id = `shot-${d.spec.design_id}-${k}`
         nodes.push({
-          id, kind: 'selection', column: 7, row: campaignRow++,
+          id, kind: 'selection', column: 8, row: campaignRow++,
           title: `${d.spec.design_id} · ${fr.label}`,
-          body: [fr.note, 'Edited from the base render, so it is the same product.'],
+          body: fr.note ? [fr.note] : [],
           imageUrl: fr.im.url,
         })
         edges.push({ from: 'top', to: id, label: k === 0 ? 'campaign' : undefined })
@@ -371,12 +367,9 @@ export function buildBoardModel(st: RunState): BoardModel {
     vars.forEach((im, k) => {
       const id = `var-${d.spec.design_id}-${k}`
       nodes.push({
-        id, kind: 'design', column: 6, row: varRow++,
+        id, kind: 'design', column: 7, row: varRow++,
         title: `${d.spec.design_id} · ${im.variantAxis ?? 'Variation'}`,
-        body: [
-          'Same silhouette, one axis changed, so the two stay comparable.',
-          'Edited from the base render rather than generated fresh.',
-        ],
+        body: ['One axis changed'],
         imageUrl: im.url,
       })
       edges.push({ from: d.spec.design_id, to: id, label: 'variation' })
@@ -389,7 +382,7 @@ export function buildBoardModel(st: RunState): BoardModel {
     const tagCount: Record<string, number> = {}
     rejectedByUser.forEach(d => d.verdictTags?.forEach(t => { tagCount[t] = (tagCount[t] ?? 0) + 1 }))
     nodes.push({
-      id: 'verdict', kind: 'selection', column: 5, row: 1,
+      id: 'verdict', kind: 'selection', column: 6, row: 1,
       title: 'Review calls',
       body: [
         `${approved.length} approved · ${rejectedByUser.length} rejected`,
@@ -402,7 +395,7 @@ export function buildBoardModel(st: RunState): BoardModel {
   }
 
   nodes.push({
-    id: 'appendix', kind: 'appendix', column: 5, row: 2,
+    id: 'appendix', kind: 'appendix', column: 6, row: 2,
     title: 'Appendix · assumptions and limits',
     body: [
       'Costs are rough. The band, the assumptions and what is excluded sit on each card.',

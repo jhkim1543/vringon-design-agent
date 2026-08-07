@@ -69,16 +69,51 @@ const SHOE_VIEW: Record<string, string> = {
   front: 'straight frontal view, the toe facing the viewer head-on',
 }
 
+// 소재명 → 마감 서술 · "patent"라고만 쓰면 광택이 안 살아난다 (Gemini QA 지적)
+const FINISH_EN: Record<string, string> = {
+  patent: 'high-gloss patent leather with sharp mirror-like specular highlights',
+  calf: 'smooth full-grain calf leather with a soft satin sheen and visible pores',
+  nappa: 'soft nappa leather with a gentle sheen',
+  suede: 'brushed suede with a clearly readable napped texture',
+  knit: 'fine technical knit with a visible loop structure',
+  'engineered mesh': 'engineered mesh with an open breathable weave',
+  synthetic: 'matte technical synthetic with a uniform surface',
+}
+
+// 공법 → 눈에 보이는 단서 · 스케치·렌더가 공법 차이를 시각으로 구분해야 한다 (Gemini QA 지적)
+const CONSTRUCTION_EN: Record<string, string> = {
+  goodyear: 'goodyear welt construction with a clearly visible stitched welt line running around the sole edge',
+  blake: 'blake-stitched construction with a close-trimmed sleek sole edge',
+  cemented: 'cemented construction with a clean bonded sole joint and no welt stitching',
+  vulcanized: 'vulcanized construction with a foxing tape wrapping the sole edge',
+  cupsole: 'cupsole construction with a raised rubber sidewall wrapping the lower upper',
+  direct_injection: 'direct-injected sole flowing seamlessly into the upper',
+  handsewn: 'handsewn moccasin construction with visible hand stitching',
+  moccasin: 'moccasin construction with a raised apron seam',
+}
+
+// 힐 높이는 숫자만으론 스케일이 안 잡힌다 · 상대 표현을 붙인다
+function heelQualifier(h: number, athletic: boolean): string {
+  if (athletic) return h >= 42 ? 'a visibly tall max-cushion stack' : h >= 32 ? 'a substantial mid-height stack' : 'a low-profile stack'
+  return h >= 60 ? 'a visibly tall elevated heel' : h >= 35 ? 'a clearly raised mid-height heel' : h >= 18 ? 'a modest low heel' : 'an almost flat profile'
+}
+
 /** 스펙 필드를 프롬프트 구절로 · 유형에 따라 의미 없는 필드는 뺀다 */
 function shoeSpecPhrase(spec: DesignSpec): string {
   const f = spec.fields as Record<string, string | number | boolean>
+  const mat = String(f.upper_material ?? '')
+  const finish = Object.keys(FINISH_EN).find(k => mat.startsWith(k))
+  const athletic = f.heel_type === 'sport_midsole'
+  const heelH = Number(f.heel_height_mm) || 20
+  const construction = CONSTRUCTION_EN[String(f.sole_construction)]
   const parts = [
     TOE_EN[String(f.toe_shape)],
-    f.heel_type === 'sport_midsole'
-      ? `${f.heel_height_mm}mm thick cushioned midsole stack`
-      : `${f.heel_height_mm}mm ${HEEL_EN[String(f.heel_type)] ?? 'heel'}`,
+    athletic
+      ? `${heelH}mm thick cushioned midsole, ${heelQualifier(heelH, true)}`
+      : `${heelH}mm ${HEEL_EN[String(f.heel_type)] ?? 'heel'}, ${heelQualifier(heelH, false)}`,
+    construction,
     `upper divided into ${f.panel_count} panels`,
-    `${f.upper_material} upper`,
+    finish ? `${mat} upper, ${FINISH_EN[finish]}` : `${mat} upper`,
     `${String(f.closure).replace(/_/g, ' ')} closure`,
   ]
   if (f.midsole_foam) parts.push(`${f.midsole_foam} midsole`)
@@ -103,8 +138,11 @@ export function linePromptClause(lp: FootwearLineProfile | undefined): string {
 }
 
 export function sketchPrompt(spec: DesignSpec, engine: EngineId = 'detail', brand?: BrandIdentity, trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
+  // 라인 리뷰에는 측면 하나로 부족하다 · 한 장짜리 3뷰 테크시트로 그린다 (Gemini QA 지적)
+  const view = 'a technical three-view sheet on one page: a large lateral profile as the main view, '
+    + 'with a smaller top-down view showing the opening and toe shape, and a smaller outsole view showing the tread pattern, arranged cleanly beside it'
   return shapePrompt(engine, {
-    subject: en(spec.itemType), spec: shoeSpecPhrase(spec), view: SHOE_VIEW.lateral,
+    subject: en(spec.itemType), spec: shoeSpecPhrase(spec), view,
     brand: [linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
     mode: 'sketch',
   })
@@ -116,6 +154,39 @@ export function renderPrompt(spec: DesignSpec, engine: EngineId = 'detail', bran
     brand: [linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
     mode: 'render',
   })
+}
+
+// ── 스케치 변형 · 하나의 외형에서 여러 흑백 스케치를 뽑는다 ──────────
+// 외형(실루엣·아웃솔)은 기준 스케치 그대로, 어퍼의 해석만 갈라진다.
+// 컬러 디자인은 이 흑백 스케치들 각각을 사진으로 옮겨 만든다.
+const SKETCH_VAR_ANGLES = [
+  'Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines.',
+  'Rework the lacing and closure area: a different eyestay shape and lacing geometry, with a reshaped tongue.',
+  'Rework the overlays: add a distinct mudguard and heel-counter overlay treatment along the same silhouette.',
+]
+
+export function sketchVariationPrompt(k: number): string {
+  return [
+    'This is one more black-ink technical sketch of the SAME shoe form.',
+    'Keep the exact silhouette, proportions, midsole geometry and outsole tread of the original sheet.',
+    SKETCH_VAR_ANGLES[k % SKETCH_VAR_ANGLES.length],
+    'Same one-page three-view layout, same black ink line style on white paper, no colour, no shading.',
+    'No text, no numbers, no labels, no logo.',
+  ].join(' ')
+}
+
+/** 스케치 → 기준 렌더 · 새로 그리지 않고 테크시트를 사진으로 옮긴다.
+ *  스케치의 실루엣·패널·아웃솔 기하가 렌더에 그대로 보존된다 (Gemini QA 지적). */
+export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
+  return [
+    'Turn the main lateral view of this technical sketch sheet into a photorealistic studio product photograph of the exact same shoe.',
+    'Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole tread pattern exactly as drawn.',
+    `Materials: ${shoeSpecPhrase(spec)}.`,
+    linePromptClause(line),
+    trendPromptClause(trend ?? null),
+    'Strict lateral side view, toe pointing to the left and heel on the right, seamless white background, soft even studio light, sharp focus, real material texture.',
+    'Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human.',
+  ].filter(Boolean).join(' ')
 }
 
 /** 추가 뷰 · 동일 객체를 유지한 채 시점만 바꾸는 편집 지시 */

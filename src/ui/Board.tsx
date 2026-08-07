@@ -4,7 +4,7 @@ import { t } from '../core/i18n'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ReactFlow, ReactFlowProvider, Background, Controls, MiniMap,
-  useReactFlow, applyNodeChanges, Handle, Position, MarkerType,
+  useReactFlow, applyNodeChanges, Handle, Position, MarkerType, NodeResizer,
 } from '@xyflow/react'
 import type { Node, Edge, NodeChange } from '@xyflow/react'
 import type { RunState } from '../core/types'
@@ -22,7 +22,8 @@ import { ModelViewer } from './ModelViewer'
 import { copyText, shareLink } from '../core/share'
 
 // 노드를 키웠으므로 열 간격·행 높이도 같이 커진다. 붙여 두면 사진이 겹친다.
-const COL_X = [0, 490, 980, 1440, 1900, 2680, 3180, 3680]
+// 5번(스케치 레인)이 들어와 열이 10개다.
+const COL_X = [0, 490, 980, 1440, 1900, 2360, 3140, 3640, 4140, 4640]
 const colX = (c: number) => {
   const i = Math.floor(c)
   const base = COL_X[Math.min(i, COL_X.length - 1)]
@@ -40,6 +41,8 @@ interface NodeEdit {
   onTitle: (id: string, v: string) => void
   onBody: (id: string, v: string[]) => void
   onHide: (id: string) => void
+  /** 드래그로 조절한 칸 크기를 저장한다 · Run별로 남는다 */
+  onSize: (id: string, w: number, h: number) => void
 }
 
 function EditableText({ value, onSave, className, multiline, editing }: {
@@ -72,13 +75,29 @@ function EditableText({ value, onSave, className, multiline, editing }: {
   )
 }
 
-function StepNode({ data }: { data: { n: BoardNode; ed?: NodeEdit } }) {
+function StepNode({ id, data, selected }: { id: string; data: { n: BoardNode; ed?: NodeEdit }; selected?: boolean }) {
   const { n, ed } = data
   const editing = !!ed?.editing
   // 내가 붙인 메모는 편집 모드를 켜지 않아도 바로 지울 수 있어야 한다.
   const isNote = n.tone === ('note' as typeof n.tone)
+  // 칸 크기를 조절하면 3D 캔버스도 따라 커져야 한다 · 노드 높이를 재서 넘긴다
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [mvH, setMvH] = useState(228)
+  useEffect(() => {
+    if (!n.modelUrl || !rootRef.current) return
+    const el = rootRef.current
+    const ro = new ResizeObserver(() => {
+      setMvH(Math.max(180, el.clientHeight - 96 - n.body.length * 20))
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [n.modelUrl, n.body.length])
   return (
-    <div className={`bnode tone-${n.tone ?? 'neutral'}${editing ? ' editing' : ''}${isNote ? ' is-note' : ''}`}>
+    <div ref={rootRef} className={`bnode tone-${n.tone ?? 'neutral'}${editing ? ' editing' : ''}${isNote ? ' is-note' : ''}`}>
+      {/* 칸을 골라 모서리를 끌면 커지고 작아진다 · 크기는 이 Run에 저장된다 */}
+      <NodeResizer isVisible={!!selected} minWidth={300} minHeight={130}
+        lineClassName="bn-resize-line" handleClassName="bn-resize-handle"
+        onResizeEnd={(_, p) => ed?.onSize(id, Math.round(p.width), Math.round(p.height))} />
       <Handle type="target" position={Position.Left} />
       {(editing || isNote) && (
         <button className="bn-x" title={t(isNote ? 'Delete this note' : 'Hide this card')}
@@ -90,7 +109,7 @@ function StepNode({ data }: { data: { n: BoardNode; ed?: NodeEdit } }) {
       {/* 착용 컷처럼 이미지가 붙는 노드는 사진이 먼저 보여야 한다 */}
       {n.imageUrl && !n.modelUrl && <img className="bn-img" src={n.imageUrl} alt="" loading="lazy" />}
       {/* 3D는 카드 안에서 바로 돌려 본다 */}
-      {n.modelUrl && <ModelViewer url={n.modelUrl} poster={n.imageUrl} height={228} light={ed?.light} />}
+      {n.modelUrl && <ModelViewer url={n.modelUrl} poster={n.imageUrl} height={mvH} light={ed?.light} />}
       {/* 팔레트는 글이 아니라 색으로 보인다 */}
       {n.palette && n.palette.length > 0 && (
         <div className="bn-pal">
@@ -113,11 +132,14 @@ function StepNode({ data }: { data: { n: BoardNode; ed?: NodeEdit } }) {
   )
 }
 
-function DesignFlowNode({ data }: { data: { n: BoardNode; st: RunState; onVerdict: any } }) {
-  const { n, st, onVerdict } = data
+function DesignFlowNode({ id, data, selected }: { id: string; data: { n: BoardNode; st: RunState; onVerdict: any; ed?: NodeEdit }; selected?: boolean }) {
+  const { n, st, onVerdict, ed } = data
   if (!n.design) return null
   return (
-    <div style={{ width: 300 }}>
+    <div style={{ width: '100%', minWidth: 268 }}>
+      <NodeResizer isVisible={!!selected} minWidth={268} minHeight={380}
+        lineClassName="bn-resize-line" handleClassName="bn-resize-handle"
+        onResizeEnd={(_, p) => ed?.onSize(id, Math.round(p.width), Math.round(p.height))} />
       <Handle type="target" position={Position.Left} />
       <DesignCard d={n.design} signals={st.signals} stagePassed={{ s3: true, s4: true }} onVerdict={onVerdict} />
       <Handle type="source" position={Position.Right} />
@@ -160,7 +182,7 @@ function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit): {
     nodes.push({
       id: `col-${c.key}`, type: 'column',
       position: { x: colX(i) - 24, y: -86 },
-      data: { title: c.title, note: c.note, h: Math.max(rows * ROW_Y + 150, 360), w: (i === 4 ? 720 : 430) },
+      data: { title: c.title, note: c.note, h: Math.max(rows * ROW_Y + 150, 360), w: (i === 5 ? 720 : 430) },
       selectable: false, draggable: false, zIndex: -1,
     })
   })
@@ -175,11 +197,13 @@ function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit): {
   }))
   ;[...visible, ...noteNodes].forEach(n => {
     const isDesign = n.kind === 'design' && !!n.design
-    const w = isDesign ? 300 : (n as any).isPitch ? 360 : 384
-    // 이미지가 붙는 노드는 사진 높이만큼 더 잡아야 연결선이 엉뚱한 데 붙지 않는다
-    const h = isDesign ? 470
+    // 이미지가 붙는 노드는 사진 높이만큼 더 잡아야 연결선이 엉뚱한 데 붙지 않는다.
+    // 사용자가 모서리를 끌어 조절한 크기가 있으면 그것이 기본값을 이긴다.
+    const sz = edits.sizes[n.id]
+    const w = sz?.w ?? (isDesign ? 300 : (n as any).isPitch ? 360 : 384)
+    const h = sz?.h ?? (isDesign ? 470
       : 46 + n.body.length * 22 + (n.imageUrl ? 240 : 0) + (n.modelUrl ? 244 : 0)
-        + (n.palette?.length ? 30 : 0) + (n.prompts?.length ? n.prompts.length * 46 : 0)
+        + (n.palette?.length ? 30 : 0) + (n.prompts?.length ? n.prompts.length * 46 : 0))
     nodes.push({
       id: n.id,
       type: isDesign ? 'designFlow' : 'step',
@@ -188,7 +212,7 @@ function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit): {
         { type: 'target', position: Position.Left, x: 0, y: h / 2, width: 1, height: 1 },
         { type: 'source', position: Position.Right, x: w, y: h / 2, width: 1, height: 1 },
       ],
-      data: isDesign ? { n, st, onVerdict } : { n, ed },
+      data: isDesign ? { n, st, onVerdict, ed } : { n, ed },
       position: edits.positions[n.id] ?? { x: colX(n.column), y: n.row * ROW_Y },
     })
   })
@@ -230,6 +254,8 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
     onHide: (id) => setEdits(e => e.notes.some(n => n.id === id)
       ? { ...e, notes: e.notes.filter(n => n.id !== id) }
       : { ...e, hidden: [...new Set([...e.hidden, id])] }),
+    // 모서리를 끌어 바꾼 크기 · 이 Run의 보드에 저장된다
+    onSize: (id, w, h) => setEdits(e => ({ ...e, sizes: { ...e.sizes, [id]: { w, h } } })),
   }), [editing, light])
 
   const initial = useMemo(() => build(st, onVerdict, edits, ed), [st, onVerdict, edits, ed])

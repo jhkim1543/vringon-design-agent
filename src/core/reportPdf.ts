@@ -13,7 +13,7 @@ function pics(st: RunState) {
   const all = st.designs.flatMap((d: Design) => d.images.map(i => i.url ? { view: i.view, url: i.url } : null))
     .filter(Boolean) as { view: string; url: string }[]
   const of = (v: string) => all.filter(i => i.view === v).map(i => i.url)
-  return { concept: of('concept'), wear: of('wear'), any: all.filter(i => i.view !== 'sketch').map(i => i.url) }
+  return { concept: of('concept'), wear: of('wear'), any: all.filter(i => i.view !== 'sketch' && i.view !== 'sketch_var').map(i => i.url) }
 }
 const at = (l: string[], i: number) => (l.length ? l[i % l.length] : '')
 const img = (url: string, cls = '') => url
@@ -106,7 +106,7 @@ function build(st: RunState): { title: string; html: string } {
             <div style="padding:2.5mm 3mm">
               <div style="font-size:7.6pt;font-weight:800">${esc(c.brand)} ${esc(c.name)}</div>
               <div style="font-size:6.8pt;color:#565D63;margin-top:1mm;line-height:1.5">
-                ${c.price_krw > 0 ? `KRW ${Math.round(c.price_krw / 1000).toLocaleString()}k` : 'price unknown'}
+                ${c.retailer ? `<b style="color:${ACCENT}">${esc(c.retailer)}</b> · ` : ''}${c.price_krw > 0 ? `KRW ${Math.round(c.price_krw / 1000).toLocaleString()}k` : 'price unknown'}
                 ${c.competitor_group ? ` · ${esc(COMP_GROUP_LABEL[c.competitor_group])}` : ''}
                 ${c.size_status && c.size_status !== 'unknown' ? ` · ${esc(c.size_status.replace('_', ' '))}` : ''}
                 ${typeof c.colorway_count === 'number' && c.colorway_count > 1 ? ` · ${c.colorway_count} colourways, one design` : ''}
@@ -124,7 +124,7 @@ function build(st: RunState): { title: string; html: string } {
 
   // 디자인 갤러리 · 이 분석이 실제로 만든 컷들 (렌더·뷰·컬러웨이·캠페인)
   const gallery = st.designs.filter(d => !d.rejected)
-    .flatMap(d => d.images.filter(i => i.view !== 'sketch').map(i => ({ id: d.spec.design_id, im: i })))
+    .flatMap(d => d.images.filter(i => i.view !== 'sketch' && i.view !== 'sketch_var').map(i => ({ id: d.spec.design_id, im: i })))
     .slice(0, 8)
   if (gallery.length >= 4) {
     out.push(slide({

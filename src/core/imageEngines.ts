@@ -55,7 +55,7 @@ export function shapePrompt(engine: EngineId, base: {
     // 스케치는 사진이 아니라 도면이어야 한다. 안 그러면 렌더와 구분이 안 된다.
     const look = mode === 'sketch'
       ? 'black and white technical line drawing, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch'
-      : 'photorealistic studio product photograph, full color, real leather and rubber texture, soft light, white background'
+      : 'photorealistic studio product photograph, full color, real leather and rubber texture, laces as separate distinct cords with clean eyelets, soft light, white background'
     // 이 경로의 모델은 치수선·라벨을 스스로 그려 넣는 성향이 있다. 명시적으로 막는다.
     return [
       subject, view, spec, look, brand,
@@ -64,9 +64,11 @@ export function shapePrompt(engine: EngineId, base: {
   }
 
   // 디테일 모델은 문장으로 서술하고 마감·질감을 명시할수록 결과가 좋아진다.
+  // 신발끈·아일릿은 융합 아티팩트가 가장 잦은 부위라 명시적으로 짚는다 (Gemini QA 지적).
   const look = mode === 'sketch'
-    ? 'Drawn as a designer\'s technical sketch: black ink outline on white paper, single consistent line weight, no colour at all, no shading, no material texture, orthographic projection, the kind of drawing that goes on a spec sheet.'
-    : 'Photorealistic studio product photography: seamless white background, soft even key light with a subtle fill, gentle contact shadow, sharp focus across the whole product, real material texture with visible grain and stitching, full colour, centered composition.'
+    ? 'Drawn as a designer\'s technical sketch: black ink outline on white paper, single consistent line weight, no colour, orthographic projection, the kind of drawing that goes on a spec sheet. '
+      + 'Indicate materials with standard sketch conventions rather than words: short-dash napped hatching for suede, sparse highlight streaks for patent gloss, fine cross-hatch zones for mesh or knit, and show welt stitching as a dotted line where the construction has one.'
+    : 'Photorealistic studio product photography: seamless white background, soft even key light with a subtle fill, gentle contact shadow, sharp focus across the whole product, real material texture with visible grain and stitching, full colour, centered composition. Laces rendered as clearly separated individual cords passing through distinct eyelets, never fused or melted together; midsole foam with a clean even surface.'
   return [
     `A single ${subject}, shown in ${view}.`,
     spec ? `Construction: ${spec}.` : '',

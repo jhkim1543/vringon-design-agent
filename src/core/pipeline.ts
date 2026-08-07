@@ -5,11 +5,11 @@ import { makeRng } from './rng'
 import { COMPETITORS, DIRECTIONS, DNA_CONFLICT, DNA_LOCKS, PROMPT_PARSE, REPORT_BIAS, SERIES_DNA, SIGNALS } from './samples'
 import { COLORWAY_NAMES } from './sketch'
 import {
-  colorwayEditPrompt, conceptPrompt, editImage, generateImage, renderPrompt,
-  generateModel, sketchPrompt, stampLogo, turnaroundPrompt, variationAxes, variationPrompt, viewEditPrompt, wearEditPrompt,
+  colorwayEditPrompt, conceptPrompt, editImage, generateImage, renderFromSketchPrompt, renderPrompt,
+  generateModel, sketchPrompt, sketchVariationPrompt, stampLogo, turnaroundPrompt, variationAxes, variationPrompt, viewEditPrompt, wearEditPrompt,
 } from './aiClient'
 import type { TrendClauseInput, TripoRole } from './aiClient'
-import { fetchCompetitors, fetchDossier, fetchTrends, toBias, toCompetitors, toSignals, setRunLang } from './research'
+import { fetchCompetitors, fetchDossier, fetchRetailPulse, fetchTrends, pulseToCompetitors, toBias, toCompetitors, toSignals, setRunLang } from './research'
 import { campaignCount, lineFingerprint, MODE_LABEL, MODE_SCOPE, TYPE_LABEL } from './types'
 import { ENGINES } from './imageEngines'
 
@@ -101,14 +101,28 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       emit({ kind: 'log', stage: 'S1', text: `${brands.length} competitor lines: ${brands.join(', ')} · primary band ${band}${params.trend.adjacentBand ? ' + adjacent reference band' : ''}` })
       emit({ kind: 'log', stage: 'S1', text: `1 Competitor products · searching ${brands.join(', ')} for ${typeName} (1-2 min)` })
       try {
-        const r = await fetchCompetitors({
-          brands, typeKo: typeName,
-          priceMin: params.trend.priceMinKrw, priceMax: params.trend.priceMaxKrw,
-          adjacentBand: !!params.trend.adjacentBand,
-          line, itemType: params.itemType,
-        })
+        // 경쟁 라인 조사와 백화점·명품몰 펄스는 서로 독립이다 · 병렬로 돈다
+        emit({ kind: 'log', stage: 'S1', text: 'Also sweeping department-store and luxury-retail bestseller pages: Lotte, SSG, The Hyundai, MR PORTER, Harrods' })
+        const [r, pulse] = await Promise.all([
+          fetchCompetitors({
+            brands, typeKo: typeName,
+            priceMin: params.trend.priceMinKrw, priceMax: params.trend.priceMaxKrw,
+            adjacentBand: !!params.trend.adjacentBand,
+            line, itemType: params.itemType,
+          }),
+          fetchRetailPulse({ typeKo: typeName, line, itemType: params.itemType }).catch(e => {
+            emit({ kind: 'log', stage: 'S1', text: `Retail pulse failed · ${String((e as Error).message).slice(0, 90)} · continuing with brand research alone` })
+            return null
+          }),
+        ])
         if (cancelled) return
-        const comps = toCompetitors(r, params.trend.priceMinKrw, params.trend.priceMaxKrw)
+        let comps = toCompetitors(r, params.trend.priceMinKrw, params.trend.priceMaxKrw)
+        if (pulse?.products?.length) {
+          const pulseComps = pulseToCompetitors(pulse, comps.length)
+          comps = [...pulseComps, ...comps]
+          const retailers = [...new Set(pulseComps.map(c => c.retailer).filter(Boolean))]
+          emit({ kind: 'log', stage: 'S1', text: `Department-store pulse: ${pulseComps.length} bestseller-flagged products with photos from ${retailers.join(', ')} (${pulse.searches} searches)` })
+        }
         emit({ kind: 'log', stage: 'S1', text: `${r.searches} web searches, ${comps.length} products${r.cached ? ' (reused an earlier pass)' : ''}` })
         // 프로필과 안 맞는 제품은 버리지 않고 참조군으로 분류된다 (지시서 5.1)
         const refs = comps.filter(c => c.competitor_group && c.competitor_group !== 'direct')
@@ -313,9 +327,11 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     emit({ kind: 'log', stage: 'S2', text: `${alive.length} of ${designs.length} specs passed · ${designs.length - alive.length} rejected early · rejects are never rendered` })
 
     // 실제 스케치 생성 · 룰 통과분만, 상한까지. 초과분은 SVG 폴백
+    // 단계가 갈라진다: ① 외형을 잡는 기준 스케치(흑백 3뷰) → ② 같은 외형에서 흑백 스케치 변형 여러 장.
+    // 컬러는 여기서 절대 나오지 않는다. 색은 S3에서 이 스케치들을 사진으로 옮길 때 처음 들어간다.
     if (budget.left() > 0) {
       const targets = alive.slice(0, budget.left())
-      emit({ kind: 'log', stage: 'S2', text: `Sketching ${targets.length} · three at a time, anything already made is reused` })
+      emit({ kind: 'log', stage: 'S2', text: `Sketching ${targets.length} base forms · black ink only, colour never enters this stage` })
       let done = 0
       await pool(targets, ENGINES[params.imageEngine].concurrency, async (d) => {
         if (cancelled) return
@@ -324,7 +340,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           const r = await generateImage(skPrompt, params.imageEngine)
           budget.spend()
           d.images = [...d.images, { view: 'sketch', url: r.url, hash: r.hash, origin: 'generated', promptUsed: skPrompt }]
-          emit({ kind: 'log', stage: 'S2', text: `${d.spec.design_id} sketch done${r.cached ? ' (reused)' : ''}` })
+          emit({ kind: 'log', stage: 'S2', text: `${d.spec.design_id} base form sketched${r.cached ? ' (reused)' : ''}` })
         } catch (e) {
           d.imageError = String((e as Error).message || e)
           emit({ kind: 'log', stage: 'S2', text: `${d.spec.design_id} sketch failed · ${d.imageError} · falling back to a diagram` })
@@ -335,6 +351,29 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       })
       if (alive.length > targets.length)
         emit({ kind: 'log', stage: 'S2', text: `${alive.length - targets.length} past the cap show as diagrams (cap ${params.imageBudget} images)` })
+
+      // ② 스케치 변형 · 하나의 외형에서 여러 흑백 안 (designsPerSketch가 변형 수를 정한다)
+      const dpsWanted = params.designsPerSketch ?? 1
+      if (dpsWanted > 1 && budget.left() > 0) {
+        const withSketch = targets.filter(d => d.images.some(i => i.view === 'sketch'))
+        emit({ kind: 'log', stage: 'S2', text: `Branching ${dpsWanted - 1} black-ink variations from each base form · same silhouette and outsole, different upper takes` })
+        await pool(withSketch, 2, async (d) => {
+          const base = d.images.find(i => i.view === 'sketch')!
+          for (let k = 0; k < dpsWanted - 1; k++) {
+            if (cancelled || budget.left() <= 0) return
+            try {
+              const p = sketchVariationPrompt(k)
+              const r = await editImage(base.hash, p, params.imageEngine)
+              budget.spend()
+              d.images = [...d.images, { view: 'sketch_var', url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: base.hash, promptUsed: p }]
+              emit({ kind: 'design-update', design: { ...d } })
+              emit({ kind: 'log', stage: 'S2', text: `${d.spec.design_id} sketch variation ${k + 1} of ${dpsWanted - 1} done` })
+            } catch {
+              emit({ kind: 'log', stage: 'S2', text: `${d.spec.design_id} sketch variation ${k + 1} failed · skipping` })
+            }
+          }
+        })
+      }
     }
     emit({ kind: 'checkpoint', label: 'S2 done · specs, sketches and rationale saved. You can resume at S3 days later.' })
     emit({ kind: 'stage-done', stage: 'S2' })
@@ -355,15 +394,21 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     for (let i = 0; i < advancing.length; i++) {
       if (cancelled) return
       const d = advancing[i]
-      emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} base render, then object mask, then ${params.viewCount - 1} more views as edits rather than new generations` })
+      emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} colour enters here: the black-ink sheet becomes a photoreal render, then ${params.viewCount - 1} more views as edits` })
       d.colorways = COLORWAY_NAMES.slice(0, params.colorwayCount)
 
       if (budget.left() > 0) {
-        // ① 기준 렌더 1장
+        // ① 기준 렌더 1장 · 스케치가 있으면 새로 그리지 않고 스케치를 사진으로 옮긴다.
+        // 테크시트의 실루엣·패널·아웃솔 기하가 렌더에 그대로 이어진다 (Gemini QA 지적).
         let baseHash: string | null = null
-        const basePrompt = renderPrompt(d.spec, params.imageEngine, params.brand, trendClause, line)
+        const sketchIm = d.images.find(i => i.view === 'sketch')
+        const basePrompt = sketchIm
+          ? renderFromSketchPrompt(d.spec, trendClause, line)
+          : renderPrompt(d.spec, params.imageEngine, params.brand, trendClause, line)
         try {
-          const r = await generateImage(basePrompt, params.imageEngine)
+          const r = sketchIm
+            ? await editImage(sketchIm.hash, basePrompt, params.imageEngine)
+            : await generateImage(basePrompt, params.imageEngine)
           budget.spend(); baseHash = r.hash
           let baseUrl = r.url
           // 브랜드 로고는 프롬프트가 아니라 실제 파일로 얹는다. 형태가 어긋나지 않는다.
@@ -384,26 +429,20 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           d.imageError = String((e as Error).message || e)
           emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} base render failed · ${d.imageError}` })
         }
-        // ② 스케치당 추가 디자인 · 트렌드에서 뽑은 방향을 하나씩 바꿔 프롬프트를 만든다
-        const dps = params.designsPerSketch ?? 1
-        if (baseHash && dps > 1) {
-          const angles = [
-            macroName ? `Push it further into the ${macroName} direction: exaggerate its defining material and hardware.` : 'Push the dominant season material further and make the hardware the focal point.',
-            'A quieter commercial take: same last and proportions, minimal hardware, tonal palette.',
-            'A bolder statement take: amplify the strongest observed trend signal into the main design feature.',
-          ]
-          for (let k = 0; k < Math.min(dps - 1, angles.length); k++) {
-            if (cancelled || budget.left() <= 0) break
-            const p2 = `Redesign this ${(TYPE_LABEL[params.itemType] ?? params.itemType).toLowerCase()} keeping the exact same sketch geometry and camera angle. ${angles[k]} Keep the same last shape and the same bottom unit — the design changes, the tooling does not. Plain white studio background, photorealistic product shot, no text, no watermark.`
-            try {
-              const r2 = await editImage(baseHash, p2, params.imageEngine)
-              budget.spend()
-              d.images = [...d.images, { view: 'design', url: r2.url, hash: r2.hash, origin: 'edited_from', editedFrom: baseHash, promptUsed: p2 }]
-              emit({ kind: 'design-update', design: { ...d } })
-              emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} design variant ${k + 2} of ${dps} done` })
-            } catch {
-              emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} design variant ${k + 2} failed · skipping` })
-            }
+        // ② 스케치 변형들도 각각 컬러 디자인이 된다 · 흑백 스케치가 원본, 색은 여기서 처음 입혀진다
+        const sketchVars = d.images.filter(i => i.view === 'sketch_var')
+        for (let k = 0; k < sketchVars.length; k++) {
+          if (cancelled || budget.left() <= 0) break
+          const sv = sketchVars[k]
+          const p2 = renderFromSketchPrompt(d.spec, trendClause, line)
+          try {
+            const r2 = await editImage(sv.hash, p2, params.imageEngine)
+            budget.spend()
+            d.images = [...d.images, { view: 'design', url: r2.url, hash: r2.hash, origin: 'edited_from', editedFrom: sv.hash, promptUsed: p2 }]
+            emit({ kind: 'design-update', design: { ...d } })
+            emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} sketch variation ${k + 1} coloured into a design` })
+          } catch {
+            emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} design from sketch variation ${k + 1} failed · skipping` })
           }
         }
 
@@ -433,7 +472,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
 
       // 스케치 한 장에서 갈라지는 제품 베리에이션 · 축을 하나씩만 바꿔 계보를 유지한다
       if (params.variationCount > 0 && budget.left() > 0) {
-        const baseImg = d.images.find(i => i.origin === 'generated' && i.view !== 'sketch')
+        const baseImg = d.images.find(i => i.view === 'lateral' && !i.colorway)
+          ?? d.images.find(i => i.origin === 'generated' && i.view !== 'sketch')
         if (baseImg) {
           const axes = variationAxes()
           const jobs = axes.slice(0, params.variationCount).map((a, k) => ({ a, k }))
@@ -489,7 +529,6 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       emit({ kind: 'log', stage: 'S4', text: `Top ${i + 1}: ${d.spec.design_id} [${d.spec.tier}] · spec distance ${d.topDistance}` })
     })
     await wait(700)
-    emit({ kind: 'log', stage: 'S4', text: 'Worn pipeline: BiRefNet cutout, MediaPipe Pose for ankle and ground line, scale normalise, depth occlusion' })
     emit({ kind: 'log', stage: 'S4', text: 'Ground contact aligned and heel height checked visually, within 20%' })
     await wait(800)
     // 캠페인 컷 · 착용컷과 연출컷을 한 단계에서 같이 뽑는다.
@@ -501,13 +540,16 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       const subject = (TYPE_LABEL[params.itemType] ?? params.itemType).toLowerCase()
       const jobs: { d: Design; base: string; idx: number; kind: 'wear' | 'concept' }[] = []
       for (const d of top) {
-        const base = d.images.find(i => i.origin === 'generated' && i.view !== 'sketch') ?? d.images.find(i => i.view !== 'sketch')
+        const base = d.images.find(i => i.view === 'lateral' && !i.colorway)
+          ?? d.images.find(i => !['sketch', 'sketch_var'].includes(i.view))
         if (!base) continue
         for (let k = 0; k < shots; k++) {
           jobs.push({ d, base: base.hash, idx: k, kind: k < worn ? 'wear' : 'concept' })
         }
       }
-      await pool(jobs.slice(0, Math.max(0, budget.left())), 2, async (job) => {
+      // 캠페인 컷은 최종 후보의 산출물이라 상한에서 면제한다 (턴어라운드와 같은 논리).
+      // 상한이 볼륨 단계(S2·S3)에서 소진돼도 머천다이저가 받아야 할 컷은 나와야 한다.
+      await pool(jobs, 2, async (job) => {
         if (cancelled) return
         const personaIdx = top.indexOf(job.d)
         const c = job.kind === 'concept'
@@ -539,11 +581,11 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     // 기준 렌더(lateral, 토가 왼쪽)가 곧 left 뷰다. 나머지 세 방향을 편집으로 만들어
     // 네 자리를 모두 채워 보낸다. 임의 각도 두세 장보다 형태 복원이 훨씬 정확하다.
     if (params.make3d) {
-      emit({ kind: 'log', stage: 'S5', text: 'Building the 3D showroom · a four-view turnaround of each top pick goes to Tripo' })
+      emit({ kind: 'log', stage: 'S5', text: 'Building the 3D showroom · four views of each pick become one model' })
       for (const d of top) {
         if (cancelled) return
-        const base = d.images.find(i => i.origin === 'generated' && i.view !== 'sketch')
-          ?? d.images.find(i => !['sketch', 'wear', 'concept', 'variation'].includes(i.view))
+        const base = d.images.find(i => i.view === 'lateral' && !i.colorway)
+          ?? d.images.find(i => !['sketch', 'sketch_var', 'wear', 'concept', 'variation'].includes(i.view))
         if (!base) {
           emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} has no clean product render, so 3D is skipped` })
           continue
@@ -573,7 +615,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           continue
         }
         try {
-          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} sending ${have} views to Tripo (front-left-back-right order) · this takes a few minutes` })
+          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} building the 3D model from ${have} views · a few minutes` })
           const m = await generateModel(ordered, {
             subject: (TYPE_LABEL[params.itemType] ?? params.itemType).toLowerCase(),
             itemType: params.itemType,

@@ -81,7 +81,7 @@ export function makeTitle(st: RunState, labels: { mode: string; category: string
 
 export function firstImage(st: RunState): string | undefined {
   for (const d of st.designs) {
-    const im = d.images.find(i => i.view !== 'sketch') ?? d.images[0]
+    const im = d.images.find(i => !['sketch', 'sketch_var'].includes(i.view)) ?? d.images[0]
     if (im) return im.url
   }
   return undefined

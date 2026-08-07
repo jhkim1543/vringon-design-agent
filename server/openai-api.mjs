@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from 
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createMiroBoard, planMiroBoard } from './miro-api.mjs'
-import { DEEP_MODEL_DEFAULT, researchCompetitors, researchTrends, researchSeasonDossier } from './research-api.mjs'
+import { DEEP_MODEL_DEFAULT, researchCompetitors, researchRetailPulse, researchTrends, researchSeasonDossier } from './research-api.mjs'
 import { geminiEdit, geminiGenerate, geminiProbe, geminiShotPlan } from './gemini-api.mjs'
 import { compositeLogo, logoAvailable } from './logo-api.mjs'
 import { tripoMultiview, tripoProbe, readModel } from './tripo-api.mjs'
@@ -306,6 +306,15 @@ export async function handleApi(req, res) {
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
   }
 
+  // 백화점·명품몰 베스트셀러 펄스 · 브랜드 입력과 무관한 상업 신호
+  if (path === '/api/research/pulse' && req.method === 'POST') {
+    try {
+      if (!API_KEY) throw new Error('OPENAI_API_KEY 미설정')
+      const body = await readBody(req)
+      return json(res, 200, await researchRetailPulse(API_KEY, ROOT, body))
+    } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
+  }
+
   if (path === '/api/research/trends' && req.method === 'POST') {
     try {
       if (!API_KEY) throw new Error('OPENAI_API_KEY 미설정')
@@ -442,10 +451,10 @@ export async function handleApi(req, res) {
         writeFileSync(join(outDir, `${h}.png`), readFileSync(src))
         copied++
       }
-      // 3D 모델도 함께 옮긴다. 캐시를 지워도 샘플이 살아 있어야 한다.
-      const vidRe = new RegExp('/api/video/file/([a-f0-9]{8,64})\\.(webp|gif|mp4|webm)', 'g')
-      const vidHashes = [...new Set([...text.matchAll(vidRe)].map(m => m[1] + '.' + m[2]))]
-      for (const name of vidHashes) {
+      // 3D 모델(GLB)도 함께 옮긴다. 캐시를 지워도 샘플이 살아 있어야 한다.
+      const modelRe = new RegExp('/api/(?:video|model)/file/([a-f0-9]{8,64})\\.(webp|gif|mp4|webm|glb|gltf)', 'g')
+      const modelNames = [...new Set([...text.matchAll(modelRe)].map(m => m[1] + '.' + m[2]))]
+      for (const name of modelNames) {
         const src = join(ROOT, '.cache', 'models', name)
         if (!existsSync(src)) continue
         writeFileSync(join(outDir, name), readFileSync(src))
