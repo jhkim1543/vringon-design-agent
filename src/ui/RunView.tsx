@@ -23,11 +23,13 @@ const RANK_SEM: Record<string, string> = {
   marketplace_trade_rank: 'resale rank',
 }
 
-/** 수집 사진 · 직링크가 죽으면 다음 후보, 다 죽으면 페이지 og:image 폴백까지 시도한다 */
+/** 수집 사진 · 직링크가 죽으면 다음 후보, 다 죽으면 페이지 og:image 폴백까지 시도한다.
+ *  이미지 URL이 하나도 없어도 상품 페이지가 있으면 페이지에서 대표 사진을 찾는다. */
 function CompShot({ urls, page, alt }: { urls: string[]; page?: string; alt: string }) {
   const [i, setI] = useState(0)
-  if (!urls.length || i >= urls.length) return <span className="cc-noshot">{t('No photo')}</span>
-  return <img src={shotUrl(urls[i], page)} alt={alt} loading="lazy" onError={() => setI(v => v + 1)} />
+  const list = urls.length ? urls : (page ? [''] : [])
+  if (!list.length || i >= list.length) return <span className="cc-noshot">{t('No photo')}</span>
+  return <img src={shotUrl(list[i], page)} alt={alt} loading="lazy" onError={() => setI(v => v + 1)} />
 }
 
 const STAGE_META: { key: 'S1' | 'S2' | 'S3' | 'S4' | 'S5'; t: string; d: string }[] = [

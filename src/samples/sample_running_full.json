@@ -723,7 +723,7 @@
     "competitor_group: adjacent"
    ],
    "image_urls": [
-    "https://www.selfridges.com/HK/en/product/hoka-clifton-9-gtx-knitted-trainers_R04567849/"
+    "/samples/ca07b8a7310ff05ab4935b65.jpg"
    ],
    "product_url": "https://www.selfridges.com/HK/en/product/hoka-clifton-9-gtx-knitted-trainers_R04567849/",
    "retailer": "Selfridges"
@@ -760,7 +760,7 @@
     "competitor_group: adjacent"
    ],
    "image_urls": [
-    "https://www.musinsa.com/products/5298347"
+    "/samples/f2a7520065c7740685f8a3d5.jpg"
    ],
    "product_url": "https://www.musinsa.com/products/5298347",
    "retailer": "MUSINSA (KICKS)"
@@ -797,7 +797,7 @@
     "competitor_group: adjacent"
    ],
    "image_urls": [
-    "https://www.musinsa.com/products/5266523"
+    "/samples/dedadc98248e6dba1f9d3caa.jpg"
    ],
    "product_url": "https://www.musinsa.com/products/5266523",
    "retailer": "MUSINSA (KICKS)"
@@ -834,7 +834,7 @@
     "competitor_group: aspirational"
    ],
    "image_urls": [
-    "https://www.ssg.com/search.ssg?_mpop=no&count=30&display=list&filterSiteNo=6009&page=37&query=%EB%9F%AC%EB%8B%9D%ED%99%94&siteTabNo=6005&target=mobile&viewType=lst"
+    "/samples/04cfa5c05b506f0d302c3ad9.avif"
    ],
    "product_url": "https://www.ssg.com/sellerhome/130100.ssg",
    "retailer": "SSG.COM (Shinsegae Dept. — Gwangju ‘Y‑Concept’ seller)"
@@ -869,9 +869,7 @@
     "drop ≈6 mm",
     "competitor_group: adjacent"
    ],
-   "image_urls": [
-    "https://www.mrporter.com/en-us/mens/product/on/sport/running-shoes/cloudmonster-rubber-trimmed-mesh-running-sneakers/1647597342044303"
-   ],
+   "image_urls": [],
    "product_url": "https://www.mrporter.com/en-us/mens/product/on/sport/running-shoes/cloudmonster-rubber-trimmed-mesh-running-sneakers/1647597342044303",
    "retailer": "MR PORTER (for image/tech reference; overseas luxury)"
   },
@@ -910,7 +908,9 @@
    ],
    "size_status": "unknown",
    "colorway_count": 4,
-   "image_urls": [],
+   "image_urls": [
+    "/samples/67b474c5b46b8f49efb684fc.jpg"
+   ],
    "product_url": "https://asics.co.kr/p/AKR_112630211-002"
   },
   {
@@ -951,7 +951,9 @@
    "available_sizes": 11,
    "size_status": "partial",
    "colorway_count": 5,
-   "image_urls": [],
+   "image_urls": [
+    "/samples/3143e764f08b4666a00bf93d.jpg"
+   ],
    "product_url": "https://www.asics.co.kr/p/AKR_112630225-004"
   },
   {
@@ -985,7 +987,9 @@
     "The outsole specifies ASICSGRIP with AHAR LO rubber. ([asics.co.kr](https://asics.co.kr/p/AKR_112630203-001?utm_source=openai))"
    ],
    "size_status": "unknown",
-   "image_urls": [],
+   "image_urls": [
+    "/samples/0ba3fedc0af424acede05f51.jpg"
+   ],
    "product_url": "https://asics.co.kr/p/AKR_112630203-001"
   },
   {
@@ -1025,9 +1029,7 @@
    "offered_sizes": 15,
    "size_status": "unknown",
    "image_urls": [
-    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/https%3A//s3.ap-southeast-2.amazonaws.com/media.au.hoka.com/products/a5fd5f01-73f2-42f0-88bf-099981471527/a3247973/1176572-gctc_gctc_01.jpg",
-    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/https%3A//s3.ap-southeast-2.amazonaws.com/media.au.hoka.com/products/a5fd5f01-73f2-42f0-88bf-099981471527/94d2efe7/1176572-gctc_gctc_02.jpg",
-    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/https%3A//s3.ap-southeast-2.amazonaws.com/media.au.hoka.com/products/a5fd5f01-73f2-42f0-88bf-099981471527/3fe8434d/1176572-gctc_gctc_03.jpg"
+    "/samples/13b55d90607dfaf628107382.avif"
    ],
    "product_url": "https://au.hoka.com/products/clifton-11-1176572-gctc-gctc"
   },
@@ -1067,8 +1069,7 @@
    "available_sizes": 0,
    "size_status": "sold_out",
    "image_urls": [
-    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/7765ead5-cce5-4b47-93aa-1b9fc1bbab4b/d6ddac10/1147790-bblc_bblc_01.jpg",
-    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/7765ead5-cce5-4b47-93aa-1b9fc1bbab4b/1388cfd5/1147790-bblc_bblc_02.jpg"
+    "/samples/b46a78fd0e322084821615d1.avif"
    ],
    "product_url": "https://au.hoka.com/products/m-mach-6-1147790-bblc-bblc"
   },
@@ -1107,9 +1108,7 @@
    "available_sizes": 0,
    "size_status": "sold_out",
    "image_urls": [
-    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/4e3ab4bd-343c-4c4e-af94-71aa0f8b131a/b63b1bab/1147911-cslp_cslp_01.jpg",
-    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/4e3ab4bd-343c-4c4e-af94-71aa0f8b131a/9ebc3b11/1147911-cslp_cslp_02.jpg",
-    "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/4e3ab4bd-343c-4c4e-af94-71aa0f8b131a/734b5563/1147911-cslp_cslp_03.jpg"
+    "/samples/34d8ddc0b8b5a2219460c15d.avif"
    ],
    "product_url": "https://au.hoka.com/products/m-skyward-x-1147911-cslp-cslp"
   },
@@ -1156,8 +1155,7 @@
    "available_sizes": 9,
    "size_status": "full",
    "image_urls": [
-    "https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/db0f5f2b-0144-43b7-8c4c-ddc03578b2d5/W%2BNIKE%2BVOMERO%2B18.png",
-    "https://static.nike.com/a/images/t_PDP_144_v1/f_auto%2Cq_auto%3Aeco%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/46925fa3-c5ad-4a2b-86eb-102c2742bd6a/W%2BNIKE%2BVOMERO%2B18.png"
+    "/samples/d2d0c6f1746d8415dcac73fa.jpg"
    ],
    "product_url": "https://www.nike.com/kr/t/%EB%82%98%EC%9D%B4%ED%82%A4-%EB%B3%B4%EB%A9%94%EB%A1%9C-18-%EC%97%AC%EC%84%B1-%EB%A1%9C%EB%93%9C-%EB%9F%AC%EB%8B%9D%ED%99%94-t2gD5z3G/HM6804-402"
   },
@@ -1202,8 +1200,7 @@
    "available_sizes": 11,
    "size_status": "full",
    "image_urls": [
-    "https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/aa001ff5-8d32-45f1-bba8-d4e66914d478/NIKE%2BSTRUCTURE%2BPLUS%2BRR.png",
-    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto%2Cq_auto%3Aeco%2Cc_scale%2Cw_300%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/f2d80603-e8b2-4cbe-af5f-ffbd00cb6255/NIKE%2BSTRUCTURE%2BPLUS%2BRR.png"
+    "/samples/7df22180da91c67106a73968.jpg"
    ],
    "product_url": "https://www.nike.com/kr/t/%EB%82%98%EC%9D%B4%ED%82%A4-%EC%8A%A4%ED%8A%B8%EB%9F%AD%EC%B2%98-%ED%94%8C%EB%9F%AC%EC%8A%A4-%EB%82%A8%EC%84%B1-%EB%A1%9C%EB%93%9C-%EB%9F%AC%EB%8B%9D%ED%99%94-xhR97O1N/II7192-100"
   },
@@ -1248,8 +1245,7 @@
    "available_sizes": 9,
    "size_status": "full",
    "image_urls": [
-    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto%2Cq_auto%3Aeco%2Cc_scale%2Cw_300%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/96c6cccf-7291-4fbf-a44b-af5f3d1e3760/W%2BNIKE%2BAIR%2BZOOM%2BPEGASUS%2B42.png",
-    "https://static.nike.com/a/images/w_1536%2Cc_auto%2Car_4%3A5%2Cf_auto%2Cq_auto/90f144b6-6839-45ba-9854-8f014a4cd433/image.jpg"
+    "/samples/f6d19fe58c955ce129d0e327.jpg"
    ],
    "product_url": "https://www.nike.com/kr/t/%EB%82%98%EC%9D%B4%ED%82%A4-%ED%8E%98%EA%B0%80%EC%88%98%EC%8A%A4-42-%EC%97%AC%EC%84%B1-%EB%A1%9C%EB%93%9C-%EB%9F%AC%EB%8B%9D%ED%99%94-wsTF7yIV/IB1881-102"
   }
@@ -4077,5 +4073,5 @@
  "finished": true,
  "sample": true,
  "sampleTitle": "Road daily trainer · full run with 3D",
- "savedAtISO": "2026-08-07T07:11:21.278Z"
+ "savedAtISO": "2026-08-07T07:26:51.703Z"
 }

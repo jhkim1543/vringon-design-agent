@@ -106,8 +106,10 @@ function StepNode({ id, data, selected }: { id: string; data: { n: BoardNode; ed
       )}
       <EditableText className="bn-t" value={plainProse(n.title)} editing={editing}
         onSave={v => ed?.onTitle(n.id, v)} />
-      {/* 착용 컷처럼 이미지가 붙는 노드는 사진이 먼저 보여야 한다 */}
-      {n.imageUrl && !n.modelUrl && <img className="bn-img" src={n.imageUrl} alt="" loading="lazy" />}
+      {/* 착용 컷처럼 이미지가 붙는 노드는 사진이 먼저 보여야 한다.
+          원격 수집 사진이 죽으면 깨진 아이콘 대신 조용히 접는다. */}
+      {n.imageUrl && !n.modelUrl && <img className="bn-img" src={n.imageUrl} alt="" loading="lazy"
+        onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />}
       {/* 3D는 카드 안에서 바로 돌려 본다 */}
       {n.modelUrl && <ModelViewer url={n.modelUrl} poster={n.imageUrl} height={mvH} light={ed?.light} />}
       {/* 팔레트는 글이 아니라 색으로 보인다 */}

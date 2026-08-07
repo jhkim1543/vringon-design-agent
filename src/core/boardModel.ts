@@ -102,7 +102,7 @@ export function buildBoardModel(st: RunState): BoardModel {
     edges.push({ from: 'in', to: 'r-comp', label: 'competitor lines' })
     // 실제 수집한 제품 사진을 보드에 올린다 · 근거는 글이 아니라 사진으로 보인다.
     // 백화점·명품몰 베스트셀러(retailer가 붙은 것)가 먼저 온다 — 지금 팔리는 것부터.
-    const withShots = st.competitors.filter(c => c.image_urls?.length)
+    const withShots = st.competitors.filter(c => c.image_urls?.length || c.product_url)
     const shotPick = [...withShots.filter(c => c.retailer), ...withShots.filter(c => !c.retailer)].slice(0, 14)
     shotPick.forEach((c, k) => {
       const id = `comp-shot-${k}`
@@ -115,7 +115,7 @@ export function buildBoardModel(st: RunState): BoardModel {
           c.retailer ? `${c.retailer} bestseller` : (c.competitor_group ? COMP_GROUP_LABEL[c.competitor_group] : ''),
           c.size_status === 'size_broken' ? 'size broken' : '',
         ].filter(Boolean).join(' · ')].filter(Boolean),
-        imageUrl: shotUrl(c.image_urls![0], c.product_url),
+        imageUrl: shotUrl(c.image_urls?.[0] ?? '', c.product_url),
         tone: c.retailer ? 'accent' : 'neutral',
       })
       edges.push({ from: 'r-comp', to: id, dashed: true })

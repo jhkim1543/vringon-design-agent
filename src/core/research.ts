@@ -51,9 +51,16 @@ export interface TrendReport {
 }
 
 /** 수집한 원격 이미지는 서버 캐시를 거쳐 불러온다.
- *  page를 함께 주면 직링크가 죽었을 때 서버가 페이지의 og:image로 폴백한다. */
-export const shotUrl = (u: string, page?: string) =>
-  `/api/shot?u=${encodeURIComponent(u)}${page ? `&p=${encodeURIComponent(page)}` : ''}`
+ *  page를 함께 주면 직링크가 죽었을 때 서버가 페이지의 og:image로 폴백한다.
+ *  이미 로컬로 굳힌 경로(/samples/…)는 그대로 쓴다 — 정적 데모에는 프록시가 없다.
+ *  u가 비어 있어도 page가 있으면 페이지에서 대표 이미지를 찾는다. */
+export const shotUrl = (u: string, page?: string) => {
+  if (u && !/^https?:\/\//.test(u)) return u
+  const q: string[] = []
+  if (u) q.push(`u=${encodeURIComponent(u)}`)
+  if (page) q.push(`p=${encodeURIComponent(page)}`)
+  return `/api/shot?${q.join('&')}`
+}
 
 export interface TrendResearch {
   signals: {

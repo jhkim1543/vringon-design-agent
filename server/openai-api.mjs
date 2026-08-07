@@ -70,6 +70,79 @@ function ensureShotCache() {
   if (!existsSync(SHOT_DIR)) mkdirSync(SHOT_DIR, { recursive: true })
 }
 
+// ── 수집 사진 내려받기 · /api/shot 프록시와 샘플 동결이 같은 경로를 쓴다 ──
+const SHOT_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36'
+
+async function fetchShotImage(imgUrl, referer) {
+  const r = await fetch(imgUrl, {
+    headers: {
+      'User-Agent': SHOT_UA,
+      Accept: 'image/avif,image/webp,image/*,*/*;q=0.8',
+      ...(referer ? { Referer: referer } : {}),
+    },
+    redirect: 'follow',
+    signal: AbortSignal.timeout(12_000),
+  })
+  if (!r.ok) throw new Error(String(r.status))
+  const type = r.headers.get('content-type') || ''
+  if (!type.startsWith('image/')) throw new Error('not image')
+  const buf = Buffer.from(await r.arrayBuffer())
+  if (buf.length > 8e6) throw new Error('too large')
+  if (buf.length < 1200) throw new Error('too small')   // 1px 추적 픽셀·플레이스홀더 차단
+  return { buf, type }
+}
+
+// 페이지에서 대표 이미지 주소를 찾는다: og:image → twitter:image → JSON-LD image
+async function shotFromPage(pageUrl) {
+  const r = await fetch(pageUrl, {
+    headers: { 'User-Agent': SHOT_UA, Accept: 'text/html,*/*;q=0.8' },
+    redirect: 'follow', signal: AbortSignal.timeout(12_000),
+  })
+  if (!r.ok) throw new Error(`page ${r.status}`)
+  const html = (await r.text()).slice(0, 600_000)
+  const metas = [
+    /<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["']/i,
+    /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["']/i,
+    /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i,
+    /"image"\s*:\s*"(https:[^"]+\.(?:jpe?g|png|webp)[^"]*)"/i,
+  ]
+  for (const re of metas) {
+    const m = re.exec(html)
+    if (m?.[1]) {
+      const u2 = m[1].replace(/&amp;/g, '&')
+      if (/^https:\/\//.test(u2)) return u2
+    }
+  }
+  throw new Error('no og:image')
+}
+
+/** 캐시에 있으면 그대로, 없으면 내려받아 캐시한다. 실패는 1시간 동안 기억한다.
+ *  성공 시 { file, type, key } — 샘플 동결이 이 파일을 그대로 복사한다. */
+async function ensureShotCached(src, page) {
+  ensureShotCache()
+  const key = keyOf(['shot2', src, page])
+  const file = join(SHOT_DIR, `${key}.img`)
+  const miss = file + '.miss'
+  if (existsSync(file)) {
+    const type = existsSync(file + '.type') ? readFileSync(file + '.type', 'utf8') : 'image/jpeg'
+    return { file, type, key }
+  }
+  if (existsSync(miss) && Date.now() - Number(readFileSync(miss, 'utf8') || 0) < 3600_000) return null
+  let got = null
+  if (/^https:\/\//.test(src)) {
+    try { got = await fetchShotImage(src, page || undefined) } catch { /* 직링크 실패 → 페이지 폴백 */ }
+  }
+  if (!got && page && /^https:\/\//.test(page)) {
+    try { got = await fetchShotImage(await shotFromPage(page), page) } catch { /* 페이지 폴백도 실패 */ }
+  }
+  if (!got) { writeFileSync(miss, String(Date.now())); return null }
+  writeFileSync(file, got.buf)
+  writeFileSync(file + '.type', got.type)
+  return { file, type: got.type, key }
+}
+
+const EXT_OF = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/avif': 'avif', 'image/gif': 'gif' }
+
 function keyOf(parts) {
   return createHash('sha256').update(JSON.stringify(parts)).digest('hex').slice(0, 24)
 }
@@ -218,73 +291,14 @@ export async function handleApi(req, res) {
   if (path === '/api/shot') {
     const src = url.searchParams.get('u') || ''
     const page = url.searchParams.get('p') || ''
-    if (!/^https:\/\//.test(src)) { res.statusCode = 400; return res.end('bad url') }
-    ensureShotCache()
-    const name = `${keyOf(['shot2', src, page])}.img`
-    const file = join(SHOT_DIR, name)
-    const miss = file + '.miss'
-    const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36'
-
-    const tryImage = async (imgUrl, referer) => {
-      const r = await fetch(imgUrl, {
-        headers: {
-          'User-Agent': UA,
-          Accept: 'image/avif,image/webp,image/*,*/*;q=0.8',
-          ...(referer ? { Referer: referer } : {}),
-        },
-        redirect: 'follow',
-        signal: AbortSignal.timeout(12_000),
-      })
-      if (!r.ok) throw new Error(String(r.status))
-      const type = r.headers.get('content-type') || ''
-      if (!type.startsWith('image/')) throw new Error('not image')
-      const buf = Buffer.from(await r.arrayBuffer())
-      if (buf.length > 8e6) throw new Error('too large')
-      if (buf.length < 1200) throw new Error('too small')   // 1px 추적 픽셀·플레이스홀더 차단
-      return { buf, type }
-    }
-
-    // 페이지에서 대표 이미지 주소를 찾는다: og:image → twitter:image → JSON-LD image
-    const fromPage = async (pageUrl) => {
-      const r = await fetch(pageUrl, {
-        headers: { 'User-Agent': UA, Accept: 'text/html,*/*;q=0.8' },
-        redirect: 'follow', signal: AbortSignal.timeout(12_000),
-      })
-      if (!r.ok) throw new Error(`page ${r.status}`)
-      const html = (await r.text()).slice(0, 600_000)
-      const metas = [
-        /<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["']/i,
-        /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["']/i,
-        /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i,
-        /"image"\s*:\s*"(https:[^"]+\.(?:jpe?g|png|webp)[^"]*)"/i,
-      ]
-      for (const re of metas) {
-        const m = re.exec(html)
-        if (m?.[1]) {
-          const u2 = m[1].replace(/&amp;/g, '&')
-          if (/^https:\/\//.test(u2)) return u2
-        }
-      }
-      throw new Error('no og:image')
-    }
-
+    // 직링크가 아예 없어도 상품 페이지만 있으면 og:image로 간다 (조사가 이미지 URL을 못 물어온 제품)
+    if (!/^https:\/\//.test(src) && !/^https:\/\//.test(page)) { res.statusCode = 400; return res.end('bad url') }
     try {
-      if (!existsSync(file)) {
-        // 최근에 실패한 조합은 잠시 재시도하지 않는다 (매 렌더마다 원격을 두드리지 않게)
-        if (existsSync(miss) && Date.now() - Number(readFileSync(miss, 'utf8') || 0) < 3600_000) throw new Error('cached miss')
-        let got = null
-        try { got = await tryImage(src, page || undefined) } catch { /* 직링크 실패 → 페이지 폴백 */ }
-        if (!got && page && /^https:\/\//.test(page)) {
-          try { got = await tryImage(await fromPage(page), page) } catch { /* 페이지 폴백도 실패 */ }
-        }
-        if (!got) { writeFileSync(miss, String(Date.now())); throw new Error('unavailable') }
-        writeFileSync(file, got.buf)
-        writeFileSync(file + '.type', got.type)
-      }
-      const type = existsSync(file + '.type') ? readFileSync(file + '.type', 'utf8') : 'image/jpeg'
-      res.setHeader('Content-Type', type)
+      const got = await ensureShotCached(src, page)
+      if (!got) throw new Error('unavailable')
+      res.setHeader('Content-Type', got.type)
       res.setHeader('Cache-Control', 'public, max-age=86400')
-      return res.end(readFileSync(file))
+      return res.end(readFileSync(got.file))
     } catch {
       res.statusCode = 404
       return res.end('shot unavailable')
@@ -442,6 +456,31 @@ export async function handleApi(req, res) {
       if (!/^[a-z0-9_]+$/.test(String(name ?? ''))) return json(res, 400, { error: 'bad name' })
       const outDir = join(ROOT, 'public', 'samples')
       mkdirSync(outDir, { recursive: true })
+
+      // 수집한 경쟁·베스트셀러 사진을 파일로 함께 굳힌다.
+      // 정적 배포에는 /api/shot 프록시가 없고, 원격 직링크는 핫링크 차단·만료로 깨진다.
+      // 캐시에 없으면 지금 내려받아 본다 — 그래도 실패한 제품은 image_urls를 비워
+      // 화면이 "사진 없음"으로 정직하게 말하게 둔다.
+      let frozenShots = 0
+      for (const c of (state?.competitors ?? [])) {
+        const page = c.product_url || ''
+        const candidates = [...(c.image_urls ?? []), ...(page ? [''] : [])]
+        let local = null
+        for (const u of candidates) {
+          try {
+            const got = await ensureShotCached(u, page)
+            if (!got) continue
+            const ext = EXT_OF[got.type] ?? 'jpg'
+            const fname = `${got.key}.${ext}`
+            writeFileSync(join(outDir, fname), readFileSync(got.file))
+            local = `/samples/${fname}`
+            break
+          } catch { /* 다음 후보 */ }
+        }
+        c.image_urls = local ? [local] : []
+        if (local) frozenShots++
+      }
+
       let text = JSON.stringify(state)
       const hashes = [...new Set([...text.matchAll(/\/api\/image\/file\/([a-f0-9]{8,64})\.png/g)].map(m => m[1]))]
       let copied = 0
@@ -464,7 +503,7 @@ export async function handleApi(req, res) {
       const dir = join(ROOT, 'src', 'samples')
       mkdirSync(dir, { recursive: true })
       writeFileSync(join(dir, `${name}.json`), JSON.stringify(JSON.parse(text), null, 1))
-      return json(res, 200, { ok: true, file: `src/samples/${name}.json`, images: hashes.length, copied })
+      return json(res, 200, { ok: true, file: `src/samples/${name}.json`, images: hashes.length, copied, frozenShots })
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
   }
 

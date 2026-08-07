@@ -242,7 +242,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
 
       {/* ── 지금 팔리는 것 · 백화점·명품몰 베스트셀러는 사진으로 먼저 읽힌다 ── */}
       {(() => {
-        const pulse = st.competitors.filter(c => c.retailer && c.image_urls?.length)
+        const pulse = st.competitors.filter(c => c.retailer && (c.image_urls?.length || c.product_url))
         if (!pulse.length) return null
         return (
           <section className="rep-sect" id="sec-pulse">
@@ -251,7 +251,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
               {pulse.slice(0, 8).map(c => (
                 <article className="rep-design" key={c.product_id}>
                   <span className="rd-shot">
-                    <img src={shotUrl(c.image_urls![0], c.product_url)} alt=""
+                    <img src={shotUrl(c.image_urls?.[0] ?? '', c.product_url)} alt=""
                       onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
                   </span>
                   <span className="rd-id">{c.brand} {c.name}<i className="rd-tier">{c.retailer}</i></span>
@@ -269,7 +269,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
       {/* ── 경쟁 구도 · 표보다 사진이 먼저 온다 ────────────────── */}
       {(() => {
         // 브랜드 조사에서 온 제품 사진 · 백화점 펄스와 겹치지 않게 뺀다
-        const rivals = st.competitors.filter(c => !c.retailer && c.image_urls?.length)
+        const rivals = st.competitors.filter(c => !c.retailer && (c.image_urls?.length || c.product_url))
         if (!rivals.length) return null
         return (
           <section className="rep-sect" id="sec-rivals">
@@ -278,7 +278,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
               {rivals.slice(0, 12).map(c => (
                 <article className="rep-design" key={c.product_id}>
                   <span className="rd-shot">
-                    <img src={shotUrl(c.image_urls![0], c.product_url)} alt="" loading="lazy"
+                    <img src={shotUrl(c.image_urls?.[0] ?? '', c.product_url)} alt="" loading="lazy"
                       onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
                   </span>
                   <span className="rd-id">{c.brand} {c.name}

@@ -95,14 +95,14 @@ function build(st: RunState): { title: string; html: string } {
   }))
 
   // 상업 신호 · 실제 수집한 경쟁 제품 사진과 가격·사이즈 재고 (지시서 18장 p5-6)
-  const comps = st.competitors.filter(c => c.image_urls?.length).slice(0, 6)
+  const comps = st.competitors.filter(c => c.image_urls?.length || c.product_url).slice(0, 6)
   if (comps.length) {
     out.push(slide({
       eyebrow, tag: 'MARKET', page: P(),
       body: `<h2 class="stitle">Live commercial signals <span class="thin">observed products</span></h2>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5mm;margin-top:4mm">
           ${comps.map(c => `<div style="border:.25mm solid #E3E7EC;border-radius:1.5mm;overflow:hidden">
-            <div style="height:34mm;background:#F4F6F8">${img(shotUrl(c.image_urls![0], c.product_url))}</div>
+            <div style="height:34mm;background:#F4F6F8">${img(shotUrl(c.image_urls?.[0] ?? '', c.product_url))}</div>
             <div style="padding:2.5mm 3mm">
               <div style="font-size:7.6pt;font-weight:800">${esc(c.brand)} ${esc(c.name)}</div>
               <div style="font-size:6.8pt;color:#565D63;margin-top:1mm;line-height:1.5">
