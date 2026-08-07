@@ -115,337 +115,332 @@
   {
    "stage": "S1",
    "text": "Trend mode · building the brief",
-   "t": 1786065553993
+   "t": 1786085933431
   },
   {
    "stage": "S1",
    "text": "Line profile: Road daily trainer · running · unisex · performance running, medium volume · engineered mesh upper · segmented rubber · cemented · FW26",
-   "t": 1786065553993
+   "t": 1786085933431
   },
   {
    "stage": "S1",
    "text": "3 competitor lines: ASICS, HOKA, Nike Running · primary band KRW 150k-220k + adjacent reference band",
-   "t": 1786065554696
+   "t": 1786085933694
   },
   {
    "stage": "S1",
    "text": "1 Competitor products · searching ASICS, HOKA, Nike Running for Road daily trainer (1-2 min)",
-   "t": 1786065554696
+   "t": 1786085933694
   },
   {
    "stage": "S1",
    "text": "Also sweeping department-store and luxury-retail bestseller pages: Lotte, SSG, The Hyundai, MR PORTER, Harrods",
-   "t": 1786065554696
+   "t": 1786085933694
   },
   {
    "stage": "S1",
    "text": "Department-store pulse: 5 bestseller-flagged products with photos from Selfridges, MUSINSA (KICKS), SSG.COM (Shinsegae Dept. — Gwangju ‘Y‑Concept’ seller), MR PORTER (for image/tech reference; overseas luxury) (32 searches)",
-   "t": 1786066054541
+   "t": 1786085933739
   },
   {
    "stage": "S1",
    "text": "64 web searches, 14 products (reused an earlier pass)",
-   "t": 1786066054541
+   "t": 1786085933739
   },
   {
    "stage": "S1",
    "text": "10 kept as reference groups rather than direct competitors — different construction, tier or use",
-   "t": 1786066054541
+   "t": 1786085933739
   },
   {
    "stage": "S1",
    "text": "2 Checking popularity evidence · 8 strong, the rest single source · surface position never stored as a sales rank",
-   "t": 1786066054541
+   "t": 1786085933739
   },
   {
    "stage": "S1",
    "text": "No sales proxy scored. One pass gives no time series, so restock and sell-out trends need repeat collection.",
-   "t": 1786066054541
+   "t": 1786085933739
   },
   {
    "stage": "S1",
    "text": "Limits of this pass: ASICS: Scope and limits. I focused on ASICS KR DTC pages checked on 2026-08-06. I confirmed prices and core tech from official product or content pages. I could",
-   "t": 1786066054541
+   "t": 1786085933739
   },
   {
    "stage": "S1",
    "text": "3 Trend research · looking for design signals",
-   "t": 1786066054541
+   "t": 1786085933739
   },
   {
    "stage": "S1",
    "text": "The full trend report is being written separately. It attaches to the research panel when done.",
-   "t": 1786066054565
+   "t": 1786085933866
   },
   {
    "stage": "S1",
    "text": "Building the season dossier: macrotrends, palettes, materials, key items. It attaches when done.",
-   "t": 1786066054565
+   "t": 1786085933866
   },
   {
    "stage": "S1",
    "text": "15 web searches, 6 signals (reused an earlier pass) · each linked to a source",
-   "t": 1786066054565
+   "t": 1786085933866
   },
   {
    "stage": "S1",
    "text": "6 signals confirmed · none unsourced",
-   "t": 1786066054565
+   "t": 1786085933866
   },
   {
    "stage": "S1",
    "text": "Each signal carries four indices — commercial, cultural, forecast, feasibility — never a single blended score",
-   "t": 1786066054565
+   "t": 1786085933866
   },
   {
    "stage": "S1",
    "text": "Design prompts now carry the PLATED DAILY direction: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape",
-   "t": 1786066054588
+   "t": 1786085933884
   },
   {
    "stage": "S1",
    "text": "Season dossier ready · 4 macrotrends, 15 sources (91 searches)",
-   "t": 1786066054588
+   "t": 1786085933884
   },
   {
    "stage": "S1",
    "text": "Trend report done · 7 implications from 38 searches",
-   "t": 1786066054886
+   "t": 1786085934115
   },
   {
    "stage": "S1",
    "text": "Three directions built, one per tier · every claim traced to a source",
-   "t": 1786066055698
+   "t": 1786085934689
   },
   {
    "stage": "S2",
    "text": "Sketch prompts carry the season direction from the dossier",
-   "t": 1786066055698
+   "t": 1786085934689
   },
   {
    "stage": "S2",
    "text": "Specs per tier · Core 2 · Push 2 · Signature 2 (schema enforced, presets locked)",
-   "t": 1786066055698
+   "t": 1786085934689
   },
   {
    "stage": "S2",
    "text": "Tier means tooling: Core reuses last and bottom, Push keeps one, Signature may open a new last or mould",
-   "t": 1786066055698
+   "t": 1786085934689
   },
   {
    "stage": "S2",
    "text": "Reference bank loaded: 4 approved, 2 near-miss rejects (too familiar, cost)",
-   "t": 1786066055698
+   "t": 1786085934689
   },
   {
    "stage": "S2",
    "text": "SH-26FW-C01 [core] rule reject · S-04",
-   "t": 1786066056701
+   "t": 1786085935702
   },
   {
    "stage": "S2",
    "text": "SH-26FW-C02 [core] passed rules, queued for sketch",
-   "t": 1786066057696
+   "t": 1786085936695
   },
   {
    "stage": "S2",
    "text": "SH-26FW-P03 [push] passed rules, queued for sketch",
-   "t": 1786066058689
+   "t": 1786085937692
   },
   {
    "stage": "S2",
    "text": "SH-26FW-P04 [push] passed rules, queued for sketch",
-   "t": 1786066059701
+   "t": 1786085938688
   },
   {
    "stage": "S2",
    "text": "SH-26FW-S05 [signature] rule reject · S-04",
-   "t": 1786066060696
+   "t": 1786085939698
   },
   {
    "stage": "S2",
    "text": "SH-26FW-S06 [signature] passed rules, queued for sketch",
-   "t": 1786066061689
+   "t": 1786085940690
   },
   {
    "stage": "S2",
    "text": "4 of 6 specs passed · 2 rejected early · rejects are never rendered",
-   "t": 1786066062702
+   "t": 1786085941704
   },
   {
    "stage": "S2",
    "text": "Sketching 4 base forms · black ink only, colour never enters this stage",
-   "t": 1786066062702
+   "t": 1786085941704
   },
   {
    "stage": "S2",
-   "text": "SH-26FW-C02 base form sketched (reused)",
-   "t": 1786066062763
+   "text": "SH-26FW-C02 base form sketched",
+   "t": 1786085970394
   },
   {
    "stage": "S2",
-   "text": "SH-26FW-P03 base form sketched (reused)",
-   "t": 1786066062763
+   "text": "SH-26FW-S06 base form sketched",
+   "t": 1786085970684
   },
   {
    "stage": "S2",
-   "text": "SH-26FW-P04 base form sketched (reused)",
-   "t": 1786066062763
+   "text": "SH-26FW-P03 base form sketched",
+   "t": 1786085974678
   },
   {
    "stage": "S2",
-   "text": "SH-26FW-S06 base form sketched (reused)",
-   "t": 1786066062763
+   "text": "SH-26FW-P04 base form sketched",
+   "t": 1786085974787
   },
   {
    "stage": "S2",
    "text": "Branching 1 black-ink variations from each base form · same silhouette and outsole, different upper takes",
-   "t": 1786066062763
+   "t": 1786085974787
   },
   {
    "stage": "S2",
    "text": "SH-26FW-C02 sketch variation 1 of 1 done",
-   "t": 1786066098239
+   "t": 1786086004997
   },
   {
    "stage": "S2",
    "text": "SH-26FW-P03 sketch variation 1 of 1 done",
-   "t": 1786066099937
-  },
-  {
-   "stage": "S2",
-   "text": "SH-26FW-S06 sketch variation 1 of 1 done",
-   "t": 1786066136171
+   "t": 1786086007054
   },
   {
    "stage": "S2",
    "text": "SH-26FW-P04 sketch variation 1 of 1 done",
-   "t": 1786066136495
+   "t": 1786086043782
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-S06 sketch variation 1 of 1 done",
+   "t": 1786086045229
   },
   {
    "stage": "S3",
    "text": "50% move to render · 2 selected",
-   "t": 1786066136495
+   "t": 1786086045229
   },
   {
    "stage": "S3",
    "text": "SH-26FW-S06 colour enters here: the black-ink sheet becomes a photoreal render, then 2 more views as edits",
-   "t": 1786066136495
+   "t": 1786086045229
   },
   {
    "stage": "S3",
    "text": "SH-26FW-S06 sketch variation 1 coloured into a design",
-   "t": 1786066201727
+   "t": 1786086116373
   },
   {
    "stage": "S3",
    "text": "SH-26FW-S06 branching 2 product variations from the base design",
-   "t": 1786066266080
+   "t": 1786086189761
   },
   {
    "stage": "S3",
    "text": "SH-26FW-S06 vision QA 3/5 · regenerating the mismatched view, attempt 1 of 2",
-   "t": 1786066300037
+   "t": 1786086228140
   },
   {
    "stage": "S3",
    "text": "SH-26FW-S06 QA passed after regeneration",
-   "t": 1786066300691
+   "t": 1786086228699
   },
   {
    "stage": "S3",
    "text": "SH-26FW-C02 colour enters here: the black-ink sheet becomes a photoreal render, then 2 more views as edits",
-   "t": 1786066300691
+   "t": 1786086228699
   },
   {
    "stage": "S3",
    "text": "SH-26FW-C02 sketch variation 1 coloured into a design",
-   "t": 1786066360246
+   "t": 1786086302693
   },
   {
    "stage": "S3",
    "text": "SH-26FW-C02 branching 2 product variations from the base design",
-   "t": 1786066423026
+   "t": 1786086378084
   },
   {
    "stage": "S3",
    "text": "SH-26FW-C02 vision QA 4/5 · regenerating the mismatched view, attempt 1 of 2",
-   "t": 1786066459113
+   "t": 1786086413163
   },
   {
    "stage": "S3",
    "text": "SH-26FW-C02 failed twice, flagged as a view mismatch and kept visible",
-   "t": 1786066459696
+   "t": 1786086413700
   },
   {
    "stage": "S4",
    "text": "Scoring metrics. Deterministic numbers and model judgement stay separate and are never summed.",
-   "t": 1786066459696
+   "t": 1786086413700
   },
   {
    "stage": "S4",
    "text": "Top 1: SH-26FW-C02 [core] · spec distance 0.54",
-   "t": 1786066460695
-  },
-  {
-   "stage": "S4",
-   "text": "Worn pipeline: BiRefNet cutout, MediaPipe Pose for ankle and ground line, scale normalise, depth occlusion",
-   "t": 1786066461689
+   "t": 1786086414695
   },
   {
    "stage": "S4",
    "text": "Ground contact aligned and heel height checked visually, within 20%",
-   "t": 1786066461689
+   "t": 1786086415694
   },
   {
    "stage": "S4",
    "text": "2 campaign cuts per top pick · 1 worn, 1 staged · caption forced: simulated wear, the real fit may differ",
-   "t": 1786066462695
+   "t": 1786086416699
   },
   {
    "stage": "S4",
    "text": "SH-26FW-C02 Virtual fitting done",
-   "t": 1786066498155
+   "t": 1786086456415
   },
   {
    "stage": "S4",
    "text": "SH-26FW-C02 worn cut 1 done",
-   "t": 1786066500736
+   "t": 1786086457882
   },
   {
    "stage": "S5",
-   "text": "Building the 3D showroom · a four-view turnaround of each top pick goes to Tripo",
-   "t": 1786066500736
+   "text": "Building the 3D showroom · four views of each pick become one model",
+   "t": 1786086457882
   },
   {
    "stage": "S5",
    "text": "SH-26FW-C02 turnaround front view done",
-   "t": 1786066530338
+   "t": 1786086490869
   },
   {
    "stage": "S5",
    "text": "SH-26FW-C02 turnaround back view done",
-   "t": 1786066567075
+   "t": 1786086524319
   },
   {
    "stage": "S5",
-   "text": "SH-26FW-C02 sending 4 views to Tripo (front-left-back-right order) · this takes a few minutes",
-   "t": 1786066567075
+   "text": "SH-26FW-C02 building the 3D model from 4 views · a few minutes",
+   "t": 1786086524319
   },
   {
    "stage": "S5",
    "text": "SH-26FW-C02 3D ready from 4 views · GLB downloadable from the card",
-   "t": 1786066694179
+   "t": 1786086629154
   },
   {
    "stage": "S5",
    "text": "Assembling the board · five lanes: brief, Core, Push, Signature, appendix",
-   "t": 1786066694179
+   "t": 1786086629154
   },
   {
    "stage": "S5",
    "text": "Writing the talk track from rationale: trend evidence, brand fit, objections, sources",
-   "t": 1786066694693
+   "t": 1786086629691
   }
  ],
  "signals": [
@@ -3077,110 +3072,110 @@
    "images": [
     {
      "view": "sketch",
-     "url": "/samples/4d59c2fa365bd3cbaa72ca42.png",
-     "hash": "4d59c2fa365bd3cbaa72ca42",
+     "url": "/samples/437a93cec7170180aeaab2d1.png",
+     "hash": "437a93cec7170180aeaab2d1",
      "origin": "generated",
-     "promptUsed": "road running daily trainer with engineered mesh upper, cushioned rocker midsole and segmented rubber outsole. a technical three-view sheet on one page: a large lateral profile as the main view, with a smaller top-down view showing the opening and toe shape, and a smaller outsole view showing the tread pattern, arranged cleanly beside it. round toe, 40mm thick cushioned midsole, a substantial mid-height stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 5 panels, synthetic 1.1mm upper, matte technical synthetic with a uniform surface, lace closure, supercritical EVA midsole. black and white technical line drawing, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. No logo, no text, no lettering anywhere on the product.. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
+     "promptUsed": "road running daily trainer with engineered mesh upper, cushioned rocker midsole and segmented rubber outsole. strict lateral side view, outer side facing the viewer, toe pointing to the left and heel on the right, one single shoe only, one single view, nothing else in frame. round toe, 40mm thick cushioned midsole, a substantial mid-height stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 5 panels, synthetic 1.1mm upper, matte technical synthetic with a uniform surface, lace closure, supercritical EVA midsole. black and white technical line drawing, one single shoe, one view only, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. No logo, no text, no lettering anywhere on the product.. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
     },
     {
      "view": "sketch_var",
-     "url": "/samples/40a9b9c1b2e7137c7aeb4955.png",
-     "hash": "40a9b9c1b2e7137c7aeb4955",
+     "url": "/samples/e375387a63d77436e47aa7f9.png",
+     "hash": "e375387a63d77436e47aa7f9",
      "origin": "edited_from",
-     "editedFrom": "4d59c2fa365bd3cbaa72ca42",
-     "promptUsed": "This is one more black-ink technical sketch of the SAME shoe form. Keep the exact silhouette, proportions, midsole geometry and outsole tread of the original sheet. Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines. Same one-page three-view layout, same black ink line style on white paper, no colour, no shading. No text, no numbers, no labels, no logo."
+     "editedFrom": "437a93cec7170180aeaab2d1",
+     "promptUsed": "This is one more black-ink technical sketch of the SAME shoe form. Keep the exact silhouette, proportions, midsole geometry and outsole line of the original. Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines. Same strict lateral side view, one single shoe, nothing else in frame. Same black ink line style on white paper, no colour, no shading. No text, no numbers, no labels, no logo."
     },
     {
      "view": "lateral",
-     "url": "/samples/e6c3054415a183f71a3ac90f.png",
-     "hash": "e6c3054415a183f71a3ac90f",
+     "url": "/samples/55664ef15bfab914d2147fb8.png",
+     "hash": "55664ef15bfab914d2147fb8",
      "origin": "generated",
-     "promptUsed": "Turn the main lateral view of this technical sketch sheet into a photorealistic studio product photograph of the exact same shoe. Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole tread pattern exactly as drawn. Materials: round toe, 40mm thick cushioned midsole, a substantial mid-height stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 5 panels, synthetic 1.1mm upper, matte technical synthetic with a uniform surface, lace closure, supercritical EVA midsole. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. Strict lateral side view, toe pointing to the left and heel on the right, seamless white background, soft even studio light, sharp focus, real material texture. Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human."
+     "promptUsed": "Replace this line drawing with a full-colour photorealistic studio product photograph of the same shoe. The output must be a photograph, not a drawing: no outlines, no white fill, no flat areas. Every surface carries real material colour and texture, with studio lighting, soft shadows and highlights. Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole line exactly as drawn. Materials and colour: round toe, 40mm thick cushioned midsole, a substantial mid-height stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 5 panels, synthetic 1.1mm upper, matte technical synthetic with a uniform surface, lace closure, supercritical EVA midsole. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. Strict lateral side view, one single shoe, toe pointing to the left and heel on the right, seamless white background, sharp focus. Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human."
     },
     {
      "view": "design",
-     "url": "/samples/e6a13448a3272b1ccd9ee448.png",
-     "hash": "e6a13448a3272b1ccd9ee448",
+     "url": "/samples/181cdd77993e9e4303595f9a.png",
+     "hash": "181cdd77993e9e4303595f9a",
      "origin": "edited_from",
-     "editedFrom": "40a9b9c1b2e7137c7aeb4955",
-     "promptUsed": "Turn the main lateral view of this technical sketch sheet into a photorealistic studio product photograph of the exact same shoe. Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole tread pattern exactly as drawn. Materials: round toe, 40mm thick cushioned midsole, a substantial mid-height stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 5 panels, synthetic 1.1mm upper, matte technical synthetic with a uniform surface, lace closure, supercritical EVA midsole. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. Strict lateral side view, toe pointing to the left and heel on the right, seamless white background, soft even studio light, sharp focus, real material texture. Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human."
+     "editedFrom": "e375387a63d77436e47aa7f9",
+     "promptUsed": "Replace this line drawing with a full-colour photorealistic studio product photograph of the same shoe. The output must be a photograph, not a drawing: no outlines, no white fill, no flat areas. Every surface carries real material colour and texture, with studio lighting, soft shadows and highlights. Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole line exactly as drawn. Materials and colour: round toe, 40mm thick cushioned midsole, a substantial mid-height stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 5 panels, synthetic 1.1mm upper, matte technical synthetic with a uniform surface, lace closure, supercritical EVA midsole. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. Strict lateral side view, one single shoe, toe pointing to the left and heel on the right, seamless white background, sharp focus. Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human."
     },
     {
      "view": "medial",
-     "url": "/samples/cbb72be18838c451aa1dc18f.png",
-     "hash": "cbb72be18838c451aa1dc18f",
+     "url": "/samples/f671ad83a3941aa47375e872.png",
+     "hash": "f671ad83a3941aa47375e872",
      "origin": "edited_from",
-     "editedFrom": "e6c3054415a183f71a3ac90f"
+     "editedFrom": "55664ef15bfab914d2147fb8"
     },
     {
      "view": "q34",
-     "url": "/samples/652b8a206c591717f2bca406.png",
-     "hash": "652b8a206c591717f2bca406",
+     "url": "/samples/8dfb13fba46ce6d4e46f986d.png",
+     "hash": "8dfb13fba46ce6d4e46f986d",
      "origin": "edited_from",
-     "editedFrom": "e6c3054415a183f71a3ac90f"
+     "editedFrom": "55664ef15bfab914d2147fb8"
     },
     {
      "view": "lateral",
      "colorway": "gold",
-     "url": "/samples/efe48b93db9dbec70d1d31ed.png",
-     "hash": "efe48b93db9dbec70d1d31ed",
+     "url": "/samples/f7cdc28ad598aacc9f1748ad.png",
+     "hash": "f7cdc28ad598aacc9f1748ad",
      "origin": "edited_from",
-     "editedFrom": "e6c3054415a183f71a3ac90f"
+     "editedFrom": "55664ef15bfab914d2147fb8"
     },
     {
      "view": "variation",
-     "url": "/samples/16ee315410451db995cf234c.png",
-     "hash": "16ee315410451db995cf234c",
+     "url": "/samples/40793865dbe21ac2806c193c.png",
+     "hash": "40793865dbe21ac2806c193c",
      "origin": "edited_from",
-     "editedFrom": "e6c3054415a183f71a3ac90f",
-     "variantOf": "SH-26FW-C02",
-     "variantAxis": "Sole rebuild"
-    },
-    {
-     "view": "variation",
-     "url": "/samples/af3fad0f634ebf23c30d7800.png",
-     "hash": "af3fad0f634ebf23c30d7800",
-     "origin": "edited_from",
-     "editedFrom": "e6c3054415a183f71a3ac90f",
+     "editedFrom": "55664ef15bfab914d2147fb8",
      "variantOf": "SH-26FW-C02",
      "variantAxis": "Material swap"
     },
     {
-     "view": "concept",
-     "url": "/samples/2c2b0aed8074fe32af30c0ce.png",
-     "hash": "2c2b0aed8074fe32af30c0ce",
+     "view": "variation",
+     "url": "/samples/fe0ea431375c47478c4fcd87.png",
+     "hash": "fe0ea431375c47478c4fcd87",
      "origin": "edited_from",
-     "editedFrom": "e6c3054415a183f71a3ac90f",
+     "editedFrom": "55664ef15bfab914d2147fb8",
+     "variantOf": "SH-26FW-C02",
+     "variantAxis": "Sole rebuild"
+    },
+    {
+     "view": "concept",
+     "url": "/samples/122878c567df9cdae3effea7.png",
+     "hash": "122878c567df9cdae3effea7",
+     "origin": "edited_from",
+     "editedFrom": "55664ef15bfab914d2147fb8",
      "conceptLabel": "Virtual fitting",
      "persona": "Morning runner"
     },
     {
      "view": "wear",
-     "url": "/samples/e3e413140733d1f10e789878.png",
-     "hash": "e3e413140733d1f10e789878",
+     "url": "/samples/43e6fc05e20a72a4e26af5d8.png",
+     "hash": "43e6fc05e20a72a4e26af5d8",
      "origin": "edited_from",
-     "editedFrom": "e6c3054415a183f71a3ac90f"
+     "editedFrom": "55664ef15bfab914d2147fb8"
     },
     {
      "view": "turn_front",
-     "url": "/samples/645e29a039800eb925c3914d.png",
-     "hash": "645e29a039800eb925c3914d",
+     "url": "/samples/e0436839cc624c6f67f9ac21.png",
+     "hash": "e0436839cc624c6f67f9ac21",
      "origin": "edited_from",
-     "editedFrom": "e6c3054415a183f71a3ac90f"
+     "editedFrom": "55664ef15bfab914d2147fb8"
     },
     {
      "view": "turn_back",
-     "url": "/samples/95cc275d97103a1935a02e43.png",
-     "hash": "95cc275d97103a1935a02e43",
+     "url": "/samples/be1904b207bf4e0044261025.png",
+     "hash": "be1904b207bf4e0044261025",
      "origin": "edited_from",
-     "editedFrom": "e6c3054415a183f71a3ac90f"
+     "editedFrom": "55664ef15bfab914d2147fb8"
     }
    ],
    "isTop": true,
    "topDistance": 0.54,
    "model": {
-    "url": "/samples/6cf04b957321edf96001b919.glb",
-    "hash": "6cf04b957321edf96001b919",
+    "url": "/samples/16bc19d2ce6bd638ef49aa24.glb",
+    "hash": "16bc19d2ce6bd638ef49aa24",
     "format": "glb",
     "views": 4
    }
@@ -3371,18 +3366,18 @@
    "images": [
     {
      "view": "sketch",
-     "url": "/samples/9af1ec6b52090f386e4e1b94.png",
-     "hash": "9af1ec6b52090f386e4e1b94",
+     "url": "/samples/b54aa0a35ccb6f55961e45af.png",
+     "hash": "b54aa0a35ccb6f55961e45af",
      "origin": "generated",
-     "promptUsed": "road running daily trainer with engineered mesh upper, cushioned rocker midsole and segmented rubber outsole. a technical three-view sheet on one page: a large lateral profile as the main view, with a smaller top-down view showing the opening and toe shape, and a smaller outsole view showing the tread pattern, arranged cleanly beside it. round toe, 30mm thick cushioned midsole, a low-profile stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, synthetic 1.1mm upper, matte technical synthetic with a uniform surface, lace closure, supercritical EVA midsole. black and white technical line drawing, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. No logo, no text, no lettering anywhere on the product.. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
+     "promptUsed": "road running daily trainer with engineered mesh upper, cushioned rocker midsole and segmented rubber outsole. strict lateral side view, outer side facing the viewer, toe pointing to the left and heel on the right, one single shoe only, one single view, nothing else in frame. round toe, 30mm thick cushioned midsole, a low-profile stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, synthetic 1.1mm upper, matte technical synthetic with a uniform surface, lace closure, supercritical EVA midsole. black and white technical line drawing, one single shoe, one view only, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. No logo, no text, no lettering anywhere on the product.. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
     },
     {
      "view": "sketch_var",
-     "url": "/samples/8a7ee8812fc54929f3a41e2d.png",
-     "hash": "8a7ee8812fc54929f3a41e2d",
+     "url": "/samples/4c89d0316e19eaea9f26911e.png",
+     "hash": "4c89d0316e19eaea9f26911e",
      "origin": "edited_from",
-     "editedFrom": "9af1ec6b52090f386e4e1b94",
-     "promptUsed": "This is one more black-ink technical sketch of the SAME shoe form. Keep the exact silhouette, proportions, midsole geometry and outsole tread of the original sheet. Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines. Same one-page three-view layout, same black ink line style on white paper, no colour, no shading. No text, no numbers, no labels, no logo."
+     "editedFrom": "b54aa0a35ccb6f55961e45af",
+     "promptUsed": "This is one more black-ink technical sketch of the SAME shoe form. Keep the exact silhouette, proportions, midsole geometry and outsole line of the original. Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines. Same strict lateral side view, one single shoe, nothing else in frame. Same black ink line style on white paper, no colour, no shading. No text, no numbers, no labels, no logo."
     }
    ],
    "isTop": false
@@ -3573,18 +3568,18 @@
    "images": [
     {
      "view": "sketch",
-     "url": "/samples/fba3ce6a68045e90afe9bd04.png",
-     "hash": "fba3ce6a68045e90afe9bd04",
+     "url": "/samples/3a3ec3607075ad726ff55a00.png",
+     "hash": "3a3ec3607075ad726ff55a00",
      "origin": "generated",
-     "promptUsed": "road running daily trainer with engineered mesh upper, cushioned rocker midsole and segmented rubber outsole. a technical three-view sheet on one page: a large lateral profile as the main view, with a smaller top-down view showing the opening and toe shape, and a smaller outsole view showing the tread pattern, arranged cleanly beside it. round toe, 39mm thick cushioned midsole, a substantial mid-height stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, suede 1.4mm upper, brushed suede with a clearly readable napped texture, lace closure, EVA midsole. black and white technical line drawing, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. No logo, no text, no lettering anywhere on the product.. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
+     "promptUsed": "road running daily trainer with engineered mesh upper, cushioned rocker midsole and segmented rubber outsole. strict lateral side view, outer side facing the viewer, toe pointing to the left and heel on the right, one single shoe only, one single view, nothing else in frame. round toe, 39mm thick cushioned midsole, a substantial mid-height stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, suede 1.4mm upper, brushed suede with a clearly readable napped texture, lace closure, EVA midsole. black and white technical line drawing, one single shoe, one view only, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. No logo, no text, no lettering anywhere on the product.. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
     },
     {
      "view": "sketch_var",
-     "url": "/samples/903bee41d52fbfe1716fb519.png",
-     "hash": "903bee41d52fbfe1716fb519",
+     "url": "/samples/c1f5b128f306d24b1ae10274.png",
+     "hash": "c1f5b128f306d24b1ae10274",
      "origin": "edited_from",
-     "editedFrom": "fba3ce6a68045e90afe9bd04",
-     "promptUsed": "This is one more black-ink technical sketch of the SAME shoe form. Keep the exact silhouette, proportions, midsole geometry and outsole tread of the original sheet. Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines. Same one-page three-view layout, same black ink line style on white paper, no colour, no shading. No text, no numbers, no labels, no logo."
+     "editedFrom": "3a3ec3607075ad726ff55a00",
+     "promptUsed": "This is one more black-ink technical sketch of the SAME shoe form. Keep the exact silhouette, proportions, midsole geometry and outsole line of the original. Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines. Same strict lateral side view, one single shoe, nothing else in frame. Same black ink line style on white paper, no colour, no shading. No text, no numbers, no labels, no logo."
     }
    ],
    "isTop": false
@@ -4000,73 +3995,73 @@
    "images": [
     {
      "view": "sketch",
-     "url": "/samples/0ec45fb3edea522f1b751a2f.png",
-     "hash": "0ec45fb3edea522f1b751a2f",
+     "url": "/samples/d78b153e479c1d8c96aa280c.png",
+     "hash": "d78b153e479c1d8c96aa280c",
      "origin": "generated",
-     "promptUsed": "road running daily trainer with engineered mesh upper, cushioned rocker midsole and segmented rubber outsole. a technical three-view sheet on one page: a large lateral profile as the main view, with a smaller top-down view showing the opening and toe shape, and a smaller outsole view showing the tread pattern, arranged cleanly beside it. round toe, 30mm thick cushioned midsole, a low-profile stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, engineered mesh 0.9mm upper, engineered mesh with an open breathable weave, lace closure, EVA midsole. black and white technical line drawing, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. No logo, no text, no lettering anywhere on the product.. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
+     "promptUsed": "road running daily trainer with engineered mesh upper, cushioned rocker midsole and segmented rubber outsole. strict lateral side view, outer side facing the viewer, toe pointing to the left and heel on the right, one single shoe only, one single view, nothing else in frame. round toe, 30mm thick cushioned midsole, a low-profile stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, engineered mesh 0.9mm upper, engineered mesh with an open breathable weave, lace closure, EVA midsole. black and white technical line drawing, one single shoe, one view only, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. No logo, no text, no lettering anywhere on the product.. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
     },
     {
      "view": "sketch_var",
-     "url": "/samples/5a257727ec0ffc7705a1ae63.png",
-     "hash": "5a257727ec0ffc7705a1ae63",
+     "url": "/samples/2b6ee75e73e57ee9d3bc38a1.png",
+     "hash": "2b6ee75e73e57ee9d3bc38a1",
      "origin": "edited_from",
-     "editedFrom": "0ec45fb3edea522f1b751a2f",
-     "promptUsed": "This is one more black-ink technical sketch of the SAME shoe form. Keep the exact silhouette, proportions, midsole geometry and outsole tread of the original sheet. Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines. Same one-page three-view layout, same black ink line style on white paper, no colour, no shading. No text, no numbers, no labels, no logo."
+     "editedFrom": "d78b153e479c1d8c96aa280c",
+     "promptUsed": "This is one more black-ink technical sketch of the SAME shoe form. Keep the exact silhouette, proportions, midsole geometry and outsole line of the original. Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines. Same strict lateral side view, one single shoe, nothing else in frame. Same black ink line style on white paper, no colour, no shading. No text, no numbers, no labels, no logo."
     },
     {
      "view": "lateral",
-     "url": "/samples/3975f022e291900626506f77.png",
-     "hash": "3975f022e291900626506f77",
+     "url": "/samples/df6bdc795d30dca0fab85272.png",
+     "hash": "df6bdc795d30dca0fab85272",
      "origin": "generated",
-     "promptUsed": "Turn the main lateral view of this technical sketch sheet into a photorealistic studio product photograph of the exact same shoe. Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole tread pattern exactly as drawn. Materials: round toe, 30mm thick cushioned midsole, a low-profile stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, engineered mesh 0.9mm upper, engineered mesh with an open breathable weave, lace closure, EVA midsole. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. Strict lateral side view, toe pointing to the left and heel on the right, seamless white background, soft even studio light, sharp focus, real material texture. Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human."
+     "promptUsed": "Replace this line drawing with a full-colour photorealistic studio product photograph of the same shoe. The output must be a photograph, not a drawing: no outlines, no white fill, no flat areas. Every surface carries real material colour and texture, with studio lighting, soft shadows and highlights. Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole line exactly as drawn. Materials and colour: round toe, 30mm thick cushioned midsole, a low-profile stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, engineered mesh 0.9mm upper, engineered mesh with an open breathable weave, lace closure, EVA midsole. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. Strict lateral side view, one single shoe, toe pointing to the left and heel on the right, seamless white background, sharp focus. Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human."
     },
     {
      "view": "design",
-     "url": "/samples/95f8a4ef040cf77ad854c6b0.png",
-     "hash": "95f8a4ef040cf77ad854c6b0",
+     "url": "/samples/c21b7f0963e726dec25325aa.png",
+     "hash": "c21b7f0963e726dec25325aa",
      "origin": "edited_from",
-     "editedFrom": "5a257727ec0ffc7705a1ae63",
-     "promptUsed": "Turn the main lateral view of this technical sketch sheet into a photorealistic studio product photograph of the exact same shoe. Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole tread pattern exactly as drawn. Materials: round toe, 30mm thick cushioned midsole, a low-profile stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, engineered mesh 0.9mm upper, engineered mesh with an open breathable weave, lace closure, EVA midsole. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. Strict lateral side view, toe pointing to the left and heel on the right, seamless white background, soft even studio light, sharp focus, real material texture. Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human."
+     "editedFrom": "2b6ee75e73e57ee9d3bc38a1",
+     "promptUsed": "Replace this line drawing with a full-colour photorealistic studio product photograph of the same shoe. The output must be a photograph, not a drawing: no outlines, no white fill, no flat areas. Every surface carries real material colour and texture, with studio lighting, soft shadows and highlights. Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole line exactly as drawn. Materials and colour: round toe, 30mm thick cushioned midsole, a low-profile stack, cemented construction with a clean bonded sole joint and no welt stitching, upper divided into 7 panels, engineered mesh 0.9mm upper, engineered mesh with an open breathable weave, lace closure, EVA midsole. The line programme fixes: engineered mesh upper, supercritical foam midsole, segmented rubber outsole, moderate rocker profile, cemented construction. It should read as part of the PLATED DAILY direction: toe semi-curved • heel 8–10 mm drop • material PEBA midsole with winged nylon plate • closure flat laces with internal loops • upper engineered mesh with zonal reinforcements • outsole segmented XT‑900 rubber; season materials: Winged nylon or polyamide plates for daily training, PEBA-on-EVA sandwich with composite plate, Engineered mesh with zonal reinforcements and tape; season details: Gusseted thin tongues to stabilize midfoot, Internal fit bands or ghillie‑style loops, Reflective films integrated into woven uppers; season palette: Safety Yellow #D6FF00, Tranquil Teal #138E8E, Vizi Orange #FF6A00. Strict lateral side view, one single shoe, toe pointing to the left and heel on the right, seamless white background, sharp focus. Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human."
     },
     {
      "view": "medial",
-     "url": "/samples/f95efe9a92666f3a956abc1d.png",
-     "hash": "f95efe9a92666f3a956abc1d",
+     "url": "/samples/96b44f8e71dc1adbce7a7ce1.png",
+     "hash": "96b44f8e71dc1adbce7a7ce1",
      "origin": "edited_from",
-     "editedFrom": "3975f022e291900626506f77"
+     "editedFrom": "df6bdc795d30dca0fab85272"
     },
     {
      "view": "q34",
-     "url": "/samples/bd1937d741e34e7c9baabb57.png",
-     "hash": "bd1937d741e34e7c9baabb57",
+     "url": "/samples/d9279b8ed4bbbdd8f48f36ac.png",
+     "hash": "d9279b8ed4bbbdd8f48f36ac",
      "origin": "edited_from",
-     "editedFrom": "3975f022e291900626506f77"
+     "editedFrom": "df6bdc795d30dca0fab85272"
     },
     {
      "view": "lateral",
      "colorway": "gold",
-     "url": "/samples/4034c197f2605af263eefd6c.png",
-     "hash": "4034c197f2605af263eefd6c",
+     "url": "/samples/c74f01013e9a83b554afeb5d.png",
+     "hash": "c74f01013e9a83b554afeb5d",
      "origin": "edited_from",
-     "editedFrom": "3975f022e291900626506f77"
+     "editedFrom": "df6bdc795d30dca0fab85272"
     },
     {
      "view": "variation",
-     "url": "/samples/954c7ebff34cf216ab92849f.png",
-     "hash": "954c7ebff34cf216ab92849f",
+     "url": "/samples/ac7dc91f9e870498ac2a2bbb.png",
+     "hash": "ac7dc91f9e870498ac2a2bbb",
      "origin": "edited_from",
-     "editedFrom": "3975f022e291900626506f77",
-     "variantOf": "SH-26FW-S06",
-     "variantAxis": "Material swap"
-    },
-    {
-     "view": "variation",
-     "url": "/samples/f2ac610382f09392152989d0.png",
-     "hash": "f2ac610382f09392152989d0",
-     "origin": "edited_from",
-     "editedFrom": "3975f022e291900626506f77",
+     "editedFrom": "df6bdc795d30dca0fab85272",
      "variantOf": "SH-26FW-S06",
      "variantAxis": "Sole rebuild"
+    },
+    {
+     "view": "variation",
+     "url": "/samples/19a04cc2327013b4c33d8cf7.png",
+     "hash": "19a04cc2327013b4c33d8cf7",
+     "origin": "edited_from",
+     "editedFrom": "df6bdc795d30dca0fab85272",
+     "variantOf": "SH-26FW-S06",
+     "variantAxis": "Material swap"
     }
    ],
    "isTop": false
@@ -4082,5 +4077,5 @@
  "finished": true,
  "sample": true,
  "sampleTitle": "Road daily trainer · full run with 3D",
- "savedAtISO": "2026-08-07T01:39:07.542Z"
+ "savedAtISO": "2026-08-07T07:11:21.278Z"
 }

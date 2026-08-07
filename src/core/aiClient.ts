@@ -138,9 +138,9 @@ export function linePromptClause(lp: FootwearLineProfile | undefined): string {
 }
 
 export function sketchPrompt(spec: DesignSpec, engine: EngineId = 'detail', brand?: BrandIdentity, trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
-  // 라인 리뷰에는 측면 하나로 부족하다 · 한 장짜리 3뷰 테크시트로 그린다 (Gemini QA 지적)
-  const view = 'a technical three-view sheet on one page: a large lateral profile as the main view, '
-    + 'with a smaller top-down view showing the opening and toe shape, and a smaller outsole view showing the tread pattern, arranged cleanly beside it'
+  // 스케치는 측면 한 컷이다. 한 장에 여러 시점을 넣으면 카드에서 서로 겹쳐 읽히지 않는다.
+  // 다른 각도는 S3에서 컬러 렌더의 뷰로 따로 만든다.
+  const view = SHOE_VIEW.lateral + ', one single shoe only, one single view, nothing else in frame'
   return shapePrompt(engine, {
     subject: en(spec.itemType), spec: shoeSpecPhrase(spec), view,
     brand: [linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
@@ -168,9 +168,10 @@ const SKETCH_VAR_ANGLES = [
 export function sketchVariationPrompt(k: number): string {
   return [
     'This is one more black-ink technical sketch of the SAME shoe form.',
-    'Keep the exact silhouette, proportions, midsole geometry and outsole tread of the original sheet.',
+    'Keep the exact silhouette, proportions, midsole geometry and outsole line of the original.',
     SKETCH_VAR_ANGLES[k % SKETCH_VAR_ANGLES.length],
-    'Same one-page three-view layout, same black ink line style on white paper, no colour, no shading.',
+    'Same strict lateral side view, one single shoe, nothing else in frame.',
+    'Same black ink line style on white paper, no colour, no shading.',
     'No text, no numbers, no labels, no logo.',
   ].join(' ')
 }
@@ -179,12 +180,14 @@ export function sketchVariationPrompt(k: number): string {
  *  스케치의 실루엣·패널·아웃솔 기하가 렌더에 그대로 보존된다 (Gemini QA 지적). */
 export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
   return [
-    'Turn the main lateral view of this technical sketch sheet into a photorealistic studio product photograph of the exact same shoe.',
-    'Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole tread pattern exactly as drawn.',
-    `Materials: ${shoeSpecPhrase(spec)}.`,
+    'Replace this line drawing with a full-colour photorealistic studio product photograph of the same shoe.',
+    'The output must be a photograph, not a drawing: no outlines, no white fill, no flat areas.',
+    'Every surface carries real material colour and texture, with studio lighting, soft shadows and highlights.',
+    'Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole line exactly as drawn.',
+    `Materials and colour: ${shoeSpecPhrase(spec)}.`,
     linePromptClause(line),
     trendPromptClause(trend ?? null),
-    'Strict lateral side view, toe pointing to the left and heel on the right, seamless white background, soft even studio light, sharp focus, real material texture.',
+    'Strict lateral side view, one single shoe, toe pointing to the left and heel on the right, seamless white background, sharp focus.',
     'Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human.',
   ].filter(Boolean).join(' ')
 }

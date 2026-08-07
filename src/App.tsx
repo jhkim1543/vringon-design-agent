@@ -54,28 +54,30 @@ export default function App() {
   // 공유 링크가 가리키는 분석이 이 브라우저에 없을 때 알려 줄 값
   const [shareMiss, setShareMiss] = useState<string | null>(null)
 
-  // 예시 Run을 한 번 심어 둔다. 처음 열어도 결과가 어떻게 나오는지 볼 수 있게.
-  useEffect(() => { ensureSampleRuns() }, [])
-
-  // 새로고침이나 렌더 오류로 화면이 날아가도 진행 결과를 되살린다.
-  // 공유 링크(?run=…)로 들어왔으면 그 분석을 먼저 연다.
+  // 예시 Run을 먼저 심고, 그다음에 공유 링크를 푼다.
+  // 순서를 지키지 않으면 샘플을 가리키는 링크가 "이 브라우저에 없다"로 잘못 뜬다.
   useEffect(() => {
-    const target = readShareTarget()
-    if (target) {
-      const rec = getRun(target.runId)
-      if (rec) {
-        runIdRef.current = rec.id
-        setSt(rec.state)
-        setView(target.view)
-        return
+    let cancelled = false
+    ensureSampleRuns().finally(() => {
+      if (cancelled) return
+      const target = readShareTarget()
+      if (target) {
+        const rec = getRun(target.runId)
+        if (rec) {
+          runIdRef.current = rec.id
+          setSt(rec.state)
+          setView(target.view)
+          return
+        }
+        setShareMiss(target.runId)
       }
-      setShareMiss(target.runId)
-    }
-    const prev = loadCurrent()
-    if (prev && prev.state.designs.length) {
-      runIdRef.current = prev.id
-      setSt(prev.state)
-    }
+      const prev = loadCurrent()
+      if (prev && prev.state.designs.length) {
+        runIdRef.current = prev.id
+        setSt(prev.state)
+      }
+    })
+    return () => { cancelled = true }
   }, [])
 
   // 보드나 분석 화면을 보고 있으면 주소에 남긴다. 새로고침해도 같은 곳이 열린다.

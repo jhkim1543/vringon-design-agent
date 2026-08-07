@@ -762,11 +762,13 @@ table.mini td b { color: var(--text); font-weight: 600; }
 .modal.gate .modal-h { padding-bottom: 4px; }
 .modal.gate .hint { line-height: 1.7; }
 
-/* 보드 노드 안 이미지 · 사진이 먼저 읽히고, 칸을 키우면 사진이 따라 커진다 */
+/* 보드 노드 안 이미지 · 사진이 먼저 읽히고, 칸을 키우면 사진이 따라 커진다.
+   제품 컷은 잘라내지 않는다 — 토나 힐이 잘리면 실루엣을 볼 수 없다. */
 .bnode .bn-img {
-  display: block; width: 100%; flex: 1 1 226px; min-height: 140px; object-fit: cover;
+  display: block; width: 100%; flex: 1 1 226px; min-height: 140px; object-fit: contain;
   border-radius: var(--r-8); margin: 4px 0 8px; background: #0E0E12;
 }
+.board-light .bnode .bn-img { background: #F4F6F8; }
 .board-light .bnode .bn-img { background: #F0F2F5; }
 
 /* 단계 배경(컬럼)은 장식이다. 여기를 잡아도 캔버스가 끌리도록 이벤트를 통과시킨다.
