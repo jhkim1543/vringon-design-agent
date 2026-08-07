@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { detectRuntime } from '../core/runtime'
 import type { Runtime } from '../core/runtime'
 import {
-  DEFAULT_PARAMS, firstTypeOf, groupOf, LINE_PRESETS, MODE_LABEL, MODE_SCOPE,
+  asFootwearLine, DEFAULT_PARAMS, firstTypeOf, groupOf, LINE_PRESETS, MODE_LABEL, MODE_SCOPE,
   OBJECTIVE_LABEL, TAXONOMY, TYPE_LABEL, UNKNOWN, defaultLineProfile, lineFingerprint,
 } from '../core/types'
 import type { FootwearLineProfile, Mode, ResearchObjective, RunParams, Stage } from '../core/types'
@@ -105,17 +105,17 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
   const setTrend = (patch: Partial<RunParams['trend']>) => setP(v => ({ ...v, trend: { ...v.trend, ...patch } }))
   const setSeries = (patch: Partial<RunParams['series']>) => setP(v => ({ ...v, series: { ...v.series, ...patch } }))
   const setMood = (patch: Partial<RunParams['moodboard']>) => setP(v => ({ ...v, moodboard: { ...v.moodboard, ...patch } }))
-  const line = p.line ?? defaultLineProfile()
+  const line = asFootwearLine(p.line) ?? defaultLineProfile()
   // 라인 프로필의 한 구역만 갈아 끼운다. 프리셋 채움과 개별 수정이 같은 경로를 쓴다.
   const setLine = <S extends keyof FootwearLineProfile>(section: S, patch: Partial<FootwearLineProfile[S]>) =>
     setP(v => {
-      const lp = v.line ?? defaultLineProfile()
+      const lp = asFootwearLine(v.line) ?? defaultLineProfile()
       return { ...v, linePreset: undefined, line: { ...lp, [section]: { ...(lp[section] as object), ...patch } as FootwearLineProfile[S] } }
     })
   const applyPreset = (id: string) => {
     const pr = LINE_PRESETS.find(x => x.id === id)
     if (!pr) return
-    setP(v => ({ ...v, itemType: pr.itemType, linePreset: id, line: pr.fill(v.line ?? defaultLineProfile()) }))
+    setP(v => ({ ...v, itemType: pr.itemType, linePreset: id, line: pr.fill(asFootwearLine(v.line) ?? defaultLineProfile()) }))
   }
   const addCompetitor = (name?: string) => {
     const n = (name ?? draft).trim()

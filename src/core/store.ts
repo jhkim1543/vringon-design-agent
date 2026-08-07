@@ -29,8 +29,19 @@ function write(k: string, v: unknown) {
   catch { /* 용량 초과 시 조용히 넘긴다. 저장 실패가 실행을 막으면 안 된다 */ }
 }
 
+/** 이 앱이 주얼리도 다루던 시절의 Run이 브라우저에 남아 있다.
+ *  주얼리는 별도 제품으로 갈라져 나갔고 이 빌드에는 그 팩도, 그 품목 분류도 없다.
+ *  열면 화면이 죽으므로 목록에서 걸러내고, 저장소에서도 한 번만 지운다. */
+function isFootwear(r: RunRecord): boolean {
+  const p = r.state?.params as { category?: string } | undefined
+  return !p?.category || p.category === 'shoe'
+}
+
 export function listRuns(): RunRecord[] {
-  return read<RunRecord[]>(KEY, []).sort((a, b) => b.savedAt - a.savedAt)
+  const all = read<RunRecord[]>(KEY, [])
+  const keep = all.filter(isFootwear)
+  if (keep.length !== all.length) write(KEY, keep)
+  return keep.sort((a, b) => b.savedAt - a.savedAt)
 }
 
 export function getRun(id: string): RunRecord | undefined {
@@ -64,7 +75,11 @@ export function saveCurrent(id: string, st: RunState) {
   write(CURRENT, { id, savedAt: Date.now(), state: st })
 }
 export function loadCurrent(): { id: string; savedAt: number; state: RunState } | null {
-  return read<{ id: string; savedAt: number; state: RunState } | null>(CURRENT, null)
+  const cur = read<{ id: string; savedAt: number; state: RunState } | null>(CURRENT, null)
+  // 진행 중이던 Run도 옛 주얼리 것이면 되살리지 않는다
+  const cat = (cur?.state?.params as { category?: string } | undefined)?.category
+  if (cur && cat && cat !== 'shoe') { clearCurrent(); return null }
+  return cur
 }
 export function clearCurrent() {
   try { localStorage.removeItem(CURRENT) } catch { /* 무시 */ }

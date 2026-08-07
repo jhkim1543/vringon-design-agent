@@ -183,8 +183,19 @@ export function defaultLineProfile(): FootwearLineProfile {
   }
 }
 
+/** 저장된 line이 신발 프로필이 맞는지 확인한다.
+ *  이 앱이 주얼리도 다루던 시절의 Run이 브라우저에 남아 있고, 그 line은 모양이 전혀 다르다
+ *  ({preset, baseMetal, coating, stone}). 그대로 읽으면 화면이 통째로 죽는다.
+ *  모양이 아니면 없는 것으로 친다 — 라인 조건 없이도 결과는 읽을 수 있어야 한다. */
+export function asFootwearLine(lp: unknown): FootwearLineProfile | undefined {
+  const l = lp as Partial<FootwearLineProfile> | undefined
+  if (!l || !l.product || !l.lastFit || !l.upper || !l.bottom || !l.construction) return undefined
+  return l as FootwearLineProfile
+}
+
 /** 라인 프로필을 사람이 읽는 짧은 지문으로. 리포트 표지와 캐시 키가 같이 쓴다. */
-export function lineFingerprint(lp: FootwearLineProfile | undefined, itemType: string): string {
+export function lineFingerprint(raw: FootwearLineProfile | undefined, itemType: string): string {
+  const lp = asFootwearLine(raw)
   if (!lp) return TYPE_LABEL[itemType] ?? itemType
   const bits = [
     TYPE_LABEL[itemType] ?? itemType,

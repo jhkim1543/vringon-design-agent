@@ -2,7 +2,7 @@
 // 도시에와 같은 뼈대를 쓴다. 이쪽은 서술형 리포트라 장수가 적다.
 // 화면(Run)에서는 텍스트로 읽고, 여기서는 발표에 그대로 쓸 수 있는 형태로 나간다.
 import type { RunState, Design } from './types'
-import { CAT_LABEL, COMP_GROUP_LABEL, lineFingerprint, MODE_LABEL, TYPE_LABEL, UNKNOWN } from './types'
+import { asFootwearLine, CAT_LABEL, COMP_GROUP_LABEL, MODE_LABEL, TYPE_LABEL, UNKNOWN } from './types'
 import type { TrendReport } from './research'
 import { shotUrl } from './research'
 import { downloadDeck, esc, printDeck, slide } from './deck'
@@ -34,7 +34,7 @@ function build(st: RunState): { title: string; html: string } {
   const P = () => ++page
 
   // 표지 · Research fingerprint (지시서 18장) — 무엇을 어떤 라인 조건으로 조사했는지가 표지에 있어야 한다
-  const lp = p.line
+  const lp = asFootwearLine(p.line)
   const u = (v?: string) => v && v !== UNKNOWN ? v : null
   const fingerprint = [
     ['Mode', MODE_LABEL[p.mode]],

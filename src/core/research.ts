@@ -6,6 +6,7 @@ let runLang: Lang | null = null
 export function setRunLang(l: Lang | null) { runLang = l }
 // ── 리서치 클라이언트 · 서버가 웹 검색으로 실제 수집한 결과를 받는다 ──
 import type { CompetitorGroup, CompetitorProduct, FootwearLineProfile, ReportBias, ResearchObjective, Signal } from './types'
+import { asFootwearLine } from './types'
 
 export interface CompetitorProductRaw {
   brand: string
@@ -98,7 +99,8 @@ async function post<T>(url: string, body: unknown): Promise<T> {
 }
 
 /** 라인 프로필을 서버에 넘길 요약으로. 검색어·필터·캐시 키가 모두 이 값을 쓴다. */
-export function lineForServer(lp?: FootwearLineProfile, itemType?: string) {
+export function lineForServer(raw?: FootwearLineProfile, itemType?: string) {
+  const lp = asFootwearLine(raw)
   if (!lp) return undefined
   return {
     itemType: itemType ?? '',
