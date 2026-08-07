@@ -1,6 +1,8 @@
 // ── 파이프라인 엔진 S1~S5 · 진행 스트리밍·승인 게이트·체크포인트 ──────
-import type { Design, DesignTier, PipelineEvent, Rationale, RunParams, Signal, Stage } from './types'
-import { PACKS, resetSeq, tierCapRule, viewSetFor } from './packs'
+import type { Design, DesignSpec, DesignTier, PipelineEvent, Rationale, RunParams, Signal, Stage } from './types'
+import { PACKS, profileOf, resetSeq, tierCapRule, viewSetFor } from './packs'
+import { blockedNarrative, deriveSpecHints, drivingFromHint, hintNarrative, reconcileHint } from './signalSpec'
+import type { SpecHint } from './signalSpec'
 import { makeRng } from './rng'
 import { COMPETITORS, DIRECTIONS, DNA_CONFLICT, DNA_LOCKS, PROMPT_PARSE, REPORT_BIAS, SERIES_DNA, SIGNALS } from './samples'
 import { COLORWAY_NAMES } from './sketch'
@@ -10,7 +12,7 @@ import {
 } from './aiClient'
 import type { TrendClauseInput, TripoRole } from './aiClient'
 import { fetchCompetitors, fetchDossier, fetchRetailPulse, fetchTrends, pulseToCompetitors, toBias, toCompetitors, toSignals, setRunLang } from './research'
-import { campaignCount, lineFingerprint, MODE_LABEL, MODE_SCOPE, TYPE_LABEL } from './types'
+import { campaignCount, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL, TYPE_LABEL } from './types'
 import { ENGINES } from './imageEngines'
 
 export type Emit = (e: PipelineEvent) => void
@@ -302,14 +304,36 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     const tiers: DesignTier[] = [
       ...Array(nCore).fill('core'), ...Array(nPush).fill('push'), ...Array(nSig).fill('signature'),
     ]
+    // 조사 신호를 스펙 값으로 옮긴다 · 티어마다 실행 가능한 신호가 다르다
+    const athletic = !!profileOf(params.itemType).athletic
+    const hintByTier: Record<DesignTier, ReturnType<typeof deriveSpecHints>> = {
+      core: deriveSpecHints(signals, 'core', athletic),
+      push: deriveSpecHints(signals, 'push', athletic),
+      signature: deriveSpecHints(signals, 'signature', athletic),
+    }
+    for (const t of ['core', 'push', 'signature'] as DesignTier[]) {
+      const h = hintByTier[t]
+      const n = Object.keys(h.fields).length
+      emit({ kind: 'log', stage: 'S2', text: n
+        ? `${TIER_LABEL[t]} reads ${n} spec values out of the research: ${Object.keys(h.fields).map(k => k.replace(/_/g, ' ')).join(', ')}`
+        : `${TIER_LABEL[t]} found no signal it can build without changing tooling, so its spec stays open` })
+    }
+    // 실제로 반영된 필드 수 · 제안과 반영은 다르다
+    const tookByTier: Record<string, Set<string>> = { core: new Set(), push: new Set(), signature: new Set() }
+    const blockedSeen = new Set<string>()
+
     for (let i = 0; i < tiers.length; i++) {
       if (cancelled) return
       const tier = tiers[i]
-      const spec = pack.generateSpec(rng, tier, params.itemType, locked)
+      const spec = pack.generateSpec(rng, tier, params.itemType, locked, hintByTier[tier].fields)
+      // 스펙이 실제로 받아들인 필드만 근거로 남긴다
+      const hint = reconcileHint(hintByTier[tier], spec.hintApplied)
+      for (const k of spec.hintApplied ?? []) tookByTier[tier].add(k)
+      for (const b of spec.hintBlocked ?? []) blockedSeen.add(`${b.field}|${b.wanted}|${b.got}`)
       const cost = pack.costModel(spec, rng)
       const ruleResults = [...pack.rules(spec), ...tierCapRule(spec, cost)]
       const rejected = ruleResults.some(r => r.severity === 'fail')
-      const rationale = buildRationale(params, spec, signals, rng)
+      const rationale = buildRationale(params, spec, signals, rng, hint)
       const d: Design = {
         spec, ruleResults, rejected, cost, rationale,
         qa: [], viewMismatch: false,
@@ -324,6 +348,15 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       await wait(180)
     }
     const alive = designs.filter(d => !d.rejected)
+    // 조사가 어디까지 실제로 반영됐는지 남긴다. 반영과 제안을 섞어서 적지 않는다.
+    for (const t of ['core', 'push', 'signature'] as DesignTier[]) {
+      const took = [...tookByTier[t]]
+      if (took.length) emit({ kind: 'log', stage: 'S2', text: `${TIER_LABEL[t]} specs carry ${took.length} field${took.length > 1 ? 's' : ''} set by the research: ${took.map(k => k.replace(/_/g, ' ')).join(', ')}` })
+    }
+    for (const b of [...blockedSeen].slice(0, 3)) {
+      const [field, wanted, got] = b.split('|')
+      emit({ kind: 'log', stage: 'S2', text: `Research asked for ${field.replace(/_/g, ' ')} ${wanted}; a ${TYPE_LABEL[params.itemType] ?? params.itemType} holds at ${got}, so it was not applied` })
+    }
     emit({ kind: 'log', stage: 'S2', text: `${alive.length} of ${designs.length} specs passed · ${designs.length - alive.length} rejected early · rejects are never rendered` })
 
     // 실제 스케치 생성 · 룰 통과분만, 상한까지. 초과분은 SVG 폴백
@@ -641,8 +674,13 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
 }
 
 // ── 근거 추적 체인 (지시서 10.1) ─────────────────────────────────────
-function buildRationale(params: RunParams, spec: { design_id: string; tier: DesignTier }, signals: Signal[], rng: ReturnType<typeof makeRng>): Rationale {
-  const s1 = rng.pick(signals), s2 = rng.pick(signals.filter(s => s.signal_id !== s1.signal_id))
+function buildRationale(params: RunParams, spec: DesignSpec, signals: Signal[], rng: ReturnType<typeof makeRng>, hint: SpecHint): Rationale {
+  // 근거는 실제로 스펙을 바꾼 신호다. 아무것도 못 바꿨을 때만 가장 센 신호로 대신한다.
+  const driving = drivingFromHint(hint)
+  const byId = (id: string) => signals.find(s => s.signal_id === id)
+  const applied = driving.map(d => byId(d.signal_id)).filter((s): s is Signal => !!s)
+  const s1 = applied[0] ?? rng.pick(signals)
+  const s2 = applied[1] ?? rng.pick(signals.filter(s => s.signal_id !== s1.signal_id))
   const compRef = {
     ref_id: `rf_${rng.int(100, 999)}`, source_type: 'competitor' as const,
     source_url: 'https://competitor.example/product/8812', collected_at: '2026-05-14',
@@ -660,11 +698,16 @@ function buildRationale(params: RunParams, spec: { design_id: string; tier: Desi
       : 'New last or new outsole mould allowed with amortisation stated. That is Signature.'
   const proxyTxt = s1.sales_proxy_score ? ` It also scores ${s1.sales_proxy_score} (${s1.proxy_confidence}) on the sales proxy.` : ''
   const feas = s1.indices?.feasibility ? ` Feasibility reads ${s1.indices.feasibility} — tooling: last ${s1.last_change ?? 'unknown'}, bottom mould ${s1.bottom_tooling_change ?? 'unknown'}.` : ''
+  // 신호가 어떤 필드를 정했는지 그대로 적는다. 못 정했으면 그렇다고 적는다.
+  const setLines = hintNarrative(hint, signals)
+  const openingLine = setLines.length
+    ? setLines[0]
+    : `${s1.label} showed up ${s1.observed_count} times in this price band, but nothing in it fixes a spec value at this tier.${proxyTxt}`
   return {
     agent_mode: params.mode,
-    driving_signals: [
-      { signal_id: s1.signal_id, weight: 0.4 },
-      { signal_id: s2.signal_id, weight: 0.25 },
+    driving_signals: driving.length ? driving : [
+      { signal_id: s1.signal_id, weight: 0 },
+      { signal_id: s2.signal_id, weight: 0 },
     ],
     reference_images: [compRef, archRef],
     reference_prompts: params.mode === 'series'
@@ -673,10 +716,13 @@ function buildRationale(params: RunParams, spec: { design_id: string; tier: Desi
     series_dna_inherited: params.mode === 'series' ? SERIES_DNA.shoe.invariant.map(i => i.element) : [],
     type_placement_reason: placement,
     narrative: [
-      `${s1.label} showed up ${s1.observed_count} times in this price band.${proxyTxt}`,
-      `${s2.label}, observed ${s2.observed_count} times, came in as the second axis.${feas}`,
+      openingLine,
+      ...setLines.slice(1),
+      ...blockedNarrative(spec.hintBlocked),
+      driving.length
+        ? `Everything else in the spec is open, chosen inside what a ${TYPE_LABEL[spec.itemType] ?? spec.itemType} allows.${feas}`
+        : `${s2.label}, observed ${s2.observed_count} times, is the nearest evidence.${feas}`,
       placement,
-      `References were used for attributes only (usage: attribute_only), collected 2026-05-14.`,
     ],
   }
 }

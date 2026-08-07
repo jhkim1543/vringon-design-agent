@@ -30,7 +30,7 @@ const colX = (c: number) => {
   const next = COL_X[Math.min(i + 1, COL_X.length - 1)]
   return base + (c - i) * (next - base)
 }
-const ROW_Y = 172
+// 세로 위치는 카드 실제 높이를 쌓아 정한다 (build 안 GAP). 고정 간격은 겹침을 만든다.
 
 // ── 노드 렌더러 ──────────────────────────────────────────────────────
 // 편집 모드에서는 제목과 본문을 그 자리에서 고칠 수 있다.
@@ -174,21 +174,6 @@ function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit): {
     body: edits.bodies[n.id] ?? n.body,
   })
 
-  // 컬럼 배경 · 단계 구분
-  const allColumns = [...model.columns, ...edits.extraColumns]
-  allColumns.forEach((c, i) => {
-    const rows = Math.max(
-      model.nodes.filter(n => n.column === i).length,
-      edits.notes.filter(n => n.column === i).length,
-    ) || 1
-    nodes.push({
-      id: `col-${c.key}`, type: 'column',
-      position: { x: colX(i) - 24, y: -86 },
-      data: { title: c.title, note: c.note, h: Math.max(rows * ROW_Y + 150, 360), w: (i === 5 ? 720 : 430) },
-      selectable: false, draggable: false, zIndex: -1,
-    })
-  })
-
   // 치수와 핸들 위치를 명시한다 · DOM 측정을 기다리지 않고 연결선이 즉시 계산된다
   const visible = model.nodes.filter(n => !hidden.has(n.id)).map(apply)
   const noteNodes: BoardNode[] = edits.notes.filter(n => !hidden.has(n.id)).map(n => ({
@@ -197,15 +182,50 @@ function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit): {
     body: edits.bodies[n.id] ?? n.body,
     tone: 'note' as any,
   }))
-  ;[...visible, ...noteNodes].forEach(n => {
+
+  /** 카드가 실제로 차지하는 크기. 사진이 붙으면 훌쩍 커진다. */
+  const sizeOf = (n: BoardNode) => {
     const isDesign = n.kind === 'design' && !!n.design
-    // 이미지가 붙는 노드는 사진 높이만큼 더 잡아야 연결선이 엉뚱한 데 붙지 않는다.
-    // 사용자가 모서리를 끌어 조절한 크기가 있으면 그것이 기본값을 이긴다.
     const sz = edits.sizes[n.id]
     const w = sz?.w ?? (isDesign ? 300 : (n as any).isPitch ? 360 : 384)
     const h = sz?.h ?? (isDesign ? 470
       : 46 + n.body.length * 22 + (n.imageUrl ? 240 : 0) + (n.modelUrl ? 244 : 0)
         + (n.palette?.length ? 30 : 0) + (n.prompts?.length ? n.prompts.length * 46 : 0))
+    return { w, h, isDesign }
+  }
+
+  // 행 번호에 고정 간격을 곱하면 사진 카드가 서로 겹친다 (카드는 300px이 넘는데 간격은 172px이었다).
+  // 열마다 실제 높이를 쌓아 내려간다. 손으로 옮긴 카드는 그 자리를 지킨다.
+  const GAP = 28
+  const cursor = new Map<number, number>()
+  const colHeight = new Map<number, number>()
+  const laid = [...visible, ...noteNodes].sort((a, b) => a.column - b.column || a.row - b.row)
+  const autoPos = new Map<string, { x: number; y: number }>()
+  for (const n of laid) {
+    const { h } = sizeOf(n)
+    const y = cursor.get(n.column) ?? 0
+    autoPos.set(n.id, { x: colX(n.column), y })
+    cursor.set(n.column, y + h + GAP)
+    colHeight.set(Math.floor(n.column), Math.max(colHeight.get(Math.floor(n.column)) ?? 0, y + h))
+  }
+
+  // 컬럼 배경 · 단계 구분. 높이는 그 열이 실제로 쓴 만큼.
+  const allColumns = [...model.columns, ...edits.extraColumns]
+  allColumns.forEach((c, i) => {
+    nodes.push({
+      id: `col-${c.key}`, type: 'column',
+      position: { x: colX(i) - 24, y: -86 },
+      data: {
+        title: c.title, note: c.note,
+        h: Math.max((colHeight.get(i) ?? 0) + 150, 360),
+        w: (i === 5 ? 720 : 430),
+      },
+      selectable: false, draggable: false, zIndex: -1,
+    })
+  })
+
+  for (const n of laid) {
+    const { w, h, isDesign } = sizeOf(n)
     nodes.push({
       id: n.id,
       type: isDesign ? 'designFlow' : 'step',
@@ -215,9 +235,9 @@ function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit): {
         { type: 'source', position: Position.Right, x: w, y: h / 2, width: 1, height: 1 },
       ],
       data: isDesign ? { n, st, onVerdict, ed } : { n, ed },
-      position: edits.positions[n.id] ?? { x: colX(n.column), y: n.row * ROW_Y },
+      position: edits.positions[n.id] ?? autoPos.get(n.id) ?? { x: colX(n.column), y: 0 },
     })
-  })
+  }
 
   const edges: Edge[] = model.edges.filter(e => !hidden.has(e.from) && !hidden.has(e.to)).map((e, i) => ({
     id: `e${i}`,

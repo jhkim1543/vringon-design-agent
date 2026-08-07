@@ -668,6 +668,10 @@ export interface DesignSpec {
   itemType: string
   fields: Record<string, string | number | boolean>
   fieldsLocked: string[]       // 시리즈 DNA로 잠긴 필드
+  /** 조사 신호가 실제로 정한 필드 이름. 제안만 되고 반영 안 된 것은 여기 없다. */
+  hintApplied?: string[]
+  /** 조사가 요구했지만 이 유형이 허용하지 않아 접힌 값 */
+  hintBlocked?: { field: string; wanted: string | number; got: string | number }[]
 }
 
 /** 실제 생성된 이미지 · origin은 지시서 9장 이미지 원장 */

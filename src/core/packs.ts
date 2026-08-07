@@ -7,7 +7,8 @@ export interface CategoryPack {
   id: Category
   types: string[]
   fieldLabels: Record<string, string>
-  generateSpec: (rng: Rng, tier: DesignTier, itemType: string, locked: Record<string, string | number>) => DesignSpec
+  /** hint는 조사 신호에서 읽어낸 값이다. 유형이 허용하는 범위 안에서만 반영한다. */
+  generateSpec: (rng: Rng, tier: DesignTier, itemType: string, locked: Record<string, string | number>, hint?: Record<string, string | number>) => DesignSpec
   rules: (spec: DesignSpec) => RuleResult[]
   costModel: (spec: DesignSpec, rng: Rng) => CostEstimate
   signalAxes: string[]
@@ -156,19 +157,41 @@ export const shoePack: CategoryPack = {
     upper_material: 'Upper', upper_thickness_mm: 'Upper thickness (mm)', size_run_count: 'Size run',
     midsole_foam: 'Midsole foam', plate: 'Plate', drop_mm: 'Drop (mm)', lug_depth_mm: 'Lug depth (mm)',
   },
-  generateSpec(rng, tier, itemType, locked) {
+  generateSpec(rng, tier, itemType, locked, hint = {}) {
     const prof = profileOf(itemType)
-    // 유형이 요구하는 라스트 계열에서 고른다
-    const pool = LAST_LIBRARY.filter(l => l.family === prof.lastFamily)
-    const last = rng.pick(pool.length ? pool : LAST_LIBRARY)
+    const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
+    // 조사가 정한 값과 이 유형이 실제로 허용한 값을 나눠 기록한다.
+    // 카드에 "이 신호가 이 필드를 정했다"고 적으려면 진짜로 정했어야 한다.
+    const took: string[] = []
+    const blocked: { field: string; wanted: string | number; got: string | number }[] = []
+    const verdict = (field: string, wanted: string | number | undefined, got: string | number) => {
+      if (wanted === undefined) return
+      if (wanted === got) took.push(field)
+      else blocked.push({ field, wanted, got })
+    }
+    // 조사가 토 셰이프를 말했으면 그 토를 가진 라스트를 먼저 찾는다.
+    // 없으면 유형이 요구하는 라스트 계열에서 고르고, 정합은 S-04가 잡는다.
+    const famPool = LAST_LIBRARY.filter(l => l.family === prof.lastFamily)
+    const hintToe = typeof hint.toe_shape === 'string' ? hint.toe_shape : null
+    const toePool = hintToe ? famPool.filter(l => l.toe === hintToe) : []
+    const last = rng.pick(toePool.length ? toePool : famPool.length ? famPool : LAST_LIBRARY)
     // 라스트 정합: 대부분 라스트의 토 형상을 따르되, 일부는 어긋나게 (S-04 검증용)
-    const toe = rng.chance(0.82) ? last.toe : rng.pick(TOES)
-    const heelH = rng.int(prof.heel[0], prof.heel[1])
+    const toe = hintToe && toePool.length ? hintToe
+      : rng.chance(0.82) ? last.toe : rng.pick(TOES)
+    // 조사가 말한 높이는 유형이 허용하는 범위 안으로 접어 넣는다
+    const heelH = typeof hint.heel_height_mm === 'number'
+      ? clamp(hint.heel_height_mm, prof.heel[0], prof.heel[1])
+      : rng.int(prof.heel[0], prof.heel[1])
+    const heelHint = typeof hint.heel_type === 'string' ? hint.heel_type : null
     const heelType = prof.athletic ? 'sport_midsole'
+      : heelHint && heelH >= 18 ? heelHint
       : heelH > 65 ? rng.pick(['stiletto', 'block'])
       : heelH < 18 ? 'flat'
       : rng.pick(['flat', 'block', 'stacked'])
-    const construction = rng.pick(prof.constructions)
+    // 공법은 유형이 실제로 쓰는 것 중에서만 반영한다 (러닝화에 굿이어를 붙일 수는 없다)
+    const consHint = typeof hint.sole_construction === 'string' && prof.constructions.includes(hint.sole_construction)
+      ? hint.sole_construction : null
+    const construction = consHint ?? rng.pick(prof.constructions)
     // 굿이어 웰트에는 두꺼운 갑피가 필요하다 · 대체로 맞추되 위반 사례도 남긴다 (S-06 검증용)
     const materials = prof.athletic
       ? ['engineered mesh 0.9mm', 'knit 0.8mm', 'synthetic 1.1mm', 'suede 1.4mm']
@@ -193,6 +216,13 @@ export const shoePack: CategoryPack = {
       newMold = rng.chance(0.7)
     }
 
+    // 패널 수 힌트는 방향(+1 / -1)으로 온다. 유형이 허용하는 범위 안에서만 움직인다.
+    const panelHi = tier === 'signature' ? prof.panels[1] : Math.max(prof.panels[0], prof.panels[1] - 2)
+    const panelBase = rng.int(prof.panels[0], panelHi)
+    const panelDelta = hint.panel_count === -1 ? -2 : hint.panel_count === 1 ? 2 : 0
+    const closureHint = typeof hint.closure === 'string' && prof.closures.includes(hint.closure) ? hint.closure : null
+    const upperHint = typeof hint.upper_material === 'string' && materials.includes(hint.upper_material) ? hint.upper_material : null
+
     const f: Record<string, string | number | boolean> = {
       last_id: last.last_id,
       is_new_last: newLast,
@@ -201,22 +231,63 @@ export const shoePack: CategoryPack = {
       heel_type: heelType,
       sole_construction: construction,
       is_new_outsole_mold: newMold,
-      panel_count: rng.int(prof.panels[0], tier === 'signature' ? prof.panels[1] : Math.max(prof.panels[0], prof.panels[1] - 2)),
-      closure: rng.pick(prof.closures),
-      upper_material: rng.pick(materials),
+      panel_count: clamp(panelBase + panelDelta, prof.panels[0], panelHi),
+      closure: closureHint ?? rng.pick(prof.closures),
+      upper_material: upperHint ?? rng.pick(materials),
       upper_thickness_mm: Math.round((prof.athletic ? 0.8 + rng.next() * 0.6
         : construction === 'goodyear' ? 1.35 + rng.next() * 0.45 : 1.0 + rng.next() * 0.8) * 10) / 10,
       size_run_count: prof.athletic ? 11 : 7,
       shaft_height_mm: prof.shaft ?? 0,
     }
     // 운동화 전용 필드 · 바텀 유닛이 곧 제품이다
-    if (prof.foams) f.midsole_foam = rng.pick(prof.foams)
-    if (prof.plates) f.plate = rng.pick(prof.plates)
-    if (prof.drop) f.drop_mm = rng.int(prof.drop[0], prof.drop[1])
-    if (prof.lugs) f.lug_depth_mm = Math.round((prof.lugs[0] + rng.next() * (prof.lugs[1] - prof.lugs[0])) * 10) / 10
+    if (prof.foams) {
+      const fh = typeof hint.midsole_foam === 'string' ? hint.midsole_foam : null
+      f.midsole_foam = fh && prof.foams.includes(fh) ? fh : rng.pick(prof.foams)
+    }
+    if (prof.plates) {
+      const ph = typeof hint.plate === 'string' ? hint.plate : null
+      f.plate = ph && prof.plates.includes(ph) ? ph : rng.pick(prof.plates)
+    }
+    if (prof.drop) {
+      f.drop_mm = typeof hint.drop_mm === 'number'
+        ? clamp(hint.drop_mm, prof.drop[0], prof.drop[1])
+        : rng.int(prof.drop[0], prof.drop[1])
+    }
+    if (prof.lugs) {
+      f.lug_depth_mm = typeof hint.lug_depth_mm === 'number'
+        ? clamp(hint.lug_depth_mm, prof.lugs[0], prof.lugs[1])
+        : Math.round((prof.lugs[0] + rng.next() * (prof.lugs[1] - prof.lugs[0])) * 10) / 10
+    }
+
+    // ── 조사가 실제로 정한 값 대조 ──
+    verdict('toe_shape', hint.toe_shape, f.toe_shape as string)
+    verdict('heel_height_mm', hint.heel_height_mm, f.heel_height_mm as number)
+    if (!prof.athletic) verdict('heel_type', hint.heel_type, f.heel_type as string)
+    else if (hint.heel_type !== undefined) blocked.push({ field: 'heel_type', wanted: hint.heel_type, got: 'sport_midsole' })
+    verdict('sole_construction', hint.sole_construction, f.sole_construction as string)
+    verdict('closure', hint.closure, f.closure as string)
+    verdict('upper_material', hint.upper_material, f.upper_material as string)
+    if (typeof hint.panel_count === 'number' && hint.panel_count !== 0) {
+      const moved = (f.panel_count as number) - panelBase
+      if (moved !== 0 && Math.sign(moved) === Math.sign(hint.panel_count)) took.push('panel_count')
+      else blocked.push({ field: 'panel_count', wanted: hint.panel_count < 0 ? 'fewer panels' : 'more panels', got: `${f.panel_count} panels, the limit for this type` })
+    }
+    if (prof.foams) verdict('midsole_foam', hint.midsole_foam, f.midsole_foam as string)
+    if (prof.plates) verdict('plate', hint.plate, f.plate as string)
+    if (prof.drop) verdict('drop_mm', hint.drop_mm, f.drop_mm as number)
+    if (prof.lugs) verdict('lug_depth_mm', hint.lug_depth_mm, f.lug_depth_mm as number)
+    // 이 유형에 없는 필드를 조사가 말했다면 그건 반영될 자리가 없다
+    for (const k of Object.keys(hint)) {
+      if (!(k in f) && k !== 'panel_count') blocked.push({ field: k, wanted: hint[k], got: 'not a field on this type' })
+    }
+
     const lockedKeys: string[] = []
     for (const [k, v] of Object.entries(locked)) { f[k] = v; lockedKeys.push(k) }
-    return { design_id: nextId(tier), tier, category: 'shoe', itemType, fields: f, fieldsLocked: lockedKeys }
+    return {
+      design_id: nextId(tier), tier, category: 'shoe', itemType, fields: f, fieldsLocked: lockedKeys,
+      hintApplied: took.filter(k => !lockedKeys.includes(k)),
+      hintBlocked: blocked,
+    }
   },
   rules(spec) {
     const f = spec.fields

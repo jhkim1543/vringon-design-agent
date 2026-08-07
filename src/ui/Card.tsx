@@ -35,6 +35,9 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
     f.plate && f.plate !== 'none' ? `${f.plate} plate` : null,
   ].filter(Boolean).join(' · ')
 
+  // 조사가 실제로 정한 필드. 제안만 되고 접힌 값은 여기 없다.
+  const fromResearch = (d.spec.hintApplied ?? []).filter(k => k in f)
+
   const fails = d.ruleResults.filter(r => r.severity === 'fail')
   const warns = d.ruleResults.filter(r => r.severity === 'warn')
   const qaPass = d.qa.filter(q => q.pass).length
@@ -94,6 +97,12 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
         {/* 설계 목표값 (AI 생성 스펙) · 한 줄 요약, 상세는 근거 패널 */}
         <div className="metric"><b>{t('Target')}</b> {specSummary}
           {d.spec.fieldsLocked.length > 0 && <> · <span style={{ color: 'var(--accent-hi)' }}>🔒 DNA {d.spec.fieldsLocked.length}</span></>}
+          {fromResearch.length > 0 && (
+            <> · <span style={{ color: 'var(--ok)' }}
+              title={`${t('Set by the research')}: ${fromResearch.map(k => `${k.replace(/_/g, ' ')} ${f[k]}`).join(', ')}`}>
+              {fromResearch.length} {t('from research')}
+            </span></>
+          )}
         </div>
 
         {/* 룰 코드는 바이어에게 무의미하다 · 칩에 사유를 함께 싣는다 (Gemini QA 지적) */}
@@ -154,7 +163,9 @@ export function RationalePanel({ d, signals }: { d: Design; signals: Signal[] })
         ))}
       </div>
       <div>
-        <h5>{t('Signals behind this, with sources')}</h5>
+        <h5>{d.rationale.driving_signals.some(x => x.weight > 0)
+          ? t('Signals that set this spec, with sources')
+          : t('Nearest evidence, though none of it set a spec value here')}</h5>
         {d.rationale.driving_signals.map(ds => {
           const s = signals.find(x => x.signal_id === ds.signal_id)
           if (!s) return null
@@ -162,7 +173,7 @@ export function RationalePanel({ d, signals }: { d: Design; signals: Signal[] })
           return (
             <div className="sig" key={ds.signal_id}>
               <Tag kind="accent">{s.signal_id}</Tag>
-              <span>{s.label} · seen {s.observed_count}x · w={ds.weight}
+              <span>{s.label} · seen {s.observed_count}x{ds.weight > 0 ? ` · ${Math.round(ds.weight * 100)}% of what the research fixed here` : ''}
                 {s.sales_proxy_score != null && ` · proxy ${s.sales_proxy_score} (${s.proxy_confidence})`}
                 {s.page_ref && ` · ${s.page_ref}`}
                 {idx && (idx.commercial || idx.cultural || idx.forecast || idx.feasibility) &&
