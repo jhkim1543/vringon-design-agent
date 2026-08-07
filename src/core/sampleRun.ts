@@ -6,9 +6,11 @@ import { listRuns, saveRun } from './store'
 const SAMPLE_IDS = ['sample_running_full', 'sample_shoe_trend', 'sample_sport_running']
 
 export async function ensureSampleRuns() {
-  const have = new Set(listRuns().map(r => r.id))
+  // 이미 있으면 건너뛰던 시절에는, 샘플을 새로 뜨면 옛 방문자에게 영영 닿지 않았다.
+  // 옛 샘플이 참조하던 이미지는 정리되면서 사라지고 카드가 빈 채로 남는다.
+  // 그래서 저장된 시각을 대조해, 파일이 새 것이면 덮어쓴다.
+  const stored = new Map(listRuns().map(r => [r.id, r]))
   for (const id of SAMPLE_IDS) {
-    if (have.has(id)) continue
     try {
       const mod = await import(`../samples/${id}.json`)
       // 배포 경로가 하위 폴더면(예: GitHub Pages) 절대경로 /samples/ 가 어긋난다.
@@ -17,10 +19,13 @@ export async function ensureSampleRuns() {
       const raw = JSON.stringify(mod.default ?? mod).replaceAll('"/samples/', `"${base}samples/`)
       const st = JSON.parse(raw) as RunState
       st.sample = true
+      const have = stored.get(id)
+      // 같은 판이면 그대로 둔다. 사용자가 즐겨찾기를 달았을 수 있다.
+      if (have && (have.state as RunState).savedAtISO === st.savedAtISO) continue
       saveRun({
         id,
         savedAt: Date.parse(st.savedAtISO ?? '') || Date.now(),
-        favorite: false,
+        favorite: have?.favorite ?? false,
         title: st.sampleTitle ?? 'Sample run',
         thumb: firstThumb(st),
         state: st,
