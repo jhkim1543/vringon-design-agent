@@ -244,10 +244,14 @@ async function generate({ prompt, size = '1024x1024', engine = 'detail' }) {
     } catch { /* Gemini 실패 시 OpenAI로 이어서 시도한다 */ }
   }
 
+  // 시간 제한이 없으면 한 건이 매달렸을 때 분석 전체가 영원히 멈춘다.
+  // 실제로 렌더 한 장에서 17분을 기다리다 멈춘 적이 있다. gpt-image-2 high가
+  // 느릴 때 약 140초이므로 그 두 배를 주고, 넘으면 그 장만 포기한다.
   const r = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
     body: JSON.stringify({ model, prompt, size, quality, n: 1, background: 'opaque' }),
+    signal: AbortSignal.timeout(300_000),
   })
   if (!r.ok) throw new Error(`OpenAI ${r.status}: ${(await r.text()).slice(0, 400)}`)
   const data = await r.json()
@@ -288,6 +292,7 @@ async function edit({ baseHash, prompt, size = '1024x1024', engine = 'detail' })
     method: 'POST',
     headers: { Authorization: `Bearer ${API_KEY}` },
     body: form,
+    signal: AbortSignal.timeout(300_000),
   })
   if (!r.ok) throw new Error(`OpenAI edit ${r.status}: ${(await r.text()).slice(0, 400)}`)
   const data = await r.json()

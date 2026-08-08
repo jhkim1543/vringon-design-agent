@@ -168,6 +168,41 @@ export function drivingFromHint(hint: SpecHint): { signal_id: string; weight: nu
     .slice(0, 4)
 }
 
+/** 시리즈에서 반복된 요소를 스펙 잠금값으로 옮긴다.
+ *
+ *  사진에서 확실히 읽히는 것만 잠근다. 라스트 아이디는 여기 없다 —
+ *  옆모습 사진으로 라스트가 같은지 알 수 없고, 모르는 것을 잠그면 뒤 단계가 통째로 어긋난다.
+ *  (드레스 라스트를 상수로 박아 두던 시절, 운동화 시리즈는 룰에서 전부 걸렸다.) */
+export function locksFromSeries(
+  invariant: { element: string; label: string; observed_in: number }[],
+  of: number,
+): Record<string, string | number> {
+  const out: Record<string, string | number> = {}
+  // 거의 모든 장에서 보인 것만 잠근다. 절반쯤 보이는 것은 그 시리즈의 규칙이 아니다.
+  const strong = invariant.filter(e => of > 0 && e.observed_in >= Math.ceil(of * 0.8))
+  for (const e of strong) {
+    const t = `${e.element} ${e.label}`.toLowerCase()
+    if (!('toe_shape' in out)) {
+      const toe = /\bsquare\b/.test(t) ? 'square' : /\balmond\b/.test(t) ? 'almond'
+        : /\bpointed\b/.test(t) ? 'pointed' : /\bround\b/.test(t) ? 'round' : null
+      if (toe && /toe/.test(t)) out.toe_shape = toe
+    }
+    if (!('closure' in out)) {
+      if (/elastic gore|gore panel/.test(t)) out.closure = 'elastic_gore'
+      else if (/\bbuckle\b/.test(t)) out.closure = 'buckle'
+      else if (/slip-?on/.test(t)) out.closure = 'slip_on'
+      else if (/\blacing\b|\blace\b|eyelet|eyestay/.test(t)) out.closure = 'lace'
+    }
+    if (!('sole_construction' in out)) {
+      if (/goodyear|storm welt/.test(t)) out.sole_construction = 'goodyear'
+      else if (/\bblake\b/.test(t)) out.sole_construction = 'blake'
+      else if (/vulcani/.test(t)) out.sole_construction = 'vulcanized'
+      else if (/cupsole/.test(t)) out.sole_construction = 'cupsole'
+    }
+  }
+  return out
+}
+
 /** 사람이 읽는 한 줄 · "이 신호가 이 필드를 이렇게 정했다" */
 export function hintNarrative(hint: SpecHint, signals: Signal[]): string[] {
   const label = (id: string) => signals.find(s => s.signal_id === id)?.label ?? id

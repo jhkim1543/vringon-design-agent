@@ -26,6 +26,8 @@ export async function generateImage(prompt: string, engine: EngineId = 'detail')
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt, size: '1024x1024', engine }),
+    // 한 장이 매달리면 분석 전체가 멈춘다. 그 장만 포기하고 도식으로 떨어뜨린다.
+    signal: AbortSignal.timeout(330_000),
   })
   const j = await r.json()
   if (!r.ok) throw new Error(j.error || `generate ${r.status}`)
@@ -38,6 +40,7 @@ export async function editImage(baseHash: string, prompt: string, engine: Engine
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ baseHash, prompt, size: '1024x1024', engine }),
+    signal: AbortSignal.timeout(330_000),
   })
   const j = await r.json()
   if (!r.ok) throw new Error(j.error || `edit ${r.status}`)

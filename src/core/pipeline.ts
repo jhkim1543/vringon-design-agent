@@ -1,10 +1,10 @@
 // ── 파이프라인 엔진 S1~S5 · 진행 스트리밍·승인 게이트·체크포인트 ──────
 import type { Design, DesignSpec, DesignTier, PipelineEvent, Rationale, RunParams, Signal, Stage } from './types'
 import { PACKS, profileOf, resetSeq, tierCapRule, viewSetFor } from './packs'
-import { blockedNarrative, deriveSpecHints, drivingFromHint, hintNarrative, reconcileHint } from './signalSpec'
+import { blockedNarrative, deriveSpecHints, drivingFromHint, hintNarrative, locksFromSeries, reconcileHint } from './signalSpec'
 import type { SpecHint } from './signalSpec'
 import { makeRng } from './rng'
-import { COMPETITORS, DIRECTIONS, DNA_CONFLICT, DNA_LOCKS, PROMPT_PARSE, REPORT_BIAS, SERIES_DNA, SIGNALS } from './samples'
+import { COMPETITORS, DIRECTIONS, SIGNALS } from './samples'
 import { COLORWAY_NAMES } from './sketch'
 import {
   colorwayEditPrompt, conceptPrompt, editImage, generateImage, renderFromSketchPrompt, renderPrompt,
@@ -98,6 +98,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     let dossierJob: Promise<unknown> | null = null
     // 무드보드가 문서에서 실제로 읽어 낸 신호. 못 읽었으면 비어 있고, 비어 있으면 비어 있다고 말한다.
     let moodSignals: Signal[] = []
+    // 시리즈에서 실제로 반복된 것 중, 스펙 값으로 옮길 수 있는 것만. 사진으로 못 보는 건 안 잠근다.
+    let seriesLocks: Record<string, string | number> = {}
 
     // ══ S1 조사 ══
     const scope = MODE_SCOPE[params.mode]
@@ -176,6 +178,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           })
           if (cancelled) return
           emit({ kind: 'series-dna', dna: toSeriesDna(read) })
+          seriesLocks = locksFromSeries(read.invariant, read.of)
           emit({ kind: 'log', stage: 'S1', text: `Read ${read.of} designs${read.cached ? ' (reused an earlier pass)' : ''} · ${read.invariant.length} elements repeat, ${read.variable.length} vary, ${read.ambiguous.length} unclear` })
           for (const inv of read.invariant.slice(0, 3)) {
             emit({ kind: 'log', stage: 'S1', text: `Repeats in ${inv.observed_in} of ${read.of}: ${inv.label} — ${inv.evidence}` })
@@ -205,9 +208,10 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       } else {
         emit({ kind: 'log', stage: 'S1', text: '3 Trend research off · working from your uploads only' })
       }
+      // 예전에는 여기서 상수 하나를 꺼내 "가치 문장을 이 필드들에 반영했다"고 적었다.
+      // 아무것도 파싱하지 않았다. 문장이 실제로 하는 일은 위의 대조 하나뿐이므로 그것만 말한다.
       if (si.valueStatement.trim()) {
-        const pp = PROMPT_PARSE.shoe
-        emit({ kind: 'log', stage: 'S1', text: `4 Reading the value statement, applied to ${pp.applied.join(' · ')}` })
+        emit({ kind: 'log', stage: 'S1', text: '4 The value statement is used to check the uploads, not to set spec values. Locks come from what repeats in the designs.' })
       }
     } else {
       // 무드보드 · 외부 조사 없음. 업로드 문서만. 결과는 신발 문법으로 번역된다.
@@ -384,8 +388,16 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     const nSig = params.sketchCount - nCore - nPush
     emit({ kind: 'log', stage: 'S2', text: `Specs per tier · Core ${nCore} · Push ${nPush} · Signature ${nSig} (schema enforced, presets locked)` })
     emit({ kind: 'log', stage: 'S2', text: 'Tier means tooling: Core reuses last and bottom, Push keeps one, Signature may open a new last or mould' })
-    const locked = params.mode === 'series' ? DNA_LOCKS.shoe : {}
-    if (params.mode === 'series') emit({ kind: 'log', stage: 'S2', text: `Series DNA locked: ${Object.entries(locked).map(([k, v]) => `${k}=${v}`).join(', ')} · fixed as spec values` })
+    // 시리즈 잠금은 올린 디자인에서 실제로 반복된 것만 잠근다.
+    // 예전에는 상수 하나(almond dress last)를 무조건 박았다. 조던 같은 운동화 시리즈에
+    // 드레스 라스트가 박히면 S-11이 전부 걸려 결과가 통째로 버려졌다.
+    // 라스트 아이디는 사진으로 알 수 없다. 모델도 "같은 라스트인지 확인 불가"라고 말한다. 그래서 안 잠근다.
+    const locked = params.mode === 'series' ? seriesLocks : {}
+    if (params.mode === 'series') {
+      emit({ kind: 'log', stage: 'S2', text: Object.keys(locked).length
+        ? `Series DNA locked from your uploads: ${Object.entries(locked).map(([k, v]) => `${k}=${v}`).join(', ')} · every design inherits these`
+        : 'Nothing locked: the uploads did not show a repeating feature that maps to a spec value, so all fields stay open' })
+    }
     emit({ kind: 'log', stage: 'S2', text: 'Reference bank loaded: 4 approved, 2 near-miss rejects (too familiar, cost)' })
     await wait(800)
 
@@ -799,10 +811,15 @@ function buildRationale(params: RunParams, spec: DesignSpec, signals: Signal[], 
       { signal_id: s2.signal_id, weight: 0 },
     ],
     reference_images: [compRef, archRef],
-    reference_prompts: params.mode === 'series'
-      ? [{ text: PROMPT_PARSE.shoe.text, origin: 'user_input', applied_as: PROMPT_PARSE.shoe.applied }]
+    // 사용자가 쓴 문장을 그대로 싣는다. 어느 필드에 반영됐는지는 실제로 잠긴 필드만 적는다.
+    reference_prompts: params.mode === 'series' && params.series.valueStatement.trim()
+      ? [{
+          text: params.series.valueStatement.trim(),
+          origin: 'user_input' as const,
+          applied_as: Object.keys(spec.fieldsLocked ?? []).length ? spec.fieldsLocked : ['checked against the uploads, not applied as a spec value'],
+        }]
       : [],
-    series_dna_inherited: params.mode === 'series' ? SERIES_DNA.shoe.invariant.map(i => i.element) : [],
+    series_dna_inherited: params.mode === 'series' ? spec.fieldsLocked : [],
     type_placement_reason: placement,
     narrative: [
       openingLine,
