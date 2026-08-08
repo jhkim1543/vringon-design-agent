@@ -1,5 +1,7 @@
 // ── 예상 시간·비용 · 설정을 바꾸면 즉시 다시 계산된다 (지시서 2.2) ──
 import { campaignCount, MODE_SCOPE } from './types'
+
+const STAGE_ORDER: Stage[] = ['S1', 'S2', 'S3', 'S4', 'S5']
 import { ENGINES } from './imageEngines'
 import type { RunParams, Stage } from './types'
 
@@ -50,8 +52,12 @@ export function estimate(p: RunParams): Estimate {
   // ── 실제 생성 장수 · 상한과 실제 필요량 중 작은 쪽
   const wantS2 = n
   const wantS3 = renders + extraDesigns + extraViews + colorways + variations
+  // 파이프라인과 같은 배분 규칙을 쓴다. 여기서만 다르게 계산하면 예상과 결과가 어긋난다.
+  // 색 단계까지 가는 분석이면 스케치는 상한의 40%까지만 가져간다.
   const budget = p.imageBudget
-  const realS2 = Math.min(wantS2, budget)
+  const goesToColour = STAGE_ORDER.indexOf(p.endStage) >= STAGE_ORDER.indexOf('S3')
+  const sketchCap = goesToColour ? Math.max(1, Math.round(budget * 0.4)) : budget
+  const realS2 = Math.min(wantS2, sketchCap)
   const realS3 = Math.min(wantS3, Math.max(0, budget - realS2))
   // 캠페인 컷과 턴어라운드는 최종 후보의 산출물이라 상한과 무관하게 생성된다
   const realS4 = campaignImgs

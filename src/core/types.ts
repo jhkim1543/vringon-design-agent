@@ -412,14 +412,26 @@ export interface TrendInput {
   /** 조사 목적 · 복수 선택 */
   objectives?: ResearchObjective[]
 }
+/** 서버에 올려 둔 파일 한 건. 내용은 서버 캐시에 있고 여기에는 손잡이만 둔다.
+ *  RunParams는 localStorage에 저장되므로 base64를 실으면 용량이 터진다. */
+export interface UploadRef {
+  id: string
+  name: string
+  type: string
+  bytes: number
+}
 export interface SeriesInput {
   seriesName: string
-  archiveFiles: string[]        // 업로드한 시리즈 디자인 파일명
+  archiveFiles: string[]        // 업로드한 시리즈 디자인 파일명 (표시용)
+  /** 실제로 서버가 읽는 파일들. 비어 있으면 아무것도 읽지 않았다는 뜻이다. */
+  uploads?: UploadRef[]
   valueStatement: string        // 시리즈 가치·철학 기입
   trendSearch: boolean          // 트렌드 조사 ON/OFF (시리즈가 하는 유일한 외부 조사)
 }
 export interface MoodboardInput {
-  files: string[]               // 트렌드 리포트·무드보드 PDF
+  files: string[]               // 트렌드 리포트·무드보드 PDF (표시용)
+  /** 실제로 서버가 읽는 파일들 */
+  uploads?: UploadRef[]
   notes: string
 }
 

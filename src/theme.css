@@ -539,12 +539,24 @@ button { cursor: pointer; background: none; border: none; }
 }
 /* 칸을 키우면 글이 아니라 사진이 커진다 */
 .bnode .bn-t, .bnode .bn-body, .bnode .bn-pal, .bnode .bn-prompts { flex: 0 0 auto; }
-/* 크기 조절 손잡이 · 칸을 고르면 모서리에 나타난다 */
-.bn-resize-line { border-color: var(--accent) !important; }
-.bn-resize-handle {
-  width: 10px !important; height: 10px !important; border-radius: 3px !important;
-  background: var(--accent) !important; border: 2px solid var(--panel) !important;
+/* 크기 조절 손잡이 · 칸에 마우스를 올리거나 고르면 나타난다.
+   10px 사각형은 눈에도 안 띄고 손으로도 안 잡혔다. 보이는 크기는 조금만 키우고,
+   실제로 눌리는 범위를 ::after 로 사방 12px 넓혀 둔다. */
+.bn-resize-line { border-color: var(--accent) !important; border-width: 2px !important; }
+.bn-resize-line::after {
+  content: ''; position: absolute; inset: -7px; display: block;
 }
+.bn-resize-handle {
+  width: 14px !important; height: 14px !important; border-radius: 4px !important;
+  background: var(--accent) !important; border: 2px solid var(--panel) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,.35);
+}
+.bn-resize-handle::after {
+  content: ''; position: absolute; inset: -12px; display: block;
+}
+.bn-resize-handle:hover { transform: scale(1.15); }
+/* 모서리에 손잡이가 있다는 걸 알려 준다 · 칸 위에 마우스를 올리면 테두리가 산다 */
+.bnode:hover, .react-flow__node:hover > .dcard { border-color: var(--line-1); }
 .bnode .bn-t { font-weight: 700; font-size: 14.5px; color: var(--text); margin-bottom: 5px; line-height: 1.4; }
 .bnode .bn-b { color: var(--text-2); line-height: 1.6; }
 .bnode .bn-b + .bn-b { margin-top: 2px; }

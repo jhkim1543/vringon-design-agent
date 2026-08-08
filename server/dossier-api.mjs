@@ -60,7 +60,7 @@ const COLOR = {
 const KEY_ITEM = {
   type: 'object',
   additionalProperties: false,
-  required: ['segment', 'name', 'description', 'metric', 'grade', 'silhouette_spec'],
+  required: ['segment', 'name', 'description', 'metric', 'grade', 'silhouette_spec', 'image_url'],
   properties: {
     segment: { type: 'string', enum: ['women', 'men', 'kids'] },
     name: { type: 'string', description: '아이템 이름. 예: THE STRAPPY STILETTO' },
@@ -68,6 +68,11 @@ const KEY_ITEM = {
     metric: METRIC,
     grade: { type: 'string', enum: TREND_GRADES },
     silhouette_spec: { type: 'string', description: '디자인 스펙으로 바로 옮길 수 있는 구절. 토 셰이프·힐·소재·클로저·부자재' },
+    // 예측을 글로만 적으면 근거가 안 보인다. 이 아이템에 해당하는 실제 판매 제품 사진 한 장.
+    image_url: {
+      type: 'string',
+      description: '이 키아이템에 해당하는 실제 판매 제품의 사진 URL. 상품 페이지 주소가 아니라 이미지 파일 주소(.jpg/.png/.webp, 또는 이미지 CDN 주소)여야 한다. 상품 페이지의 og:image가 가장 확실하다. 못 찾았으면 빈 문자열. 지어내지 말 것',
+    },
   },
 }
 
@@ -297,6 +302,10 @@ ${FORECAST} ${categoryEn}를 이끌 매크로트렌드 4개를 예측하세요.
 - materials 4개: 소재별 전년 대비 성장
 - details 4개: 부자재·봉제·마감 디테일별 성장
 - key_items 9개: 여성 3, 남성 3, 키즈 3. 각각 이름·설명·성장률·등급·스펙 구절
+- key_items의 image_url: 그 아이템에 해당하는 실제 판매 제품 사진을 한 장씩 찾아 넣으세요.
+  상품 페이지를 열고 og:image 주소를 그대로 씁니다. 브랜드 공식몰이나 편집숍 상품 이미지가 좋습니다.
+  이미지 파일 주소여야 합니다 (.jpg/.png/.webp 또는 이미지 CDN). 못 찾으면 빈 문자열로 두세요.
+  예측을 글로만 적어 두면 보는 사람이 판단할 수 없습니다. 사진이 근거입니다.
 - grade: 이 매크로 전체의 등급`,
       schema: MACRO, name: 'macrotrend',
     })

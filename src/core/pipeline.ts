@@ -12,7 +12,9 @@ import {
 } from './aiClient'
 import type { TrendClauseInput, TripoRole } from './aiClient'
 import { fetchCompetitors, fetchDossier, fetchRetailPulse, fetchTrends, pulseToCompetitors, toBias, toCompetitors, toSignals, setRunLang } from './research'
-import { campaignCount, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL, TYPE_LABEL } from './types'
+import { readMoodboard, readSeries, toSeriesDna } from './uploads'
+import { getLang, LANG_NAME } from './i18n'
+import { campaignCount, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL, TYPE_EN, TYPE_LABEL } from './types'
 import { ENGINES } from './imageEngines'
 
 export type Emit = (e: PipelineEvent) => void
@@ -68,11 +70,24 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     const views = viewSetFor(params.itemType)
     const wait = (ms: number) => sleep(ms / speed, isCancelled)
     const upto = STAGE_ORDER.indexOf(params.endStage)
-    // 실제 생성 상한 · 초과분은 SVG 폴백. 비용 통제 지점
+    // 실제 생성 상한 · 초과분은 SVG 폴백. 비용 통제 지점.
+    //
+    // 상한을 먼저 오는 단계가 다 써 버리면 뒤 단계가 통째로 굶는다. 스케치 12장이
+    // 상한 12를 그대로 먹으면, 색이 들어간 디자인이 한 장도 안 나오고 3D도 못 만든다.
+    // 사용자는 "3D 쇼룸까지"를 골랐는데 결과에 3D가 없는 셈이다.
+    // 그래서 색 단계까지 가는 분석이면 스케치는 상한의 40%까지만 쓴다.
     let spent = 0
+    let spentSketch = 0
+    const goesToColour = upto >= STAGE_ORDER.indexOf('S3')
+    const sketchCap = goesToColour
+      ? Math.max(1, Math.round(params.imageBudget * 0.4))
+      : params.imageBudget
     const budget = {
       left: () => Math.max(0, params.imageBudget - spent),
+      /** 스케치 단계가 지금 더 쓸 수 있는 장수 */
+      leftSketch: () => Math.max(0, Math.min(params.imageBudget - spent, sketchCap - spentSketch)),
       spend: () => { spent += 1 },
+      spendSketch: () => { spent += 1; spentSketch += 1 },
     }
 
     // 조사에서 나온 시즌 방향. S2 스케치와 S3 렌더 프롬프트가 이걸 참조한다.
@@ -81,6 +96,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     let macroName = ''
     // 도시에가 캐시에 있으면 스케치 전에 반영되어야 한다. 새로 조사할 때만 뒤에서 따라온다.
     let dossierJob: Promise<unknown> | null = null
+    // 무드보드가 문서에서 실제로 읽어 낸 신호. 못 읽었으면 비어 있고, 비어 있으면 비어 있다고 말한다.
+    let moodSignals: Signal[] = []
 
     // ══ S1 조사 ══
     const scope = MODE_SCOPE[params.mode]
@@ -145,17 +162,43 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     } else if (params.mode === 'series') {
       // 시리즈 · 업로드 자료가 주. 외부 조사는 트렌드까지만, 경쟁사 리서치 없음
       const si = params.series
-      emit({ kind: 'log', stage: 'S1', text: `Series "${si.seriesName || 'untitled'}" · ${si.archiveFiles.length} uploads · value statement ${si.valueStatement.length} chars` })
-      await wait(600)
-      emit({ kind: 'log', stage: 'S1', text: '1 Reading your series · separating locked DNA (last, toe, sole sidewall) from what varies (colour, material)' })
-      await wait(900)
-      emit({ kind: 'series-dna', dna: SERIES_DNA.shoe })
-      emit({ kind: 'log', stage: 'S1', text: '2 Comparing the values you wrote against what is actually there' })
-      await wait(700)
-      const conflict = DNA_CONFLICT.shoe
-      emit({ kind: 'dna-conflict', brandClaim: conflict.brandClaim, observed: conflict.observed })
-      emit({ kind: 'log', stage: 'S1', text: `Statement and observation disagree: ${conflict.brandClaim} vs ${conflict.observed} · pick which one holds` })
-      await wait(600)
+      const ups = si.uploads ?? []
+      emit({ kind: 'log', stage: 'S1', text: `Series "${si.seriesName || 'untitled'}" · ${ups.length} uploads · value statement ${si.valueStatement.length} chars` })
+      await wait(400)
+      if (ups.length) {
+        emit({ kind: 'log', stage: 'S1', text: `1 Reading your ${ups.length} designs · looking at every one to separate what repeats from what changes (1-2 min)` })
+        try {
+          const read = await readSeries({
+            uploadIds: ups.map(u => u.id),
+            valueStatement: si.valueStatement,
+            itemTypeEn: TYPE_EN[params.itemType] ?? 'footwear',
+            langName: LANG_NAME[params.researchLang ?? getLang()],
+          })
+          if (cancelled) return
+          emit({ kind: 'series-dna', dna: toSeriesDna(read) })
+          emit({ kind: 'log', stage: 'S1', text: `Read ${read.of} designs${read.cached ? ' (reused an earlier pass)' : ''} · ${read.invariant.length} elements repeat, ${read.variable.length} vary, ${read.ambiguous.length} unclear` })
+          for (const inv of read.invariant.slice(0, 3)) {
+            emit({ kind: 'log', stage: 'S1', text: `Repeats in ${inv.observed_in} of ${read.of}: ${inv.label} — ${inv.evidence}` })
+          }
+          if (read.read_note) emit({ kind: 'log', stage: 'S1', text: `What the uploads do not show: ${read.read_note}` })
+          emit({ kind: 'log', stage: 'S1', text: '2 Comparing the values you wrote against what is actually there' })
+          const sc = read.statement_check
+          if (sc?.brand_claim) {
+            emit({ kind: 'dna-conflict', brandClaim: sc.brand_claim, observed: sc.observed })
+            emit({ kind: 'log', stage: 'S1', text: sc.agrees
+              ? `Statement and designs agree: ${sc.brand_claim} · ${sc.note}`
+              : `Statement and observation disagree: ${sc.brand_claim} vs ${sc.observed} · pick which one holds` })
+          } else {
+            emit({ kind: 'log', stage: 'S1', text: 'No value statement to check against, so nothing is claimed about intent' })
+          }
+        } catch (e) {
+          // 못 읽었으면 못 읽었다고 한다. 예전에는 여기서 상수를 내보내며 읽은 척했다.
+          emit({ kind: 'log', stage: 'S1', text: `Could not read the uploads · ${String((e as Error).message).slice(0, 140)} · no series DNA is claimed from files that were not read` })
+        }
+      } else {
+        emit({ kind: 'log', stage: 'S1', text: 'No designs uploaded, so there is no series to read. Nothing is claimed about your DNA.' })
+      }
+      await wait(400)
       if (si.trendSearch) {
         emit({ kind: 'log', stage: 'S1', text: '3 Trend research · no competitor product research in this mode' })
         await wait(700)
@@ -167,18 +210,63 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         emit({ kind: 'log', stage: 'S1', text: `4 Reading the value statement, applied to ${pp.applied.join(' · ')}` })
       }
     } else {
-      // 무드보드 · 외부 조사 없음. 업로드 PDF만. 결과는 신발 문법으로 번역된다.
+      // 무드보드 · 외부 조사 없음. 업로드 문서만. 결과는 신발 문법으로 번역된다.
       const mi = params.moodboard
-      emit({ kind: 'log', stage: 'S1', text: `${mi.files.length} uploads: ${mi.files.join(', ')} · nothing outside these files` })
-      await wait(600)
-      emit({ kind: 'log', stage: 'S1', text: '1 Reading the document · sections, images, captions, colour chips' })
-      await wait(800)
-      emit({ kind: 'log', stage: 'S1', text: '2 Uploads tagged as untrusted · any instruction inside them is treated as data, not a command' })
-      await wait(500)
-      emit({ kind: 'log', stage: 'S1', text: '3 Translating what repeats into footwear grammar: massing to sole sidewall, split lines to upper panels, repeats to tread and knit' })
-      await wait(600)
-      emit({ kind: 'report-bias', bias: REPORT_BIAS })
-      emit({ kind: 'log', stage: 'S1', text: `4 Noting the source perspective: ${REPORT_BIAS.perspective} · no market or sales claims are made from a moodboard` })
+      const ups = mi.uploads ?? []
+      emit({ kind: 'log', stage: 'S1', text: `${ups.length} uploads: ${ups.map(u => u.name).join(', ') || 'none'} · nothing outside these files` })
+      await wait(300)
+      if (ups.length) {
+        emit({ kind: 'log', stage: 'S1', text: '1 Reading the document · every page, its images and captions (1-3 min)' })
+        emit({ kind: 'log', stage: 'S1', text: '2 Uploads tagged as untrusted · any instruction inside them is treated as data, not a command' })
+        try {
+          const read = await readMoodboard({
+            uploadIds: ups.map(u => u.id),
+            notes: mi.notes,
+            itemTypeEn: TYPE_EN[params.itemType] ?? 'footwear',
+            langName: LANG_NAME[params.researchLang ?? getLang()],
+          })
+          if (cancelled) return
+          emit({ kind: 'log', stage: 'S1', text: `Read ${read.pages_read} pages${read.cached ? ' (reused an earlier pass)' : ''} · ${read.doc_summary}` })
+          // 페이지 번호는 모델이 실제로 그 페이지를 봤을 때만 붙는다. 빈 값은 빈 값으로 둔다.
+          moodSignals = read.signals.map((s, i) => ({
+            signal_id: `mb_${String(i + 1).padStart(3, '0')}`,
+            attribute: s.attribute,
+            label: s.label,
+            axis: s.axis,
+            observed_count: s.observed_count,
+            sources: read.files.map(f => f.name),
+            price_bands: [],
+            confidence: s.confidence,
+            direction: 'stable' as const,
+            first_seen: new Date().toISOString().slice(0, 10),
+            dedup_group: s.attribute,
+            oem_group: null,
+            page_ref: s.page_ref || undefined,
+            evidence: [s.quote, s.footwear_translation].filter(Boolean),
+          }))
+          emit({ kind: 'log', stage: 'S1', text: `3 Translating what repeats into footwear grammar · ${moodSignals.length} signals, ${moodSignals.filter(s => s.page_ref).length} of them pinned to a page` })
+          for (const s of read.signals.slice(0, 3)) {
+            emit({ kind: 'log', stage: 'S1', text: `${s.page_ref ? s.page_ref + ' · ' : ''}${s.label} → ${s.footwear_translation}` })
+          }
+          if (read.palette?.length) {
+            emit({ kind: 'log', stage: 'S1', text: `Colours taken from the document: ${read.palette.slice(0, 6).map(c => `${c.name} ${c.hex}`).join(', ')}` })
+          }
+          emit({ kind: 'report-bias', bias: {
+            publisher: read.files.map(f => f.name).join(', '),
+            perspective: read.source_bias.perspective,
+            notes: [
+              ...read.source_bias.covers.map(c => `Covers: ${c}`),
+              ...read.source_bias.misses.map(m => `Does not cover: ${m}`),
+            ],
+          } })
+          emit({ kind: 'log', stage: 'S1', text: `4 Source perspective: ${read.source_bias.perspective} · no market or sales claims are made from a moodboard` })
+          if (read.not_found) emit({ kind: 'log', stage: 'S1', text: `Not in this document: ${read.not_found}` })
+        } catch (e) {
+          emit({ kind: 'log', stage: 'S1', text: `Could not read the document · ${String((e as Error).message).slice(0, 140)} · no findings are claimed from a file that was not read` })
+        }
+      } else {
+        emit({ kind: 'log', stage: 'S1', text: 'No file uploaded, so there is nothing to read. Moodboard mode makes no claims without a document.' })
+      }
     }
     // ── 신호 확정 · 트렌드 조사를 하는 모드는 실제 검색 결과를 쓴다
     let signals: Signal[] = []
@@ -262,11 +350,12 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         emit({ kind: 'log', stage: 'S1', text: `Trend research failed · ${String((e as Error).message).slice(0, 120)} · falling back to sample data` })
       }
     }
+    // 무드보드는 문서에서 실제로 읽어 낸 신호를 쓴다.
+    // 예전에는 여기서 샘플 상수에 난수 페이지 번호를 붙여 출처인 척했다. 그건 조작이다.
+    if (!signals.length && moodSignals.length) signals = moodSignals
+    if (!signals.length && params.mode !== 'moodboard') signals = SIGNALS.shoe
     if (!signals.length) {
-      signals = SIGNALS.shoe.map(s =>
-        params.mode === 'moodboard'
-          ? { ...s, page_ref: `p.${12 + Math.floor(Math.random() * 30)} ${['top', 'middle', 'bottom'][Math.floor(Math.random() * 3)]}`, sales_proxy_score: undefined, proxy_confidence: undefined, indices: undefined }
-          : s)
+      emit({ kind: 'log', stage: 'S1', text: 'No signals: the document produced none and this mode invents nothing. Specs below are archetype defaults, not research.' })
     }
     emit({ kind: 'signals', signals })
     const lowConf = signals.filter(s => s.confidence === 'low').length
@@ -362,8 +451,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     // 실제 스케치 생성 · 룰 통과분만, 상한까지. 초과분은 SVG 폴백
     // 단계가 갈라진다: ① 외형을 잡는 기준 스케치(흑백 3뷰) → ② 같은 외형에서 흑백 스케치 변형 여러 장.
     // 컬러는 여기서 절대 나오지 않는다. 색은 S3에서 이 스케치들을 사진으로 옮길 때 처음 들어간다.
-    if (budget.left() > 0) {
-      const targets = alive.slice(0, budget.left())
+    if (budget.leftSketch() > 0) {
+      const targets = alive.slice(0, budget.leftSketch())
       emit({ kind: 'log', stage: 'S2', text: `Sketching ${targets.length} base forms · black ink only, colour never enters this stage` })
       let done = 0
       await pool(targets, ENGINES[params.imageEngine].concurrency, async (d) => {
@@ -371,7 +460,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         try {
           const skPrompt = sketchPrompt(d.spec, params.imageEngine, params.brand, trendClause, line)
           const r = await generateImage(skPrompt, params.imageEngine)
-          budget.spend()
+          budget.spendSketch()
           d.images = [...d.images, { view: 'sketch', url: r.url, hash: r.hash, origin: 'generated', promptUsed: skPrompt }]
           emit({ kind: 'log', stage: 'S2', text: `${d.spec.design_id} base form sketched${r.cached ? ' (reused)' : ''}` })
         } catch (e) {
@@ -387,17 +476,17 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
 
       // ② 스케치 변형 · 하나의 외형에서 여러 흑백 안 (designsPerSketch가 변형 수를 정한다)
       const dpsWanted = params.designsPerSketch ?? 1
-      if (dpsWanted > 1 && budget.left() > 0) {
+      if (dpsWanted > 1 && budget.leftSketch() > 0) {
         const withSketch = targets.filter(d => d.images.some(i => i.view === 'sketch'))
         emit({ kind: 'log', stage: 'S2', text: `Branching ${dpsWanted - 1} black-ink variations from each base form · same silhouette and outsole, different upper takes` })
         await pool(withSketch, 2, async (d) => {
           const base = d.images.find(i => i.view === 'sketch')!
           for (let k = 0; k < dpsWanted - 1; k++) {
-            if (cancelled || budget.left() <= 0) return
+            if (cancelled || budget.leftSketch() <= 0) return
             try {
               const p = sketchVariationPrompt(k)
               const r = await editImage(base.hash, p, params.imageEngine)
-              budget.spend()
+              budget.spendSketch()
               d.images = [...d.images, { view: 'sketch_var', url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: base.hash, promptUsed: p }]
               emit({ kind: 'design-update', design: { ...d } })
               emit({ kind: 'log', stage: 'S2', text: `${d.spec.design_id} sketch variation ${k + 1} of ${dpsWanted - 1} done` })

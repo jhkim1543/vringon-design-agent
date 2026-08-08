@@ -79,9 +79,15 @@ export const DECK_CSS = `
   .kitem .yoy { font-size: 6pt; color: #8A9099; letter-spacing: .1em; }
   .kitem .grade { margin-left: auto; font-size: 6pt; font-weight: 800; letter-spacing: .08em;
                   text-transform: uppercase; padding: .8mm 2mm; border-radius: 4mm; }
-  .kitem .pic { height: 28mm; margin-bottom: 2.5mm; }
-  .kitem p { font-size: 7.6pt; line-height: 1.5; color: #40474F; margin: 0 0 2mm; }
-  .kitem .spec { margin-top: auto; font-size: 6.8pt; color: #565D63; border-top: .3mm solid #DDE1E7; padding-top: 1.5mm; }
+  /* 사진이 카드에서 가장 큰 자리를 차지한다. 남는 높이는 글이 아니라 사진이 가져간다.
+     예전에는 28mm로 고정이라 아래쪽이 그대로 빈 칸으로 남았다. */
+  .kitem .pic { flex: 1 1 auto; min-height: 26mm; margin-bottom: 2.5mm; }
+  .kitem .pic .ph { width: 100%; height: 100%; object-fit: cover; }
+  .kitem p { font-size: 7.6pt; line-height: 1.5; color: #40474F; margin: 0 0 2mm; flex: 0 0 auto; }
+  .kitem .spec { font-size: 6.8pt; color: #565D63; border-top: .3mm solid #DDE1E7; padding-top: 1.5mm; flex: 0 0 auto; }
+  /* 이 숫자가 어디서 나왔는지 · 카드가 스스로 근거를 들고 있어야 한다 */
+  .kitem .ev { font-size: 6.6pt; line-height: 1.45; color: #6B7178; margin-top: 1.5mm; flex: 0 0 auto; }
+  .kitem .evsrc { font-size: 6pt; letter-spacing: .06em; color: #8A9099; margin-top: 1mm; flex: 0 0 auto; }
 
   .chip { display: inline-block; font-size: 7.5pt; font-weight: 700; letter-spacing: .06em;
           text-transform: uppercase; padding: 1.4mm 3.4mm; border-radius: 1mm; margin: 0 1.5mm 1.5mm 0; color: #fff; }

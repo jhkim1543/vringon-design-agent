@@ -14,7 +14,7 @@ function mdLinks(escaped: string): string {
 import type { RunState, Design } from './types'
 import { CAT_LABEL, TYPE_LABEL, MODE_LABEL } from './types'
 import type { SeasonDossier, DossierMetric, Macrotrend } from './research'
-import { GRADE_LABEL, SOURCE_LABEL, metricText } from './research'
+import { GRADE_LABEL, SOURCE_LABEL, metricText, shotUrl } from './research'
 import { DECK_CSS, downloadDeck, esc, isLight, printDeck, slide } from './deck'
 
 // 매크로마다 색을 하나씩 준다. MICAM이 트렌드별로 색을 정해 쓰는 방식과 같다.
@@ -69,6 +69,12 @@ function paletteStrip(m: Macrotrend) {
 
 function keyItemCard(k: Macrotrend['key_items'][number], color: string, pic: string) {
   const [bg, fg] = GRADE_TINT[k.grade] ?? ['#EEF1F5', '#40474F']
+  // 우리 렌더가 남아 있으면 그걸 쓰고, 없으면 이 아이템의 근거로 인용된 페이지에서
+  // 실제 제품 사진을 끌어온다. 예측을 글로만 적어 두면 근거가 안 보인다.
+  const evidence = (k as { image_url?: string }).image_url ?? ''
+  const shot = pic || (evidence || k.metric?.source_url
+    ? shotUrl(evidence, k.metric?.source_url) : '')
+  const src = k.metric?.source_url ? sourceHost(k.metric.source_url) : ''
   return `<div class="kitem">
     <div class="side" style="background:${color}">${esc(k.name)}</div>
     <div class="body">
@@ -77,11 +83,18 @@ function keyItemCard(k: Macrotrend['key_items'][number], color: string, pic: str
         <span class="yoy">YoY</span>
         <span class="grade" style="background:${bg};color:${fg}">${esc(GRADE_LABEL[k.grade] ?? k.grade)}</span>
       </div>
-      ${img(pic, 'pic')}
+      ${img(shot, 'pic')}
       <p>${esc(k.description)}</p>
       <div class="spec">${esc(k.silhouette_spec)}</div>
+      ${k.metric?.observed_note ? `<div class="ev">${esc(k.metric.observed_note)}</div>` : ''}
+      ${src ? `<div class="evsrc">${esc(src)}</div>` : ''}
     </div>
   </div>`
+}
+
+/** 근거 출처는 도메인만 보여 준다. 긴 주소는 카드를 망친다. */
+function sourceHost(u: string): string {
+  try { return new URL(u).host.replace(/^www\./, '') } catch { return '' }
 }
 
 function buildDeck(st: RunState): { title: string; html: string } {

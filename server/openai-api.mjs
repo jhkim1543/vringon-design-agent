@@ -11,6 +11,7 @@ import { geminiEdit, geminiGenerate, geminiProbe, geminiShotPlan } from './gemin
 import { compositeLogo, logoAvailable } from './logo-api.mjs'
 import { tripoMultiview, tripoProbe, readModel } from './tripo-api.mjs'
 import { brightdataProbe, unlockImage, unlockPage } from './brightdata.mjs'
+import { analyzeMoodboard, analyzeSeries, saveUpload } from './upload-api.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..')
@@ -209,10 +210,11 @@ function keyOf(parts) {
   return createHash('sha256').update(JSON.stringify(parts)).digest('hex').slice(0, 24)
 }
 
-function readBody(req) {
+// 업로드는 base64라 원본보다 4/3 크다. 12MB 파일이면 16MB가 넘어오므로 따로 열어 준다.
+function readBody(req, max = 8e6) {
   return new Promise((resolve, reject) => {
     let raw = ''
-    req.on('data', c => { raw += c; if (raw.length > 8e6) reject(new Error('body too large')) })
+    req.on('data', c => { raw += c; if (raw.length > max) reject(new Error('body too large')) })
     req.on('end', () => { try { resolve(raw ? JSON.parse(raw) : {}) } catch (e) { reject(e) } })
     req.on('error', reject)
   })
@@ -412,6 +414,37 @@ export async function handleApi(req, res) {
       return json(res, 200, await researchSeasonDossier(DEEP_RESEARCH ? DEEP_KEY : API_KEY, ROOT, {
         categoryEn: b.categoryEn, season: b.season, priceBand: b.priceBand,
         brands: b.brands ?? [], deep: DEEP_RESEARCH, langName: b.langName, line: b.line,
+      }))
+    } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
+  }
+
+  // ── 업로드 · 파일을 실제로 받아 두고, 실제로 읽는다 ────────────────
+  // 예전에는 파일명만 params에 담고 내용은 아무도 열지 않았다.
+  if (path === '/api/upload' && req.method === 'POST') {
+    try {
+      const b = await readBody(req, 48e6)
+      const files = Array.isArray(b.files) ? b.files : [b]
+      const saved = files.map(f => saveUpload(ROOT, f))
+      return json(res, 200, { files: saved })
+    } catch (e) { return json(res, 400, { error: String(e.message || e) }) }
+  }
+
+  if (path === '/api/analyze/series' && req.method === 'POST') {
+    try {
+      const b = await readBody(req)
+      return json(res, 200, await analyzeSeries(API_KEY, ROOT, {
+        uploadIds: b.uploadIds, valueStatement: b.valueStatement,
+        itemTypeEn: b.itemTypeEn, langName: b.langName,
+      }))
+    } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
+  }
+
+  if (path === '/api/analyze/moodboard' && req.method === 'POST') {
+    try {
+      const b = await readBody(req)
+      return json(res, 200, await analyzeMoodboard(API_KEY, ROOT, {
+        uploadIds: b.uploadIds, notes: b.notes,
+        itemTypeEn: b.itemTypeEn, langName: b.langName,
       }))
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
   }

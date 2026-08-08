@@ -3,7 +3,7 @@
 // 연결(edge)은 장식이 아니라 실제 데이터다. 디자인이 어떤 신호에서 나왔는지는
 // rationale.driving_signals에, 디렉션이 어떤 신호를 묶었는지는 signal_ids에 있다.
 import type { Design, RunState } from './types'
-import { COMP_GROUP_LABEL, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL } from './types'
+import { COMP_GROUP_LABEL, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL, TYPE_LABEL } from './types'
 import { buildLocalPitch } from './pitch'
 import type { SeasonDossier } from './research'
 import { GRADE_LABEL, shotUrl, SOURCE_LABEL, metricText } from './research'
@@ -198,6 +198,22 @@ export function buildBoardModel(st: RunState): BoardModel {
         palette: (m.palette ?? []).slice(0, 8).map(c => ({ name: c.name, hex: c.hex })),
       })
       edges.push({ from: 'dos', to: id, label: 'macrotrend' })
+
+      // 예측도 근거 사진을 들고 있어야 한다 · 키아이템이 인용한 상품 페이지에서 끌어온다
+      const withShot = (m.key_items ?? []).filter(k =>
+        (k as { image_url?: string }).image_url || k.metric?.source_url).slice(0, 3)
+      withShot.forEach((k, j) => {
+        const kid = `macro-${i}-item-${j}`
+        nodes.push({
+          id: kid, kind: 'research', column: 1.5, row: dosRow + 1 + i * 3 + j,
+          title: k.name,
+          body: [[metricText(k.metric), GRADE_LABEL[k.grade] ?? k.grade].filter(Boolean).join(' · '),
+            k.silhouette_spec].filter(Boolean),
+          imageUrl: shotUrl((k as { image_url?: string }).image_url ?? '', k.metric?.source_url),
+          tone: 'muted',
+        })
+        edges.push({ from: id, to: kid, label: 'evidence', dashed: true })
+      })
     })
   }
 
@@ -269,11 +285,21 @@ export function buildBoardModel(st: RunState): BoardModel {
       const basePrompt = d.images.find(im => im.origin === 'generated' && im.view !== 'sketch')?.promptUsed
       const variantPrompt = d.images.find(im => im.view === 'design')?.promptUsed
       const cut = (s?: string) => s ? (s.length > 150 ? s.slice(0, 150) + '…' : s) : null
+      // 조사가 실제로 정한 값과, 이 유형이 안 받은 값. 카드가 비어 보이던 자리를 이게 채운다.
+      const setBy = (d.spec.hintApplied ?? [])
+        .filter(k => k in d.spec.fields)
+        .map(k => `${k.replace(/_/g, ' ')} ${d.spec.fields[k]}`)
+      const refused = (d.spec.hintBlocked ?? []).slice(0, 2)
+        .map(b => `${b.field.replace(/_/g, ' ')} ${b.wanted}, held at ${b.got}`)
+      const capPct = Math.round((d.cost.cap_ratio - 1) * 100)
       nodes.push({
         id: `pitch-${d.spec.design_id}`, kind: 'selection', column: 5.5, row: i,
         title: 'Why this sketch, and the prompt behind it',
         body: [
-          ...pit.why.slice(0, 2),
+          ...pit.why.slice(0, 3),
+          ...(setBy.length ? [`The research set ${setBy.length} of the spec: ${setBy.join(', ')}.`] : []),
+          ...(refused.length ? [`It also asked for ${refused.join(' and ')}. A ${TYPE_LABEL[d.spec.itemType] ?? d.spec.itemType} cannot take that.`] : []),
+          `Tooling: ${d.cost.tooling.mold_count_required === 0 ? 'no new moulds' : `${d.cost.tooling.mold_count_required} new moulds`}. Cost sits ${capPct === 0 ? 'level with' : capPct > 0 ? `${capPct}% over` : `${Math.abs(capPct)}% under`} the cap.`,
           ...(pit.objections.length ? [`Likely objection: ${pit.objections[0].q} ${pit.objections[0].a}`] : []),
         ],
         prompts: [

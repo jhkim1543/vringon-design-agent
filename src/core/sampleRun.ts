@@ -1,15 +1,26 @@
 // ── 예시 Run · 처음 열어도 결과가 어떻게 나오는지 볼 수 있게 심어 둔다 ──
 // 실제로 파이프라인을 돌려 만든 결과를 JSON으로 떠서 넣는다. API 호출은 하지 않는다.
 import type { RunState } from './types'
-import { listRuns, saveRun } from './store'
+import { deleteRun, listRuns, saveRun } from './store'
 
-const SAMPLE_IDS = ['sample_running_full', 'sample_shoe_trend', 'sample_sport_running']
+// 예시는 하나다. 지금 파이프라인이 실제로 만들어 낸 결과 한 건.
+// 여러 개를 두면 그중 옛 판이 섞이고, 옛 판은 지금 하는 말과 다른 말을 한다.
+const SAMPLE_IDS = ['sample_chelsea_fw26']
 
 export async function ensureSampleRuns() {
   // 이미 있으면 건너뛰던 시절에는, 샘플을 새로 뜨면 옛 방문자에게 영영 닿지 않았다.
   // 옛 샘플이 참조하던 이미지는 정리되면서 사라지고 카드가 빈 채로 남는다.
   // 그래서 저장된 시각을 대조해, 파일이 새 것이면 덮어쓴다.
   const stored = new Map(listRuns().map(r => [r.id, r]))
+
+  // 목록에서 빠진 예시는 이 브라우저에서도 치운다. 안 그러면 옛 방문자에게만 옛 샘플이 남는다.
+  // 사용자가 직접 돌린 Run은 sample 표시가 없으니 건드리지 않는다.
+  for (const [id, rec] of stored) {
+    if ((rec.state as RunState).sample && !SAMPLE_IDS.includes(id)) {
+      deleteRun(id)
+      try { localStorage.removeItem(`vringon.board.${id}`) } catch { /* 스토리지가 막혀 있으면 넘어간다 */ }
+    }
+  }
   for (const id of SAMPLE_IDS) {
     try {
       const mod = await import(`../samples/${id}.json`)

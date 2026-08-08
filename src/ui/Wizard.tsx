@@ -6,6 +6,7 @@
 // 합성피혁+시멘티드 10만원대와 굿이어+가죽솔 60만원대는 다른 시장이다.
 // 그래서 1단계에 제품·용도와 빠른 프리셋, 2단계에 라스트·어퍼·바텀·공법의
 // 전문가 설정과 시장·경쟁군·조사 목적이 들어간다.
+import { uploadFiles } from '../core/uploads'
 import { getLang, t } from '../core/i18n'
 import { useEffect, useMemo, useState } from 'react'
 import { detectRuntime } from '../core/runtime'
@@ -105,6 +106,39 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
   const setTrend = (patch: Partial<RunParams['trend']>) => setP(v => ({ ...v, trend: { ...v.trend, ...patch } }))
   const setSeries = (patch: Partial<RunParams['series']>) => setP(v => ({ ...v, series: { ...v.series, ...patch } }))
   const setMood = (patch: Partial<RunParams['moodboard']>) => setP(v => ({ ...v, moodboard: { ...v.moodboard, ...patch } }))
+
+  // 업로드는 파일명만 담아 두면 아무 의미가 없다. 실제로 서버에 올려 두고 손잡이를 받는다.
+  const [upBusy, setUpBusy] = useState(false)
+  const [upError, setUpError] = useState<string | null>(null)
+  const takeFiles = async (e: React.ChangeEvent<HTMLInputElement>, which: 'series' | 'moodboard') => {
+    const picked = Array.from(e.target.files ?? [])
+    e.target.value = ''            // 같은 파일을 다시 고를 수 있어야 한다
+    if (!picked.length) return
+    setUpBusy(true); setUpError(null)
+    try {
+      const { ok, failed } = await uploadFiles(picked)
+      if (failed.length) setUpError(`${failed.length} file${failed.length > 1 ? 's' : ''} could not be read · ${failed[0]}`)
+      if (ok.length) {
+        if (which === 'series') {
+          setP(v => ({ ...v, series: {
+            ...v.series,
+            archiveFiles: [...v.series.archiveFiles, ...ok.map(f => f.name)],
+            uploads: [...(v.series.uploads ?? []), ...ok],
+          } }))
+        } else {
+          setP(v => ({ ...v, moodboard: {
+            ...v.moodboard,
+            files: [...v.moodboard.files, ...ok.map(f => f.name)],
+            uploads: [...(v.moodboard.uploads ?? []), ...ok],
+          } }))
+        }
+      }
+    } catch (err) {
+      setUpError(String((err as Error).message).slice(0, 140))
+    } finally {
+      setUpBusy(false)
+    }
+  }
   const line = asFootwearLine(p.line) ?? defaultLineProfile()
   // 라인 프로필의 한 구역만 갈아 끼운다. 프리셋 채움과 개별 수정이 같은 경로를 쓴다.
   const setLine = <S extends keyof FootwearLineProfile>(section: S, patch: Partial<FootwearLineProfile[S]>) =>
@@ -523,11 +557,12 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                     value={p.series.seriesName} onChange={e => setSeries({ seriesName: e.target.value })} />
                 </div>
                 <label className="dropzone">
-                  <input type="file" multiple accept="image/*" hidden
-                    onChange={e => setSeries({ archiveFiles: [...p.series.archiveFiles, ...Array.from(e.target.files ?? []).map(f => f.name)] })} />
-                  {t('Upload past designs from this series')}
+                  <input type="file" multiple accept="image/png,image/jpeg,image/webp" hidden
+                    onChange={e => void takeFiles(e, 'series')} />
+                  {upBusy ? t('Uploading…') : t('Upload past designs from this series')}
                   <span className="dz-sub">{t('8 or more, so the constants can be told apart')}</span>
                 </label>
+                {upError && <p className="note" style={{ color: 'var(--danger)' }}>{upError}</p>}
                 {p.series.archiveFiles.length > 0 && (
                   <div className="chiplist quick">
                     {p.series.archiveFiles.slice(0, 6).map((f, i) => <span className="chip-in" key={i}>{f}</span>)}
@@ -559,16 +594,20 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
               <section className="sect">
                 <h2>{t('Your file')}</h2>
                 <label className="dropzone">
-                  <input type="file" multiple accept="application/pdf" hidden
-                    onChange={e => setMood({ files: [...p.moodboard.files, ...Array.from(e.target.files ?? []).map(f => f.name)] })} />
-                  {t('Upload your trend report or moodboard PDF')}
+                  <input type="file" multiple accept="application/pdf,image/png,image/jpeg,image/webp" hidden
+                    onChange={e => void takeFiles(e, 'moodboard')} />
+                  {upBusy ? t('Uploading…') : t('Upload your trend report or moodboard PDF')}
                   <span className="dz-sub">{t('Nothing outside these files is used')}</span>
                 </label>
+                {upError && <p className="note" style={{ color: 'var(--danger)' }}>{upError}</p>}
                 {p.moodboard.files.length > 0 && (
                   <div className="chiplist quick">
                     {p.moodboard.files.map((f, i) => (
                       <span className="chip-in" key={i}>{f}
-                        <button onClick={() => setMood({ files: p.moodboard.files.filter((_, j) => j !== i) })} aria-label={t('Remove')}>{t('Remove')}</button>
+                        <button onClick={() => setMood({
+                          files: p.moodboard.files.filter((_, j) => j !== i),
+                          uploads: (p.moodboard.uploads ?? []).filter((_, j) => j !== i),
+                        })} aria-label={t('Remove')}>{t('Remove')}</button>
                       </span>
                     ))}
                   </div>

@@ -114,6 +114,8 @@ function StepNode({ id, data, selected }: { id: string; data: { n: BoardNode; ed
   // 칸 크기를 조절하면 3D 캔버스도 따라 커져야 한다 · 노드 높이를 재서 넘긴다
   const rootRef = useRef<HTMLDivElement>(null)
   const [mvH, setMvH] = useState(228)
+  // 손잡이가 고른 칸에만 나타나면, 고를 수 있다는 것부터 모른다. 올려 두기만 해도 보인다.
+  const [hover, setHover] = useState(false)
   useMeasure(rootRef, id, data.onMeasure, [n.body.length, n.imageUrl, n.modelUrl, n.prompts?.length, editing])
   useEffect(() => {
     if (!n.modelUrl || !rootRef.current) return
@@ -125,9 +127,10 @@ function StepNode({ id, data, selected }: { id: string; data: { n: BoardNode; ed
     return () => ro.disconnect()
   }, [n.modelUrl, n.body.length])
   return (
-    <div ref={rootRef} className={`bnode tone-${n.tone ?? 'neutral'}${editing ? ' editing' : ''}${isNote ? ' is-note' : ''}`}>
-      {/* 칸을 골라 모서리를 끌면 커지고 작아진다 · 크기는 이 Run에 저장된다 */}
-      <NodeResizer isVisible={!!selected} minWidth={300} minHeight={130}
+    <div ref={rootRef} className={`bnode tone-${n.tone ?? 'neutral'}${editing ? ' editing' : ''}${isNote ? ' is-note' : ''}`}
+      onPointerEnter={() => setHover(true)} onPointerLeave={() => setHover(false)}>
+      {/* 칸에 마우스를 올리거나 골라 모서리를 끌면 커지고 작아진다 · 크기는 이 Run에 저장된다 */}
+      <NodeResizer isVisible={!!selected || hover} minWidth={300} minHeight={130}
         lineClassName="bn-resize-line" handleClassName="bn-resize-handle"
         onResizeEnd={(_, p) => ed?.onSize(id, Math.round(p.width), Math.round(p.height))} />
       <Handle type="target" position={Position.Left} />
@@ -169,12 +172,14 @@ function StepNode({ id, data, selected }: { id: string; data: { n: BoardNode; ed
 function DesignFlowNode({ id, data, selected }: { id: string; data: { n: BoardNode; st: RunState; onVerdict: any; ed?: NodeEdit; onMeasure?: (id: string, h: number) => void }; selected?: boolean }) {
   const { n, st, onVerdict, ed } = data
   const rootRef = useRef<HTMLDivElement>(null)
+  const [hover, setHover] = useState(false)
   // 근거 패널을 펴면 카드가 두 배로 길어진다 · 그때마다 다시 재서 아래 칸을 밀어낸다
   useMeasure(rootRef, id, data.onMeasure, [n.design?.images.length, n.design?.verdict])
   if (!n.design) return null
   return (
-    <div ref={rootRef} style={{ width: '100%', minWidth: 268, position: 'relative', height: '100%', overflow: 'hidden' }}>
-      <NodeResizer isVisible={!!selected} minWidth={268} minHeight={380}
+    <div ref={rootRef} style={{ width: '100%', minWidth: 268, position: 'relative', height: '100%', overflow: 'hidden' }}
+      onPointerEnter={() => setHover(true)} onPointerLeave={() => setHover(false)}>
+      <NodeResizer isVisible={!!selected || hover} minWidth={268} minHeight={380}
         lineClassName="bn-resize-line" handleClassName="bn-resize-handle"
         onResizeEnd={(_, p) => ed?.onSize(id, Math.round(p.width), Math.round(p.height))} />
       <Handle type="target" position={Position.Left} />
