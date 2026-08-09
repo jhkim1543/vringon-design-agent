@@ -698,6 +698,8 @@ export interface DesignImage {
   variantAxis?: string
   /** 이 이미지를 만든 프롬프트 · 근거 표시용. 없으면 옛 데이터다. */
   promptUsed?: string
+  /** 브랜드 로고를 실제로 합성한 이미지인가 · 최종 선정 컷은 이게 true여야 한다 */
+  logoStamped?: boolean
   /** 컨셉 촬영 컷 라벨과 가상 인물 */
   conceptLabel?: string
   persona?: string

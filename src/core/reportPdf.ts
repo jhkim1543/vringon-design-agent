@@ -147,23 +147,46 @@ function build(st: RunState): { title: string; html: string } {
       const part = rep.design_implications.slice(i, i + chunk)
       out.push(slide({
         eyebrow, tag: 'IMPLICATIONS', page: P(),
+        // 이 장은 글만 있었다. 무엇을 바꾸라는 이야기인데 그 대상이 안 보이면 읽히지 않는다.
+        // 이 분석이 실제로 만든 컷을 옆에 세워 남는 여백을 없앤다.
         body: `<h2 class="stitle">What to change <span class="thin">in the design</span></h2>
-          <div class="grid2" style="gap:6mm 10mm">
-            ${part.map(x => `<div style="border-top:.5mm solid ${ACCENT};padding-top:2.5mm">
-              <div style="font-size:7pt;letter-spacing:.12em;text-transform:uppercase;color:${ACCENT};font-weight:800">${esc(x.area)}</div>
-              <div style="font-size:8.6pt;line-height:1.55;margin-top:1.5mm">${esc(x.guidance)}</div>
-              <div style="font-size:7pt;color:#8A9099;margin-top:1.5mm">From: ${esc(x.basis)}</div>
-            </div>`).join('')}
+          <div class="cols" style="height:calc(100% - 24mm)">
+            <div style="flex:1.5">
+              <div class="grid2" style="gap:5mm 8mm">
+                ${part.map(x => `<div style="border-top:.5mm solid ${ACCENT};padding-top:2.5mm">
+                  <div style="font-size:7pt;letter-spacing:.12em;text-transform:uppercase;color:${ACCENT};font-weight:800">${esc(x.area)}</div>
+                  <div style="font-size:8.6pt;line-height:1.55;margin-top:1.5mm">${esc(x.guidance)}</div>
+                  <div style="font-size:7pt;color:#8A9099;margin-top:1.5mm">From: ${esc(x.basis)}</div>
+                </div>`).join('')}
+              </div>
+            </div>
+            ${pool.any.length ? `<div style="flex:.5;display:flex;flex-direction:column;gap:3mm">
+              ${img(at(pool.any, i))}${img(at(pool.any, i + 1))}
+            </div>` : ''}
           </div>`,
       }))
     }
   }
 
-  // 본문
+  // 본문 · 문단 수로 자르면 긴 문단이 몰린 장에서 글이 칸 밖으로 흘러 나간다.
+  // 글자 수로 채운다. 한 장에 들어가는 양이 일정해지고, 짧은 문단들은 더 많이 들어간다.
   const paras = (rep.body_markdown ?? '').split(/\n{2,}/).filter(Boolean)
-  const perSlide = 7
-  for (let i = 0; i < paras.length; i += perSlide) {
-    const part = paras.slice(i, i + perSlide)
+  const CHARS_PER_SLIDE = 1650
+  const groups: string[][] = []
+  let cur: string[] = []
+  let curLen = 0
+  for (const p of paras) {
+    const isHeading = /^#{2,4}\s+/.test(p.trim())
+    // 소제목만 남기고 장이 끝나는 일이 없게 한다
+    if (cur.length && curLen + p.length > CHARS_PER_SLIDE && !(isHeading && curLen === 0)) {
+      groups.push(cur); cur = []; curLen = 0
+    }
+    cur.push(p); curLen += p.length
+  }
+  if (cur.length) groups.push(cur)
+
+  for (let i = 0; i < groups.length; i++) {
+    const part = groups[i]
     out.push(slide({
       eyebrow, tag: 'REPORT', page: P(),
       body: `<div class="cols">

@@ -261,15 +261,16 @@ function buildDeck(st: RunState): { title: string; html: string } {
             </div>
             <div class="quote" style="color:${c};margin-top:auto">${esc(m.statement)}</div>
           </div>
-          <div style="flex:1;display:flex;flex-direction:column;gap:3mm">
-            <div style="flex:1.3">${img(at(pool.concept, i) || at(pool.any, i))}</div>
-            <div style="flex:1;display:flex;gap:3mm">
-              <div style="flex:1">${img(at(pool.render, i))}</div>
-              <div style="flex:1">${img(at(pool.wear, i))}</div>
+          <!-- min-height:0 이 없으면 flex 자식이 사진 원본 높이 밑으로 못 줄어들어 칸을 넘는다 -->
+          <div style="flex:1;display:flex;flex-direction:column;gap:3mm;min-height:0">
+            <div style="flex:1.3;min-height:0">${img(at(pool.concept, i) || at(pool.any, i))}</div>
+            <div style="flex:1;display:flex;gap:3mm;min-height:0">
+              <div style="flex:1;min-height:0">${img(at(pool.render, i))}</div>
+              <div style="flex:1;min-height:0">${img(at(pool.wear, i))}</div>
             </div>
           </div>
         </div>
-        <div style="margin-top:4mm">${paletteStrip(m)}</div>
+        <div style="margin-top:4mm;flex:0 0 auto">${paletteStrip(m)}</div>
       </div>`,
     }))
 
@@ -330,17 +331,21 @@ function buildDeck(st: RunState): { title: string; html: string } {
       eyebrow, tag: `MACRO ${i + 1} · NEXT`, page: P(),
       body: `<h3 class="sub">${esc(fc)} FORECAST</h3>
         <h2 class="stitle" style="color:${c}">${esc(m.name)} <span class="thin">next season</span></h2>
-        <div class="cols" style="margin-top:4mm">
-          <div style="flex:1.3">
+        <div class="cols" style="margin-top:4mm;height:calc(100% - 34mm)">
+          <div style="flex:1.3;min-height:0;overflow:hidden">
             <p style="font-size:11pt;line-height:1.5">${esc(call)}</p>
             ${conf ? `<div style="margin-top:4mm;display:inline-flex;align-items:center;gap:2mm;
                   background:#EEF1F5;padding:1.4mm 3mm;border-radius:4mm;font-size:7.5pt;
                   font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#40474F">
                   CONFIDENCE ${esc(conf)}</div>` : ''}
           </div>
-          <div style="flex:1">
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column">
             <h3 class="sub">CARRIES OVER</h3>
-            ${(m.sub_trends ?? []).map(x => `<div style="font-size:9pt;padding:1.4mm 0;border-bottom:.2mm solid #E3E7EC">${esc(x)}</div>`).join('')}
+            <div style="flex:0 0 auto">
+              ${(m.sub_trends ?? []).slice(0, 6).map(x => `<div style="font-size:9pt;padding:1.4mm 0;border-bottom:.2mm solid #E3E7EC">${esc(x)}</div>`).join('')}
+            </div>
+            ${/* 글만 있던 장이다 · 이 매크로의 컷을 세워 남는 자리를 채운다 */ ''}
+            ${pool.any.length ? `<div style="flex:1;min-height:24mm;margin-top:4mm">${img(at(pool.render.length ? pool.render : pool.any, i))}</div>` : ''}
           </div>
         </div>`,
     }))
@@ -366,21 +371,29 @@ function buildDeck(st: RunState): { title: string; html: string } {
   }
 
   // ── 8 출처 ────────────────────────────────────────────────────
+  // 한 장에 다 밀어 넣으면 슬라이드가 잘라 낸다. 출처가 20개면 그중 절반이 안 보였다.
+  // 출처가 안 보이는 트렌드 덱은 근거 없는 덱과 같다. 그래서 넘치면 장을 넘긴다.
   if ((d.sources ?? []).length) {
-    out.push(slide({
-      eyebrow, tag: 'SOURCES', page: P(),
-      body: `<h2 class="stitle">SOURCES <span class="thin">everything above traces here</span></h2>
-        <table class="src">
-          ${d.sources.map((s, i2) => `<tr>
-            <td class="n">${i2 + 1}</td>
-            <td><b>${esc(s.title || s.url)}</b><div style="color:#8A9099">${esc(s.used_for)}</div></td>
-            <td class="u">${esc(s.url)}</td>
-          </tr>`).join('')}
-        </table>
-        ${(d.open_questions ?? []).length ? `<div class="note" style="margin-top:5mm">
-          <b>Still unverified.</b> ${d.open_questions.map(esc).join(' · ')}
-        </div>` : ''}`,
-    }))
+    const PER = 12
+    for (let i2 = 0; i2 < d.sources.length; i2 += PER) {
+      const part = d.sources.slice(i2, i2 + PER)
+      const last = i2 + PER >= d.sources.length
+      out.push(slide({
+        eyebrow, tag: 'SOURCES', page: P(),
+        body: `<h2 class="stitle">SOURCES <span class="thin">everything above traces here${
+          d.sources.length > PER ? ` · ${i2 + 1}-${i2 + part.length} of ${d.sources.length}` : ''}</span></h2>
+          <table class="src">
+            ${part.map((s, k) => `<tr>
+              <td class="n">${i2 + k + 1}</td>
+              <td><b>${esc(s.title || s.url)}</b><div style="color:#8A9099">${esc(s.used_for)}</div></td>
+              <td class="u">${esc(s.url)}</td>
+            </tr>`).join('')}
+          </table>
+          ${last && (d.open_questions ?? []).length ? `<div class="note" style="margin-top:5mm">
+            <b>Still unverified.</b> ${d.open_questions.map(esc).join(' · ')}
+          </div>` : ''}`,
+      }))
+    }
   }
 
   // ── 9 클로징 ──────────────────────────────────────────────────

@@ -51,7 +51,11 @@ export const DECK_CSS = `
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
 
   .ph { width: 100%; height: 100%; object-fit: cover; display: block; background: #EEF1F5; }
-  .frame { overflow: hidden; border-radius: 1.5mm; background: #EEF1F5; }
+  /* height가 없으면 사진이 제 원본 높이로 펴져 칸 밖으로 흘러 아래 글자를 덮는다.
+     감싼 칸이 높이를 정하고, 사진은 그 안을 채운다. */
+  .frame { overflow: hidden; border-radius: 1.5mm; background: #EEF1F5; height: 100%; min-height: 0; }
+  /* 키아이템 카드에서는 남는 높이를 사진이 가져간다 (flex가 크기를 정한다) */
+  .kitem .pic { height: auto; }
 
   /* 성장 지표 막대 */
   .stat { display: flex; align-items: center; gap: 3mm; padding: 2.4mm 4mm; border-radius: 1mm; margin-bottom: 2mm; color: #fff; }

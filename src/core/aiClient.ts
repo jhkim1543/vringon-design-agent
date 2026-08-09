@@ -20,31 +20,44 @@ export async function apiStatus(): Promise<{ keyPresent: boolean; model: string;
   return r.json()
 }
 
+/** 이미지 한 장을 만드는 요청. 시간 제한과 재시도가 여기 한 곳에 있다.
+ *
+ *  노트북이 잠들면 진행 중이던 요청이 ERR_NETWORK_IO_SUSPENDED로 끊긴다.
+ *  한 장이 끊겼다고 분석 전체를 버릴 이유는 없다 — 깨어난 뒤 다시 부르면 대개 된다.
+ *  서버가 프롬프트로 캐시하므로 재시도가 중복 과금이 되지도 않는다. */
+async function imageCall(url: string, body: unknown, what: string): Promise<GenResult> {
+  let last: Error | null = null
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(330_000),
+      })
+      const j = await r.json()
+      if (!r.ok) throw new Error(j.error || `${what} ${r.status}`)
+      return j
+    } catch (e) {
+      last = e as Error
+      // 모델이 거절한 프롬프트는 다시 불러도 같은 답이다. 끊긴 연결만 다시 시도한다.
+      const msg = String(last.message || last)
+      const worthRetrying = /fetch|network|timeout|abort|suspend|502|503|504|429/i.test(msg)
+      if (!worthRetrying || attempt === 2) break
+      await new Promise(res => setTimeout(res, 4000 * (attempt + 1)))
+    }
+  }
+  throw last ?? new Error(`${what} failed`)
+}
+
 /** 신규 생성 · 동일 프롬프트는 서버 캐시로 재사용되어 중복 과금이 없다 */
-export async function generateImage(prompt: string, engine: EngineId = 'detail'): Promise<GenResult> {
-  const r = await fetch('/api/image/generate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt, size: '1024x1024', engine }),
-    // 한 장이 매달리면 분석 전체가 멈춘다. 그 장만 포기하고 도식으로 떨어뜨린다.
-    signal: AbortSignal.timeout(330_000),
-  })
-  const j = await r.json()
-  if (!r.ok) throw new Error(j.error || `generate ${r.status}`)
-  return j
+export function generateImage(prompt: string, engine: EngineId = 'detail'): Promise<GenResult> {
+  return imageCall('/api/image/generate', { prompt, size: '1024x1024', engine }, 'generate')
 }
 
 /** 편집 · S3 추가 뷰·컬러웨이는 신규 생성이 아니라 기준 렌더의 편집 (지시서 S3-③④) */
-export async function editImage(baseHash: string, prompt: string, engine: EngineId = 'detail'): Promise<GenResult> {
-  const r = await fetch('/api/image/edit', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ baseHash, prompt, size: '1024x1024', engine }),
-    signal: AbortSignal.timeout(330_000),
-  })
-  const j = await r.json()
-  if (!r.ok) throw new Error(j.error || `edit ${r.status}`)
-  return j
+export function editImage(baseHash: string, prompt: string, engine: EngineId = 'detail'): Promise<GenResult> {
+  return imageCall('/api/image/edit', { baseHash, prompt, size: '1024x1024', engine }, 'edit')
 }
 
 // ── 스펙 → 프롬프트 (지시서 S2-4) ────────────────────────────────────

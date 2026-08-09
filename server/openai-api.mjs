@@ -150,6 +150,16 @@ const PAGE_IMAGE_PATTERNS = [
   /"(?:image|contentUrl)"\s*:\s*\[\s*"(https:[^"]+?)"/i,
 ]
 
+// 사이트 공용 이미지 · og:image에 브랜드 로고를 박아 두는 곳이 있다.
+// ASICS는 제품 페이지에도 /data/icon/favicon/snslogo.jpg 를 준다. 그대로 쓰면
+// 보드의 경쟁 제품 칸에 신발 대신 아식스 로고가 세 장 나란히 걸린다.
+const LOGO_LIKE = /(^|[\/_-])(logo|snslogo|favicon|og[-_]?default|default[-_]?(og|share|image)|share[-_]?image|placeholder|no[-_]?image|opengraph)([\/_.-]|$)/i
+
+/** 이 주소가 제품 사진이 아니라 사이트 공용 이미지인가 */
+function looksLikeLogo(u) {
+  try { return LOGO_LIKE.test(new URL(u).pathname) } catch { return LOGO_LIKE.test(String(u)) }
+}
+
 export async function shotFromPage(pageUrl) {
   const r = await fetchWithBackoff(pageUrl, {
     headers: {
@@ -167,15 +177,21 @@ export async function shotFromPage(pageUrl) {
     if (unlocked) html = unlocked.slice(0, 900_000)
   }
   if (!html) throw new Error(`page ${r.status}`)
+  // 로고로 보이는 후보는 건너뛰고 다음 패턴을 본다. JSON-LD 쪽에 진짜 제품 사진이 있는 경우가 많다.
+  let skipped = null
   for (const re of PAGE_IMAGE_PATTERNS) {
     const m = re.exec(html)
     if (m?.[1]) {
       let u2 = m[1].replace(/&amp;/g, '&').trim()
       if (u2.startsWith('//')) u2 = 'https:' + u2
       if (u2.startsWith('/')) { try { u2 = new URL(u2, pageUrl).href } catch { /* 무시 */ } }
-      if (/^https:\/\//.test(u2)) return u2
+      if (!/^https:\/\//.test(u2)) continue
+      if (looksLikeLogo(u2)) { skipped = skipped ?? u2; continue }
+      return u2
     }
   }
+  // 로고밖에 없으면 사진이 없는 것으로 본다. 로고를 제품 사진 자리에 넣지는 않는다.
+  if (skipped) throw new Error('only a site logo on this page')
   throw new Error('no page image')
 }
 

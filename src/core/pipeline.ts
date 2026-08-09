@@ -546,7 +546,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           budget.spend(); baseHash = r.hash
           let baseUrl = r.url
           // 브랜드 로고는 프롬프트가 아니라 실제 파일로 얹는다. 형태가 어긋나지 않는다.
-          if (params.brand?.logo?.dataUrl && params.brand.logo.placement !== 'none') {
+          // 사용자가 "이미지에 로고 넣기"를 껐으면 넣지 않는다. 예전에는 이 스위치를 무시했다.
+          if (params.brand?.applyLogoToImages && params.brand?.logo?.dataUrl && params.brand.logo.placement !== 'none') {
             try {
               const stamped = await stampLogo(r.hash, params.brand)
               if (stamped) {
@@ -557,7 +558,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
               emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} logo composite failed · ${String((e as Error).message).slice(0, 80)}` })
             }
           }
-          d.images = [...d.images, { view: views[0].key, url: baseUrl, hash: baseHash, origin: 'generated', promptUsed: basePrompt }]
+          d.images = [...d.images, { view: views[0].key, url: baseUrl, hash: baseHash, origin: 'generated', promptUsed: basePrompt, logoStamped: baseHash !== r.hash }]
           emit({ kind: 'design-update', design: { ...d } })
         } catch (e) {
           d.imageError = String((e as Error).message || e)
@@ -662,6 +663,27 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       emit({ kind: 'design-update', design: { ...d } })
       emit({ kind: 'log', stage: 'S4', text: `Top ${i + 1}: ${d.spec.design_id} [${d.spec.tier}] · spec distance ${d.topDistance}` })
     })
+    // 최종 선정 컷에는 브랜드 로고가 반드시 올라가야 한다.
+    // S3에서 로고를 못 얹은 건(그때 실패했거나 도식으로 떨어진 건)이 그대로 최종이 되면,
+    // 브랜드가 자기 로고 없는 이미지를 최종안으로 받게 된다. 여기서 한 번 더 확인한다.
+    const brandLogo = params.brand
+    if (brandLogo?.applyLogoToImages && brandLogo.logo?.dataUrl && brandLogo.logo.placement !== 'none') {
+      for (const d of top) {
+        const main = d.images.find(im => im.view === views[0].key && !im.colorway)
+        if (!main || main.logoStamped) continue
+        try {
+          const stamped = await stampLogo(main.hash, brandLogo)
+          if (stamped) {
+            d.images = d.images.map(im => im === main
+              ? { ...im, url: stamped.url, hash: stamped.hash, logoStamped: true } : im)
+            emit({ kind: 'design-update', design: { ...d } })
+            emit({ kind: 'log', stage: 'S4', text: `${d.spec.design_id} final cut carries the ${brandLogo.brandName || 'brand'} logo at the ${brandLogo.logo.placement}` })
+          }
+        } catch (e) {
+          emit({ kind: 'log', stage: 'S4', text: `${d.spec.design_id} could not carry the logo · ${String((e as Error).message).slice(0, 80)}` })
+        }
+      }
+    }
     await wait(700)
     emit({ kind: 'log', stage: 'S4', text: 'Ground contact aligned and heel height checked visually, within 20%' })
     await wait(800)
