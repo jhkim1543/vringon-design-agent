@@ -525,9 +525,22 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     const advanceN = Math.max(1, Math.round(alive.length * params.renderRatio))
     const advancing = [...alive].sort((a, b) => a.cost.cap_ratio - b.cost.cap_ratio).slice(0, advanceN)
     emit({ kind: 'log', stage: 'S3', text: `${Math.round(params.renderRatio * 100)}% move to render · ${advanceN} selected` })
+
+    // 앞선 디자인이 추가 뷰와 컬러웨이로 남은 상한을 다 써 버리면 뒤 디자인은 한 장도 못 받는다.
+    // 실제로 첫 디자인이 7컷을 가져가고 나머지 넷이 0컷으로 끝난 적이 있다.
+    // 그래서 먼저 모두에게 기준 렌더 한 장씩 몫을 떼어 두고, 남는 만큼만 추가 컷에 쓴다.
+    const perDesignExtras = Math.max(0, Math.floor((budget.left() - advancing.length) / Math.max(1, advancing.length)))
+    if (advancing.length > 1) {
+      emit({ kind: 'log', stage: 'S3', text: perDesignExtras > 0
+        ? `Every design gets its base render, then up to ${perDesignExtras} extra cuts each, so the cap does not land on the first one`
+        : 'The cap covers one render each and no extra views, so every design still gets a photo' })
+    }
+
     for (let i = 0; i < advancing.length; i++) {
       if (cancelled) return
       const d = advancing[i]
+      // 이 디자인이 추가 컷에 쓸 수 있는 장수 · 기준 렌더는 이 몫에서 빼지 않는다
+      let extrasLeft = perDesignExtras
       emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} colour enters here: the black-ink sheet becomes a photoreal render, then ${params.viewCount - 1} more views as edits` })
       d.colorways = COLORWAY_NAMES.slice(0, params.colorwayCount)
 
@@ -567,12 +580,12 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         // ② 스케치 변형들도 각각 컬러 디자인이 된다 · 흑백 스케치가 원본, 색은 여기서 처음 입혀진다
         const sketchVars = d.images.filter(i => i.view === 'sketch_var')
         for (let k = 0; k < sketchVars.length; k++) {
-          if (cancelled || budget.left() <= 0) break
+          if (cancelled || budget.left() <= 0 || extrasLeft <= 0) break
           const sv = sketchVars[k]
           const p2 = renderFromSketchPrompt(d.spec, trendClause, line)
           try {
             const r2 = await editImage(sv.hash, p2, params.imageEngine)
-            budget.spend()
+            budget.spend(); extrasLeft -= 1
             d.images = [...d.images, { view: 'design', url: r2.url, hash: r2.hash, origin: 'edited_from', editedFrom: sv.hash, promptUsed: p2 }]
             emit({ kind: 'design-update', design: { ...d } })
             emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} sketch variation ${k + 1} coloured into a design` })
@@ -588,12 +601,12 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
             ...views.filter(v => v.required).slice(1, params.viewCount)
               .map(v => ({ view: v.key, prompt: viewEditPrompt(v.key) })),
             ...d.colorways.map(cw => ({ view: views[0].key, colorway: cw, prompt: colorwayEditPrompt(cw) })),
-          ].slice(0, budget.left())
+          ].slice(0, Math.min(budget.left(), extrasLeft))
           await pool(jobs, 2, async (job) => {
             if (cancelled) return
             try {
               const r = await editImage(baseHash!, job.prompt, params.imageEngine)
-              budget.spend()
+              budget.spend(); extrasLeft -= 1
               d.images = [...d.images, { view: job.view, colorway: job.colorway, url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: baseHash! }]
               emit({ kind: 'design-update', design: { ...d } })
             } catch (e) {
@@ -606,18 +619,18 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       }
 
       // 스케치 한 장에서 갈라지는 제품 베리에이션 · 축을 하나씩만 바꿔 계보를 유지한다
-      if (params.variationCount > 0 && budget.left() > 0) {
+      if (params.variationCount > 0 && budget.left() > 0 && extrasLeft > 0) {
         const baseImg = d.images.find(i => i.view === 'lateral' && !i.colorway)
           ?? d.images.find(i => i.origin === 'generated' && i.view !== 'sketch')
         if (baseImg) {
           const axes = variationAxes()
           const jobs = axes.slice(0, params.variationCount).map((a, k) => ({ a, k }))
           emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} branching ${jobs.length} product variations from the base design` })
-          await pool(jobs.slice(0, Math.max(0, budget.left())), 2, async (job) => {
+          await pool(jobs.slice(0, Math.max(0, Math.min(budget.left(), extrasLeft))), 2, async (job) => {
             if (cancelled) return
             try {
               const r = await editImage(baseImg.hash, variationPrompt(job.k), params.imageEngine)
-              budget.spend()
+              budget.spend(); extrasLeft -= 1
               d.images = [...d.images, {
                 view: 'variation', url: r.url, hash: r.hash, origin: 'edited_from',
                 editedFrom: baseImg.hash, variantOf: d.spec.design_id, variantAxis: job.a.label,
@@ -644,6 +657,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         }
       }
       emit({ kind: 'design-update', design: { ...d } })
+      // 디자인 한 건이 끝날 때마다 남긴다. 중간에 멈추면 어디서 멈췄는지 로그가 말해 준다.
+      emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} done · ${d.images.filter(im => im.view !== 'sketch' && im.view !== 'sketch_var').length} cuts (${i + 1} of ${advancing.length})` })
       emit({ kind: 'progress', stage: 'S3', pct: Math.round(((i + 1) / advancing.length) * 100) })
     }
     emit({ kind: 'checkpoint', label: 'S3 done · renders, colourways and QA results saved' })
@@ -791,7 +806,16 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     emit({ kind: 'checkpoint', label: 'S5 done · 3D showroom, board and PDF export ready' })
     emit({ kind: 'stage-done', stage: 'S5' })
     emit({ kind: 'done', endStage: 'S5' })
-  })()
+  })().catch((err: unknown) => {
+    // 이 catch가 없던 동안, 안쪽 try 밖에서 던진 예외 하나가 분석을 조용히 끝냈다.
+    // 화면에는 마지막 로그가 그대로 남아 영원히 진행 중처럼 보였다.
+    // 멈췄으면 멈췄다고 말한다. 그때까지 만든 것은 그대로 남는다.
+    if (cancelled) return
+    const msg = String((err as Error)?.message ?? err).slice(0, 200)
+    console.error('[VRINGON] pipeline stopped', err)
+    emit({ kind: 'log', stage: params.endStage, text: `The run stopped here: ${msg}. Everything produced up to this point is saved.` })
+    emit({ kind: 'done', endStage: params.endStage })
+  })
 
   return handle
 }

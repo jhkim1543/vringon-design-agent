@@ -1,0 +1,5227 @@
+{
+ "params": {
+  "mode": "series",
+  "category": "shoe",
+  "itemType": "court_sneaker",
+  "line": {
+   "product": {
+    "useCase": "daily",
+    "environment": "urban",
+    "targetConsumer": "unisex",
+    "season": "FW26",
+    "climate": "all_season"
+   },
+   "lastFit": {
+    "lastFamily": "unknown",
+    "baseSize": "unknown",
+    "width": "unknown",
+    "toeShape": "unknown",
+    "toeVolume": "unknown",
+    "heelHold": "unknown",
+    "existingLastReuse": true
+   },
+   "upper": {
+    "outer": "unknown",
+    "lining": "unknown",
+    "reinforcement": "unknown",
+    "closure": "unknown",
+    "protection": "unknown"
+   },
+   "bottom": {
+    "midsole": "unknown",
+    "plate": "unknown",
+    "outsole": "unknown",
+    "stackBand": "unknown",
+    "dropMm": "unknown",
+    "rocker": "unknown",
+    "heel": "unknown",
+    "existingBottomReuse": true
+   },
+   "construction": {
+    "lasting": "unknown",
+    "soleAttachment": "unknown"
+   },
+   "performance": {
+    "weightTargetG": "unknown",
+    "cushioning": "unknown",
+    "stability": "unknown",
+    "wetGrip": "unknown",
+    "flexibility": "unknown"
+   },
+   "commercial": {
+    "markets": [
+     "KR"
+    ],
+    "channels": [
+     "DTC"
+    ]
+   }
+  },
+  "endStage": "S3",
+  "sketchCount": 12,
+  "tierRatio": [
+   1,
+   1,
+   1
+  ],
+  "renderRatio": 0.5,
+  "viewCount": 3,
+  "colorwayCount": 2,
+  "topN": 3,
+  "designsPerSketch": 2,
+  "variationCount": 3,
+  "campaignShots": 4,
+  "make3d": true,
+  "approvalGate": false,
+  "imageEngine": "fast",
+  "imageBudget": 12,
+  "trend": {
+   "competitors": [],
+   "priceBand": "contemporary",
+   "priceMinKrw": 150000,
+   "priceMaxKrw": 450000,
+   "adjacentBand": true,
+   "objectives": [
+    "live_commercial_pulse",
+    "design_trends",
+    "next_season_forecast"
+   ]
+  },
+  "series": {
+   "seriesName": "Air Jordan 1",
+   "archiveFiles": [
+    "Air_Jordan_1_Retro_Low_OG_1.jpg",
+    "Air_Jordan_1_Retro_Low_OG_2.jpg",
+    "Air_Jordan_1_Low_SE_Women__1.jpg",
+    "Air_Jordan_1_Low_SE_Women__2.jpg",
+    "Air_Jordan_1_Triple_Stack_SE_Women__1.jpg",
+    "Air_Jordan_1_Triple_Stack_SE_Women__2.jpg",
+    "Air_Jordan_1_Retro_High_OG_1.jpg",
+    "Air_Jordan_1_Retro_High_OG_2.jpg",
+    "Air_Jordan_1_Mid_1.jpg",
+    "Air_Jordan_1_Mid_2.jpg",
+    "Air_Jordan_1_Low_SE_1.jpg",
+    "Air_Jordan_1_Low_SE_2.jpg"
+   ],
+   "valueStatement": "The Air Jordan 1 line is defined by its silhouette, not its colour. Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+   "trendSearch": true,
+   "uploads": [
+    {
+     "id": "94752da171de4d153cf5d689",
+     "name": "Air_Jordan_1_Retro_Low_OG_1.jpg",
+     "type": "image/jpeg",
+     "ext": "jpg",
+     "bytes": 109435
+    },
+    {
+     "id": "de14221dd33154df0fe294dc",
+     "name": "Air_Jordan_1_Retro_Low_OG_2.jpg",
+     "type": "image/jpeg",
+     "ext": "jpg",
+     "bytes": 320274
+    },
+    {
+     "id": "683005c6a5913fd20c365299",
+     "name": "Air_Jordan_1_Low_SE_Women__1.jpg",
+     "type": "image/jpeg",
+     "ext": "jpg",
+     "bytes": 96152
+    },
+    {
+     "id": "30970c14bceb44ac362a6751",
+     "name": "Air_Jordan_1_Low_SE_Women__2.jpg",
+     "type": "image/jpeg",
+     "ext": "jpg",
+     "bytes": 264282
+    },
+    {
+     "id": "5534f91ccebbf39bc093448d",
+     "name": "Air_Jordan_1_Triple_Stack_SE_Women__1.jpg",
+     "type": "image/jpeg",
+     "ext": "jpg",
+     "bytes": 108441
+    },
+    {
+     "id": "d4ea21ba31de96b51f0cfd78",
+     "name": "Air_Jordan_1_Triple_Stack_SE_Women__2.jpg",
+     "type": "image/jpeg",
+     "ext": "jpg",
+     "bytes": 290888
+    },
+    {
+     "id": "631f977f19d7488dcb06cc6d",
+     "name": "Air_Jordan_1_Retro_High_OG_1.jpg",
+     "type": "image/jpeg",
+     "ext": "jpg",
+     "bytes": 115113
+    },
+    {
+     "id": "f0bff5e018eb86fd593b99e0",
+     "name": "Air_Jordan_1_Retro_High_OG_2.jpg",
+     "type": "image/jpeg",
+     "ext": "jpg",
+     "bytes": 328314
+    },
+    {
+     "id": "c40cd1accd0dc7bd431fc19e",
+     "name": "Air_Jordan_1_Mid_1.jpg",
+     "type": "image/jpeg",
+     "ext": "jpg",
+     "bytes": 96671
+    },
+    {
+     "id": "e503ca179e4dd5aa24cef189",
+     "name": "Air_Jordan_1_Mid_2.jpg",
+     "type": "image/jpeg",
+     "ext": "jpg",
+     "bytes": 277707
+    },
+    {
+     "id": "1f4d87ddc66f6465fcf0c728",
+     "name": "Air_Jordan_1_Low_SE_1.jpg",
+     "type": "image/jpeg",
+     "ext": "jpg",
+     "bytes": 70773
+    },
+    {
+     "id": "c7b01e8968d1374dd670f644",
+     "name": "Air_Jordan_1_Low_SE_2.jpg",
+     "type": "image/jpeg",
+     "ext": "jpg",
+     "bytes": 209552
+    }
+   ]
+  },
+  "moodboard": {
+   "files": [],
+   "notes": ""
+  }
+ },
+ "stageStatus": {
+  "S1": "done",
+  "S2": "done",
+  "S3": "done",
+  "S4": "idle",
+  "S5": "idle"
+ },
+ "logs": [
+  {
+   "stage": "S1",
+   "text": "Series mode · building the brief",
+   "t": 1786264045154
+  },
+  {
+   "stage": "S1",
+   "text": "Line profile: Court · daily · unisex · FW26",
+   "t": 1786264045154
+  },
+  {
+   "stage": "S1",
+   "text": "Series \"Air Jordan 1\" · 12 uploads · value statement 172 chars",
+   "t": 1786264046142
+  },
+  {
+   "stage": "S1",
+   "text": "1 Reading your 12 designs · looking at every one to separate what repeats from what changes (1-2 min)",
+   "t": 1786264047155
+  },
+  {
+   "stage": "S1",
+   "text": "Read 12 designs (reused an earlier pass) · 7 elements repeat, 9 vary, 5 unclear",
+   "t": 1786264047221
+  },
+  {
+   "stage": "S1",
+   "text": "Repeats in 12 of 12: 둥글고 낮은 토 스프링. 측면에서 크게 들리지 않는 오지 형태 — Air_Jordan_1_Retro_Low_OG_1.jpg와 Air_Jordan_1_Mid_1.jpg의 앞코 곡률이 동일한 형태로 반복됨",
+   "t": 1786264047221
+  },
+  {
+   "stage": "S1",
+   "text": "Repeats in 12 of 12: 토박스를 감싸는 U자형 오버레이(머드가드) 존재 — Air_Jordan_1_Retro_Low_OG_2.jpg 앞코와 Air_Jordan_1_Low_SE_Women__1.jpg 앞코의 동일한 오버레이 분할선",
+   "t": 1786264047221
+  },
+  {
+   "stage": "S1",
+   "text": "Repeats in 12 of 12: 슈레이스 구멍을 따라 길게 내려오는 아이스테이 오버레이 — Air_Jordan_1_Low_SE_1.jpg와 Air_Jordan_1_Mid_2.jpg에서 레이스 라인을 따라 독립된 오버레이가 보임",
+   "t": 1786264047221
+  },
+  {
+   "stage": "S1",
+   "text": "What the uploads do not show: 모든 사진이 좌우 측면만 제공되어 혀 라벨, 힐 정면(후면), 아웃솔 바닥, 인솔/내부 구조, 정확한 펀칭 배열은 확인하지 못함. 트리플 스택 모델(두 장)은 폭싱 상단 스티치가 레이어에 가려져 명확히 보이지 않았음.",
+   "t": 1786264047221
+  },
+  {
+   "stage": "S1",
+   "text": "2 Comparing the values you wrote against what is actually there",
+   "t": 1786264047221
+  },
+  {
+   "stage": "S1",
+   "text": "Statement and observation disagree: Every release keeps the same last and panel structure, and we only change materials and colour blocking. vs 업로드된 세트에는 로우(여러 장) 외에도 미드(Air_Jordan_1_Mid_1/2.jpg)와 하이(Air_Jordan_1_Retro_High_OG_1/2.jpg)가 있으며, 하이/미드에는 발목 플랩 추가 패널과 Wings 로고가 존재하지만 로우에는 그 패널이 없음. 또한 Air_Jordan_1_Triple_Stack_SE_Women__1/2.jpg는 3단 플랫폼 컵솔로 사이드월 구조가 표준 모델과 다름. · pick which one holds",
+   "t": 1786264047221
+  },
+  {
+   "stage": "S1",
+   "text": "3 Trend research · no competitor product research in this mode",
+   "t": 1786264048144
+  },
+  {
+   "stage": "S1",
+   "text": "4 The value statement is used to check the uploads, not to set spec values. Locks come from what repeats in the designs.",
+   "t": 1786264049140
+  },
+  {
+   "stage": "S1",
+   "text": "The full trend report is being written separately. It attaches to the research panel when done.",
+   "t": 1786264049156
+  },
+  {
+   "stage": "S1",
+   "text": "Building the season dossier: macrotrends, palettes, materials, key items. It attaches when done.",
+   "t": 1786264049156
+  },
+  {
+   "stage": "S1",
+   "text": "29 web searches, 7 signals (reused an earlier pass) · each linked to a source",
+   "t": 1786264049156
+  },
+  {
+   "stage": "S1",
+   "text": "7 signals confirmed · none unsourced",
+   "t": 1786264049156
+  },
+  {
+   "stage": "S1",
+   "text": "Each signal carries four indices — commercial, cultural, forecast, feasibility — never a single blended score",
+   "t": 1786264049156
+  },
+  {
+   "stage": "S1",
+   "text": "Design prompts now carry the SLIM COURT direction: 텀블 레더 어퍼, 소프트 스웨이드 보강, ChromeFree/트레이스드 레더",
+   "t": 1786264049173
+  },
+  {
+   "stage": "S1",
+   "text": "Season dossier ready · 4 macrotrends, 20 sources (185 searches)",
+   "t": 1786264049173
+  },
+  {
+   "stage": "S1",
+   "text": "Trend report done · 10 implications from 35 searches",
+   "t": 1786264049323
+  },
+  {
+   "stage": "S1",
+   "text": "Three directions built, one per tier · every claim traced to a source",
+   "t": 1786264050146
+  },
+  {
+   "stage": "S2",
+   "text": "Sketch prompts carry the season direction from the dossier",
+   "t": 1786264050146
+  },
+  {
+   "stage": "S2",
+   "text": "Specs per tier · Core 4 · Push 4 · Signature 4 (schema enforced, presets locked)",
+   "t": 1786264050146
+  },
+  {
+   "stage": "S2",
+   "text": "Tier means tooling: Core reuses last and bottom, Push keeps one, Signature may open a new last or mould",
+   "t": 1786264050146
+  },
+  {
+   "stage": "S2",
+   "text": "Series DNA locked from your uploads: closure=lace, sole_construction=cupsole · every design inherits these",
+   "t": 1786264050146
+  },
+  {
+   "stage": "S2",
+   "text": "Reference bank loaded: 4 approved, 2 near-miss rejects (too familiar, cost)",
+   "t": 1786264050146
+  },
+  {
+   "stage": "S2",
+   "text": "Core found no signal it can build without changing tooling, so its spec stays open",
+   "t": 1786264051152
+  },
+  {
+   "stage": "S2",
+   "text": "Push found no signal it can build without changing tooling, so its spec stays open",
+   "t": 1786264051152
+  },
+  {
+   "stage": "S2",
+   "text": "Signature found no signal it can build without changing tooling, so its spec stays open",
+   "t": 1786264051152
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-C01 [core] passed rules, queued for sketch",
+   "t": 1786264051152
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-C02 [core] rule reject · S-01, S-04",
+   "t": 1786264052146
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-C03 [core] passed rules, queued for sketch",
+   "t": 1786264053139
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-C04 [core] passed rules, queued for sketch",
+   "t": 1786264054138
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-P05 [push] rule reject · S-04",
+   "t": 1786264055151
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-P06 [push] passed rules, queued for sketch",
+   "t": 1786264056137
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-P07 [push] passed rules, queued for sketch",
+   "t": 1786264057145
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-P08 [push] passed rules, queued for sketch",
+   "t": 1786264058145
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-S09 [signature] passed rules, queued for sketch",
+   "t": 1786264059139
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-S10 [signature] passed rules, queued for sketch",
+   "t": 1786264060140
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-S11 [signature] rule reject · S-04",
+   "t": 1786264061142
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-S12 [signature] passed rules, queued for sketch",
+   "t": 1786264062144
+  },
+  {
+   "stage": "S2",
+   "text": "9 of 12 specs passed · 3 rejected early · rejects are never rendered",
+   "t": 1786264063165
+  },
+  {
+   "stage": "S2",
+   "text": "Sketching 5 base forms · black ink only, colour never enters this stage",
+   "t": 1786264063165
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-C01 base form sketched (reused)",
+   "t": 1786264063232
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-C03 base form sketched (reused)",
+   "t": 1786264063232
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-C04 base form sketched (reused)",
+   "t": 1786264063232
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-P06 base form sketched (reused)",
+   "t": 1786264063232
+  },
+  {
+   "stage": "S2",
+   "text": "SH-26FW-P07 base form sketched (reused)",
+   "t": 1786264063288
+  },
+  {
+   "stage": "S2",
+   "text": "4 past the cap show as diagrams (cap 12 images)",
+   "t": 1786264063288
+  },
+  {
+   "stage": "S3",
+   "text": "50% move to render · 5 selected",
+   "t": 1786264063288
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-P07 colour enters here: the black-ink sheet becomes a photoreal render, then 2 more views as edits",
+   "t": 1786264063288
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-P07 brand logo composited at the side",
+   "t": 1786264063385
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-P07 branching 3 product variations from the base design",
+   "t": 1786264063629
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-P07 done · 7 cuts (1 of 5)",
+   "t": 1786264063759
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C04 colour enters here: the black-ink sheet becomes a photoreal render, then 2 more views as edits",
+   "t": 1786264063759
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C04 vision QA 3/4 · regenerating the mismatched view, attempt 1 of 2",
+   "t": 1786264064145
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C04 failed twice, flagged as a view mismatch and kept visible",
+   "t": 1786264065140
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C04 done · 0 cuts (2 of 5)",
+   "t": 1786264065140
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C01 colour enters here: the black-ink sheet becomes a photoreal render, then 2 more views as edits",
+   "t": 1786264065140
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C01 done · 0 cuts (3 of 5)",
+   "t": 1786264066135
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C03 colour enters here: the black-ink sheet becomes a photoreal render, then 2 more views as edits",
+   "t": 1786264066135
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C03 vision QA 3/4 · regenerating the mismatched view, attempt 1 of 2",
+   "t": 1786264067145
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C03 QA passed after regeneration",
+   "t": 1786264068141
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-C03 done · 0 cuts (4 of 5)",
+   "t": 1786264068141
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-S09 colour enters here: the black-ink sheet becomes a photoreal render, then 2 more views as edits",
+   "t": 1786264068141
+  },
+  {
+   "stage": "S3",
+   "text": "SH-26FW-S09 done · 0 cuts (5 of 5)",
+   "t": 1786264069137
+  }
+ ],
+ "signals": [
+  {
+   "signal_id": "sg_001",
+   "attribute": "high_stack_platform",
+   "label": "하이 스택 플랫폼 컵솔",
+   "axis": "솔 스택",
+   "observed_count": 3,
+   "sources": [
+    "https://www.nike.com/kr/t/%EC%BD%94%ED%8A%B8-%EB%A0%88%EA%B1%B0%EC%8B%9C-%EB%A6%AC%ED%94%84%ED%8A%B8-%EC%97%AC%EC%84%B1-%EC%8B%A0%EB%B0%9C-InXsCqgL",
+    "https://www.newbalance.com.tw/gender-neutral/shoes/CT302V1-42381.html",
+    "https://www.yoox.com/kr/17519438DA/item"
+   ],
+   "price_bands": [],
+   "confidence": "medium",
+   "direction": "rising",
+   "first_seen": "2026-08-09",
+   "dedup_group": "dg_1",
+   "oem_group": null,
+   "evidence": [
+    "나이키 Court Legacy Lift는 “플랫폼 중창”을 적용한 코트 실루엣의 여성용 라이프스타일 모델로 판매 중이다(사이즈 전개·리뷰 존재). ([nike.com](https://www.nike.com/kr/t/%EC%BD%94%ED%8A%B8-%EB%A0%88%EA%B1%B0%EC%8B%9C-%EB%A6%AC%ED%94%84%ED%8A%B8-%EC%97%AC%EC%84%B1-%EC%8B%A0%EB%B0%9C-InXsCqgL?utm_source=openai))",
+    "뉴발란스 CT302는 ‘증가한(증대된) 중창’과 ‘확장된 컵솔’, 아웃솔이 토까지 감싸는 러버 토 랩을 명시한다(아시아 공식 DTC 설명). ([newbalance.com.tw](https://www.newbalance.com.tw/gender-neutral/shoes/CT302V1-42381.html?utm_source=openai))",
+    "CT302는 리테일 제품 설명에 밑창 높이 약 4.5cm로 표기되어 하이 스택 트렌드를 수치로 확인할 수 있다(YOOX 상품 페이지). ([yoox.com](https://www.yoox.com/kr/17519438DA/item?utm_source=openai))"
+   ],
+   "co_occurring": [
+    "와이드 폭싱(확장 컵솔)",
+    "러버 토 랩",
+    "낮은 아치 롤(플랫 라이딩)"
+   ],
+   "indices": {
+    "commercial": "medium",
+    "cultural": "medium",
+    "forecast": "medium",
+    "feasibility": "low"
+   },
+   "adoption_stage": "growing",
+   "last_change": "modification",
+   "bottom_tooling_change": "required",
+   "upper_pattern_change": "minor"
+  },
+  {
+   "signal_id": "sg_002",
+   "attribute": "deconstructed_upper_no_lining",
+   "label": "디콘스트럭티드 레더 어퍼(안감 제거·폴더블)",
+   "axis": "어퍼 패널·라이닝 구조",
+   "observed_count": 3,
+   "sources": [
+    "https://www.adidas.co.kr/%EC%8A%A4%ED%83%A0-%EC%8A%A4%EB%AF%B8%EC%8A%A4-decon/IE9117.html",
+    "https://www.adidas.co.kr/%EC%8A%A4%ED%83%A0-%EC%8A%A4%EB%AF%B8%EC%8A%A4-decon/IH4480.html",
+    "https://www.adidas.com/us/stan-smith-decon-shoes/IE9117.html"
+   ],
+   "price_bands": [],
+   "confidence": "high",
+   "direction": "rising",
+   "first_seen": "2026-08-09",
+   "dedup_group": "dg_2",
+   "oem_group": null,
+   "evidence": [
+    "아디다스 Stan Smith Decon은 ‘안감 미적용’과 ‘완전히 접을 수 있는 형태(뮬처럼 착용 가능)’를 명시한 미니멀 구조의 코트 스니커즈다(블랙 컬러). ([adidas.co.kr](https://www.adidas.co.kr/%EC%8A%A4%ED%83%A0-%EC%8A%A4%EB%AF%B8%EC%8A%A4-decon/IE9117.html?utm_source=openai))",
+    "같은 모델의 브라운 컬러 페이지도 ‘안감 없는 구조’와 고무 아웃솔, 천공 3-스트라이프 등 디테일을 확인시켜 준다. ([adidas.co.kr](https://www.adidas.co.kr/%EC%8A%A4%ED%83%A0-%EC%8A%A4%EB%AF%B8%EC%8A%A4-decon/IH4480.html?utm_source=openai))",
+    "글로벌 제품 페이지에서도 동일 콘셉트(디콘·가죽 갑피)를 반복 확인할 수 있다. ([adidas.com](https://www.adidas.com/us/stan-smith-decon-shoes/IE9117.html?utm_source=openai))"
+   ],
+   "co_occurring": [
+    "미니멀 스티치(소수 패널)",
+    "소프트 레더 갑피",
+    "뮬형 착화 옵션"
+   ],
+   "indices": {
+    "commercial": "medium",
+    "cultural": "medium",
+    "forecast": "medium",
+    "feasibility": "high"
+   },
+   "adoption_stage": "growing",
+   "last_change": "not_required",
+   "bottom_tooling_change": "not_required",
+   "upper_pattern_change": "minor"
+  },
+  {
+   "signal_id": "sg_003",
+   "attribute": "vintage_aged_finish",
+   "label": "빈티지 워싱 미드솔·에이징 피니시",
+   "axis": "피니시·표면처리",
+   "observed_count": 4,
+   "sources": [
+    "https://www.autry-usa.com/en/man/sneakers/medalist/medalist-low-super-vintage-sneakers-in-white-leather-845665.html",
+    "https://www.nordstrom.com/s/medalist-super-vintage-low-sneaker-men/8440839",
+    "https://www.lyst.com/shoes/autry-medalist-super-vintage-trainers-13/",
+    "https://www.reebok.co.kr/"
+   ],
+   "price_bands": [],
+   "confidence": "high",
+   "direction": "rising",
+   "first_seen": "2026-08-09",
+   "dedup_group": "dg_3",
+   "oem_group": null,
+   "evidence": [
+    "Autry Medalist ‘Super Vintage’ 라인은 핸드크래프트된 ‘worn/used-effect’(에이징) 피니시와 빈티지 무드의 러버 솔을 제품 설명에 명시한다. ([autry-usa.com](https://www.autry-usa.com/en/man/sneakers/medalist/medalist-low-super-vintage-sneakers-in-white-leather-845665.html?utm_source=openai))",
+    "Nordstrom 리테일 페이지도 ‘pre‑scuffed(미리 스커핑된) 미드솔’과 worn‑effect 레더를 강조한다. ([nordstrom.com](https://www.nordstrom.com/s/medalist-super-vintage-low-sneaker-men/8440839?utm_source=openai))",
+    "Lyst 상품 설명에는 ‘worn effect handcrafted’, ‘부분 왁싱한 면 슈레이스’, ‘레더+코튼 테리 라이닝’ 등 에이징·레트로 디테일이 기재된다. ([lyst.com](https://www.lyst.com/shoes/autry-medalist-super-vintage-trainers-13/?utm_source=openai))",
+    "국내 DTC(리복 코리아) 메인 ‘Best Seller’ 섹션에 Club C 85 빈티지(크림/빈티지 톤 미드솔)가 노출되어 상업적 모멘텀을 확인할 수 있다. ([reebok.co.kr](https://www.reebok.co.kr/))"
+   ],
+   "co_occurring": [
+    "오프화이트/크림 미드솔 톤",
+    "천공 토박스",
+    "면 플랫 슈레이스",
+    "노출 폼 텅(모델별)"
+   ],
+   "indices": {
+    "commercial": "high",
+    "cultural": "high",
+    "forecast": "medium",
+    "feasibility": "high"
+   },
+   "adoption_stage": "established",
+   "last_change": "not_required",
+   "bottom_tooling_change": "not_required",
+   "upper_pattern_change": "minor"
+  },
+  {
+   "signal_id": "sg_004",
+   "attribute": "mary_jane_hook_loop",
+   "label": "스트랩·후크앤루프 클로저(메리제인 변형)",
+   "axis": "클로저",
+   "observed_count": 3,
+   "sources": [
+    "https://www.adidas.co.kr/%EC%8A%A4%ED%83%A0-%EC%8A%A4%EB%AF%B8%EC%8A%A4-%EB%A1%9C%EC%9A%B0-%EB%B0%9C%EB%A0%88-w/JQ6939.html",
+    "https://www.adidas.co.kr/stan_smith",
+    "https://www.adidas.co.kr/women-hook_loop-shoes-leather_upper"
+   ],
+   "price_bands": [],
+   "confidence": "high",
+   "direction": "rising",
+   "first_seen": "2026-08-09",
+   "dedup_group": "dg_4",
+   "oem_group": null,
+   "evidence": [
+    "Stan Smith Low Ballet W는 ‘탈부착 스트랩’과 ‘메리제인 스타일의 슬림 로우 프로필’로 재해석된 코트 스니커즈다(리뷰·사이즈 전개 확인). ([adidas.co.kr](https://www.adidas.co.kr/%EC%8A%A4%ED%83%A0-%EC%8A%A4%EB%AF%B8%EC%8A%A4-%EB%A1%9C%EC%9A%B0-%EB%B0%9C%EB%A0%88-w/JQ6939.html?utm_source=openai))",
+    "스탠 스미스 카테고리에서 Hook & Loop(벨크로) 옵션이 4종 노출되어 레이스 이외의 클로저 확장을 확인할 수 있다. ([adidas.co.kr](https://www.adidas.co.kr/stan_smith?utm_source=openai))",
+    "아디다스 내 Hook Loop·Leather Upper 필터에서도 동일 제품군이 반복 노출된다. ([adidas.co.kr](https://www.adidas.co.kr/women-hook_loop-shoes-leather_upper?utm_source=openai))"
+   ],
+   "co_occurring": [
+    "슬림 로우 프로파일",
+    "개방형 토프라인",
+    "톤온톤 레더 갑피"
+   ],
+   "indices": {
+    "commercial": "medium",
+    "cultural": "medium",
+    "forecast": "medium",
+    "feasibility": "medium"
+   },
+   "adoption_stage": "growing",
+   "last_change": "not_required",
+   "bottom_tooling_change": "not_required",
+   "upper_pattern_change": "major"
+  },
+  {
+   "signal_id": "sg_005",
+   "attribute": "metal_eylets_zigzag_stay",
+   "label": "메탈 아일렛·지그재그 아이스테이 디테일",
+   "axis": "아이렛·레이스 스테이",
+   "observed_count": 3,
+   "sources": [
+    "https://www.onitsukatiger.com/sg/en-sg/product/gsm-sd/1183a803.200",
+    "https://www.macys.com/shop/product/asics-mens-onitsuka-tiger-gsm-casual-sneakers-from-finish-line?ID=2763299",
+    "https://eu.kith.com/blogs/discover/onitsuka-tiger-gsm-pack"
+   ],
+   "price_bands": [],
+   "confidence": "high",
+   "direction": "rising",
+   "first_seen": "2026-08-09",
+   "dedup_group": "dg_5",
+   "oem_group": null,
+   "evidence": [
+    "오니츠카타이거 GSM SD는 ‘메탈 아일렛’과 ‘지그재그 아이스테이’를 명시하며 클래식 코트 실루엣에 디테일 포인트를 준다(가죽 갑피·이중 인솔). ([onitsukatiger.com](https://www.onitsukatiger.com/sg/en-sg/product/gsm-sd/1183a803.200?utm_source=openai))",
+    "리테일 설명에서 GSM은 ‘퍼포레이티드 토박스’와 ‘스웨이드·레더 어퍼’ 조합이 반복 확인된다. ([macys.com](https://www.macys.com/shop/product/asics-mens-onitsuka-tiger-gsm-casual-sneakers-from-finish-line?ID=2763299&utm_source=openai))",
+    "과거 GSM 팩 기사에서도 퍼포레이션과 스웨이드 포인트 등 디테일이 강조된다. ([eu.kith.com](https://eu.kith.com/blogs/discover/onitsuka-tiger-gsm-pack?utm_source=openai))"
+   ],
+   "co_occurring": [
+    "퍼포레이티드 토박스",
+    "스웨이드 오버레이",
+    "컵솔 구조"
+   ],
+   "indices": {
+    "commercial": "medium",
+    "cultural": "medium",
+    "forecast": "low",
+    "feasibility": "high"
+   },
+   "adoption_stage": "established",
+   "last_change": "not_required",
+   "bottom_tooling_change": "not_required",
+   "upper_pattern_change": "minor"
+  },
+  {
+   "signal_id": "sg_006",
+   "attribute": "waterproof_membrane_gtx",
+   "label": "생활방수·GORE‑TEX 적용 로우 코트",
+   "axis": "어퍼 소재·라이닝",
+   "observed_count": 3,
+   "sources": [
+    "https://www.nike.com/kr/t/%EB%8D%A9%ED%81%AC-%EB%A1%9C%EC%9A%B0-gore-tex-%EB%82%A8%EC%84%B1-%EC%8B%A0%EB%B0%9C-3psLRn9W/HQ2053-001",
+    "https://www.adidas.co.kr/%EC%8A%88%ED%8D%BC%EC%8A%A4%ED%83%80-ii-mg-gtx/KK0995.html",
+    "https://prod.danawa.com/info/?pcode=17603459"
+   ],
+   "price_bands": [],
+   "confidence": "high",
+   "direction": "rising",
+   "first_seen": "2026-08-09",
+   "dedup_group": "dg_6",
+   "oem_group": null,
+   "evidence": [
+    "나이키 Dunk Low GORE‑TEX는 생활 방수 기능을 명시하며 해당 컬러가 ‘품절’ 상태로 확인된다(로우탑 코트 계열 라이프스타일). ([nike.com](https://www.nike.com/kr/t/%EB%8D%A9%ED%81%AC-%EB%A1%9C%EC%9A%B0-gore-tex-%EB%82%A8%EC%84%B1-%EC%8B%A0%EB%B0%9C-3psLRn9W/HQ2053-001?utm_source=openai))",
+    "아디다스 Superstar II MG GTX 등 코트 스타일의 GTX 적용 모델이 DTC에서 판매 중이다. ([adidas.co.kr](https://www.adidas.co.kr/%EC%8A%88%ED%8D%BC%EC%8A%A4%ED%83%80-ii-mg-gtx/KK0995.html?utm_source=openai))",
+    "스탠 스미스 GTX 모델(예: S42669)의 국내 유통 상품 정보로 GTX 적용 스펙을 확인할 수 있다(해외판·국내 판매 페이지). ([prod.danawa.com](https://prod.danawa.com/info/?pcode=17603459&utm_source=openai))"
+   ],
+   "co_occurring": [
+    "방투습 멤브레인 라이닝",
+    "시접 테이핑(모델별)",
+    "가죽/합성 어퍼"
+   ],
+   "indices": {
+    "commercial": "medium",
+    "cultural": "medium",
+    "forecast": "medium",
+    "feasibility": "medium"
+   },
+   "adoption_stage": "growing",
+   "last_change": "not_required",
+   "bottom_tooling_change": "not_required",
+   "upper_pattern_change": "minor"
+  },
+  {
+   "signal_id": "sg_007",
+   "attribute": "sustainable_materials_chromefree_recycled",
+   "label": "크롬프리 레더·리사이클 소재 채택",
+   "axis": "소재",
+   "observed_count": 3,
+   "sources": [
+    "https://www.adidas.co.kr/%EC%8A%A4%ED%83%A0-%EC%8A%A4%EB%AF%B8%EC%8A%A4/FX7521.html",
+    "https://www.ssense.com/ko-kr/women/product/veja/white-campo-chromefree-leather-sneakers/14797161",
+    "https://www.rei.com/product/180374/veja-campo-leather-shoes-mens"
+   ],
+   "price_bands": [],
+   "confidence": "high",
+   "direction": "rising",
+   "first_seen": "2026-08-09",
+   "dedup_group": "dg_7",
+   "oem_group": null,
+   "evidence": [
+    "스탠 스미스(예: FX7521)는 ‘Primegreen 상급 재생 소재’ 적용을 명시한다(천공 3‑스트라이프·클래식 컵솔 유지). ([adidas.co.kr](https://www.adidas.co.kr/%EC%8A%A4%ED%83%A0-%EC%8A%A4%EB%AF%B8%EC%8A%A4/FX7521.html?utm_source=openai))",
+    "VEJA는 오가닉 코튼, 아마존산 천연 고무, 재생 플라스틱 등 지속가능 소재 기반을 리테일 설명에서 강조한다(SSENSE KR). ([ssense.com](https://www.ssense.com/ko-kr/women/product/veja/white-campo-chromefree-leather-sneakers/14797161?utm_source=openai))",
+    "VEJA Campo 리테일(미국 REI) 페이지에서도 레더 기반 코트 실루엣과 친환경 소재 포지셔닝이 확인된다. ([rei.com](https://www.rei.com/product/180374/veja-campo-leather-shoes-mens?utm_source=openai))"
+   ],
+   "co_occurring": [
+    "크롬프리/로우임팩트 가죽",
+    "천연고무 아웃솔",
+    "재활용 합성 섬유 라이닝"
+   ],
+   "indices": {
+    "commercial": "medium",
+    "cultural": "medium",
+    "forecast": "medium",
+    "feasibility": "medium"
+   },
+   "adoption_stage": "established",
+   "last_change": "not_required",
+   "bottom_tooling_change": "not_required",
+   "upper_pattern_change": "minor"
+  }
+ ],
+ "competitors": [],
+ "directions": [
+  {
+   "id": "dir_1",
+   "title": "Square toe with a low block heel",
+   "summary": "The two strongest signals in this band, combined. It runs on the existing LST-2024-11 last, so development stays cheap.",
+   "signal_ids": [
+    "sg_014",
+    "sg_031"
+   ]
+  },
+  {
+   "id": "dir_2",
+   "title": "Chunky sole, played for volume",
+   "summary": "The chunky sole scores high culturally, pulled back to a volume that fits the brand. The new outsole mould, one per size, is the cost to watch — feasibility is the low index here.",
+   "signal_ids": [
+    "sg_027",
+    "sg_042"
+   ]
+  },
+  {
+   "id": "dir_3",
+   "title": "Soft classic, refined",
+   "summary": "Keeps the classic penny silhouette and improves the fit with suede and a gore panel. Restock signals back this one, so it is the safe axis.",
+   "signal_ids": [
+    "sg_042",
+    "sg_038"
+   ]
+  }
+ ],
+ "seriesDna": {
+  "invariant": [
+   {
+    "element": "toe_shape",
+    "label": "둥글고 낮은 토 스프링. 측면에서 크게 들리지 않는 오지 형태",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": true,
+    "note": "Air_Jordan_1_Retro_Low_OG_1.jpg와 Air_Jordan_1_Mid_1.jpg의 앞코 곡률이 동일한 형태로 반복됨"
+   },
+   {
+    "element": "toe_mudguard",
+    "label": "토박스를 감싸는 U자형 오버레이(머드가드) 존재",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": true,
+    "note": "Air_Jordan_1_Retro_Low_OG_2.jpg 앞코와 Air_Jordan_1_Low_SE_Women__1.jpg 앞코의 동일한 오버레이 분할선"
+   },
+   {
+    "element": "eyestay_overlay",
+    "label": "슈레이스 구멍을 따라 길게 내려오는 아이스테이 오버레이",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": true,
+    "note": "Air_Jordan_1_Low_SE_1.jpg와 Air_Jordan_1_Mid_2.jpg에서 레이스 라인을 따라 독립된 오버레이가 보임"
+   },
+   {
+    "element": "swoosh_overlay",
+    "label": "쿼터를 가로지르는 대형 스우시 오버레이가 힐 오버레이 위로 겹침",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": true,
+    "note": "Air_Jordan_1_Triple_Stack_SE_Women__1.jpg의 금색 스우시가 힐 오버레이 위에 얹힘. Air_Jordan_1_Retro_High_OG_1.jpg도 동일"
+   },
+   {
+    "element": "quarter_heel_panel_split",
+    "label": "스우시 뒷부분 근처의 세로 분할선(쿼터와 힐의 경계)",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": true,
+    "note": "Air_Jordan_1_Retro_Low_OG_1.jpg에서 스우시 꼬리 뒤 세로 스티치, Air_Jordan_1_Mid_1.jpg에서도 동일 위치의 분할 확인"
+   },
+   {
+    "element": "heel_counter_overlay",
+    "label": "뒤꿈치를 감싸는 힐 오버레이 존재",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": true,
+    "note": "Air_Jordan_1_Retro_Low_OG_1.jpg의 붉은 힐 랩과 Air_Jordan_1_Mid_1.jpg의 갈색 힐 랩"
+   },
+   {
+    "element": "cupsole_top_stitch",
+    "label": "컵솔 상단에 어퍼와 결합하는 둘레 스티치(폭싱 스티치)",
+    "observed_in": 10,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": true,
+    "note": "Air_Jordan_1_Retro_Low_OG_1.jpg, Air_Jordan_1_Low_SE_1.jpg에서 중창 상단의 연속 스티치 라인이 선명함. 3단 플랫폼인 Air_Jordan_1_Triple_Stack_SE_Women__1/2.jpg는 레이어가 많아 동일 위치 스티치가 명확히 보이지 않음"
+   }
+  ],
+  "variable": [
+   {
+    "element": "collar_height",
+    "label": "로우/미드/하이 컷 높이 차이",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": false,
+    "note": "로우: Air_Jordan_1_Retro_Low_OG_1.jpg; 미드: Air_Jordan_1_Mid_1.jpg; 하이: Air_Jordan_1_Retro_High_OG_1.jpg"
+   },
+   {
+    "element": "sole_stack_height",
+    "label": "표준 컵솔 vs 3단 플랫폼(트리플 스택)",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": false,
+    "note": "표준: Air_Jordan_1_Retro_Low_OG_1.jpg 등 대부분; 플랫폼: Air_Jordan_1_Triple_Stack_SE_Women__1.jpg의 두꺼운 3단 사이드월"
+   },
+   {
+    "element": "upper_material_combo",
+    "label": "어퍼 소재 조합(스무스 가죽처럼 보이는 표면/스웨이드처럼 보이는 표면/텍스타일 혼용)",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": false,
+    "note": "스웨이드 전체 톤: Air_Jordan_1_Low_SE_Women__1.jpg; 텍스타일 쿼터 혼용: Air_Jordan_1_Low_SE_1.jpg; 스무스 가죽 위주: Air_Jordan_1_Triple_Stack_SE_Women__1.jpg"
+   },
+   {
+    "element": "color_blocking",
+    "label": "패널별 배색 방식이 모델마다 달라짐(투톤, 톤온톤, 삼색 등)",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": false,
+    "note": "투톤: Air_Jordan_1_Mid_1.jpg; 삼색: Air_Jordan_1_Retro_High_OG_1.jpg; 톤온톤: Air_Jordan_1_Low_SE_Women__1.jpg"
+   },
+   {
+    "element": "outsole_color",
+    "label": "아웃솔 컬러(레드/블랙/그레이 등) 변화",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": false,
+    "note": "레드: Air_Jordan_1_Retro_Low_OG_1.jpg; 블랙: Air_Jordan_1_Mid_1.jpg; 그레이: Air_Jordan_1_Low_SE_1.jpg"
+   },
+   {
+    "element": "wings_logo_placement",
+    "label": "Wings 로고 위치가 모델에 따라 달라짐(하이/미드의 발목 플랩 vs 일부 로우의 힐 측면)",
+    "observed_in": 6,
+    "of": 12,
+    "confidence": "medium",
+    "must_inherit": false,
+    "note": "발목 플랩: Air_Jordan_1_Retro_High_OG_1.jpg, Air_Jordan_1_Mid_1.jpg; 힐 측면: Air_Jordan_1_Triple_Stack_SE_Women__1.jpg. 로우 OG/일부 로우는 측면에서 보이지 않음"
+   },
+   {
+    "element": "midsole_color_tone",
+    "label": "미드솔 톤(화이트 vs 세일 톤)의 차이",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": false,
+    "note": "세일 톤: Air_Jordan_1_Retro_High_OG_1.jpg; 화이트: Air_Jordan_1_Low_SE_1.jpg"
+   },
+   {
+    "element": "laces_color",
+    "label": "슈레이스 컬러가 모델마다 다름",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": false,
+    "note": "블랙: Air_Jordan_1_Retro_Low_OG_1.jpg; 화이트: Air_Jordan_1_Low_SE_Women__1.jpg"
+   },
+   {
+    "element": "swoosh_color_finish",
+    "label": "스우시의 컬러/마감 차이(대비 색상, 톤온톤, 메탈릭 톤처럼 보임)",
+    "observed_in": 12,
+    "of": 12,
+    "confidence": "high",
+    "must_inherit": false,
+    "note": "대비 컬러: Air_Jordan_1_Retro_Low_OG_1.jpg의 레드; 톤온톤: Air_Jordan_1_Low_SE_Women__1.jpg; 금색처럼 보이는 메탈릭 톤: Air_Jordan_1_Triple_Stack_SE_Women__1.jpg"
+   }
+  ],
+  "ambiguous": [
+   {
+    "element": "tongue_label",
+    "label": "혀 라벨(점프맨/Nike Air 등) 타입과 위치",
+    "observed_in": 0,
+    "of": 12,
+    "confidence": "low",
+    "must_inherit": false,
+    "note": "모든 사진이 측면만 보여 혀 라벨이 보이지 않음"
+   },
+   {
+    "element": "outsole_tread",
+    "label": "밑창 바닥 트레드 패턴(피벗 서클 등)",
+    "observed_in": 0,
+    "of": 12,
+    "confidence": "low",
+    "must_inherit": false,
+    "note": "밑창 하부가 노출되지 않음"
+   },
+   {
+    "element": "heel_center_branding",
+    "label": "로우 모델의 힐 중앙 윙스/자수 존재 여부",
+    "observed_in": 0,
+    "of": 12,
+    "confidence": "low",
+    "must_inherit": false,
+    "note": "로우 대부분이 후면이 보이지 않아 판단 불가"
+   },
+   {
+    "element": "last_identity",
+    "label": "모든 모델이 동일 라스트(라스트 번호/형상)인지 여부",
+    "observed_in": 0,
+    "of": 12,
+    "confidence": "low",
+    "must_inherit": false,
+    "note": "측면 사진만으로 동일 라스트를 확정할 수 없음"
+   },
+   {
+    "element": "toe_box_perforation_layout",
+    "label": "토박스 펀칭 개수/배열",
+    "observed_in": 0,
+    "of": 12,
+    "confidence": "low",
+    "must_inherit": false,
+    "note": "대부분 각도상 상부가 가려져 정확한 레이아웃 파악 불가"
+   }
+  ]
+ },
+ "dnaConflict": {
+  "brandClaim": "Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+  "observed": "업로드된 세트에는 로우(여러 장) 외에도 미드(Air_Jordan_1_Mid_1/2.jpg)와 하이(Air_Jordan_1_Retro_High_OG_1/2.jpg)가 있으며, 하이/미드에는 발목 플랩 추가 패널과 Wings 로고가 존재하지만 로우에는 그 패널이 없음. 또한 Air_Jordan_1_Triple_Stack_SE_Women__1/2.jpg는 3단 플랫폼 컵솔로 사이드월 구조가 표준 모델과 다름."
+ },
+ "reportBias": {
+  "publisher": "Web, collected 2026-08-09 across 29 searches",
+  "perspective": "KR · DTC 중심 관점에 글로벌/아시아 공식 DTC 및 공신력 있는 리테일·플랫폼(미국/유럽) 보조 인용 — 코트 스니커즈의 데일리·올시즌 유니섹스 시장을 디자인 스펙 중심으로 스캔.",
+  "notes": [
+   "- 경쟁군 분류: (core) 아디다스 Stan Smith 계열, 오니츠카타이거 GSM, 리복 Club C 85(국내 DTC) / (adjacent) 뉴발란스 CT302(과장된 스택·폭싱), 나이키 Dunk GTX·Superstar GTX(방수 적용 로우 코트 라이프스타일) / (aspirational) Autry Medalist Super Vintage(에이징 피니시 가격대 상향), Common Projects Achilles Low(미니멀 레더 컵솔).\n- 베스트셀러·재고: 리복 코리아 메인에 Club C 85 빈티지가 Best Seller로 노출(상업 지수 가중). ([reebok.co.kr](https://www.reebok.co.kr/))\n- 여성 전용(Stan Smith Low Ballet W)은 유니섹스 트렌드 렌즈에서는 ‘adjacent 변형’으로 간주했으나, 코트 실루엣의 클로저 확장 신호로 가치가 높아 포함. ([adidas.co.kr](https://www.adidas.co.kr/%EC%8A%A4%ED%83%A0-%EC%8A%A4%EB%AF%B8%EC%8A%A4-%EB%A1%9C%EC%9A%B0-%EB%B0%9C%EB%A0%88-w/JQ6939.html?utm_source=openai))\n- 문화 지표(참고): 오트리 ‘메달리스트’는 국내 리셀 플랫폼(KREAM)에서 높은 관심·거래량이 관측되어 빈티지 마감 트렌드의 문화적 채택을 보강한다. ([kream.co.kr](https://kream.co.kr/search?keyword=autry&origin_keyword=fila&utm_source=openai))"
+  ]
+ },
+ "trendReport": {
+  "title": "2026 F/W 코트 스니커즈 트렌드 리포트 (한국 DTC 한정, 가격대 미지정)",
+  "executive_view": "한국 DTC에서 직접 확인된 신호는 화이트 기반 코트 룩의 견조한 수요와 레이스 클로저 중심의 보수적 선택이다. 품절·웨이트리스트가 붙은 PUMA CA Pro와 Onitsuka Tiger GSM가 이를 뒷받침하며, adidas Samba OG는 ‘정사이즈’ 커뮤니케이션과 149,000~169,000원대 정상가 및 104,300~135,200원대 세일가 노출로 가격·가용성 벤치마크를 제공한다. 세부 라스트·패널·트레드 스펙은 다수 PDP에 미기재이므로 2026 F/W에는 제품 자체 개선과 더불어 스펙 투명성 강화를 병행하는 편이 리스크를 줄인다. 인접 계열의 스택형 미드솔, 크롬프리 레더, 직접 사출 PU 솔은 코트 룩을 해치지 않는 범위에서 차별화 옵션으로 검토 가치가 있다.",
+  "body_markdown": "## 개요 및 범위\n본 리포트는 2026년 8월 9일 기준, 한국 DTC 및 브랜드 공식 페이지에서 확인된 사실만을 사용했다. SKU별 상위 판매·품절/재입고 빈도·사이즈별 소진 이력은 공식적으로 공개되지 않아 정량 추정은 불가하며, 페이지에 노출된 가격·가용성·설명 텍스트를 중심으로 해석했다. 코트 스니커즈 직접 신호를 60~70% 비중으로 다루고, 인접 계열은 20~25%, 신발 매크로 맥락은 10~15% 선에서 보조 지표로 제시한다.\n한국 DTC에서 유니섹스 표기가 명확한 코트 스니커즈는 본 검색 범위에서 찾지 못했다. adidas Samba OG 예시는 남성 분류로 표기되어 있으며, 많은 세부 스펙은 PDP에 미기재다. 이는 카테고리의 ‘무엇이 팔리는가’보다는 ‘무엇이 어떻게 설명되는가’에 대해 더 많은 신호가 관찰된다는 점을 의미한다.\n\n## 직접 신호: 한국 DTC 가용성·가격·수요 징후\nadidas Samba OG는 정상가 149,000원 또는 159,000원으로 노출되며, 일부 SKU는 111,300원(-30%) 세일가가 확인된다. 같은 카테고리에는 169,000원 정상가와 104,300~135,200원 구간의 세일가 노출도 존재한다. PDP에는 ‘정사이즈’ 권장 문구가 반복되지만 라스트 볼륨, 토 셰이프, 컵솔·폭싱 높이, 트레드 유형 등은 텍스트로 명시되어 있지 않다. 또한 해당 예시들은 유니섹스 표기가 아닌 남성 분류다.\nOnitsuka Tiger GSM WHITE/WHITE는 한국 DTC에서 ‘품절’과 ‘재입고 알림 신청’이 활성화되어 있다. 어퍼 혁신 소재 표시는 없고 클래식 코트 실루엣으로 제시되며, 미니멀 화이트 톤에 대한 선호가 실제 수요 신호로 관찰된다. competitor_group은 Performance Heritage/Japanese로 분류된다.\nPUMA CA Pro 라인은 한국 DTC에서 복수 SKU가 ‘품절’로 표시되며, 상품 설명에는 전후면 고무 플러그가 달린 스택형 미드솔이 명시된다. 글로벌 공시에서도 CA Pro·Slipstream·Doublecourt를 통해 ‘화이트 코트 슈즈’ 수요에 대응했다는 진술이 존재해 품절 신호가 일회성이 아닐 가능성을 보강한다. competitor_group은 PUMA SE로 식별된다.\nadidas 스탠 스미스 남성 카테고리의 필터 스냅샷에서는 클로저 분포가 Laces 13, Slip On 1로 표시된다. 시즌 간 추세는 아니지만, 레이스가 현재 코트 룩에서 지배적임을 보여주는 직접 단서다.\nReebok Club C 85 계열은 리스트 화면에서 가격·사이즈·컬러 중심의 정보만 제공되며 아이렛 수나 레이스 폭 같은 미세 스펙은 표기되지 않는다. 이는 한국 DTC에서 마이크로 스펙 벤치마킹이 어렵다는 실무적 제약을 시사한다.\n\n## 라스트·핏\n직접 관찰된 PDP에서 라스트 볼륨 값이나 토 셰이프는 명시되지 않았고, 대신 ‘정사이즈’ 메시지가 반복된다. 유니섹스 표시는 제한적으로만 보였고, 예시로 든 Samba OG는 남성 분류였다. FW26 기획에서 라스트 관련 결정을 외부 데이터에만 의존하기 어렵고, TTS 커뮤니케이션을 전제로 실제 착화 폭·볼룸은 내부 표준(미디엄 라스트 가정 등)에서 검증해야 한다는 과제가 남는다.\n레이스 클로저의 우세가 카테고리 스냅샷에서 드러나므로, 핏 안정성을 해치지 않는 범위에서 레이스 기반 조절성을 유지하는 편이 안전하다. 다만 본 관측은 특정 시점의 필터 수량이므로 보편 법칙으로 단정하기엔 표본이 작다.\n\n## 어퍼 구조\nSamba OG의 PDP에는 T-토 유무, 패널 피스 수, 폭싱·오버레이 레이아웃 같은 구조 정보가 표기되어 있지 않다. 이는 경쟁 비교에서 디테일의 텍스트 기반 검증이 어렵다는 뜻이며, FW26 기획 시 ‘보이는 구조’만으로 차별화하려면 추가 이미지·카피 전략이 병행되어야 한다.\nOnitsuka Tiger GSM는 혁신 소재 표기가 따로 없고 클래식 레더 기반 코트 실루엣으로 제시된다. 화이트/화이트 컬러웨이에 품절·웨이트리스트가 붙은 점은 미니멀 패널링과 청결한 표면감에 대한 지속 수요를 시사하지만, 동일 구조가 다른 컬러에서도 동일 성과를 내는지는 더 많은 표본이 필요하다.\n인접 계열에서는 New Balance CT302가 비대칭 토캡과 얇은 1겹 나일론 텅 등 구조 업데이트를 채택했다. 코트 룩의 골격을 유지하면서 한두 군데의 시그니처 디테일로 차이를 만드는 방식이 실현 가능하다는 레퍼런스이며, competitor_group은 Athletic Heritage/Global로 분류된다.\nVEJA는 Chromefree leather를 명기해 친환경 소재 설계를 전면에 세운다. 한국 DTC 교차 확인은 추가 작업이 필요하지만, 소재 스토리텔링의 유효성을 시사하는 인접 신호로 해석된다.\n\n## 솔·힐·트레드\nPUMA CA Pro의 스택형 미드솔과 전후면 고무 플러그는 코트 룩을 해치지 않으면서 체감 볼륨과 시각적 레이어를 더하는 장치로 제시된다. 한국 DTC에서 복수 SKU 품절이 확인되어 FW26에도 이 조합의 흡인력이 유지될 가능성이 있다.\nECCO Street Lite는 경량 PU 솔과 FLUIDFORM 기술을 명시해 저부의 편안함과 일체감을 강조한다. 레트로 코트풍 외관을 유지하는 라이프스타일 포지셔닝이어서, 코트 룩에 직접 사출 기반 솔을 결합해 차별화할 여지를 보여준다. 다만 한국 DTC의 판매 신호는 본 범위에서 확인하지 못했다.\nSamba OG와 GSM의 PDP에서는 컵솔/폭싱 높이나 트레드 패턴에 대한 명시가 없었다. 트레드의 헤링본/와플 등 형상 트렌드를 텍스트로 검증하기 어렵고, 별도의 실물 조사 또는 이미지 기반 분류가 필요하다.\nVEJA는 아웃솔에 아마조니아 천연 고무 사용을 공개한다. 친환경 러버 블렌드를 코트 룩과 접목하는 접근은 소재 차별화로 읽힌다.\n\n## 공법\nECCO FLUIDFORM는 접착제나 스티칭 없이 상·하부를 경량 유체 소재로 일체화하는 직접 사출 계열 공정으로 소개된다. 코트풍 외관을 유지하면서도 저부의 쿠셔닝·내구 일체감을 높일 수 있는 제조 관점의 옵션이다.\n반면 한국 DTC에서 관찰한 PUMA CA Pro, Onitsuka Tiger GSM, adidas Samba OG PDP에는 보드/스트로벨 라스팅 여부, EVA·PU 웨지 두께·경도, Ortholite/PU 드롭인 인솔 유무 등 공법·내장 스펙이 명시되지 않았다. FW26에는 제품 개발과 동시에 PDP 스펙 투명성을 높여 구매 장벽을 낮출 필요가 있다.\n\n## 인접 계열 관측\nAutry Medalist는 ko 언어 페이지에서 Sold out 표기가 다수 보이나 배송 지역이 United States로 표시되어 한국 DTC 신호는 아니다. 그래도 클래식 코트 룩의 글로벌 인기 지속을 가늠하는 주변지표로는 유의미하다.\nVEJA의 Chromefree leather, 아마조니아 천연 고무, 그리고 New Balance CT302의 구조 업데이트는 코트 룩을 유지하면서도 차별화를 만들 수 있는 소재·구조 카드로 기능한다. 다만 한국 DTC에서 동일 스펙과 조기 판매 신호가 동시에 확인된 사례는 추가 조사가 필요하다.\n\n## 매크로 맥락\n무신사 2025 트렌드 결산에서는 ‘편하고 코디 쉬운 로우컷 스니커즈’ 선호가 확인되었다고 서술된다. 코트 스니커즈의 저부 편안함 강화와 로우컷 유지가 여전히 유효한 배경으로 읽힌다.\n또한 한국 DTC PDP 다수에서 라스팅·인솔·웨지 수치가 비공개라는 점은 소비자 정보 비대칭을 낳는다. FW26 커뮤니케이션에서는 핏 가이드 외에 저부 구조의 핵심 키워드를 간명하게 노출하는 것이 필요하다.\n\n## 리스크와 반대 신호\n직접 관찰된 예시 중 일부는 남성 분류로만 운영되어 유니섹스 대응에 바로 대입하기 어렵다. 같은 화이트 기반 코트 룩이라도 품절은 공급량 제약의 결과일 수 있어 수요 과잉으로 단정할 수 없다.\n스택형 미드솔·고무 플러그 선호는 PUMA의 특정 라인에서 강하게 보였지만, 패션·퍼포먼스 메이저 전반으로의 확산은 추가 검증이 필요하다. 인접 계열의 친환경 소재 스토리는 설득력이 있으나, 한국 DTC에서의 실제 판매 신호와 결합된 데이터가 부족하다.",
+  "design_implications": [
+   {
+    "area": "라스트·핏",
+    "guidance": "정사이즈 커뮤니케이션을 기본값으로 설계하고, 사이즈 선택 텍스트와 피팅 가이드를 PDP 초반에 배치한다.",
+    "basis": "adidas Samba OG PDP에 ‘정사이즈’ 권장 문구가 반복 표기됨."
+   },
+   {
+    "area": "라스트·핏",
+    "guidance": "유니섹스 단일 그레이딩 가정보다는 남녀 별 라스트 운영 또는 폭옵션 보완을 사전 검토한다.",
+    "basis": "본 범위에서 유니섹스 표기가 드물고, Samba OG 예시는 남성 분류로만 운영됨."
+   },
+   {
+    "area": "어퍼",
+    "guidance": "화이트/화이트 미니멀 코트 룩을 핵심 컬러웨이로 배치한다.",
+    "basis": "Onitsuka Tiger GSM WHITE/WHITE 한국 DTC에서 품절 및 재입고 알림 활성화 확인."
+   },
+   {
+    "area": "어퍼",
+    "guidance": "클래식 코트 골격을 유지하되, 한 포인트 디테일(예: 비대칭 토캡 또는 얇은 텅감)을 옵션 팩으로 실험한다.",
+    "basis": "New Balance CT302가 비대칭 토캡, 1겹 나일론 텅 등 구조 업데이트를 공식 명시."
+   },
+   {
+    "area": "솔·힐·트레드",
+    "guidance": "컵솔 베이스 위 스택형 미드솔 효과와 소형 러버 플러그류의 레이어링을 적용하되 과장된 높이는 지양한다.",
+    "basis": "PUMA CA Pro 한국 DTC에서 ‘스택형 미드솔·고무 플러그’ 명시 및 복수 SKU 품절 신호 확인."
+   },
+   {
+    "area": "소재",
+    "guidance": "친환경 스토리를 위한 크롬프리 레더 버전을 병행 기획하고 소재 설명 모듈을 PDP에 추가한다.",
+    "basis": "VEJA가 Chromefree leather 라인 운영 사실을 공식 공개."
+   },
+   {
+    "area": "솔·힐·트레드",
+    "guidance": "경량성·내구 일체감을 위한 직접 사출 PU 솔 변형을 탐색하되 코트 룩의 시각적 단순함을 해치지 않는 범위에서 적용한다.",
+    "basis": "ECCO FLUIDFORM가 직접 사출 계열 공법으로 소개되고 레트로 코트풍 Street Lite에 적용."
+   },
+   {
+    "area": "컬러",
+    "guidance": "화이트 코어를 중심으로 내추럴·검솔·톤온톤 변주를 최소 단위로 확장한다.",
+    "basis": "PUMA 연차보고서에서 ‘화이트 코트 슈즈’ 수요 대응을 명시, GSM 화이트/화이트 품절 신호와도 부합."
+   },
+   {
+    "area": "부자재",
+    "guidance": "레이스 클로저를 기본 사양으로 두고, 슬립온은 컬렉션 보조나 캡슐 한정으로 제한한다.",
+    "basis": "adidas 스탠 스미스 남성 카테고리 필터 스냅샷에서 Laces 13, Slip On 1로 표기."
+   },
+   {
+    "area": "공법",
+    "guidance": "라스팅 방식, 인솔 종류, 미드솔 소재 등 핵심 사양을 PDP에 명문화하여 정보 비대칭을 줄인다.",
+    "basis": "한국 DTC 다수 PDP에서 라스팅·인솔·웨지 두께·경도·중량이 미기재로 확인됨."
+   }
+  ],
+  "open_questions": [
+   "FW24→FW26 구간에서 한국 DTC 유니섹스 코트 스니커즈의 라스트·토 셰이프·패널 분포가 실제로 어떻게 이동했는가? 시간축 데이터가 부재하다.",
+   "한국 DTC에서 코트 룩에 크롬프리 레더나 아마조니아 고무 등 친환경 소재가 채택된 SKU와 그 초기 판매 신호는 어디에서 확인 가능한가?",
+   "PUMA CA Pro의 품절 신호가 전 컬러·전 라스트에 폭넓게 나타나는지, 혹은 특정 테마·공급량에 한정되는지 교차 검증이 필요하다.",
+   "보드/스트로벨 라스팅, EVA·PU 웨지 두께·경도, 드롭인 인솔의 실제 스펙을 공개 또는 실측으로 확보할 수 있는가?",
+   "레이스 우세가 시즌성인지 상시 현상인지 파악하려면 클로저 분포의 시계열 스냅샷이 필요하다.",
+   "Samba OG 등 주요 모델의 유니섹스 운영 전환 계획 또는 폭옵션 확대 계획이 있는지 브랜드별 확인이 필요하다."
+  ],
+  "sources": [
+   "https://www.adidas.co.kr/%EC%82%BC%EB%B0%94-og/IH6820.html",
+   "https://www.adidas.co.kr/%EC%82%BC%EB%B0%94-og/JR0890.html",
+   "https://www.adidas.co.kr/samba",
+   "https://www.adidas.co.kr/men-stan_smith",
+   "https://www.reebok.co.kr/goods/goods_search.php?keyword=%ED%81%B4%EB%9F%BD+C+85",
+   "https://www.musinsa.com/content/1452880391798882205",
+   "https://www.onitsukatiger.com/kr/ko-kr/product/gsm/1183a353.137",
+   "https://www.autry-usa.com/ko/%EB%82%A8%EC%84%B1/%EC%8A%A4%EB%8B%88%EC%BB%A4%EC%A6%88/medalist/",
+   "https://project.veja-store.com/pt_br/single/emissions",
+   "https://project.veja-store.com/en/single/rubber",
+   "https://company.newbalance.jp/press/2022/p-58355",
+   "https://global.ecco.com/en/men/product-types/shoes/ecco%2Bstreet%2Blite%2Bm-521304-51052",
+   "https://global.ecco.com/en/ladies/product-types/shoes/ecco%2Bstreet%2Blite%2Bw-212803-59390",
+   "https://us.ecco.com/stories/innovation",
+   "https://us.ecco.com/product/ecco-street-lite/521434/61005",
+   "https://kr.puma.com/kr/ko/pd/ca-%ED%94%84%EB%A1%9C-fd/387486.html",
+   "https://kr.puma.com/kr/ko/pd/ca-%ED%94%84%EB%A1%9C-%EA%B3%A0-%ED%8F%AC%2Fca-pro-go-for/384214.html",
+   "https://annual-report.puma.com/2023/en/downloads/puma-ar-2023_combined-management-report.pdf",
+   "https://about.puma.com/sites/default/files/media/news/downloads/all-time-2022-press-release.pdf"
+  ]
+ },
+ "reportPending": false,
+ "dossier": {
+  "season": "FW26",
+  "forecast_season": "SS27",
+  "evidence_season": "FW26",
+  "season_title": "SS27 FOOTWEAR · COURT_SNEAKER · DAILY · UNISEX",
+  "powershift": "FW26 관측을 바탕으로 SS27에 실루엣은 슬림화되고, 소재는 라이트 글램으로 확장되며, 가무솔 테라스는 일상화되고, 슬립온 변형이 부상한다.",
+  "season_narrative": "FW26 관측 결과는 코트형 로우 스니커의 체력을 입증한다. 런웨이는 스포츠 감도를 고급화했고 실루엣은 낮고 얇았다. Onitsuka Tiger가 Mexico 66 계열을 변주했고 Balenciaga도 스포츠 무드를 확장했다. Lyst의 Q1-26 리스트에는 스니커가 상위 제품에 포함됐다. SS27에서는 이 얇은 프로파일이 상업 영역에서 더 넓어진다. ([voguehk.com](https://www.voguehk.com/en/article/runway/onitsuka-tiger-fall-2026/?utm_source=openai))\n리테일 신호는 SS27에 테라스 코트의 연착륙을 예고한다. adidas는 Q1-26에서 Terrace 비즈니스의 건전함과 Samba Jane 확장을 밝혔다. 자사몰 베스트셀러에는 Gazelle과 Gazelle Indoor, SL 72가 반복 노출된다. SS27에서는 갈색과 뉴트럴 스웨이드, 얇은 컵솔의 일상 착화가 더 늘어난다. ([adidas-group.com](https://www.adidas-group.com/en/media/press-releases/adidas-records-strong-start-to-the-year-in-the-first-quarter-of-2026?utm_source=openai))\n소비자 서사는 슬림 스니커와 ‘페미닌’ 디테일의 결합을 키운다. 2026 트렌드 리포트는 슬림 스니커의 우세와 새틴·비딩 스니커의 등장을 공통 지목했다. FW26/27 프리뷰도 ‘슬림’ 키워드를 반복했다. SS27에서는 낮은 토박스와 얇은 끈, 미세 비딩이 코트형에 접목된다. ([elle.com](https://www.elle.com/fashion/shopping/a70082570/2026-sneaker-trends/?utm_source=openai))\n선행 지표는 슬립온 전환을 가속한다. PUMA는 2026년 4월 Speedcat Ballet을 글로벌 런칭했다. adidas는 2026년 여름 Samba Mule을 예고했고 변형 라스트가 검증 중이다. Onitsuka Tiger는 신공장을 가동하며 Mexico 66 라인 확장을 이어갔다. SS27에서는 끈 없는 코트형 일상화가 본격화된다. ([mediahub.puma.com](https://mediahub.puma.com/articles/puma-expands-its-ballet-range-with-a-graceful-speedcat-refresh?utm_source=openai))\n또한 Samba의 절정이 2024년에 이미 지났다는 분석이 확산했다. 에디토리얼은 ‘다운 주기’ 속에서도 코트형 변주가 지속 유효하다고 본다. SS27에서는 OG 과열 대신 SL 72와 Gazelle 파생, Club C류로 수요가 분산된다. 코트 스니커의 생활화가 다음 파장으로 이어진다. ([vogue.com](https://www.vogue.com/article/is-the-reign-of-the-fashion-sneaker-over?utm_source=openai))\n이번 시즌의 매크로는 네 갈래로 정리된다. SLIM COURT는 얇은 컵솔과 낮은 프로파일을 표준으로 굳히며 안전 구간에 든다. GLAM COURT는 새틴과 비딩으로 상업적 변주를 키우며 성장기로 본다. GUM TERRACE는 궤도에 오른 안정 단계로 유지된다. SLIP COURT는 슬립온·뮬 전개가 늘며 이른 성장 신호로 본다.",
+  "macrotrends": [
+   {
+    "name": "SLIM COURT",
+    "statement": "SS27에 데일리 유니섹스 코트 스니커가 더 얇고 가볍게 확장된다.",
+    "narrative": "FW26에서 ‘슬림 스니커’가 주류로 올라섰다. 테니스 코드가 다시 전면에 섰고, 하우스와 스포츠 양쪽이 로우 컵솔을 정제했다. SS27에는 같은 무드가 일상 착장으로 더 넓게 스며든다.\n리테일에서는 얇은 컵솔과 경량 인서트가 표준이 된다. 스탠 스미스와 클럽 C 계열이 품번 확장과 재입고로 저변을 넓힌다. SS27에는 메시와 퍼포 토가 통기성과 경량감을 맡는다.\n색과 재료는 조용하고 촉감이 좋은 쪽으로 간다. 텀블 레더와 소프트 스웨이드가 표면을 부드럽게 만든다. SS27에는 화이트와 거무스름한 검, 저채도 포인트가 균형을 잡는다.",
+    "sub_trends": [
+     "로우컷 코트 라스트와 슬림 토",
+     "얇은 컵솔과 경량 EVA 인서트",
+     "퍼포레이션 토와 메시 사이드 패널",
+     "텀블 레더와 소프트 스웨이드 믹스"
+    ],
+    "drivers": [
+     {
+      "label": "검색·수요 지표",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "consumer",
+      "source_url": "https://www.lyst.com/the-lyst-index/q1-26/",
+      "observed_note": "Q1 2026 Hottest Products에 스니커가 포함되어 상위 노출을 유지했다."
+     },
+     {
+      "label": "소셜 파급",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "social",
+      "source_url": "https://www.youtube.com/watch?v=OARE9c6EB8c",
+      "observed_note": "Autry가 Changbin 앰버서더 캠페인을 공개했고 영상 조회 수가 축적되며 브랜드 언급이 늘었다."
+     },
+     {
+      "label": "쇼 등판",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "shows",
+      "source_url": "https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/lacoste",
+      "observed_note": "Lacoste FW26가 테니스 코드를 강화해 코트 무드의 연속성을 확인했다."
+     }
+    ],
+    "palette": [
+     {
+      "name": "Cloud White",
+      "pantone_tcx": "",
+      "hex": "#F2F2F2"
+     },
+     {
+      "name": "Sail Off-White",
+      "pantone_tcx": "",
+      "hex": "#F3EDE3"
+     },
+     {
+      "name": "Gum Caramel",
+      "pantone_tcx": "",
+      "hex": "#B2742B"
+     },
+     {
+      "name": "Pine Green",
+      "pantone_tcx": "",
+      "hex": "#1F5E3E"
+     },
+     {
+      "name": "Peacoat Navy",
+      "pantone_tcx": "",
+      "hex": "#1B2A41"
+     },
+     {
+      "name": "Butter Cream",
+      "pantone_tcx": "",
+      "hex": "#F1E2A8"
+     },
+     {
+      "name": "Powder Blue",
+      "pantone_tcx": "",
+      "hex": "#A7C6ED"
+     },
+     {
+      "name": "Soft Lilac",
+      "pantone_tcx": "",
+      "hex": "#C8B7E9"
+     },
+     {
+      "name": "Stone Grey",
+      "pantone_tcx": "",
+      "hex": "#D9DDE1"
+     }
+    ],
+    "materials": [
+     {
+      "label": "텀블 레더 어퍼",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.beymen.com/en/p_autry-medalist-super-vintage-mens-leather-sneakers_1811626",
+      "observed_note": "Autry Medalist Super Vintage 상세에 ‘Perforated, tumbled textured’가 명시되었다."
+     },
+     {
+      "label": "소프트 스웨이드 보강",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.nike.com/t/killshot-2-leather-mens-shoes-72M7D1/432997-107?nikegos=true",
+      "observed_note": "Nike Killshot 2 설명에 ‘soft suedes’가 반복 표기된다."
+     },
+     {
+      "label": "ChromeFree/트레이스드 레더",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.veja-store.com/en_us/p/campo-leather-white-natural-CP0502429.html",
+      "observed_note": "VEJA Campo가 ChromeFree 레더와 바이오 기반 인솔을 표준으로 쓴다."
+     },
+     {
+      "label": "메시 패널",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.net-a-porter.com/en-us/shop/product/chloe/shoes/low-top/kick-leather-and-suede-trimmed-mesh-sneakers/46376663162985245",
+      "observed_note": "Chloé Kick가 메시와 레더를 혼합해 경량감을 강조했다."
+     }
+    ],
+    "details": [
+     {
+      "label": "마이크로 퍼포 토",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.autry-usa.com/en/woman/sneakers/medalist/medalist-low-sneakers-in-meteorite-napa-leather-4274.html",
+      "observed_note": "Autry Medalist 상세에 ‘Micro-perforated toe’가 기재되었다."
+     },
+     {
+      "label": "슬림 컵솔",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://runrepeat.com/nike-killshot-2",
+      "observed_note": "Killshot 2 분해 리뷰에서 컵솔 구조가 확인되었다."
+     },
+     {
+      "label": "EVA 미드솔/인서트",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.reebok.com/collections/eva-foam-midsole-sneakers-0afz00a/products/reebok-club-c-85-vintage-shoes-chalk-paperwhite-glen-green-103162",
+      "observed_note": "Club C 85 Vintage 설명에 ‘EVA midsole’ 경량 쿠셔닝이 명시되었다."
+     },
+     {
+      "label": "메시 사이드 통기",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.net-a-porter.com/en-us/shop/product/chloe/shoes/low-top/kick-leather-and-suede-trimmed-mesh-sneakers/46376663162985245",
+      "observed_note": "Chloé Kick에 메시 사이드와 경량 솔이 기재되었다."
+     }
+    ],
+    "key_items": [
+     {
+      "segment": "women",
+      "name": "adidas Stan Smith (M20324)",
+      "description": "클래식 테니스 라스트가 더 슬림하게 보인다. 퍼포 3-스트라이프가 측면을 정갈하게 만든다. SS27에는 화이트와 녹색 포인트가 데일리 유니섹스로 고정된다.",
+      "metric": {
+       "label": "로우 컵솔·슬림 토",
+       "yoy_percent": null,
+       "magnitude": "steady",
+       "source_kind": "market",
+       "source_url": "https://www.adidas.com/us/stan-smith-shoes/M20324.html",
+       "observed_note": "리뷰 1.7만여 건이 누적되어 상시 수요를 증명한다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 슬림 라운드. 힐 로우 컵솔 25mm. 소재 풀그레인 레더. 클로저 7아이렛 플랫 레이스. 부자재 퍼포 사이드 홀·힐탭 콘트라스트.",
+      "image_url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/69721f2e7c934d909168a80e00818569_9366/Stan_Smith_Shoes_White_M20324_01_standard.jpg"
+     },
+     {
+      "segment": "women",
+      "name": "CHLOÉ Kick leather and suede-trimmed mesh sneakers",
+      "description": "레더와 스웨이드, 메시가 가볍게 조합된다. 얇은 러버솔이 발등을 낮춰 슬림하다. SS27에는 여성용 코트 스니커의 페미닌 변주로 확산된다.",
+      "metric": {
+       "label": "메시 사이드 패널",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.net-a-porter.com/en-us/shop/product/chloe/shoes/low-top/kick-leather-and-suede-trimmed-mesh-sneakers/46376663162985245",
+       "observed_note": "일부 사이즈가 품절로 표시되며 회전이 빠르다."
+      },
+      "grade": "early_sign",
+      "silhouette_spec": "토 슬림 알몬드. 힐 로우 웨지 감도. 소재 메시·스웨이드·레더. 클로저 6아이렛. 부자재 레더 패치·라이트컵솔.",
+      "image_url": "https://www.net-a-porter.com/variants/images/46376663162985245/in/w2000_q60.jpg"
+     },
+     {
+      "segment": "women",
+      "name": "AUTRY Medalist Low",
+      "description": "마이크로 퍼포 토와 플랫 컵솔이 빈티지 무드를 만든다. 테리 라이닝이 일상 착화감을 높인다. SS27에는 실버·뉴트럴 톤으로 데일리화가 진행된다.",
+      "metric": {
+       "label": "퍼포 토·텀블 텍스처",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.nordstrom.com/s/medalist-low-sneaker-women/7406621",
+       "observed_note": "색상 Metal/Snake Silver에 ‘Only a few left’가 표기되었다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 슬림 라운드·퍼포. 힐 로우 컵솔. 소재 텀블 레더·스웨이드. 클로저 7아이렛. 부자재 테리 라이닝·사이드 로고 라벨.",
+      "image_url": "https://n.nordstrommedia.com/it/5fa756e2-de49-4662-b64b-41072ee6a4a9.jpeg?crop=pad&h=1196&trim=color&w=780"
+     },
+     {
+      "segment": "men",
+      "name": "Nike Killshot 2 Leather",
+      "description": "로우 컵솔과 얇은 레더·스웨이드가 경량감을 준다. 거무스름한 검솔이 레트로 무드를 더한다. SS27에는 셀·네이비 조합이 포멀 캐주얼에 맞춰 진입한다.",
+      "metric": {
+       "label": "슬림 컵솔",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.nike.com/t/killshot-2-leather-mens-shoes-72M7D1/432997-107?nikegos=true",
+       "observed_note": "상세에 ‘low-profile tennis shoes’ 출신 문구가 반복된다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 슬림 라운드. 힐 로우 컵솔·검 러버. 소재 레더·스웨이드. 클로저 6아이렛. 부자재 나일론 라벨.",
+      "image_url": "https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/73627869-5239-40d9-b41f-5dcdaba413e4/KILLSHOT%2B2%2BLEATHER.png"
+     },
+     {
+      "segment": "men",
+      "name": "Reebok Club C 85 Vintage",
+      "description": "EVA 미드솔과 얇은 컵솔이 가벼운 착화감을 만든다. 절제된 스티치와 슬림 토가 드레스 코드와도 호환된다. SS27에는 초크·그린 조합이 안정된 수요를 잇는다.",
+      "metric": {
+       "label": "EVA 미드솔",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.zappos.com/p/unisex-reebok-lifestyle-club-c-85-vintage-int-white-green/product/8798702/color/657966",
+       "observed_note": "Zappos에서 별점 5.0과 다수 색상 구성이 유지된다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 슬림 라운드. 힐 로우 컵솔. 소재 가죽 어퍼. 클로저 7아이렛. 부자재 EVA 미드솔·패디드 카라.",
+      "image_url": "https://m.media-amazon.com/images/I/81kvXX9rD5L._AC_SR73%2C58_.jpg"
+     },
+     {
+      "segment": "men",
+      "name": "VEJA Campo Leather White Natural",
+      "description": "ChromeFree 레더와 바이오 기반 인솔이 특징이다. 얇은 벽의 컵솔이 매끈한 측면선을 만든다. SS27에는 화이트·내추럴 조합이 여름용 데일리로 확대된다.",
+      "metric": {
+       "label": "지속가능 레더·슬림 컵솔",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.veja-store.com/en_us/p/campo-leather-white-natural-CP0502429.html",
+       "observed_note": "사이즈별 ‘Low stock’ 문구가 다수 노출되었다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 슬림 라운드. 힐 로우 컵솔. 소재 ChromeFree 레더·스웨이드. 클로저 7아이렛. 부자재 바이오 EVA 인솔.",
+      "image_url": "https://media.veja-store.com/images/t_sfcc-pdp-mobile-v2/f_auto/v1781690726/VEJA/PACKSHOTS/CP0502429_1/veja-sneakers-campo-leather-white-cp0502429_1.jpg"
+     },
+     {
+      "segment": "kids",
+      "name": "adidas Stan Smith Kids (JP9712)",
+      "description": "아이용 라스트가 더 가볍고 낮게 설계되었다. 트리플 화이트가 교복과도 조화된다. SS27에는 벨크로와 레이스형이 병행 확장된다.",
+      "metric": {
+       "label": "경량 로우 컵솔",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.adidas.com/us/stan-smith-shoes-kids/JP9712.html",
+       "observed_note": "키즈 모델이 상시 입고되며 리뷰가 안정적이다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 슬림 라운드. 힐 로우 컵솔. 소재 합성·레더 믹스. 클로저 6아이렛 또는 벨크로. 부자재 퍼포 사이드 홀.",
+      "image_url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/a5f6488d9fe2450dabef4f05afa2da6c_9366/Stan_Smith_Shoes_Kids_White_JP9712_01_standard.jpg"
+     },
+     {
+      "segment": "kids",
+      "name": "Reebok Club C Shoes, Big Kids (108292)",
+      "description": "얇은 컵솔과 미니멀 어퍼가 교복 스타일과 맞다. 초크·그린 포인트가 클래식 무드를 준다. SS27에는 경량 쿠셔닝의 범위가 더 넓어진다.",
+      "metric": {
+       "label": "클래식 코트 라인",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.reebok.com/products/reebok-club-c-shoes-grade-school-chalk-chalk-glen-green-108292",
+       "observed_note": "제품 설명에 ‘클래식 80s 테니스 아이콘’이 강조된다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 슬림 라운드. 힐 로우 컵솔. 소재 가죽. 클로저 6아이렛. 부자재 경량 인솔.",
+      "image_url": "https://shop.simon.com/cdn/shop/files/6840084eedd346d592c305255da26b23.jpg?v=1741018615"
+     },
+     {
+      "segment": "kids",
+      "name": "VEJA Esplar Leather White Natural (SV0520642)",
+      "description": "밸크로 여밈과 슬림 컵솔이 착화 편의와 경량을 준다. 저채도 내추럴 톤이 여름 룩에 잘 맞는다. SS27에는 크롬 프리 가죽 비중이 높아진다.",
+      "metric": {
+       "label": "지속가능 레더·경량",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.veja-store.com/en_us/p/esplar-leather-white-natural-SV0520642.html?cgid=Toddlers+ENFANT",
+       "observed_note": "상세에 바이오 EVA와 재활용 라이닝이 명시되었다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 슬림 라운드. 힐 로우 컵솔. 소재 레더·스웨이드. 클로저 더블 스트랩. 부자재 바이오 EVA 인솔.",
+      "image_url": "https://media.veja-store.com/images/t_sfcc-pdp-mobile-v2/f_auto/v1781690485/VEJA/PACKSHOTS/SV0520642_1/veja-sneakers-small-esplar-leather-white-sv0520642_1.jpg"
+     }
+    ],
+    "grade": "big",
+    "next_season_call": "SS27에서는 로우 컵솔과 메시 혼합이 더 넓어진다. FW26 대비 무게는 줄고 통기 디테일이 늘어난다. 컬러는 화이트와 검, 소프트 파스텔이 남고 과장된 대비는 줄어든다.",
+    "confidence": "medium"
+   },
+   {
+    "name": "GLAM COURT",
+    "statement": "SS27에는 코트 스니커가 라이트 글램으로 일상을 비춘다.",
+    "narrative": "FW26 쇼에서 새틴과 메탈릭 스니커가 두드러졌다.\n코트 실루엣에 라이트 글램이 얹혀 사용성이 보였다.\nSS27에는 이 무드가 데일리 유니섹스로 확장된다.\n\n실버와 샴페인 톤이 오피스 캐주얼에 자연스레 섞인다.\n새틴 질감과 미니 비즈가 포인트로 반복 제안된다.\n하드 글리터보다 은은한 반사감이 선택된다.\n\n코트 로우의 미니멀 비례는 그대로 간다.\n힐탭과 오버레이에 광택을 모아 착화 난이도를 낮춘다.\n리오더 가능한 소재와 경량 솔로 상용화가 빨라진다.",
+    "sub_trends": [
+     "새틴 어퍼의 코트 로우",
+     "실버·샴페인 메탈릭 오버레이",
+     "미니 비즈·자수 포인트",
+     "오피스 캐주얼과 호환되는 절제된 광택"
+    ],
+    "drivers": [
+     {
+      "label": "쇼에서의 메탈릭·새틴 트레이너 부각",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "shows",
+      "source_url": "https://www.vogue.co.uk/article/autumn-2026-trending-trainers",
+      "observed_note": "Vogue UK 가을 2026 트레이너 트렌드에 Metallics·Satin 항목이 독립 소개되었다."
+     },
+     {
+      "label": "소셜 커머스 내 ‘silver sneakers’ 노출",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "social",
+      "source_url": "https://shop.tiktok.com/us/k/silver-sneakers",
+      "observed_note": "TikTok Shop 검색 결과와 판매 노출이 다수 확인되어 제작·리뷰 콘텐츠 증가를 시사했다."
+     },
+     {
+      "label": "소비자 쇼핑 에디토리얼의 동시 다발 노출",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "consumer",
+      "source_url": "https://www.vogue.com/article/silver-sneakers",
+      "observed_note": "봄 2026 ‘실버 스니커즈’ 큐레이션이 발행되어 검색과 구매 유입 신호를 확인했다."
+     }
+    ],
+    "palette": [
+     {
+      "name": "Cloud Dancer",
+      "pantone_tcx": "11-4201 TCX",
+      "hex": "#F0EEE9"
+     },
+     {
+      "name": "Moonbeam",
+      "pantone_tcx": "13-0000 TCX",
+      "hex": "#CDC6BD"
+     },
+     {
+      "name": "Silver",
+      "pantone_tcx": "14-5002 TCX",
+      "hex": "#A2A2A1"
+     },
+     {
+      "name": "Harbor Mist",
+      "pantone_tcx": "14-4202 TCX",
+      "hex": "#B0B2B5"
+     },
+     {
+      "name": "Powder Blue",
+      "pantone_tcx": "14-4214 TCX",
+      "hex": "#95B1CE"
+     },
+     {
+      "name": "Arctic Ice",
+      "pantone_tcx": "13-4110 TCX",
+      "hex": "#BFCAD6"
+     },
+     {
+      "name": "Pale Gold",
+      "pantone_tcx": "15-0927 TCX",
+      "hex": "#BD9865"
+     },
+     {
+      "name": "Evening Sand",
+      "pantone_tcx": "14-1311 TCX",
+      "hex": "#DDB6AB"
+     },
+     {
+      "name": "Sleet",
+      "pantone_tcx": "16-3916 TCX",
+      "hex": "#97999E"
+     }
+    ],
+    "materials": [
+     {
+      "label": "새틴 어퍼",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.driesvannoten.com/en-eu/products/261-011783-0601",
+      "observed_note": "제품 정보에 비스코스·실크 새틴 어퍼 표기와 재고 한정 문구가 확인되었다."
+     },
+     {
+      "label": "메탈릭 가죽(실버·샴페인)",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.net-a-porter.com/en-us/shop/product/autry/shoes/low-top/medalist-low-metallic-textured-leather-sneakers/1647597326077433",
+      "observed_note": "Silver 텍스처드 레더 설명과 다수 사이즈 품절 상태가 확인되었다."
+     },
+     {
+      "label": "플레이팅 TPU 필름 오버레이",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.tpu-film.com.cn/en/productview/219.html",
+      "observed_note": "신발용 전사지형 메탈 광택 TPU 필름 공급 문서가 공개되어 양산 가능성이 높다."
+     },
+     {
+      "label": "크리스털·비즈 패치",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.farfetch.com/ca/shopping/women/golden-goose-ball-star-with-swarovski-crystals-and-grey-suede-star-sneakers-item-21356009.aspx",
+      "observed_note": "Ball Star의 Swarovski 크리스털 트림 명시로 장식 수요가 확인되었다."
+     }
+    ],
+    "details": [
+     {
+      "label": "새틴·리본 레이스",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.shopwss.com/products/ib6652_100",
+      "observed_note": "Nike Court Vision Low SE에 리본 레이스와 비즈 디테일 표기가 보인다."
+     },
+     {
+      "label": "실버 메탈 애글릿",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://angelusdirect.com/collections/modern/products/silver-cylinder-aglets",
+      "observed_note": "애글릿 부자재의 실버 마감 상품이 상시 판매되어 커스터마이즈 수요가 보인다."
+     },
+     {
+      "label": "사이드 자수 로고",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.net-a-porter.com/en-us/shop/product/saint-laurent/shoes/low-top/court-classic-sl06-logo-embroidered-leather-sneakers/1647597306100101",
+      "observed_note": "Saint Laurent Court Classic에 로고 자수 설명이 명시되었다."
+     },
+     {
+      "label": "저광 메탈릭 힐탭",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.veja-store.com/en_us/p/campo-leather-white-platine-CP0503495.html",
+      "observed_note": "VEJA Campo의 ‘Platine’ 힐탭이 절제된 광택 포인트로 제안된다."
+     }
+    ],
+    "key_items": [
+     {
+      "segment": "women",
+      "name": "THE SATIN COURT LOW",
+      "description": "새틴 어퍼를 코트 로우 비례에 얹은 여성용이다.\n뉴트럴 컬러로 오피스 룩과의 궁합이 좋다.\nFW26 신호를 SS27 상업 컬러로 번역한다.\n가벼운 쿠셔닝과 얇은 컵솔로 통근용에 맞춘다.",
+      "metric": {
+       "label": "새틴 어퍼",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "shows",
+       "source_url": "https://www.driesvannoten.com/en-eu/products/261-011783-0601",
+       "observed_note": "새틴 스니커가 SS26~FW26 상품화되어 리오더 신호다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "라운드 토·20~25mm 플랫컵솔·새틴/레더·레이스업·메탈 아일릿",
+      "image_url": "https://www.maxfieldla.com/cdn/shop/files/362241-54668-DRIES-VAN-NOTEN-SATIN-SNEAKERS-1_dfcf9426ec27480d937ed440c87c5b73.jpg?v=1773096384&width=1200"
+     },
+     {
+      "segment": "women",
+      "name": "THE CHAMPAGNE TAB COURT",
+      "description": "화이트 레더에 샴페인 힐탭을 얹은 코트다.\n광택을 힐과 로고에만 두어 드레스 코드에 안전하다.\nSS27에는 플라틴·페일 골드 비중이 커진다.",
+      "metric": {
+       "label": "저광 메탈릭 힐탭",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.veja-store.com/en_us/p/campo-leather-white-platine-CP0503495.html",
+       "observed_note": "Platine 컬러가 다수 사이즈 저재고로 표시되었다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "라운드 토·25mm 컵솔·크롬프리 레더·레이스업·플라틴 힐탭",
+      "image_url": "https://media.veja-store.com/images/t_sfcc-pdp-mobile-v2/f_auto/v1777497083/VEJA/PACKSHOTS/CP0503495_1/veja-sneakers-campo-leather-white-cp0503495_1.jpg"
+     },
+     {
+      "segment": "women",
+      "name": "THE BEADED STAR CLUB",
+      "description": "미니 크리스털과 글리터가 스타 패치에 모인다.\n코트 로우 실루엣을 유지해 데일리 착화가 쉽다.\nSS27에는 미세 사이즈 비즈로 광택을 완화한다.",
+      "metric": {
+       "label": "크리스털 패치",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.farfetch.com/ca/shopping/women/golden-goose-ball-star-with-swarovski-crystals-and-grey-suede-star-sneakers-item-21356009.aspx",
+       "observed_note": "Swarovski 트림 사양이 명시된 코트 로우가 판매 중이다."
+      },
+      "grade": "early_sign",
+      "silhouette_spec": "라운드 토·25~30mm 컵솔·레더·레이스업·비즈 스타 패치",
+      "image_url": "https://cdn-images.farfetch-contents.com/21/35/60/09/21356009_51349485_1000.jpg"
+     },
+     {
+      "segment": "men",
+      "name": "THE EMBROIDERED COURT CLASSIC",
+      "description": "사이드 자수 로고가 레더 어퍼에 얹힌다.\n포멀 팬츠와 청바지 모두에 조용한 포인트가 된다.\nSS27에는 블랙·건메탈 탭 조합이 늘어난다.",
+      "metric": {
+       "label": "사이드 자수",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.net-a-porter.com/en-us/shop/product/saint-laurent/shoes/low-top/court-classic-sl06-logo-embroidered-leather-sneakers/1647597306100101",
+       "observed_note": "로고 자수 디테일 설명과 상품 전개가 확인된다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "라운드 토·25mm 컵솔·스무스 레더·레이스업·자수 로고",
+      "image_url": "https://www.net-a-porter.com/variants/images/1647597306100101/in/w2000_q60.jpg"
+     },
+     {
+      "segment": "men",
+      "name": "THE SILVER MEDALIST",
+      "description": "실버 텍스처드 레더의 코트 로우다.\n빈티지 아이보리 솔과의 대비가 오피스에 무난하다.\nSS27에는 샴페인·펄 그레이 변주가 동반된다.",
+      "metric": {
+       "label": "메탈릭 레더",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.net-a-porter.com/en-us/shop/product/autry/shoes/low-top/medalist-low-metallic-textured-leather-sneakers/1647597326077433",
+       "observed_note": "Silver 컬러가 빠르게 품절되어 재입고 알림 유입이 보인다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "라운드 토·25mm 컵솔·메탈릭 레더·레이스업·사이드 플래그 패치",
+      "image_url": "https://www.net-a-porter.com/variants/images/1647597326077433/in/w2000_q60.jpg"
+     },
+     {
+      "segment": "men",
+      "name": "THE METALLIC-TRIM STAN",
+      "description": "화이트 베이스에 실버·골드 포일을 소량 쓴다.\n정장 슬랙스에도 과하지 않은 포인트가 된다.\nSS27에는 메탈 트림의 비율이 더 줄어든다.",
+      "metric": {
+       "label": "미세 메탈릭 트림",
+       "yoy_percent": null,
+       "magnitude": "steady",
+       "source_kind": "market",
+       "source_url": "https://www.adidas.com/us/stan-smith-shoes/HQ4243.html",
+       "observed_note": "Cloud White/Silver Metallic/Gold Metallic 컬러가 상시 전개된다."
+      },
+      "grade": "stable",
+      "silhouette_spec": "라운드 토·25mm 컵솔·레더·레이스업·메탈 포일 포인트",
+      "image_url": ""
+     },
+     {
+      "segment": "kids",
+      "name": "THE KIDS SILVER STAN",
+      "description": "메탈릭 실버 어퍼로 축제 감성을 살린다.\n코트 로우 비례로 통학 코디에 범용적이다.\nSS27에는 가족 셋업 컬러가 함께 제안된다.",
+      "metric": {
+       "label": "키즈 메탈릭 어퍼",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.adidas.com/us/adidas-originals-x-disney-mickey-stan-smith-shoes-kids/ID7187.html",
+       "observed_note": "Silver Metallic 컬러명과 키즈 전용 사이즈 구성이 확인된다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "라운드 토·20~25mm 컵솔·코팅 레더·레이스업·실버 어퍼",
+      "image_url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/7e6ec4cc7ed7456c92f999823c29bed7_9366/adidas_Originals_x_Disney_Mickey_Stan_Smith_Shoes_Kids_Silver_ID7187_04_standard.jpg"
+     },
+     {
+      "segment": "kids",
+      "name": "THE SHIMMER SWOOSH COURT",
+      "description": "메탈릭 스우시가 포인트인 코트 보로우다.\n벨크로와 엘라스틱 끈으로 자가 착화가 쉽다.\nSS27에는 샴페인·펄 탭이 늘어난다.",
+      "metric": {
+       "label": "메탈릭 스우시",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.nike.com/t/court-borough-low-baby-toddler-shoes-6KpmT0Gg",
+       "observed_note": "Shimmer 톤 스우시 이미지와 유아용 핏이 동시 제공된다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "라운드 토·25mm 컵솔·합성가죽·벨크로+고무밴드·메탈릭 스우시",
+      "image_url": "https://static.nike.com/a/images/t_web_pdp_936_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/79f6f7e5-b45a-4a09-acdb-b6617575ac5d/COURT%2BBOROUGH%2BLOW%2BBBALL%2B%28TD%29.png"
+     },
+     {
+      "segment": "kids",
+      "name": "THE MINI PLATINE MID",
+      "description": "미드컷 코트 실루엣에 플라틴 V 로고를 단다.\n벨크로와 레이스 혼합으로 활동성이 높다.\nSS27에는 라이트 베이지 베이스가 강세다.",
+      "metric": {
+       "label": "플라틴 V 로고",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.zappos.com/p/veja-kids-small-v-10-mid-chromefree-little-kid-big-kid-platine-white-1/product/9831041/color/992724",
+       "observed_note": "Platine/White 조합이 이미지와 컬러명으로 제시된다."
+      },
+      "grade": "safe",
+      "silhouette_spec": "라운드 토·30mm 컵솔·크롬프리 레더·벨크로+레이스·메탈릭 V",
+      "image_url": "https://m.media-amazon.com/images/I/7166uQD3%2BtL._AC_SR920%2C736_.jpg"
+     }
+    ],
+    "grade": "safe",
+    "next_season_call": "FW27에는 샴페인·건메탈 뉴트럴이 중심이 된다. 새틴은 매트 처리로 잔광만 남고, 비즈는 로고 스케일이 더 작아진다.",
+    "confidence": "medium"
+   },
+   {
+    "name": "GUM TERRACE",
+    "statement": "SS27에 테라스 계열 코트 스니커가 일상에서 확장된다.",
+    "narrative": "FW26에서 테라스 무드는 런웨이와 리테일 모두 견조했다. Wales Bonner 쇼가 adidas와의 협업을 이어가며 로우 컵솔 미학을 재확인했다. SS27에는 이 무드가 스웨이드와 가무솔 조합으로 일상화된다. ([vogue.com](https://www.vogue.com/fashion-shows/fall-2026-menswear/wales-bonner?utm_source=openai))\nFW26 리테일은 Gazelle·Samba·Palermo 계열의 재색 출시가 꾸준했다. 베스트셀러 모듈에 실린 Gazelle Indoor와 Palermo는 구매 전환을 유지했다. SS27에는 반투명 가무솔과 투톤 스웨이드가 주력군이 된다. ([adidas.com](https://www.adidas.com/us/regular-best_sellers-gazelle_indoor?utm_source=openai))\n브랜드 발표는 ‘테라스’ 카테고리의 체력을 확인시켰다. adidas는 2026년 1분기에 Terrace 사업이 건강하다고 밝혔다. SS27에는 클래식 재해석과 신형 생활화의 동시 전개가 가속된다. ([adidas-group.com](https://www.adidas-group.com/en/media/press-releases/adidas-records-strong-start-to-the-year-in-the-first-quarter-of-2026?utm_source=openai))",
+    "sub_trends": [
+     "반투명 가무솔과 로우 컵솔",
+     "스웨이드 토와 가피 투톤",
+     "코튼 평직 슈레이스와 미니멀 로고",
+     "뉴트럴·브라운 축의 일상 컬러군"
+    ],
+    "drivers": [
+     {
+      "label": "검색·조회 기반의 테라스 관심 유지",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "consumer",
+      "source_url": "https://www.lyst.com/the-lyst-index/q1-26/",
+      "observed_note": "Lyst Q1-26 핫 제품에 adidas 품목이 포함되어 조회·검색 신호가 유지되었다. ([lyst.com](https://www.lyst.com/data/the-lyst-index/q126/))"
+     },
+     {
+      "label": "소셜 협업을 통한 Palermo 노출 증대",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "social",
+      "source_url": "https://mediahub.puma.com/articles/puma-x-superkicks-serve-jamun-season-on-the-palermo-sneaker",
+      "observed_note": "PUMA x Superkicks의 Palermo 협업이 2026년 5월 공개되어 지역 문화 서사와 함께 소셜 확산을 이끌었다. ([mediahub.puma.com](https://mediahub.puma.com/articles/puma-x-superkicks-serve-jamun-season-on-the-palermo-sneaker?utm_source=openai))"
+     },
+     {
+      "label": "FW26 쇼에서의 로우 컵솔 존재감",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "shows",
+      "source_url": "https://www.vogue.com/fashion-shows/fall-2026-menswear/wales-bonner",
+      "observed_note": "Wales Bonner FW26 남성복에서 adidas와의 장기 협업 언급으로 코트형 로우 실루엣의 지속을 확인했다. ([vogue.com](https://www.vogue.com/fashion-shows/fall-2026-menswear/wales-bonner?utm_source=openai))"
+     }
+    ],
+    "palette": [
+     {
+      "name": "Gum Amber",
+      "pantone_tcx": "",
+      "hex": "#C1792F"
+     },
+     {
+      "name": "Cognac Brown",
+      "pantone_tcx": "",
+      "hex": "#8B5A2B"
+     },
+     {
+      "name": "Coffee Bean",
+      "pantone_tcx": "",
+      "hex": "#4B2E24"
+     },
+     {
+      "name": "Stone Taupe",
+      "pantone_tcx": "",
+      "hex": "#B1A190"
+     },
+     {
+      "name": "Pumice Grey",
+      "pantone_tcx": "",
+      "hex": "#A7A39D"
+     },
+     {
+      "name": "Chalk White",
+      "pantone_tcx": "",
+      "hex": "#F3F1EB"
+     },
+     {
+      "name": "Vapor Gray",
+      "pantone_tcx": "",
+      "hex": "#D8D7D2"
+     },
+     {
+      "name": "Olive Branch",
+      "pantone_tcx": "",
+      "hex": "#6C6F3C"
+     },
+     {
+      "name": "Navy Night",
+      "pantone_tcx": "",
+      "hex": "#1C2A39"
+     }
+    ],
+    "materials": [
+     {
+      "label": "스플릿 스웨이드 가피",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.adidas.com/us/gazelle-indoor-shoes/JQ0175.html",
+      "observed_note": "Gazelle Indoor 상품 설명에 스웨이드 상부와 가무솔 조합이 명시되었다. ([adidas.com](https://www.adidas.com/us/gazelle-indoor-shoes/JQ0175.html))"
+     },
+     {
+      "label": "반투명 가무 컵솔",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.adidas.com/us/gazelle-indoor-shoes/IH9134.html",
+      "observed_note": "성인용 Gazelle Indoor에 반투명 가무솔과 랩어라운드 월이 기재되었다. ([adidas.com](https://www.adidas.com/us/gazelle-indoor-shoes/IH9134.html?utm_source=openai))"
+     },
+     {
+      "label": "레더 어퍼와 EVA 미드솔 복고 사양",
+      "yoy_percent": null,
+      "magnitude": "steady",
+      "source_kind": "market",
+      "source_url": "https://www.reebok.com/collections/shoes/products/reebok-club-c-85-vintage-shoes-chalk-black-gum-103162",
+      "observed_note": "Club C 85 Vintage 페이지에 레더 어퍼와 EVA 쿠셔닝이 명시되었다. ([reebok.com](https://www.reebok.com/collections/shoes/products/reebok-club-c-85-vintage-shoes-chalk-black-gum-103162))"
+     },
+     {
+      "label": "스웨이드 텅과 메쉬 백킹",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://us.puma.com/us/en/pd/palermo-sneakers/396463?swatch=89",
+      "observed_note": "Palermo Leather 상품 설명에 스웨이드 텅과 메쉬 백킹이 표기되었다. ([us.puma.com](https://us.puma.com/us/en/pd/palermo-sneakers/396463?swatch=89&utm_source=openai))"
+     }
+    ],
+    "details": [
+     {
+      "label": "스웨이드 T-토 오버레이",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "consumer",
+      "source_url": "https://en.wikipedia.org/wiki/Adidas_Samba",
+      "observed_note": "Samba의 스웨이드 T-토 구조가 자료에 명시되어 테라스 혈통을 상기시킨다. ([en.wikipedia.org](https://en.wikipedia.org/wiki/Adidas_Samba?utm_source=openai))"
+     },
+     {
+      "label": "골드 포일 미니 로고",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.adidas.com/us/gazelle-indoor-shoes/JQ0175.html",
+      "observed_note": "Gazelle Indoor 컬러 명에 Gold Metallic이 병기되어 포일 로고 사용을 확인했다. ([adidas.com](https://www.adidas.com/us/gazelle-indoor-shoes/JQ0175.html))"
+     },
+     {
+      "label": "랩어라운드 가무 측벽",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.adidas.com/us/gazelle-indoor-shoes/IH9134.html",
+      "observed_note": "가무솔이 측벽을 감싸는 구조가 제품 설명에 표기되었다. ([adidas.com](https://www.adidas.com/us/gazelle-indoor-shoes/IH9134.html?utm_source=openai))"
+     },
+     {
+      "label": "디보스 라벨과 폼스트립 최소화",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://us.puma.com/us/en/pd/palermo-sneakers/396463?swatch=89",
+      "observed_note": "Palermo의 디보스 라벨과 간결한 사이드 스트립이 기재되었다. ([us.puma.com](https://us.puma.com/us/en/pd/palermo-sneakers/396463?swatch=89&utm_source=openai))"
+     }
+    ],
+    "key_items": [
+     {
+      "segment": "women",
+      "name": "adidas Gazelle Indoor Earth Strata",
+      "description": "스웨이드와 가무 컵솔의 정석을 보여 준다. FW26에 브라운 축이 상위 노출을 이어 갔다. SS27에는 뉴트럴 데님과 매칭이 늘어난다. 투톤 가피가 일상 착장에 깊이를 더한다. 베이직 레이스로 미니멀 무드를 유지한다.",
+      "metric": {
+       "label": "베스트셀러 표기 노출",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.adidas.com/us/regular-best_sellers-gazelle_indoor",
+       "observed_note": "Gazelle Indoor가 Best Seller로 노출되며 수요를 확인했다. ([adidas.com](https://www.adidas.com/us/regular-best_sellers-gazelle_indoor?utm_source=openai))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 세미라운드·힐 20mm·스웨이드·컵솔·미니 로고·면 평직 끈·투톤 가피",
+      "image_url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/c9e50afdbdcb405486de84a4f52eee07_9366/Gazelle_Indoor_Shoes_Brown_JQ0175_01_00_standard.jpg"
+     },
+     {
+      "segment": "women",
+      "name": "PUMA Palermo Leather Black/Feather Gray/Gum",
+      "description": "T-토와 골드 라벨이 테라스 코드를 환기한다. FW26에 블랙·화이트·가무 배색이 안정적이었다. SS27에는 코튼 셋업과의 데일리 스타일이 확장된다. 여성 전개에서도 유니섹스 핏을 선호한다.",
+      "metric": {
+       "label": "컬렉션 내 Best Seller",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://us.puma.com/us/en/sport/lifestyle/shop-all-classics/palermo-collection",
+       "observed_note": "Palermo Leather가 Best Seller로 표기되어 재고 회전이 빠르다. ([us.puma.com](https://us.puma.com/us/en/puma/shop-all-classics/palermo-collection))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 세미라운드·힐 18–20mm·가죽/스웨이드·컵솔·골드 포일 라벨·면 끈",
+      "image_url": "https://images.puma.com/image/upload/f_auto%2Cq_auto%2Cb_rgb%3Afafafa%2Cw_300%2Ch_300/global/397647/03/sv01/fnd/PNA/fmt/png/Palermo-Leather-Women%27s-Sneakers"
+     },
+     {
+      "segment": "women",
+      "name": "Reebok Club C 85 Vintage Chalk/Black/Gum",
+      "description": "코트 유산을 담은 심플 레더가 핵심이다. FW26에 빈티지 톤과 가무 바닥이 꾸준했다. SS27에는 슬랙스와의 도회적 매칭이 늘어난다. EVA 미드솔이 가벼운 착화감을 준다.",
+      "metric": {
+       "label": "제품 리뷰와 재입고 순환",
+       "yoy_percent": null,
+       "magnitude": "steady",
+       "source_kind": "market",
+       "source_url": "https://www.reebok.com/collections/shoes/products/reebok-club-c-85-vintage-shoes-chalk-black-gum-103162",
+       "observed_note": "공식몰 리뷰 다수로 수요의 지속성을 확인했다. ([reebok.com](https://www.reebok.com/collections/shoes/products/reebok-club-c-85-vintage-shoes-chalk-black-gum-103162))"
+      },
+      "grade": "stable",
+      "silhouette_spec": "토 라운드·힐 20mm·가죽·컵솔+EVA·미니 로고·면 끈",
+      "image_url": "https://cdn.afew-store.com/assets/26/268429/600/reebok-club-c-85-vintage-chalkpaperwhitecollegiate-navy-exclntred-v67900-footwear%20%3E%20sneaker-manufacturers-1.jpg"
+     },
+     {
+      "segment": "men",
+      "name": "adidas Samba OG Black/White/Red Gum (IH6869)",
+      "description": "스웨이드 T-토와 가무솔이 상징성을 만든다. FW26에 신색 출시와 세일이 병행되었다. SS27에는 어스톤 팬츠와의 데일리 조합이 확장된다. 리셀 시장의 거래량이 유동성을 보증한다.",
+      "metric": {
+       "label": "리셀 거래 지표",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "consumer",
+       "source_url": "https://stockx.com/adidas-samba-og-black-white-red-gum",
+       "observed_note": "2026-02-01 출시와 다수의 거래 건수가 표기되었다. ([stockx.com](https://stockx.com/adidas-samba-og-black-white-red-gum?utm_source=openai))"
+      },
+      "grade": "big",
+      "silhouette_spec": "토 세미라운드·힐 20mm·가죽/스웨이드·컵솔·골드 포일·면 끈",
+      "image_url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/b82aae9739694aa28d29663c9411aa62_9366/Samba_OG_Shoes_Black_IH6869_01_00_standard.jpg"
+     },
+     {
+      "segment": "men",
+      "name": "Nike Killshot 2 Leather Black/Gum",
+      "description": "로우 컵솔과 가무 바닥이 코트 기반을 잇는다. FW26에 블랙/가무 조합이 재확산했다. SS27에는 니트 폴로와 치노 조합으로 성별 경계를 흐린다. 텍스처 레더가 생활 구김을 완화한다.",
+      "metric": {
+       "label": "공식몰 노출·리뷰",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.nike.com/t/killshot-2-leather-mens-shoe-4JmbdG/432997-070",
+       "observed_note": "공식 페이지에 가무솔 강조와 다수 사이즈 전개가 확인됐다. ([nike.com](https://www.nike.com/t/killshot-2-leather-mens-shoe-4JmbdG/432997-070))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 라운드·힐 20mm·가죽+스웨이드·컵솔·미니 로고·면 끈",
+      "image_url": "https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/5064713b-1548-4644-8204-abe5ee820a5f/KILLSHOT%2B2%2BLEATHER.png"
+     },
+     {
+      "segment": "men",
+      "name": "adidas Gazelle Indoor Collegiate Green (IH9134)",
+      "description": "반투명 가무솔과 스웨이드가 레트로 감도를 준다. FW26에 인도어 파생이 남성군에서 확대되었다. SS27에는 세미와이드 팬츠와의 조합이 표준이 된다. 컬러는 뉴트럴과 딥그린이 핵심이다.",
+      "metric": {
+       "label": "신규 컬러 지속 출고",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.adidas.com/us/gazelle-indoor-shoes/IH9134.html",
+       "observed_note": "성인 Gazelle Indoor 페이지에 반투명 가무솔 특성이 명시되었다. ([adidas.com](https://www.adidas.com/us/gazelle-indoor-shoes/IH9134.html?utm_source=openai))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 세미라운드·힐 20mm·스웨이드·컵솔·미니 로고·면 끈",
+      "image_url": ""
+     },
+     {
+      "segment": "kids",
+      "name": "adidas Samba OG Kids Black/Gum (KK3383)",
+      "description": "성인과 동일한 T-토와 가무 바닥을 가진다. FW26에 키즈 라인 재고 회전이 안정적이었다. SS27에는 미니 미 전략으로 가족 세트가 늘어난다. 컬러는 블랙과 화이트가 안전하다.",
+      "metric": {
+       "label": "키즈 유니섹스 전개",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.adidas.com/us/samba-og-shoes/KK3383.html",
+       "observed_note": "Kids Unisex 표기와 가무 배색이 유지되는 점을 확인했다. ([adidas.com](https://www.adidas.com/us/samba-og-shoes/KK3383.html))"
+      },
+      "grade": "stable",
+      "silhouette_spec": "토 라운드·힐 18–20mm·가죽/스웨이드·컵솔·미니 로고·면 끈",
+      "image_url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/a0dd8df582f440759bb82ae7302898e1_9366/SAMBA_OG_SHOES_Black_KK3383_01_00_standard.jpg"
+     },
+     {
+      "segment": "kids",
+      "name": "adidas Gazelle Indoor Kids Black/Gum (JQ8701)",
+      "description": "반투명 가무솔과 스웨이드가 키즈에서도 유지된다. FW26에 블랙/화이트/가무가 상시 전개됐다. SS27에는 스쿨룩과의 매칭 수요가 늘어난다. 반사 로고 대비가 시인성을 높인다.",
+      "metric": {
+       "label": "할인·리뷰 동시 확인",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.adidas.com/us/gazelle-indoor-shoes-kids/JQ8701.html",
+       "observed_note": "30% 세일과 리뷰 수로 수요의 폭을 확인했다. ([adidas.com](https://www.adidas.com/us/gazelle-indoor-shoes-kids/JQ8701.html))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 세미라운드·힐 18mm·스웨이드·컵솔·포일 로고·면 끈",
+      "image_url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/175548be4a1042bb93e129dd09ef6912_9366/Gazelle_Indoor_Shoes_Kids_Black_JQ8701_01_00_standard.jpg"
+     },
+     {
+      "segment": "kids",
+      "name": "PUMA Palermo Big Kids Redmazing/White/Gum",
+      "description": "T-토와 가무솔이 활동성에 유리하다. FW26에 빅 키즈 사이징과 색상 폭이 확대됐다. SS27에는 밝은 톤으로 하이브리드 스쿨룩을 제안한다. 내구성 높은 러버 월이 장점이다.",
+      "metric": {
+       "label": "제품 설명상 테라스 복각",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://us.puma.com/us/en/pd/palermo_big_kids_sneakers/397271",
+       "observed_note": "아카이브 테라스 복각과 가무솔 언급이 명시되었다. ([us.puma.com](https://us.puma.com/us/en/pd/palermo_big_kids_sneakers/397271))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 세미라운드·힐 18mm·가죽/스웨이드·컵솔·골드 라벨·면 끈",
+      "image_url": "https://images.puma.com/image/upload/f_auto%2Cq_auto%2Cb_rgb%3Afafafa%2Cw_600%2Ch_600/global/397271/10/sv01/fnd/PNA/fmt/png/Palermo-Big-Kids%27-Sneakers"
+     }
+    ],
+    "grade": "big",
+    "next_season_call": "FW27에는 동일 무드가 톤 다운 컬러로 심화된다. 가무 월을 더 두껍게 한 하이브리드 코트·스케이트형이 늘고, 메탈릭 포일은 줄어든다. 근거는 FW26 쇼·리테일에서 확인된 로우 컵솔 유지와 클래식 리프레시의 지속이다. ([vogue.com](https://www.vogue.com/fashion-shows/fall-2026-menswear/wales-bonner?utm_source=openai))",
+    "confidence": "medium"
+   },
+   {
+    "name": "SLIP COURT",
+    "statement": "FW26에서 싹튼 코트형 뮬이 SS27에 유니섹스로 빠르게 일상화된다.",
+    "narrative": "FW26 말에 백리스·레이스리스 코트 스니커가 확인되었다. adidas Samba Mule이 공식 보도로 반복 노출되며 파급을 키웠다. 동시기에 런웨이·캠페인에서도 뮬형 코트 무드가 포착되었다. ([sneakernews.com](https://sneakernews.com/2026/05/11/adidas-samba-mule-release-date/))\nSS27에는 힐을 덜어낸 컵솔과 패드 카운터가 표준이 된다. 엘라스틱 거셋과 히든 가이드로 발등을 눌러 고정한다. 삭스 레이어링을 전제로 한 높은 갑피 비율이 확대된다. ([designscene.net](https://www.designscene.net/wp-content/uploads/2026/06/adidas-Samba-Mule-Fur-Lined-1.webp))\n데일리 라인업은 크림 화이트와 검·검 콤보가 주력이다. 가무솔과 에그렛 미드솔이 레트로 무드를 완성한다. 여름엔 위빙·메시, 간절기엔 스웨이드·파일 라이닝이 늘어난다. ([sneakerjagers.com](https://www.sneakerjagers.com/n/adidas-samba-mule-woven-crew-white/308273))",
+    "sub_trends": [
+     "백리스 컵솔과 패드 카운터",
+     "엘라스틱 거셋·히든 레이스 가이드",
+     "삭스 레이어링을 고려한 발등 커버",
+     "논슬립 가무솔 트레드"
+    ],
+    "drivers": [
+     {
+      "label": "검색 노출 증가(Samba Mule·Sabot)",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "consumer",
+      "source_url": "https://sneakernews.com/2026/05/11/adidas-samba-mule-release-date/",
+      "observed_note": "Samba Mule 관련 보도가 2026년 5~6월 집중 게재되었다. 동 키워드 기사량이 2025년 대비 체감 증가였다. ([sneakernews.com](https://sneakernews.com/2026/05/11/adidas-samba-mule-release-date/))"
+     },
+     {
+      "label": "소셜·캠페인 증폭(스피드캣·모스트로)",
+      "yoy_percent": null,
+      "magnitude": "surging",
+      "source_kind": "social",
+      "source_url": "https://mediahub.puma.com/articles/rose-steps-into-pumas-new-speedcat-mule",
+      "observed_note": "PUMA가 글로벌 앰배서더 ROSÉ와 뮬 출시를 전파했다. 유튜브·스니커 채널에서 Samba Mule 리뷰도 증가했다. ([mediahub.puma.com](https://mediahub.puma.com/articles/rose-steps-into-pumas-new-speedcat-mule?utm_source=openai))"
+     },
+     {
+      "label": "쇼 등장 확대(런웨이 기원 레퍼런스)",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "shows",
+      "source_url": "https://mediahub.puma.com/articles/as-seen-on-the-runway-the-asap-rocky-x-puma-mostro-3d-mule-is-finally-here",
+      "observed_note": "AW26 시점에 ‘런웨이에서 보인’ 뮬형 스니커 출시가 공표되었다. Onitsuka의 AW26 발표로 코트 기반 변형이 확인되었다. ([mediahub.puma.com](https://mediahub.puma.com/articles/as-seen-on-the-runway-the-asap-rocky-x-puma-mostro-3d-mule-is-finally-here?utm_source=openai))"
+     }
+    ],
+    "palette": [
+     {
+      "name": "Cream White",
+      "pantone_tcx": "",
+      "hex": "#F6F3ED"
+     },
+     {
+      "name": "Egret",
+      "pantone_tcx": "",
+      "hex": "#F2EFE4"
+     },
+     {
+      "name": "Gum Brown",
+      "pantone_tcx": "",
+      "hex": "#B98E5E"
+     },
+     {
+      "name": "Core Black",
+      "pantone_tcx": "",
+      "hex": "#000000"
+     },
+     {
+      "name": "Collegiate Green",
+      "pantone_tcx": "",
+      "hex": "#006847"
+     },
+     {
+      "name": "Navy",
+      "pantone_tcx": "",
+      "hex": "#0A1F44"
+     },
+     {
+      "name": "Chalk",
+      "pantone_tcx": "",
+      "hex": "#EEE7DA"
+     },
+     {
+      "name": "Grey Two",
+      "pantone_tcx": "",
+      "hex": "#C7C7C7"
+     },
+     {
+      "name": "Better Scarlet",
+      "pantone_tcx": "",
+      "hex": "#D0131C"
+     }
+    ],
+    "materials": [
+     {
+      "label": "위빙 어퍼(메시·위브)",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.sneakerjagers.com/n/adidas-samba-mule-woven-crew-white/308273",
+      "observed_note": "Samba Mule Woven이 6월 드롭 리마인더로 노출되었다. SS27에 여름형 통기 어퍼의 확대가 예상된다. ([sneakerjagers.com](https://www.sneakerjagers.com/n/adidas-samba-mule-woven-crew-white/308273))"
+     },
+     {
+      "label": "리사이클 캔버스",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.highsnobiety.com/en-us/shop/product/converse-chuck-70-mule-slip-black-black-egret/",
+      "observed_note": "Chuck 70 Mule이 100% 재생 PET 캔버스로 기재되었다. 친환경 소재의 상시 채택이 늘었다. ([highsnobiety.com](https://www.highsnobiety.com/en-us/shop/product/converse-chuck-70-mule-slip-black-black-egret/))"
+     },
+     {
+      "label": "스웨이드+파일 라이닝",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.designscene.net/2026/06/adidas-samba-mule-fur-lined.html",
+      "observed_note": "FW26에 파일 라이닝을 적용한 Samba Mule이 공개되었다. 간절기 대응 소재로 SS27 초입까지 이어진다. ([designscene.net](https://www.designscene.net/2026/06/adidas-samba-mule-fur-lined.html))"
+     },
+     {
+      "label": "가무솔 컵솔 러버",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://sneakernews.com/2026/05/11/adidas-samba-mule-release-date/",
+      "observed_note": "Samba Mule이 클래식 가무솔을 유지한다고 명시되었다. 레트로 코트 룩의 핵심 재료로 수요가 견조하다. ([sneakernews.com](https://sneakernews.com/2026/05/11/adidas-samba-mule-release-date/))"
+     }
+    ],
+    "details": [
+     {
+      "label": "패드 카운터 림(노출 톱라인 완충)",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.designscene.net/2026/06/adidas-samba-mule-fur-lined.html",
+      "observed_note": "푹신한 라이닝이 힐 톱라인을 덮는 뮬이 확인되었다. 맨발 착화 안정성에 기여한다. ([designscene.net](https://www.designscene.net/2026/06/adidas-samba-mule-fur-lined.html))"
+     },
+     {
+      "label": "엘라스틱 거셋·스트랩",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://mediahub.puma.com/articles/rose-steps-into-pumas-new-speedcat-mule",
+      "observed_note": "스피드캣 뮬이 엘라스틱 스트랩으로 착탈 편의성을 높였다. 유사 구조의 채택이 늘 전망이다. ([mediahub.puma.com](https://mediahub.puma.com/articles/rose-steps-into-pumas-new-speedcat-mule?utm_source=openai))"
+     },
+     {
+      "label": "컴포트 클로저·히든 가이드",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "consumer",
+      "source_url": "https://www.adidas.com/us/adidas-disney-samba-og-comfort-closure-elastic-lace-shoes/IH1753.html",
+      "observed_note": "키즈용 엘라스틱 레이스 클로저가 표준화되고 있다. 무끈 가이드가 겉으로 드러나지 않는다. ([adidas.com](https://www.adidas.com/us/adidas-disney-samba-og-comfort-closure-elastic-lace-shoes/IH1753.html))"
+     },
+     {
+      "label": "논슬립 다이아몬드 트레드",
+      "yoy_percent": null,
+      "magnitude": "rising",
+      "source_kind": "market",
+      "source_url": "https://www.converse.com/shop/p/chuck-70-at-cx-unisex-high-top-shoe/A03277C_085.html",
+      "observed_note": "다이아몬드 계열 트레드가 접지 강조로 반복 노출된다. 코트 기반 데일리 착화에 유효하다. ([converse.com](https://www.converse.com/shop/p/chuck-70-at-cx-unisex-high-top-shoe/A03277C_085.html?utm_source=openai))"
+     }
+    ],
+    "key_items": [
+     {
+      "segment": "women",
+      "name": "adidas Samba Mule Woven 'Crew White'",
+      "description": "클래식 코트 스니커가 백리스 컵솔로 변한다. 위빙 어퍼가 여름 통기와 텍스처를 강화한다. SS27에는 여성 유니섹스 사이징으로 확장된다. 가무솔과 T-토가 레트로 무드를 유지한다.",
+      "metric": {
+       "label": "리테일 노출·드롭 리마인더 증가",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.sneakerjagers.com/n/adidas-samba-mule-woven-crew-white/308273",
+       "observed_note": "6월 드롭 공지와 구매 유도 콘텐츠가 반복 게재되었다. ([sneakerjagers.com](https://www.sneakerjagers.com/n/adidas-samba-mule-woven-crew-white/308273))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "토 세이프 라운드·백리스 컵솔·위빙 어퍼·가무솔·패드 톱라인",
+      "image_url": "https://sneakernews.com/wp-content/uploads/2026/05/adidas-samba-mule-release-date-2.jpg"
+     },
+     {
+      "segment": "women",
+      "name": "Converse Chuck 70 Mule Black/Egret",
+      "description": "Chuck 70의 디테일을 유지한 슬립 코트형이다. 오솔라이트 풋베드가 일상 착화 시간을 늘린다. SS27에는 재생 캔버스와 뉴톤 변주가 예고된다. UK 리테일에서 품절 회전이 빨랐다.",
+      "metric": {
+       "label": "품절·세일 종료 속도",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.converse.com/uk/en/shop/p/chuck-70-mule-womens-low-top-shoe/172591C.html",
+       "observed_note": "공식몰에 ‘The product is sold out’ 문구가 표기되었다. ([converse.com](https://www.converse.com/uk/en/shop/p/chuck-70-mule-womens-low-top-shoe/172591C.html))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "라운드 토·백리스 컵솔·리사이클 캔버스·오솔라이트·에그렛 미드솔",
+      "image_url": "https://www.converse.com/dw/image/v2/BJJF_PRD/on/demandware.static/-/Sites-cnv-master-catalog-we/default/dw8a52267f/images/a_107/172591C_A_107X1.jpg?strip=false&sw=964"
+     },
+     {
+      "segment": "women",
+      "name": "Onitsuka Tiger MEXICO 66 SABOT 'Birch/Peacoat'",
+      "description": "멕시코 66을 사보 형태로 재해석했다. 메쉬와 스웨이드가 가벼움과 안정감을 만든다. SS27에는 중립색 확장과 유니섹스 사이징이 예측된다. 여름용 밀도 낮은 갑피가 양말 레이어에 유리하다.",
+      "metric": {
+       "label": "공식·리셀 채널 동시 노출",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.kickscrew.com/products/onitsuka-tiger-mexico-66-sabot-birch-peacoat-1183c123-200",
+       "observed_note": "정식 유통과 리셀 숍에서 상시 재고·이미지가 확보되었다. ([kickscrew.com](https://www.kickscrew.com/products/onitsuka-tiger-mexico-66-sabot-birch-peacoat-1183c123-200))"
+      },
+      "grade": "early_sign",
+      "silhouette_spec": "세미 포인트 토·백리스 컵솔·메쉬 어퍼·스웨이드 오버레이·논슬립 러버",
+      "image_url": "https://cdn.shopify.com/s/files/1/0603/3031/1875/files/1183C123_200_SR_RT_GLB_1080x-square_3840x.jpg?=75&v=1743061142"
+     },
+     {
+      "segment": "men",
+      "name": "adidas Samba Mule Fur-Lined",
+      "description": "스웨이드와 파일 라이닝이 간절기를 겨냥한다. 백리스 구조가 슬리퍼 감성을 더한다. SS27 초입에는 남성 데일리로 확산된다. 다크 가무솔이 색의 안정감을 준다.",
+      "metric": {
+       "label": "시즌 업데이트 공개",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.designscene.net/2026/06/adidas-samba-mule-fur-lined.html",
+       "observed_note": "FW26용 퍼 라이닝 뮬이 정식 기사로 소개되었다. ([designscene.net](https://www.designscene.net/2026/06/adidas-samba-mule-fur-lined.html))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "라운드 토·백리스 컵솔·스웨이드·퍼 라이닝·다크 가무솔",
+      "image_url": "https://www.designscene.net/wp-content/uploads/2026/06/adidas-Samba-Mule-Fur-Lined-1.webp"
+     },
+     {
+      "segment": "men",
+      "name": "Converse Chuck 70 Mule Recycled Canvas",
+      "description": "코트 기반 밸런스를 유지한 미니멀 뮬이다. 리사이클 캔버스가 친환경 수요를 충족한다. SS27에는 남성 폭에서 하프사이즈 보강이 요구된다. 오솔라이트 인솔이 장시간 보행을 돕는다.",
+      "metric": {
+       "label": "상세 스펙 공개",
+       "yoy_percent": null,
+       "magnitude": "steady",
+       "source_kind": "market",
+       "source_url": "https://www.highsnobiety.com/en-us/shop/product/converse-chuck-70-mule-slip-black-black-egret/",
+       "observed_note": "제품 설명에 재생 캔버스와 오솔라이트가 기재되었다. ([highsnobiety.com](https://www.highsnobiety.com/en-us/shop/product/converse-chuck-70-mule-slip-black-black-egret/))"
+      },
+      "grade": "stable",
+      "silhouette_spec": "라운드 토·백리스 컵솔·리사이클 캔버스·오솔라이트·에그렛 미드솔",
+      "image_url": "https://www.converse.com/dw/image/v2/BJJF_PRD/on/demandware.static/-/Sites-cnv-master-catalog-we/default/dw8a52267f/images/a_107/172591C_A_107X1.jpg?strip=false&sw=964"
+     },
+     {
+      "segment": "men",
+      "name": "Reebok Club C 85 Mule 'White'",
+      "description": "코트 아이콘 Club C를 오픈 힐로 단순화했다. 소프트 레더와 러버 컵솔이 클래식을 유지한다. SS27에는 유니섹스 라벨로 재확장될 여지가 크다. 일본 공식몰에서 사이즈 품절이 다수였다.",
+      "metric": {
+       "label": "사이즈 품절 다발",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://reebok.jp/commodity/SREB1055D/RE1759BW13658/",
+       "observed_note": "상품 옵션 전반에 ‘品切れ’가 연속 표기되었다. ([reebok.jp](https://reebok.jp/commodity/SREB1055D/RE1759BW13658/))"
+      },
+      "grade": "early_sign",
+      "silhouette_spec": "라운드 토·백리스 컵솔·레더 어퍼·러버 아웃솔·미니멀 브랜딩",
+      "image_url": "https://sc3.locondo.jp/contents/commodity_image/RE/RE1759BW13658_1_l.jpg"
+     },
+     {
+      "segment": "kids",
+      "name": "adidas Disney Samba OG Comfort Closure",
+      "description": "엘라스틱 레이스와 스트랩이 셀프 착화를 돕는다. 코트형 가무솔로 미끄럼 방지를 보강한다. SS27에는 주니어까지 라인 확장이 합리적이다. 삼선 컬러로 패밀리 룩 연출이 쉽다.",
+      "metric": {
+       "label": "키즈용 컴포트 클로저 채택",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "consumer",
+       "source_url": "https://www.adidas.com/us/adidas-disney-samba-og-comfort-closure-elastic-lace-shoes/IH1753.html",
+       "observed_note": "엘라스틱 클로저·가무솔 조합이 공식 상품 설명에 명시되었다. ([adidas.com](https://www.adidas.com/us/adidas-disney-samba-og-comfort-closure-elastic-lace-shoes/IH1753.html))"
+      },
+      "grade": "big",
+      "silhouette_spec": "라운드 토·로우 컵솔·엘라스틱 레이스·스트랩·가무솔 트레드",
+      "image_url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/bff3eb0c63b74c0b84008053d1c7608c_9366/ADIDAS_DISNEY_SAMBA_OG_COMFORT_CLOSURE_ELASTIC_LACE_SHOES_White_IH1753_01_00_standard.jpg"
+     },
+     {
+      "segment": "kids",
+      "name": "Converse Chuck Taylor All Star Easy-On",
+      "description": "싱글 스트랩과 이지 온 구조로 자율 착화가 가능하다. 코트형 다이아몬드 트레드가 활동성을 지지한다. SS27에는 경량 인솔과 내구 봉제가 더해질 전망이다. 클래식 화이트가 가장 무난하다.",
+      "metric": {
+       "label": "공식몰 스펙 노출",
+       "yoy_percent": null,
+       "magnitude": "steady",
+       "source_kind": "market",
+       "source_url": "https://www.converse.com/shop/p/chuck-taylor-all-star-easy-on-little-kids-high-top-shoe/372884F_020.html",
+       "observed_note": "‘싱글 스트랩’ ‘이지 온’ 등 착탈 편의 문구가 확인되었다. ([converse.com](https://www.converse.com/shop/p/chuck-taylor-all-star-easy-on-little-kids-high-top-shoe/372884F_020.html))"
+      },
+      "grade": "stable",
+      "silhouette_spec": "라운드 토·로우 컵솔·싱글 스트랩·엘라스틱 레이스·다이아몬드 트레드",
+      "image_url": "https://www.converse.com/dw/image/v2/BCZC_PRD/on/demandware.static/-/Sites-cnv-master-catalog/default/dw79693d41/images/a_107/372884C_A_107X1.jpg?strip=false&sw=964"
+     },
+     {
+      "segment": "kids",
+      "name": "adidas Grand Court 00s Kids Elastic Lace",
+      "description": "엘라스틱 레이스와 탑 스트랩이 고정력을 준다. 스웨이드·가무솔 조합이 코트 기반을 유지한다. SS27에는 교복·캠퍼스 수요로 판매 폭이 넓어진다. 그레이 투 톤이 활용도가 높다.",
+      "metric": {
+       "label": "신규 컬러·구성 출시",
+       "yoy_percent": null,
+       "magnitude": "rising",
+       "source_kind": "market",
+       "source_url": "https://www.adidas.com/us/grand-court-00s-shoes-kids/JP5897.html",
+       "observed_note": "엘라스틱+스트랩 구조와 그레이·검솔 조합이 확인되었다. ([adidas.com](https://www.adidas.com/us/grand-court-00s-shoes-kids/JP5897.html))"
+      },
+      "grade": "safe",
+      "silhouette_spec": "라운드 토·로우 컵솔·엘라스틱 레이스·스트랩·가무솔 트레드",
+      "image_url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/5b434b7706d2462bb4d12d5819a48fc2_9366/Grand_Court_00s_Shoes_Kids_Grey_JP5897_01_00_standard.jpg"
+     }
+    ],
+    "grade": "big",
+    "next_season_call": "SS27에는 백리스·레이스리스 코트 기반이 메인 스트림에 안착한다. 여성 사이징의 유니섹스 전개와 키즈용 컴포트 클로저가 동시에 커진다. 반대로 전통적 하이라이스 레이스업은 비중이 줄어든다. 근거는 Samba Mule·SABOT·Easy-On의 동시 확산이다.",
+    "confidence": "medium"
+   }
+  ],
+  "yearly_context": [
+   {
+    "season": "SS25",
+    "headline": "슬림한 코트 스니커가 경량 대안으로 부상했다.",
+    "what_changed": "청키 러너가 물러나고 얇은 프로파일이 주류에 가까워졌다.",
+    "source_url": "https://www.vogue.com/article/spring-2025-shoe-trends"
+   },
+   {
+    "season": "FW25",
+    "headline": "하이브리드와 슬립온이 늘며 스니커의 ‘드레스업’이 진행됐다.",
+    "what_changed": "플랫과 스니커의 경계가 흐려졌고 장식형 코트 스니커가 확장됐다.",
+    "source_url": "https://www.vogue.co.uk/article/autumn-2025-shoe-trends"
+   },
+   {
+    "season": "SS26",
+    "headline": "슬림 베이스에 새틴·비딩을 얹은 코트형이 확산됐다.",
+    "what_changed": "여성적 소재가 코트 스니커의 데일리 착화로 연결됐다.",
+    "source_url": "https://www.elle.com/fashion/shopping/a70082570/2026-sneaker-trends/"
+   },
+   {
+    "season": "FW26",
+    "headline": "런웨이는 로우 프로파일과 테라스 DNA를 고급화했다.",
+    "what_changed": "Mexico 66 변주가 제안됐고 로우 컵솔 미학이 유지됐다.",
+    "source_url": "https://www.voguehk.com/en/article/runway/onitsuka-tiger-fall-2026/"
+   },
+   {
+    "season": "FW26/27 프리뷰",
+    "headline": "슬림 스니커와 새틴 스니커가 다음 시즌 주요 키워드로 고정됐다.",
+    "what_changed": "스웨이드 중심에서 새틴·나일론과 장식이 전면으로 이동했다.",
+    "source_url": "https://www.vogue.fr/article/tendance-baskets-satin"
+   }
+  ],
+  "method_note": "작성 기준일은 2026-08-09이다. FW26 관측은 2026년 1~3월 남녀 패션위크와 브랜드 보도자료, 리테일 베스트셀러 노출에서 수집했다. 선행 지표로는 2026년 4~7월의 프리폴·크루즈 룩, 공급사 신제품 런칭, 생산 거점 확장을 우선했다. 정량 YoY 수치가 공개되지 않은 경우 방향성은 재고 소진, 반복 재입고, 상품군 노출, 컬렉션 등장 여부로 판단했다. 링크는 쇼와 리테일, 트렌드 리포트를 혼합했고, 소셜은 보조 근거로만 활용했다.",
+  "open_questions": [
+   "SS27의 Samba Mule과 기타 슬립온 코트형이 남녀 공용 사이징을 어디까지 확장할까.",
+   "Gazelle Indoor Pro와 SL 72의 병행 수요가 리테일 랙에서 어떤 폭으로 유지될까.",
+   "새틴·비딩 적용 코트형의 내구 클레임이 환불률에 영향을 줄까.",
+   "테라스형 검솔이 여름 이후에도 브라운·얼스톤 수요를 지지할까.",
+   "Onitsuka Tiger의 북미 유통 전략 변화가 Mexico 66 수급에 어떤 파급을 낳을까."
+  ],
+  "sources": [
+   {
+    "title": "The Lyst Index Q1-26",
+    "url": "https://www.lyst.com/the-lyst-index/q1-26/",
+    "used_for": "consumer"
+   },
+   {
+    "title": "Onitsuka Tiger FW26 런웨이 리포트",
+    "url": "https://www.voguehk.com/en/article/runway/onitsuka-tiger-fall-2026/",
+    "used_for": "shows"
+   },
+   {
+    "title": "Balenciaga Fall 2026는 스포츠웨어 시대를 입증",
+    "url": "https://www.vogue.it/article/balenciaga-fall-2026-sportswear-debutto-uomo-pierpaolo-piccioli",
+    "used_for": "shows"
+   },
+   {
+    "title": "adidas Q1 2026 실적 발표",
+    "url": "https://www.adidas-group.com/en/media/press-releases/adidas-records-strong-start-to-the-year-in-the-first-quarter-of-2026",
+    "used_for": "market"
+   },
+   {
+    "title": "adidas Gazelle Indoor Best Sellers",
+    "url": "https://www.adidas.com/us/best_sellers-gazelle_indoor-shoes",
+    "used_for": "market"
+   },
+   {
+    "title": "adidas Gazelle Best Sellers",
+    "url": "https://www.adidas.com/us/best_sellers-gazelle-shoes",
+    "used_for": "market"
+   },
+   {
+    "title": "adidas SL 72 Best Sellers",
+    "url": "https://www.adidas.com/us/best_sellers-sl_72-lifestyle-shoes",
+    "used_for": "market"
+   },
+   {
+    "title": "2026 여성 스니커 트렌드 7",
+    "url": "https://www.elle.com/fashion/shopping/a70082570/2026-sneaker-trends/",
+    "used_for": "consumer"
+   },
+   {
+    "title": "새틴 스니커가 2026 봄 대세",
+    "url": "https://www.vogue.fr/article/tendance-baskets-satin",
+    "used_for": "consumer"
+   },
+   {
+    "title": "FW26/27 스니커 트렌드 프리뷰",
+    "url": "https://www.vogue.es/articulos/tendencias-zapatillas-otono-invierno-2026-2027",
+    "used_for": "consumer"
+   },
+   {
+    "title": "Sneaker trends AW 2026/2027",
+    "url": "https://vogue.gr/fashion/sneaker-trends-ayta-einai-ta-styl-poy-tha-foresoyme-to-fthinoporo-2026/",
+    "used_for": "consumer"
+   },
+   {
+    "title": "PUMA Speedcat Ballet 글로벌 런칭 안내",
+    "url": "https://mediahub.puma.com/articles/puma-expands-its-ballet-range-with-a-graceful-speedcat-refresh",
+    "used_for": "market"
+   },
+   {
+    "title": "adidas Samba Mule 2026 여름 출시 소식",
+    "url": "https://sneakerbardetroit.com/adidas-samba-mule-hp5050-hp5053/",
+    "used_for": "market"
+   },
+   {
+    "title": "adidas Samba Mule Woven 출시 정보",
+    "url": "https://sitesupply.co/news/adidas-samba-mule-woven-kh7719",
+    "used_for": "market"
+   },
+   {
+    "title": "Samba Mule 상세 이미지 리포트",
+    "url": "https://houseofheat.co/adidas/adidas-samba-mule-woven-kh7719",
+    "used_for": "market"
+   },
+   {
+    "title": "Gear Patrol: Samba는 다운 사이클이지만 여전히 보편적",
+    "url": "https://www.gearpatrol.com/footwear/adidas-samba-mule-beige-indigo-white/",
+    "used_for": "consumer"
+   },
+   {
+    "title": "Vogue: 패션 스니커의 재조정 국면 분석",
+    "url": "https://www.vogue.com/article/is-the-reign-of-the-fashion-sneaker-over",
+    "used_for": "consumer"
+   },
+   {
+    "title": "Vogue SS25 슈즈 트렌드",
+    "url": "https://www.vogue.com/article/spring-2025-shoe-trends",
+    "used_for": "consumer"
+   },
+   {
+    "title": "MIU MIU FW26 공식 릴리즈",
+    "url": "https://www.pradagroup.com/content/dam/pradagroup/documents/2026/Marzo/Inglese/Miu-Miu-FW26-fashion-show-PR.pdf",
+    "used_for": "shows"
+   },
+   {
+    "title": "adidas Samba Jane 제품 페이지",
+    "url": "https://www.adidas.com/us/samba-jane-shoes/IH9206.html",
+    "used_for": "market"
+   }
+  ],
+  "searches": 185,
+  "collected_at": "2026-08-09",
+  "cached": true
+ },
+ "dossierPending": false,
+ "designs": [
+  {
+   "spec": {
+    "design_id": "SH-26FW-C01",
+    "tier": "core",
+    "category": "shoe",
+    "itemType": "court_sneaker",
+    "fields": {
+     "last_id": "LST-RUN-05",
+     "is_new_last": false,
+     "toe_shape": "round",
+     "heel_height_mm": 19,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cupsole",
+     "is_new_outsole_mold": false,
+     "panel_count": 4,
+     "closure": "lace",
+     "upper_material": "engineered mesh 0.9mm",
+     "upper_thickness_mm": 1.4,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "tpu shank"
+    },
+    "fieldsLocked": [
+     "closure",
+     "sole_construction"
+    ],
+    "hintApplied": [],
+    "hintBlocked": []
+   },
+   "ruleResults": [],
+   "rejected": false,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 7000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Plate (tpu shank)",
+      "krw": 3800
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 8300
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (0 moulds)",
+      "krw": 0
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 0,
+     "mold_count_required": 0,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 0
+    },
+    "estimated_total_krw": 51400,
+    "estimated_band_krw": [
+     44204,
+     62098
+    ],
+    "cap_ratio": 0.89,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "series",
+    "driving_signals": [
+     {
+      "signal_id": "sg_004",
+      "weight": 0
+     },
+     {
+      "signal_id": "sg_006",
+      "weight": 0
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_897",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "mary_jane_hook_loop",
+       "waterproof_membrane_gtx"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_666",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [
+     {
+      "text": "The Air Jordan 1 line is defined by its silhouette, not its colour. Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+      "origin": "user_input",
+      "applied_as": [
+       "closure",
+       "sole_construction"
+      ]
+     }
+    ],
+    "series_dna_inherited": [
+     "closure",
+     "sole_construction"
+    ],
+    "type_placement_reason": "Existing last and existing bottom unit, inside the cost cap. That is what Core is for.",
+    "narrative": [
+     "스트랩·후크앤루프 클로저(메리제인 변형) showed up 3 times in this price band, but nothing in it fixes a spec value at this tier.",
+     "생활방수·GORE‑TEX 적용 로우 코트, observed 3 times, is the nearest evidence. Feasibility reads medium — tooling: last not_required, bottom mould not_required.",
+     "Existing last and existing bottom unit, inside the cost cap. That is what Core is for."
+    ]
+   },
+   "qa": [
+    {
+     "check": "Toe shape reads correctly",
+     "target": "round",
+     "observed": "round",
+     "pass": true
+    },
+    {
+     "check": "Heel height visual deviation",
+     "target": "19mm, within 20%",
+     "observed": "21mm, off by 13%",
+     "pass": true
+    },
+    {
+     "check": "Panel count",
+     "target": "4",
+     "observed": "4",
+     "pass": true
+    },
+    {
+     "check": "Same object across views",
+     "target": ">=0.80",
+     "observed": "0.79",
+     "pass": true
+    }
+   ],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "11% under"
+    },
+    {
+     "label": "New moulds",
+     "value": "0"
+    },
+    {
+     "label": "Signals observed",
+     "value": "6"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "Medium",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "High",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "Medium",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [
+    "gold",
+    "black"
+   ],
+   "images": [
+    {
+     "view": "sketch",
+     "url": "/samples/4e555963cb6fbc6d1cf732b8.png",
+     "hash": "4e555963cb6fbc6d1cf732b8",
+     "origin": "generated",
+     "promptUsed": "low-top court sneaker with leather upper and cupsole. strict lateral side view, outer side facing the viewer, toe pointing to the left and heel on the right, one single shoe only, one single view, nothing else in frame. round toe, 19mm thick cushioned midsole, a low-profile stack, cupsole construction with a raised rubber sidewall wrapping the lower upper, upper divided into 4 panels, engineered mesh 0.9mm upper, engineered mesh with an open breathable weave, lace closure, EVA midsole, tpu shank plate embedded in the midsole. black and white technical line drawing, one single shoe, one view only, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. It should read as part of the SLIM COURT direction: 토 슬림 라운드. 힐 로우 컵솔 25mm. 소재 풀그레인 레더. 클로저 7아이렛 플랫 레이스. 부자재 퍼포 사이드 홀·힐탭 콘트라스트.; season materials: 텀블 레더 어퍼, 소프트 스웨이드 보강, ChromeFree/트레이스드 레더; season details: 마이크로 퍼포 토, 슬림 컵솔, EVA 미드솔/인서트; season palette: Cloud White #F2F2F2, Sail Off-White #F3EDE3, Gum Caramel #B2742B. Brand signature details: stripe cage wrapping the midfoot, visible gel window at the heel. Brand palette: ASICS blue #001E62, Flash coral #FF6A3D. Preferred materials: engineered mesh, synthetic overlay. Overall impression: technical, restrained. Leave a clean unbranded area on the lateral side panel for a modest brand mark. Do not invent any logo, text, or lettering.. Avoid: printed slogans on the upper. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
+    }
+   ],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-C02",
+    "tier": "core",
+    "category": "shoe",
+    "itemType": "court_sneaker",
+    "fields": {
+     "last_id": "LST-RUN-02",
+     "is_new_last": false,
+     "toe_shape": "square",
+     "heel_height_mm": 20,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cupsole",
+     "is_new_outsole_mold": true,
+     "panel_count": 4,
+     "closure": "lace",
+     "upper_material": "suede 1.4mm",
+     "upper_thickness_mm": 1.4,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "tpu shank"
+    },
+    "fieldsLocked": [
+     "closure",
+     "sole_construction"
+    ],
+    "hintApplied": [],
+    "hintBlocked": []
+   },
+   "ruleResults": [
+    {
+     "rule": "S-01",
+     "severity": "fail",
+     "message": "New outsole mould on a Core piece. Core reuses the existing bottom unit."
+    },
+    {
+     "rule": "S-04",
+     "severity": "fail",
+     "message": "Toe shape square does not match last LST-RUN-02 (round)."
+    },
+    {
+     "rule": "S-CAP",
+     "severity": "warn",
+     "message": "Cost sits at 103% against a 100% cap"
+    }
+   ],
+   "rejected": true,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 12000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Plate (tpu shank)",
+      "krw": 3800
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 8300
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (11 moulds)",
+      "krw": 3117
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 9350000,
+     "mold_count_required": 11,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 3117
+    },
+    "estimated_total_krw": 59517,
+    "estimated_band_krw": [
+     51185,
+     72782
+    ],
+    "cap_ratio": 1.03,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "series",
+    "driving_signals": [
+     {
+      "signal_id": "sg_006",
+      "weight": 0
+     },
+     {
+      "signal_id": "sg_004",
+      "weight": 0
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_956",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "waterproof_membrane_gtx",
+       "mary_jane_hook_loop"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_450",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [
+     {
+      "text": "The Air Jordan 1 line is defined by its silhouette, not its colour. Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+      "origin": "user_input",
+      "applied_as": [
+       "closure",
+       "sole_construction"
+      ]
+     }
+    ],
+    "series_dna_inherited": [
+     "closure",
+     "sole_construction"
+    ],
+    "type_placement_reason": "Existing last and existing bottom unit, inside the cost cap. That is what Core is for.",
+    "narrative": [
+     "생활방수·GORE‑TEX 적용 로우 코트 showed up 3 times in this price band, but nothing in it fixes a spec value at this tier.",
+     "스트랩·후크앤루프 클로저(메리제인 변형), observed 3 times, is the nearest evidence. Feasibility reads medium — tooling: last not_required, bottom mould not_required.",
+     "Existing last and existing bottom unit, inside the cost cap. That is what Core is for."
+    ]
+   },
+   "qa": [],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "3% over"
+    },
+    {
+     "label": "New moulds",
+     "value": "11"
+    },
+    {
+     "label": "Signals observed",
+     "value": "6"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "High",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "Medium",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "Medium",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [],
+   "images": [],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-C03",
+    "tier": "core",
+    "category": "shoe",
+    "itemType": "court_sneaker",
+    "fields": {
+     "last_id": "LST-RUN-02",
+     "is_new_last": false,
+     "toe_shape": "round",
+     "heel_height_mm": 21,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cupsole",
+     "is_new_outsole_mold": false,
+     "panel_count": 7,
+     "closure": "lace",
+     "upper_material": "engineered mesh 0.9mm",
+     "upper_thickness_mm": 1,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "tpu shank"
+    },
+    "fieldsLocked": [
+     "closure",
+     "sole_construction"
+    ],
+    "hintApplied": [],
+    "hintBlocked": []
+   },
+   "ruleResults": [],
+   "rejected": false,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 7000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Plate (tpu shank)",
+      "krw": 3800
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 10400
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (0 moulds)",
+      "krw": 0
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 0,
+     "mold_count_required": 0,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 0
+    },
+    "estimated_total_krw": 53500,
+    "estimated_band_krw": [
+     46010,
+     65337
+    ],
+    "cap_ratio": 0.92,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "series",
+    "driving_signals": [
+     {
+      "signal_id": "sg_003",
+      "weight": 0
+     },
+     {
+      "signal_id": "sg_001",
+      "weight": 0
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_764",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "vintage_aged_finish",
+       "high_stack_platform"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_527",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [
+     {
+      "text": "The Air Jordan 1 line is defined by its silhouette, not its colour. Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+      "origin": "user_input",
+      "applied_as": [
+       "closure",
+       "sole_construction"
+      ]
+     }
+    ],
+    "series_dna_inherited": [
+     "closure",
+     "sole_construction"
+    ],
+    "type_placement_reason": "Existing last and existing bottom unit, inside the cost cap. That is what Core is for.",
+    "narrative": [
+     "빈티지 워싱 미드솔·에이징 피니시 showed up 4 times in this price band, but nothing in it fixes a spec value at this tier.",
+     "하이 스택 플랫폼 컵솔, observed 3 times, is the nearest evidence. Feasibility reads high — tooling: last not_required, bottom mould not_required.",
+     "Existing last and existing bottom unit, inside the cost cap. That is what Core is for."
+    ]
+   },
+   "qa": [
+    {
+     "check": "Toe shape reads correctly",
+     "target": "round",
+     "observed": "round",
+     "pass": true
+    },
+    {
+     "check": "Heel height visual deviation",
+     "target": "21mm, within 20%",
+     "observed": "23mm, off by 11%",
+     "pass": true
+    },
+    {
+     "check": "Panel count",
+     "target": "7",
+     "observed": "7",
+     "pass": true
+    },
+    {
+     "check": "Same object across views",
+     "target": ">=0.80",
+     "observed": "0.87",
+     "pass": true
+    }
+   ],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "8% under"
+    },
+    {
+     "label": "New moulds",
+     "value": "0"
+    },
+    {
+     "label": "Signals observed",
+     "value": "7"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "High",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "Low",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "Medium",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [
+    "gold",
+    "black"
+   ],
+   "images": [
+    {
+     "view": "sketch",
+     "url": "/samples/fd4e380f3c2ba11249b952eb.png",
+     "hash": "fd4e380f3c2ba11249b952eb",
+     "origin": "generated",
+     "promptUsed": "low-top court sneaker with leather upper and cupsole. strict lateral side view, outer side facing the viewer, toe pointing to the left and heel on the right, one single shoe only, one single view, nothing else in frame. round toe, 21mm thick cushioned midsole, a low-profile stack, cupsole construction with a raised rubber sidewall wrapping the lower upper, upper divided into 7 panels, engineered mesh 0.9mm upper, engineered mesh with an open breathable weave, lace closure, EVA midsole, tpu shank plate embedded in the midsole. black and white technical line drawing, one single shoe, one view only, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. It should read as part of the SLIM COURT direction: 토 슬림 라운드. 힐 로우 컵솔 25mm. 소재 풀그레인 레더. 클로저 7아이렛 플랫 레이스. 부자재 퍼포 사이드 홀·힐탭 콘트라스트.; season materials: 텀블 레더 어퍼, 소프트 스웨이드 보강, ChromeFree/트레이스드 레더; season details: 마이크로 퍼포 토, 슬림 컵솔, EVA 미드솔/인서트; season palette: Cloud White #F2F2F2, Sail Off-White #F3EDE3, Gum Caramel #B2742B. Brand signature details: stripe cage wrapping the midfoot, visible gel window at the heel. Brand palette: ASICS blue #001E62, Flash coral #FF6A3D. Preferred materials: engineered mesh, synthetic overlay. Overall impression: technical, restrained. Leave a clean unbranded area on the lateral side panel for a modest brand mark. Do not invent any logo, text, or lettering.. Avoid: printed slogans on the upper. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
+    }
+   ],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-C04",
+    "tier": "core",
+    "category": "shoe",
+    "itemType": "court_sneaker",
+    "fields": {
+     "last_id": "LST-RUN-02",
+     "is_new_last": false,
+     "toe_shape": "round",
+     "heel_height_mm": 28,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cupsole",
+     "is_new_outsole_mold": false,
+     "panel_count": 4,
+     "closure": "lace",
+     "upper_material": "synthetic 1.1mm",
+     "upper_thickness_mm": 1,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "tpu shank"
+    },
+    "fieldsLocked": [
+     "closure",
+     "sole_construction"
+    ],
+    "hintApplied": [],
+    "hintBlocked": []
+   },
+   "ruleResults": [],
+   "rejected": false,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 5500
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Plate (tpu shank)",
+      "krw": 3800
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 8300
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (0 moulds)",
+      "krw": 0
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 0,
+     "mold_count_required": 0,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 0
+    },
+    "estimated_total_krw": 49900,
+    "estimated_band_krw": [
+     42914,
+     61785
+    ],
+    "cap_ratio": 0.86,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "series",
+    "driving_signals": [
+     {
+      "signal_id": "sg_004",
+      "weight": 0
+     },
+     {
+      "signal_id": "sg_003",
+      "weight": 0
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_803",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "mary_jane_hook_loop",
+       "vintage_aged_finish"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_110",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [
+     {
+      "text": "The Air Jordan 1 line is defined by its silhouette, not its colour. Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+      "origin": "user_input",
+      "applied_as": [
+       "closure",
+       "sole_construction"
+      ]
+     }
+    ],
+    "series_dna_inherited": [
+     "closure",
+     "sole_construction"
+    ],
+    "type_placement_reason": "Existing last and existing bottom unit, inside the cost cap. That is what Core is for.",
+    "narrative": [
+     "스트랩·후크앤루프 클로저(메리제인 변형) showed up 3 times in this price band, but nothing in it fixes a spec value at this tier.",
+     "빈티지 워싱 미드솔·에이징 피니시, observed 4 times, is the nearest evidence. Feasibility reads medium — tooling: last not_required, bottom mould not_required.",
+     "Existing last and existing bottom unit, inside the cost cap. That is what Core is for."
+    ]
+   },
+   "qa": [
+    {
+     "check": "Toe shape reads correctly",
+     "target": "round",
+     "observed": "round",
+     "pass": true
+    },
+    {
+     "check": "Heel height visual deviation",
+     "target": "28mm, within 20%",
+     "observed": "34mm, off by 23%",
+     "pass": false
+    },
+    {
+     "check": "Panel count",
+     "target": "4",
+     "observed": "4",
+     "pass": true
+    },
+    {
+     "check": "Same object across views",
+     "target": ">=0.80",
+     "observed": "0.97",
+     "pass": true
+    }
+   ],
+   "viewMismatch": true,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "14% under"
+    },
+    {
+     "label": "New moulds",
+     "value": "0"
+    },
+    {
+     "label": "Signals observed",
+     "value": "7"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "High",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "Medium",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "High",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [
+    "gold",
+    "black"
+   ],
+   "images": [
+    {
+     "view": "sketch",
+     "url": "/samples/5e0ac156a71bb8e5161cd758.png",
+     "hash": "5e0ac156a71bb8e5161cd758",
+     "origin": "generated",
+     "promptUsed": "low-top court sneaker with leather upper and cupsole. strict lateral side view, outer side facing the viewer, toe pointing to the left and heel on the right, one single shoe only, one single view, nothing else in frame. round toe, 28mm thick cushioned midsole, a low-profile stack, cupsole construction with a raised rubber sidewall wrapping the lower upper, upper divided into 4 panels, synthetic 1.1mm upper, matte technical synthetic with a uniform surface, lace closure, EVA midsole, tpu shank plate embedded in the midsole. black and white technical line drawing, one single shoe, one view only, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. It should read as part of the SLIM COURT direction: 토 슬림 라운드. 힐 로우 컵솔 25mm. 소재 풀그레인 레더. 클로저 7아이렛 플랫 레이스. 부자재 퍼포 사이드 홀·힐탭 콘트라스트.; season materials: 텀블 레더 어퍼, 소프트 스웨이드 보강, ChromeFree/트레이스드 레더; season details: 마이크로 퍼포 토, 슬림 컵솔, EVA 미드솔/인서트; season palette: Cloud White #F2F2F2, Sail Off-White #F3EDE3, Gum Caramel #B2742B. Brand signature details: stripe cage wrapping the midfoot, visible gel window at the heel. Brand palette: ASICS blue #001E62, Flash coral #FF6A3D. Preferred materials: engineered mesh, synthetic overlay. Overall impression: technical, restrained. Leave a clean unbranded area on the lateral side panel for a modest brand mark. Do not invent any logo, text, or lettering.. Avoid: printed slogans on the upper. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
+    }
+   ],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-P05",
+    "tier": "push",
+    "category": "shoe",
+    "itemType": "court_sneaker",
+    "fields": {
+     "last_id": "LST-RUN-07",
+     "is_new_last": false,
+     "toe_shape": "pointed",
+     "heel_height_mm": 20,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cupsole",
+     "is_new_outsole_mold": true,
+     "panel_count": 5,
+     "closure": "lace",
+     "upper_material": "synthetic 1.1mm",
+     "upper_thickness_mm": 1.2,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "none"
+    },
+    "fieldsLocked": [
+     "closure",
+     "sole_construction"
+    ],
+    "hintApplied": [],
+    "hintBlocked": []
+   },
+   "ruleResults": [
+    {
+     "rule": "S-04",
+     "severity": "fail",
+     "message": "Toe shape pointed does not match last LST-RUN-07 (round)."
+    }
+   ],
+   "rejected": true,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 5500
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 9000
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (11 moulds)",
+      "krw": 3117
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 9350000,
+     "mold_count_required": 11,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 3117
+    },
+    "estimated_total_krw": 49917,
+    "estimated_band_krw": [
+     42929,
+     60200
+    ],
+    "cap_ratio": 0.86,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "series",
+    "driving_signals": [
+     {
+      "signal_id": "sg_001",
+      "weight": 0
+     },
+     {
+      "signal_id": "sg_006",
+      "weight": 0
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_948",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "high_stack_platform",
+       "waterproof_membrane_gtx"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_852",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [
+     {
+      "text": "The Air Jordan 1 line is defined by its silhouette, not its colour. Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+      "origin": "user_input",
+      "applied_as": [
+       "closure",
+       "sole_construction"
+      ]
+     }
+    ],
+    "series_dna_inherited": [
+     "closure",
+     "sole_construction"
+    ],
+    "type_placement_reason": "Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push.",
+    "narrative": [
+     "하이 스택 플랫폼 컵솔 showed up 3 times in this price band, but nothing in it fixes a spec value at this tier.",
+     "생활방수·GORE‑TEX 적용 로우 코트, observed 3 times, is the nearest evidence. Feasibility reads low — tooling: last modification, bottom mould required.",
+     "Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push."
+    ]
+   },
+   "qa": [],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "14% under"
+    },
+    {
+     "label": "New moulds",
+     "value": "11"
+    },
+    {
+     "label": "Signals observed",
+     "value": "6"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "Medium",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "Low",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "Medium",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [],
+   "images": [],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-P06",
+    "tier": "push",
+    "category": "shoe",
+    "itemType": "court_sneaker",
+    "fields": {
+     "last_id": "LST-CRT-01",
+     "is_new_last": false,
+     "toe_shape": "round",
+     "heel_height_mm": 28,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cupsole",
+     "is_new_outsole_mold": true,
+     "panel_count": 5,
+     "closure": "lace",
+     "upper_material": "suede 1.4mm",
+     "upper_thickness_mm": 1.3,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "tpu shank"
+    },
+    "fieldsLocked": [
+     "closure",
+     "sole_construction"
+    ],
+    "hintApplied": [],
+    "hintBlocked": []
+   },
+   "ruleResults": [],
+   "rejected": false,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 12000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Plate (tpu shank)",
+      "krw": 3800
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 9000
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (11 moulds)",
+      "krw": 3117
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 9350000,
+     "mold_count_required": 11,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 3117
+    },
+    "estimated_total_krw": 60217,
+    "estimated_band_krw": [
+     51787,
+     74029
+    ],
+    "cap_ratio": 1.04,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "series",
+    "driving_signals": [
+     {
+      "signal_id": "sg_005",
+      "weight": 0
+     },
+     {
+      "signal_id": "sg_004",
+      "weight": 0
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_738",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "metal_eylets_zigzag_stay",
+       "mary_jane_hook_loop"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_803",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [
+     {
+      "text": "The Air Jordan 1 line is defined by its silhouette, not its colour. Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+      "origin": "user_input",
+      "applied_as": [
+       "closure",
+       "sole_construction"
+      ]
+     }
+    ],
+    "series_dna_inherited": [
+     "closure",
+     "sole_construction"
+    ],
+    "type_placement_reason": "Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push.",
+    "narrative": [
+     "메탈 아일렛·지그재그 아이스테이 디테일 showed up 3 times in this price band, but nothing in it fixes a spec value at this tier.",
+     "스트랩·후크앤루프 클로저(메리제인 변형), observed 3 times, is the nearest evidence. Feasibility reads high — tooling: last not_required, bottom mould not_required.",
+     "Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push."
+    ]
+   },
+   "qa": [],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "4% over"
+    },
+    {
+     "label": "New moulds",
+     "value": "11"
+    },
+    {
+     "label": "Signals observed",
+     "value": "6"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "Medium",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "High",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "Medium",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [],
+   "images": [
+    {
+     "view": "sketch",
+     "url": "/samples/44ae5b64ee74d5022f5e5ca7.png",
+     "hash": "44ae5b64ee74d5022f5e5ca7",
+     "origin": "generated",
+     "promptUsed": "low-top court sneaker with leather upper and cupsole. strict lateral side view, outer side facing the viewer, toe pointing to the left and heel on the right, one single shoe only, one single view, nothing else in frame. round toe, 28mm thick cushioned midsole, a low-profile stack, cupsole construction with a raised rubber sidewall wrapping the lower upper, upper divided into 5 panels, suede 1.4mm upper, brushed suede with a clearly readable napped texture, lace closure, EVA midsole, tpu shank plate embedded in the midsole. black and white technical line drawing, one single shoe, one view only, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. It should read as part of the SLIM COURT direction: 토 슬림 라운드. 힐 로우 컵솔 25mm. 소재 풀그레인 레더. 클로저 7아이렛 플랫 레이스. 부자재 퍼포 사이드 홀·힐탭 콘트라스트.; season materials: 텀블 레더 어퍼, 소프트 스웨이드 보강, ChromeFree/트레이스드 레더; season details: 마이크로 퍼포 토, 슬림 컵솔, EVA 미드솔/인서트; season palette: Cloud White #F2F2F2, Sail Off-White #F3EDE3, Gum Caramel #B2742B. Brand signature details: stripe cage wrapping the midfoot, visible gel window at the heel. Brand palette: ASICS blue #001E62, Flash coral #FF6A3D. Preferred materials: engineered mesh, synthetic overlay. Overall impression: technical, restrained. Leave a clean unbranded area on the lateral side panel for a modest brand mark. Do not invent any logo, text, or lettering.. Avoid: printed slogans on the upper. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
+    }
+   ],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-P07",
+    "tier": "push",
+    "category": "shoe",
+    "itemType": "court_sneaker",
+    "fields": {
+     "last_id": "LST-RUN-07",
+     "is_new_last": true,
+     "toe_shape": "round",
+     "heel_height_mm": 27,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cupsole",
+     "is_new_outsole_mold": false,
+     "panel_count": 5,
+     "closure": "lace",
+     "upper_material": "knit 0.8mm",
+     "upper_thickness_mm": 1.4,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "none"
+    },
+    "fieldsLocked": [
+     "closure",
+     "sole_construction"
+    ],
+    "hintApplied": [],
+    "hintBlocked": []
+   },
+   "ruleResults": [],
+   "rejected": false,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 6000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 9000
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (0 moulds)",
+      "krw": 733
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 2200000,
+     "mold_count_required": 0,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 733
+    },
+    "estimated_total_krw": 48033,
+    "estimated_band_krw": [
+     41308,
+     57823
+    ],
+    "cap_ratio": 0.83,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "series",
+    "driving_signals": [
+     {
+      "signal_id": "sg_001",
+      "weight": 0
+     },
+     {
+      "signal_id": "sg_002",
+      "weight": 0
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_810",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "high_stack_platform",
+       "deconstructed_upper_no_lining"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_915",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [
+     {
+      "text": "The Air Jordan 1 line is defined by its silhouette, not its colour. Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+      "origin": "user_input",
+      "applied_as": [
+       "closure",
+       "sole_construction"
+      ]
+     }
+    ],
+    "series_dna_inherited": [
+     "closure",
+     "sole_construction"
+    ],
+    "type_placement_reason": "Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push.",
+    "narrative": [
+     "하이 스택 플랫폼 컵솔 showed up 3 times in this price band, but nothing in it fixes a spec value at this tier.",
+     "디콘스트럭티드 레더 어퍼(안감 제거·폴더블), observed 3 times, is the nearest evidence. Feasibility reads low — tooling: last modification, bottom mould required.",
+     "Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push."
+    ]
+   },
+   "qa": [
+    {
+     "check": "Toe shape reads correctly",
+     "target": "round",
+     "observed": "round",
+     "pass": true
+    },
+    {
+     "check": "Heel height visual deviation",
+     "target": "27mm, within 20%",
+     "observed": "28mm, off by 4%",
+     "pass": true
+    },
+    {
+     "check": "Panel count",
+     "target": "5",
+     "observed": "5",
+     "pass": true
+    },
+    {
+     "check": "Same object across views",
+     "target": ">=0.80",
+     "observed": "0.78",
+     "pass": true
+    },
+    {
+     "check": "Lateral and medial sides consistent",
+     "target": "same sole line and panel logic",
+     "observed": "consistent",
+     "pass": true
+    }
+   ],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "17% under"
+    },
+    {
+     "label": "New moulds",
+     "value": "0"
+    },
+    {
+     "label": "Signals observed",
+     "value": "6"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "Medium",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "Medium",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "High",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [
+    "gold",
+    "black"
+   ],
+   "images": [
+    {
+     "view": "sketch",
+     "url": "/samples/3ed1a58687ea3da6bf8b1ff7.png",
+     "hash": "3ed1a58687ea3da6bf8b1ff7",
+     "origin": "generated",
+     "promptUsed": "low-top court sneaker with leather upper and cupsole. strict lateral side view, outer side facing the viewer, toe pointing to the left and heel on the right, one single shoe only, one single view, nothing else in frame. round toe, 27mm thick cushioned midsole, a low-profile stack, cupsole construction with a raised rubber sidewall wrapping the lower upper, upper divided into 5 panels, knit 0.8mm upper, fine technical knit with a visible loop structure, lace closure, EVA midsole. black and white technical line drawing, one single shoe, one view only, pen outline only, no color, no shading, no gradient, no photographic texture, flat white paper, hand-drawn designer sketch. It should read as part of the SLIM COURT direction: 토 슬림 라운드. 힐 로우 컵솔 25mm. 소재 풀그레인 레더. 클로저 7아이렛 플랫 레이스. 부자재 퍼포 사이드 홀·힐탭 콘트라스트.; season materials: 텀블 레더 어퍼, 소프트 스웨이드 보강, ChromeFree/트레이스드 레더; season details: 마이크로 퍼포 토, 슬림 컵솔, EVA 미드솔/인서트; season palette: Cloud White #F2F2F2, Sail Off-White #F3EDE3, Gum Caramel #B2742B. Brand signature details: stripe cage wrapping the midfoot, visible gel window at the heel. Brand palette: ASICS blue #001E62, Flash coral #FF6A3D. Preferred materials: engineered mesh, synthetic overlay. Overall impression: technical, restrained. Leave a clean unbranded area on the lateral side panel for a modest brand mark. Do not invent any logo, text, or lettering.. Avoid: printed slogans on the upper. Absolutely no text, no numbers, no measurement lines, no dimension callouts, no arrows, no labels, no logo, no watermark, no human"
+    },
+    {
+     "view": "lateral",
+     "url": "/samples/ef2d188785a2946f8e562eb7.png",
+     "hash": "ef2d188785a2946f8e562eb7",
+     "origin": "generated",
+     "promptUsed": "Replace this line drawing with a full-colour photorealistic studio product photograph of the same shoe. The output must be a photograph, not a drawing: no outlines, no white fill, no flat areas. Every surface carries real material colour and texture, with studio lighting, soft shadows and highlights. Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole line exactly as drawn. Materials and colour: round toe, 27mm thick cushioned midsole, a low-profile stack, cupsole construction with a raised rubber sidewall wrapping the lower upper, upper divided into 5 panels, knit 0.8mm upper, fine technical knit with a visible loop structure, lace closure, EVA midsole. It should read as part of the SLIM COURT direction: 토 슬림 라운드. 힐 로우 컵솔 25mm. 소재 풀그레인 레더. 클로저 7아이렛 플랫 레이스. 부자재 퍼포 사이드 홀·힐탭 콘트라스트.; season materials: 텀블 레더 어퍼, 소프트 스웨이드 보강, ChromeFree/트레이스드 레더; season details: 마이크로 퍼포 토, 슬림 컵솔, EVA 미드솔/인서트; season palette: Cloud White #F2F2F2, Sail Off-White #F3EDE3, Gum Caramel #B2742B. Strict lateral side view, one single shoe, toe pointing to the left and heel on the right, seamless white background, sharp focus. Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human.",
+     "logoStamped": true
+    },
+    {
+     "view": "medial",
+     "url": "/samples/0d75cb877edfbebc76e6e37d.png",
+     "hash": "0d75cb877edfbebc76e6e37d",
+     "origin": "edited_from",
+     "editedFrom": "ef2d188785a2946f8e562eb7"
+    },
+    {
+     "view": "q34",
+     "url": "/samples/aaa87945f5860096a8391e38.png",
+     "hash": "aaa87945f5860096a8391e38",
+     "origin": "edited_from",
+     "editedFrom": "ef2d188785a2946f8e562eb7"
+    },
+    {
+     "view": "lateral",
+     "colorway": "gold",
+     "url": "/samples/880b938cd86ed8fea666ee47.png",
+     "hash": "880b938cd86ed8fea666ee47",
+     "origin": "edited_from",
+     "editedFrom": "ef2d188785a2946f8e562eb7"
+    },
+    {
+     "view": "lateral",
+     "colorway": "black",
+     "url": "/samples/e5cad5084e85b26608c2b47f.png",
+     "hash": "e5cad5084e85b26608c2b47f",
+     "origin": "edited_from",
+     "editedFrom": "ef2d188785a2946f8e562eb7"
+    },
+    {
+     "view": "variation",
+     "url": "/samples/bae3b9e549236fa2e0fa9bfa.png",
+     "hash": "bae3b9e549236fa2e0fa9bfa",
+     "origin": "edited_from",
+     "editedFrom": "ef2d188785a2946f8e562eb7",
+     "variantOf": "SH-26FW-P07",
+     "variantAxis": "Material swap"
+    },
+    {
+     "view": "variation",
+     "url": "/samples/cea3c265924ddbf6e9f3504b.png",
+     "hash": "cea3c265924ddbf6e9f3504b",
+     "origin": "edited_from",
+     "editedFrom": "ef2d188785a2946f8e562eb7",
+     "variantOf": "SH-26FW-P07",
+     "variantAxis": "Sole rebuild"
+    }
+   ],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-P08",
+    "tier": "push",
+    "category": "shoe",
+    "itemType": "court_sneaker",
+    "fields": {
+     "last_id": "LST-CRT-01",
+     "is_new_last": false,
+     "toe_shape": "round",
+     "heel_height_mm": 20,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cupsole",
+     "is_new_outsole_mold": false,
+     "panel_count": 7,
+     "closure": "lace",
+     "upper_material": "suede 1.4mm",
+     "upper_thickness_mm": 0.9,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "tpu shank"
+    },
+    "fieldsLocked": [
+     "closure",
+     "sole_construction"
+    ],
+    "hintApplied": [],
+    "hintBlocked": []
+   },
+   "ruleResults": [],
+   "rejected": false,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 12000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Plate (tpu shank)",
+      "krw": 3800
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 10400
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (0 moulds)",
+      "krw": 0
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 0,
+     "mold_count_required": 0,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 0
+    },
+    "estimated_total_krw": 58500,
+    "estimated_band_krw": [
+     50310,
+     70845
+    ],
+    "cap_ratio": 1.01,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "series",
+    "driving_signals": [
+     {
+      "signal_id": "sg_004",
+      "weight": 0
+     },
+     {
+      "signal_id": "sg_005",
+      "weight": 0
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_676",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "mary_jane_hook_loop",
+       "metal_eylets_zigzag_stay"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_386",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [
+     {
+      "text": "The Air Jordan 1 line is defined by its silhouette, not its colour. Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+      "origin": "user_input",
+      "applied_as": [
+       "closure",
+       "sole_construction"
+      ]
+     }
+    ],
+    "series_dna_inherited": [
+     "closure",
+     "sole_construction"
+    ],
+    "type_placement_reason": "Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push.",
+    "narrative": [
+     "스트랩·후크앤루프 클로저(메리제인 변형) showed up 3 times in this price band, but nothing in it fixes a spec value at this tier.",
+     "메탈 아일렛·지그재그 아이스테이 디테일, observed 3 times, is the nearest evidence. Feasibility reads medium — tooling: last not_required, bottom mould not_required.",
+     "Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push."
+    ]
+   },
+   "qa": [],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "1% over"
+    },
+    {
+     "label": "New moulds",
+     "value": "0"
+    },
+    {
+     "label": "Signals observed",
+     "value": "6"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "Medium",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "Medium",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "High",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [],
+   "images": [],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-S09",
+    "tier": "signature",
+    "category": "shoe",
+    "itemType": "court_sneaker",
+    "fields": {
+     "last_id": "LST-RUN-05",
+     "is_new_last": true,
+     "toe_shape": "pointed",
+     "heel_height_mm": 19,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cupsole",
+     "is_new_outsole_mold": true,
+     "panel_count": 4,
+     "closure": "lace",
+     "upper_material": "knit 0.8mm",
+     "upper_thickness_mm": 1.2,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "tpu shank"
+    },
+    "fieldsLocked": [
+     "closure",
+     "sole_construction"
+    ],
+    "hintApplied": [],
+    "hintBlocked": []
+   },
+   "ruleResults": [],
+   "rejected": false,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 6000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Plate (tpu shank)",
+      "krw": 3800
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 8300
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (11 moulds)",
+      "krw": 3850
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 11550000,
+     "mold_count_required": 11,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 3850
+    },
+    "estimated_total_krw": 54250,
+    "estimated_band_krw": [
+     46655,
+     65209
+    ],
+    "cap_ratio": 0.94,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "series",
+    "driving_signals": [
+     {
+      "signal_id": "sg_004",
+      "weight": 0
+     },
+     {
+      "signal_id": "sg_005",
+      "weight": 0
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_213",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "mary_jane_hook_loop",
+       "metal_eylets_zigzag_stay"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_454",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [
+     {
+      "text": "The Air Jordan 1 line is defined by its silhouette, not its colour. Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+      "origin": "user_input",
+      "applied_as": [
+       "closure",
+       "sole_construction"
+      ]
+     }
+    ],
+    "series_dna_inherited": [
+     "closure",
+     "sole_construction"
+    ],
+    "type_placement_reason": "New last or new outsole mould allowed with amortisation stated. That is Signature.",
+    "narrative": [
+     "스트랩·후크앤루프 클로저(메리제인 변형) showed up 3 times in this price band, but nothing in it fixes a spec value at this tier.",
+     "메탈 아일렛·지그재그 아이스테이 디테일, observed 3 times, is the nearest evidence. Feasibility reads medium — tooling: last not_required, bottom mould not_required.",
+     "New last or new outsole mould allowed with amortisation stated. That is Signature."
+    ]
+   },
+   "qa": [
+    {
+     "check": "Toe shape reads correctly",
+     "target": "pointed",
+     "observed": "pointed",
+     "pass": true
+    },
+    {
+     "check": "Heel height visual deviation",
+     "target": "19mm, within 20%",
+     "observed": "23mm, off by 20%",
+     "pass": true
+    },
+    {
+     "check": "Panel count",
+     "target": "4",
+     "observed": "4",
+     "pass": true
+    },
+    {
+     "check": "Same object across views",
+     "target": ">=0.80",
+     "observed": "0.93",
+     "pass": true
+    }
+   ],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "6% under"
+    },
+    {
+     "label": "New moulds",
+     "value": "11"
+    },
+    {
+     "label": "Signals observed",
+     "value": "6"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "High",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "High",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "Medium",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [
+    "gold",
+    "black"
+   ],
+   "images": [],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-S10",
+    "tier": "signature",
+    "category": "shoe",
+    "itemType": "court_sneaker",
+    "fields": {
+     "last_id": "LST-RUN-07",
+     "is_new_last": true,
+     "toe_shape": "round",
+     "heel_height_mm": 22,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cupsole",
+     "is_new_outsole_mold": true,
+     "panel_count": 9,
+     "closure": "lace",
+     "upper_material": "knit 0.8mm",
+     "upper_thickness_mm": 1.1,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "tpu shank"
+    },
+    "fieldsLocked": [
+     "closure",
+     "sole_construction"
+    ],
+    "hintApplied": [],
+    "hintBlocked": []
+   },
+   "ruleResults": [],
+   "rejected": false,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 6000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Plate (tpu shank)",
+      "krw": 3800
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 11800
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (11 moulds)",
+      "krw": 3850
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 11550000,
+     "mold_count_required": 11,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 3850
+    },
+    "estimated_total_krw": 57750,
+    "estimated_band_krw": [
+     49665,
+     71158
+    ],
+    "cap_ratio": 1,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "series",
+    "driving_signals": [
+     {
+      "signal_id": "sg_003",
+      "weight": 0
+     },
+     {
+      "signal_id": "sg_006",
+      "weight": 0
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_293",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "vintage_aged_finish",
+       "waterproof_membrane_gtx"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_927",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [
+     {
+      "text": "The Air Jordan 1 line is defined by its silhouette, not its colour. Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+      "origin": "user_input",
+      "applied_as": [
+       "closure",
+       "sole_construction"
+      ]
+     }
+    ],
+    "series_dna_inherited": [
+     "closure",
+     "sole_construction"
+    ],
+    "type_placement_reason": "New last or new outsole mould allowed with amortisation stated. That is Signature.",
+    "narrative": [
+     "빈티지 워싱 미드솔·에이징 피니시 showed up 4 times in this price band, but nothing in it fixes a spec value at this tier.",
+     "생활방수·GORE‑TEX 적용 로우 코트, observed 3 times, is the nearest evidence. Feasibility reads high — tooling: last not_required, bottom mould not_required.",
+     "New last or new outsole mould allowed with amortisation stated. That is Signature."
+    ]
+   },
+   "qa": [],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "level"
+    },
+    {
+     "label": "New moulds",
+     "value": "11"
+    },
+    {
+     "label": "Signals observed",
+     "value": "7"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "Medium",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "Low",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "High",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [],
+   "images": [],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-S11",
+    "tier": "signature",
+    "category": "shoe",
+    "itemType": "court_sneaker",
+    "fields": {
+     "last_id": "LST-CRT-01",
+     "is_new_last": false,
+     "toe_shape": "square",
+     "heel_height_mm": 28,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cupsole",
+     "is_new_outsole_mold": true,
+     "panel_count": 5,
+     "closure": "lace",
+     "upper_material": "knit 0.8mm",
+     "upper_thickness_mm": 0.8,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "none"
+    },
+    "fieldsLocked": [
+     "closure",
+     "sole_construction"
+    ],
+    "hintApplied": [],
+    "hintBlocked": []
+   },
+   "ruleResults": [
+    {
+     "rule": "S-04",
+     "severity": "fail",
+     "message": "Toe shape square does not match last LST-CRT-01 (round)."
+    }
+   ],
+   "rejected": true,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 6000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 9000
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (11 moulds)",
+      "krw": 3117
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 9350000,
+     "mold_count_required": 11,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 3117
+    },
+    "estimated_total_krw": 50417,
+    "estimated_band_krw": [
+     43359,
+     60795
+    ],
+    "cap_ratio": 0.87,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "series",
+    "driving_signals": [
+     {
+      "signal_id": "sg_007",
+      "weight": 0
+     },
+     {
+      "signal_id": "sg_002",
+      "weight": 0
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_538",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "sustainable_materials_chromefree_recycled",
+       "deconstructed_upper_no_lining"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_570",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [
+     {
+      "text": "The Air Jordan 1 line is defined by its silhouette, not its colour. Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+      "origin": "user_input",
+      "applied_as": [
+       "closure",
+       "sole_construction"
+      ]
+     }
+    ],
+    "series_dna_inherited": [
+     "closure",
+     "sole_construction"
+    ],
+    "type_placement_reason": "New last or new outsole mould allowed with amortisation stated. That is Signature.",
+    "narrative": [
+     "크롬프리 레더·리사이클 소재 채택 showed up 3 times in this price band, but nothing in it fixes a spec value at this tier.",
+     "디콘스트럭티드 레더 어퍼(안감 제거·폴더블), observed 3 times, is the nearest evidence. Feasibility reads medium — tooling: last not_required, bottom mould not_required.",
+     "New last or new outsole mould allowed with amortisation stated. That is Signature."
+    ]
+   },
+   "qa": [],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "13% under"
+    },
+    {
+     "label": "New moulds",
+     "value": "11"
+    },
+    {
+     "label": "Signals observed",
+     "value": "6"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "High",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "Medium",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "Medium",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [],
+   "images": [],
+   "isTop": false
+  },
+  {
+   "spec": {
+    "design_id": "SH-26FW-S12",
+    "tier": "signature",
+    "category": "shoe",
+    "itemType": "court_sneaker",
+    "fields": {
+     "last_id": "LST-RUN-05",
+     "is_new_last": true,
+     "toe_shape": "round",
+     "heel_height_mm": 20,
+     "heel_type": "sport_midsole",
+     "sole_construction": "cupsole",
+     "is_new_outsole_mold": true,
+     "panel_count": 6,
+     "closure": "lace",
+     "upper_material": "engineered mesh 0.9mm",
+     "upper_thickness_mm": 1.2,
+     "size_run_count": 11,
+     "shaft_height_mm": 0,
+     "midsole_foam": "EVA",
+     "plate": "tpu shank"
+    },
+    "fieldsLocked": [
+     "closure",
+     "sole_construction"
+    ],
+    "hintApplied": [],
+    "hintBlocked": []
+   },
+   "ruleResults": [],
+   "rejected": false,
+   "cost": {
+    "lines": [
+     {
+      "label": "Upper",
+      "krw": 7000
+     },
+     {
+      "label": "Lining",
+      "krw": 3000
+     },
+     {
+      "label": "Outsole",
+      "krw": 7200
+     },
+     {
+      "label": "Midsole (EVA)",
+      "krw": 6500
+     },
+     {
+      "label": "Plate (tpu shank)",
+      "krw": 3800
+     },
+     {
+      "label": "Hardware",
+      "krw": 1200
+     },
+     {
+      "label": "Insole",
+      "krw": 2400
+     },
+     {
+      "label": "Cutting",
+      "krw": 3000
+     },
+     {
+      "label": "Stitching labour",
+      "krw": 9700
+     },
+     {
+      "label": "Lasting and assembly",
+      "krw": 7000
+     },
+     {
+      "label": "Finishing",
+      "krw": 2000
+     },
+     {
+      "label": "Tooling amortised (11 moulds)",
+      "krw": 3850
+     }
+    ],
+    "tooling": {
+     "total_tooling_krw": 11550000,
+     "mold_count_required": 11,
+     "size_run_count": 11,
+     "amortization_volume": 3000,
+     "tooling_per_unit_krw": 3850
+    },
+    "estimated_total_krw": 56650,
+    "estimated_band_krw": [
+     48719,
+     68481
+    ],
+    "cap_ratio": 0.98,
+    "confidence": "low",
+    "assumptions": [
+     "MOQ 1200 pairs",
+     "11 sizes",
+     "Amortised over 3,000 pairs",
+     "Material prices as of 2026-08-01"
+    ],
+    "excluded_costs": [
+     "Duty",
+     "Freight",
+     "Shoe box",
+     "Defect rate",
+     "Vendor margin",
+     "Sampling and last revisions"
+    ]
+   },
+   "rationale": {
+    "agent_mode": "series",
+    "driving_signals": [
+     {
+      "signal_id": "sg_001",
+      "weight": 0
+     },
+     {
+      "signal_id": "sg_004",
+      "weight": 0
+     }
+    ],
+    "reference_images": [
+     {
+      "ref_id": "rf_447",
+      "source_type": "competitor",
+      "source_url": "https://competitor.example/product/8812",
+      "collected_at": "2026-05-14",
+      "borrowed_attributes": [
+       "high_stack_platform",
+       "mary_jane_hook_loop"
+      ],
+      "usage": "attribute_only"
+     },
+     {
+      "ref_id": "rf_604",
+      "source_type": "archive",
+      "source_url": "supabase://uploads/archive_112.jpg",
+      "collected_at": "2026-04-02",
+      "borrowed_attributes": [
+       "proportion"
+      ],
+      "usage": "visual_reference"
+     }
+    ],
+    "reference_prompts": [
+     {
+      "text": "The Air Jordan 1 line is defined by its silhouette, not its colour. Every release keeps the same last and panel structure, and we only change materials and colour blocking.",
+      "origin": "user_input",
+      "applied_as": [
+       "closure",
+       "sole_construction"
+      ]
+     }
+    ],
+    "series_dna_inherited": [
+     "closure",
+     "sole_construction"
+    ],
+    "type_placement_reason": "New last or new outsole mould allowed with amortisation stated. That is Signature.",
+    "narrative": [
+     "하이 스택 플랫폼 컵솔 showed up 3 times in this price band, but nothing in it fixes a spec value at this tier.",
+     "스트랩·후크앤루프 클로저(메리제인 변형), observed 3 times, is the nearest evidence. Feasibility reads low — tooling: last modification, bottom mould required.",
+     "New last or new outsole mould allowed with amortisation stated. That is Signature."
+    ]
+   },
+   "qa": [],
+   "viewMismatch": false,
+   "metrics": [
+    {
+     "label": "Against cost cap",
+     "value": "2% under"
+    },
+    {
+     "label": "New moulds",
+     "value": "11"
+    },
+    {
+     "label": "Signals observed",
+     "value": "6"
+    }
+   ],
+   "modelEval": [
+    {
+     "label": "Brand fit",
+     "value": "Medium",
+     "basis": "How much of the existing last and mould is reused, and silhouette distance from the archive"
+    },
+    {
+     "label": "Distinctiveness",
+     "value": "Low",
+     "basis": "Attribute distance from competitor products in the same band"
+    },
+    {
+     "label": "Trend backing",
+     "value": "High",
+     "basis": "Observation count and index profile of the linked signals"
+    }
+   ],
+   "colorways": [],
+   "images": [],
+   "isTop": false
+  }
+ ],
+ "checkpoints": [
+  "S1 done · signals.json · directions[3] saved",
+  "S2 done · specs, sketches and rationale saved. You can resume at S3 days later.",
+  "S3 done · renders, colourways and QA results saved"
+ ],
+ "finished": true,
+ "sampleTitle": "Series · Air Jordan 1 archive read, then carried forward"
+}
