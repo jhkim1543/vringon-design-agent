@@ -4,7 +4,6 @@ import { useState } from 'react'
 import type { Design, Signal } from '../core/types'
 import { TIER_LABEL, TYPE_LABEL, VERDICT_TAGS } from '../core/types'
 import { viewSetFor } from '../core/packs'
-import { designSVG, svgDataUri } from '../core/sketch'
 import { Tag } from './bits'
 
 export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
@@ -20,7 +19,6 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
   const views = viewSetFor(d.spec.itemType)
   const rendered = stagePassed.s3 && !d.rejected && d.colorways.length >= 0 && d.qa.length > 0
   const mainView = 'lateral'
-  const mainSvg = designSVG(d.spec, rendered ? 'render' : 'sketch', mainView)
   const f = d.spec.fields
   // 실제 생성 이미지 우선 · 렌더(기준뷰) > 스케치 > SVG 시뮬레이션 폴백
   const baseImg = d.images.find(i => i.view === mainView && !i.colorway)
@@ -45,15 +43,24 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
   return (
     <div className={`dcard ${d.rejected ? 'rejected' : ''}`}>
       <div className="imgwrap">
-        {/* 생성 이미지가 못 불려오면 조용히 비워두지 않고 도식으로 되돌린다 */}
-        <img src={heroImg ? heroImg.url : svgDataUri(mainSvg)} alt={d.spec.design_id}
-          onError={e => { (e.currentTarget as HTMLImageElement).src = svgDataUri(mainSvg) }} />
+        {/* 생성된 컷이 없으면 도식을 그리지 않는다.
+            회색 신발 도형은 보기 싫었고, 그 SVG는 <g>를 안 닫아 브라우저에서 깨진 아이콘으로 떴다.
+            안 만들어졌으면 안 만들어졌다고 적는 편이 낫다. */}
+        {heroImg
+          ? <img src={heroImg.url} alt={d.spec.design_id}
+              onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+          : (
+            <div className="nocut">
+              <b>{d.spec.design_id}</b>
+              <span>{d.rejected ? t('Rejected by a rule, so it was never rendered') : t('No render yet — the image cap was reached before this one')}</span>
+              <i>{specSummary}</i>
+            </div>
+          )}
         <div className="flag" style={{ display: 'flex', gap: 4 }}>
           {d.isTop && <Tag kind="accent">TOP</Tag>}
           {d.viewMismatch && <Tag kind="warn">{t('View mismatch')}</Tag>}
           {d.rejected && <Tag kind="danger">{t('Rule reject')}</Tag>}
         </div>
-        {!heroImg && !d.rejected && <span className="simbadge">{t('Diagram')}</span>}
       </div>
 
       {/* 실제로 생성된 컷만 건다. 예전에는 컷이 없으면 도식(SVG)을 대신 깔았는데,
