@@ -3,6 +3,8 @@ import { useRef, useState } from 'react'
 import type { BrandIdentity, BrandLogo } from '../core/brand'
 import { EMPTY_BRAND, brandPromptClause } from '../core/brand'
 import { Tag } from './bits'
+import { readLogoStyle, uploadFiles } from '../core/uploads'
+import { getLang, LANG_NAME } from '../core/i18n'
 
 const PLACEMENTS: { id: BrandLogo['placement']; label: string; forShoe: boolean }[] = [
   { id: 'none', label: 'None', forShoe: true },
@@ -62,8 +64,41 @@ export default function BrandSetup({ brand, onSave, onClose }: {
     r.onload = () => set('logo', {
       name: f.name, dataUrl: String(r.result),
       placement: b.logo?.placement ?? 'none', scale: b.logo?.scale ?? 'subtle',
+      references: b.logo?.references, style: null,   // 로고가 바뀌면 옛 배치 규칙은 못 믿는다
     })
     r.readAsDataURL(f)
+  }
+
+  // 로고가 이미 적용된 제품 사진 · 올리면 그 배치 방식을 읽어 온다
+  const [refBusy, setRefBusy] = useState(false)
+  const [refError, setRefError] = useState<string | null>(null)
+  const takeRefs = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const picked = Array.from(e.target.files ?? [])
+    e.target.value = ''
+    if (!picked.length || !b.logo) return
+    setRefBusy(true); setRefError(null)
+    try {
+      const { ok, failed } = await uploadFiles(picked)
+      if (failed.length) setRefError(`${failed.length} could not be read · ${failed[0]}`)
+      if (!ok.length) return
+      const refs = [...(b.logo.references ?? []), ...ok]
+      // 로고 원본도 함께 올려 둔다. 모델이 "이 마크"를 알아야 사진에서 그걸 찾는다.
+      let logoId: string | undefined
+      try {
+        const blob = await (await fetch(b.logo.dataUrl)).blob()
+        const up = await uploadFiles([new File([blob], b.logo.name, { type: blob.type || 'image/png' })])
+        logoId = up.ok[0]?.id
+      } catch { /* 원본을 못 올려도 참고 사진만으로 읽을 수 있다 */ }
+      const style = await readLogoStyle({
+        logoId, referenceIds: refs.map(r => r.id),
+        itemTypeEn: 'footwear', langName: LANG_NAME[getLang()],
+      })
+      set('logo', { ...b.logo, references: refs, style })
+    } catch (err) {
+      setRefError(String((err as Error).message).slice(0, 160))
+    } finally {
+      setRefBusy(false)
+    }
   }
 
   const [color, setColor] = useState({ name: '', hex: '#444AE8' })
@@ -155,6 +190,42 @@ export default function BrandSetup({ brand, onSave, onClose }: {
                   Generators can't reproduce a logo accurately. With this on, nothing is drawn there and
                   <b> the spot you picked is left clean.</b> Composite the real file onto it afterwards.
                 </span>
+              </div>
+
+              {/* 로고 파일만으로는 평면 합성밖에 못 한다. 실제 제품에서 마크가 어떻게 앉는지를
+                  보여 주면 그 방식을 읽어 렌더가 형태로 그려 낸다. */}
+              <div className="row"><span className="lbl">How it sits</span>
+                <div style={{ flex: 1 }}>
+                  <label className="dropzone" style={{ minHeight: 64 }}>
+                    <input type="file" multiple accept="image/png,image/jpeg,image/webp" hidden
+                      onChange={e => void takeRefs(e)} />
+                    {refBusy ? 'Reading how the mark is applied…' : 'Add product photos that already carry this logo'}
+                    <span className="dz-sub">The agent copies how the mark sits on these, instead of pasting a flat file</span>
+                  </label>
+                  {refError && <p className="hint" style={{ color: 'var(--danger)' }}>{refError}</p>}
+                  {!!b.logo.references?.length && (
+                    <div className="chiplist quick" style={{ marginTop: 6 }}>
+                      {b.logo.references.map((f, i) => (
+                        <span className="chip-in" key={f.id + i}>{f.name}
+                          <button aria-label="Remove" onClick={() => set('logo', {
+                            ...b.logo!,
+                            references: b.logo!.references!.filter((_, j) => j !== i),
+                            style: null,
+                          })}>Remove</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {b.logo.style && (
+                    <div className="logo-style">
+                      <b>Read from your photos</b>
+                      <div>{b.logo.style.placement_description}</div>
+                      <div>{b.logo.style.scale_note} · {b.logo.style.integration}</div>
+                      <div>{b.logo.style.colour_treatment}</div>
+                      {b.logo.style.not_seen && <div className="hint">Not visible in these photos: {b.logo.style.not_seen}</div>}
+                    </div>
+                  )}
+                </div>
               </div>
             </>)}
           </div>

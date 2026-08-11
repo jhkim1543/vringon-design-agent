@@ -1,6 +1,7 @@
 // ── 업로드 · 파일을 실제로 서버에 올리고, 실제로 읽힌 결과를 받는다 ────────
 // 예전에는 여기가 없었다. 파일 입력이 f.name만 담고 내용은 아무도 열지 않았다.
 import type { SeriesDna, UploadRef } from './types'
+import type { LogoStyle } from './brand'
 
 const MAX_FILES = 12
 
@@ -82,6 +83,10 @@ export const readSeries = (b: { uploadIds: string[]; valueStatement: string; ite
 
 export const readMoodboard = (b: { uploadIds: string[]; notes: string; itemTypeEn: string; langName: string }) =>
   post<MoodboardRead>('/api/analyze/moodboard', b)
+
+/** 로고가 적용된 제품 사진에서 배치 규칙을 읽는다 */
+export const readLogoStyle = (b: { logoId?: string; referenceIds: string[]; itemTypeEn: string; langName: string }) =>
+  post<LogoStyle>('/api/analyze/logo-style', b)
 
 /** 읽어 낸 결과를 화면이 쓰는 SeriesDna 모양으로 옮긴다.
  *  confidence는 몇 장에서 보였는지로만 정한다. 지어내지 않는다. */

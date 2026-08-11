@@ -255,6 +255,76 @@ ${langName}로 씁니다. attribute만 영어 snake_case로 두세요.`,
   })
 }
 
+// ── 로고 배치 규칙 ────────────────────────────────────────────────────
+// 로고 파일만 있으면 할 수 있는 것은 평면 합성뿐이다. 네모난 이미지를 신발 옆에 붙이면
+// 붙인 티가 난다. 실제 브랜드 마크는 패널을 타고 휘고, 스티치로 앉고, 갑피 색과 대비된다.
+//
+// 그래서 "로고가 이미 적용된 제품 사진"을 함께 받는다. 그 사진에서 마크가 어떻게 앉는지를
+// 읽어 프롬프트 문장으로 바꾸면, 렌더가 마크를 붙이는 게 아니라 그려 낸다.
+const LOGO_STYLE_SCHEMA = {
+  type: 'object', additionalProperties: false,
+  required: ['prompt_clause', 'placement_description', 'scale_note', 'integration', 'colour_treatment', 'not_seen'],
+  properties: {
+    prompt_clause: {
+      type: 'string',
+      description: '이미지 생성 프롬프트에 그대로 넣을 영어 문단 2~4문장. 마크의 형태와 앉는 자리와 방향을 구체적으로 묘사한다. 브랜드 이름은 쓰지 말고 형태만 묘사한다. 예: "a pair of converging curved stripes sweeps up from the midsole across the midfoot panel, widening toward the laces"',
+    },
+    placement_description: { type: 'string', description: '어느 패널의 어느 지점에 앉는가' },
+    scale_note: { type: 'string', description: '갑피 대비 크기와 비율' },
+    integration: { type: 'string', description: '스티치·오버레이·프린트·엠보스 중 무엇으로 보이는가' },
+    colour_treatment: { type: 'string', description: '갑피와의 색 대비 처리' },
+    not_seen: { type: 'string', description: '이 사진들로는 확인 못 한 것. 예: 반대쪽 면, 힐 마크' },
+  },
+}
+
+export async function analyzeLogoStyle(apiKey, root, { logoId, referenceIds = [], itemTypeEn = 'footwear', langName = 'English' }) {
+  if (!apiKey) throw new Error('OPENAI_API_KEY not set')
+  const refs = referenceIds.slice(0, 6).map(id => loadUpload(root, id))
+  if (!refs.length) throw new Error('no reference photos to read')
+  const logo = logoId ? loadUpload(root, logoId) : null
+  const key = createHash('sha256').update(JSON.stringify([
+    'logostyle1', langName, logo?.id ?? '', refs.map(r => r.id), itemTypeEn,
+  ])).digest('hex').slice(0, 24)
+
+  return cached(root, key, async () => {
+    const data = await ask(apiKey, {
+      model: 'gpt-5',
+      name: 'logo_style',
+      schema: LOGO_STYLE_SCHEMA,
+      input: [{
+        role: 'user',
+        content: [
+          {
+            type: 'input_text',
+            text: `${logo ? '첫 번째 이미지는 브랜드 로고 원본입니다. 나머지' : '첨부한'} 사진들은 그 로고가 실제로 적용된 제품입니다.
+
+이 로고가 제품 위에 어떻게 앉는지를 읽어 주세요. 우리가 새로 만들 ${itemTypeEn}에 같은 방식으로 마크를 올릴 것입니다.
+
+봐야 할 것:
+- 마크가 어느 패널의 어느 지점에서 시작해 어디로 뻗는가
+- 갑피 곡면을 따라 어떻게 휘는가. 평평하게 붙어 있는가, 패널 분할선을 타는가
+- 갑피 높이 대비 크기
+- 어떻게 얹혀 있는가: 박음질된 오버레이인가, 프린트인가, 엠보스인가
+- 갑피 색과 어떤 대비를 이루는가
+
+prompt_clause는 이미지 생성 모델에게 줄 영어 문장입니다. 규칙이 하나 있습니다:
+브랜드 이름이나 상표명을 쓰지 마세요. 오직 형태만 묘사하세요.
+생성 모델은 이름을 들으면 기억에 있는 다른 것을 그립니다. 형태를 들으면 그 형태를 그립니다.
+
+사진에서 안 보이는 부분은 not_seen에 적고, 봤다고 쓰지 마세요.
+
+placement_description, scale_note, integration, colour_treatment는 ${langName}로 씁니다.
+prompt_clause만 영어로 씁니다.`,
+          },
+          ...(logo ? [asModelInput(logo)] : []),
+          ...refs.map(asModelInput),
+        ],
+      }],
+    })
+    return { ...data, from: refs.map(r => ({ id: r.id, name: r.name })) }
+  })
+}
+
 /** 개발 편의 · 남아 있는 업로드 목록 */
 export function listUploads(root) {
   const dir = uploadDir(root)

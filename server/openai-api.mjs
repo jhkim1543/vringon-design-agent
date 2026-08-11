@@ -11,7 +11,7 @@ import { geminiEdit, geminiGenerate, geminiProbe, geminiShotPlan } from './gemin
 import { compositeLogo, logoAvailable } from './logo-api.mjs'
 import { tripoMultiview, tripoProbe, readModel } from './tripo-api.mjs'
 import { brightdataProbe, unlockImage, unlockPage } from './brightdata.mjs'
-import { analyzeMoodboard, analyzeSeries, saveUpload } from './upload-api.mjs'
+import { analyzeLogoStyle, analyzeMoodboard, analyzeSeries, saveUpload } from './upload-api.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..')
@@ -455,6 +455,17 @@ export async function handleApi(req, res) {
       const b = await readBody(req)
       return json(res, 200, await analyzeSeries(API_KEY, ROOT, {
         uploadIds: b.uploadIds, valueStatement: b.valueStatement,
+        itemTypeEn: b.itemTypeEn, langName: b.langName,
+      }))
+    } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
+  }
+
+  // 로고가 적용된 제품 사진에서 배치 규칙을 읽는다
+  if (path === '/api/analyze/logo-style' && req.method === 'POST') {
+    try {
+      const b = await readBody(req)
+      return json(res, 200, await analyzeLogoStyle(API_KEY, ROOT, {
+        logoId: b.logoId, referenceIds: b.referenceIds,
         itemTypeEn: b.itemTypeEn, langName: b.langName,
       }))
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }

@@ -2,11 +2,34 @@
 // 에이전트(트렌드·시리즈·무드보드)의 판단이 우선이지만, 로고와 브랜드 규칙은
 // 그 위에 항상 덧씌워진다. 그래서 파이프라인이 아니라 별도 저장소에 둔다.
 
+/** 로고가 실제 제품에 어떻게 올라가는지 · 참고 사진에서 읽어 낸 규칙 */
+export interface LogoStyle {
+  /** 프롬프트에 그대로 실리는 한 문단. 이게 있으면 렌더가 마크를 형태로 그린다 */
+  prompt_clause: string
+  /** 어디에 앉는가 · 사람이 읽는 요약 */
+  placement_description: string
+  /** 크기와 비율 */
+  scale_note: string
+  /** 어떻게 얹혀 있는가 (스티치·오버레이·프린트·엠보스) */
+  integration: string
+  /** 색 처리 */
+  colour_treatment: string
+  /** 참고 사진에서 확인 못 한 것 */
+  not_seen: string
+  /** 이 규칙을 뽑는 데 쓴 사진 */
+  from: { id: string; name: string }[]
+}
+
 export interface BrandLogo {
   name: string
   dataUrl: string          // 브라우저에만 두고 서버로 보내지 않는다
   placement: 'none' | 'tongue' | 'heel' | 'side' | 'insole' | 'clasp' | 'pendant'
   scale: 'subtle' | 'normal' | 'bold'
+  /** 로고가 이미 적용된 제품 사진 · 서버가 읽고, 배치 규칙을 여기서 뽑는다.
+   *  파일 자체는 서버 캐시에 있고 여기에는 손잡이만 둔다. */
+  references?: { id: string; name: string; type: string; bytes: number }[]
+  /** 참고 사진에서 읽어 낸 배치 규칙. 참고 사진이 없으면 없다. */
+  style?: LogoStyle | null
 }
 
 export interface BrandIdentity {
@@ -68,8 +91,9 @@ export function brandPromptClause(b: BrandIdentity): string {
   if (b.toneWords.length)
     parts.push(`Overall impression: ${b.toneWords.join(', ')}`)
 
-  // 로고는 형태를 재현할 수 없으므로 위치와 절제만 지시한다.
-  // 실제 로고 삽입은 편집 단계에서 원본 파일로 합성하는 것이 정확하다.
+  // 로고를 파일로 얹기만 하면 네모난 판을 붙인 티가 난다. 실제 마크는 패널을 타고 휜다.
+  // 그래서 "로고가 적용된 제품 사진"을 올렸으면, 거기서 읽어 낸 형태 묘사를 프롬프트에 싣는다.
+  // 상표명은 절대 싣지 않는다 — 이름을 주면 모델이 기억 속의 다른 것을 그린다. 형태만 준다.
   if (b.applyLogoToImages && b.logo && b.logo.placement !== 'none') {
     const where: Record<string, string> = {
       tongue: 'on the tongue', heel: 'on the heel counter', side: 'on the lateral side panel',
@@ -77,7 +101,11 @@ export function brandPromptClause(b: BrandIdentity): string {
     }
     const size = b.logo.scale === 'subtle' ? 'very small and understated'
       : b.logo.scale === 'bold' ? 'clearly visible' : 'modest'
-    parts.push(`Leave a clean unbranded area ${where[b.logo.placement]} for a ${size} brand mark. Do not invent any logo, text, or lettering.`)
+    if (b.logo.style?.prompt_clause) {
+      parts.push(`${b.logo.style.prompt_clause} Render this mark as part of the shoe's construction, following the curve of the panel it sits on. No text, no lettering, no wordmark.`)
+    } else {
+      parts.push(`Leave a clean unbranded area ${where[b.logo.placement]} for a ${size} brand mark. Do not invent any logo, text, or lettering.`)
+    }
   } else {
     parts.push('No logo, no text, no lettering anywhere on the product.')
   }

@@ -550,7 +550,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         let baseHash: string | null = null
         const sketchIm = d.images.find(i => i.view === 'sketch')
         const basePrompt = sketchIm
-          ? renderFromSketchPrompt(d.spec, trendClause, line)
+          ? renderFromSketchPrompt(d.spec, trendClause, line, params.brand)
           : renderPrompt(d.spec, params.imageEngine, params.brand, trendClause, line)
         try {
           const r = sketchIm
@@ -560,7 +560,10 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           let baseUrl = r.url
           // 브랜드 로고는 프롬프트가 아니라 실제 파일로 얹는다. 형태가 어긋나지 않는다.
           // 사용자가 "이미지에 로고 넣기"를 껐으면 넣지 않는다. 예전에는 이 스위치를 무시했다.
-          if (params.brand?.applyLogoToImages && params.brand?.logo?.dataUrl && params.brand.logo.placement !== 'none') {
+          // 참고 사진에서 배치를 배웠으면 마크는 이미 그려져 있다. 그 위에 파일을 덧붙이면 두 번 나온다.
+          // 참고 사진이 없을 때만 올린 파일을 그 자리에 합성한다.
+          const drewMark = !!params.brand?.logo?.style?.prompt_clause
+          if (!drewMark && params.brand?.applyLogoToImages && params.brand?.logo?.dataUrl && params.brand.logo.placement !== 'none') {
             try {
               const stamped = await stampLogo(r.hash, params.brand)
               if (stamped) {
@@ -571,7 +574,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
               emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} logo composite failed · ${String((e as Error).message).slice(0, 80)}` })
             }
           }
-          d.images = [...d.images, { view: views[0].key, url: baseUrl, hash: baseHash, origin: 'generated', promptUsed: basePrompt, logoStamped: baseHash !== r.hash }]
+          d.images = [...d.images, { view: views[0].key, url: baseUrl, hash: baseHash, origin: 'generated', promptUsed: basePrompt, logoStamped: drewMark || baseHash !== r.hash }]
           emit({ kind: 'design-update', design: { ...d } })
         } catch (e) {
           d.imageError = String((e as Error).message || e)
@@ -582,7 +585,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         for (let k = 0; k < sketchVars.length; k++) {
           if (cancelled || budget.left() <= 0 || extrasLeft <= 0) break
           const sv = sketchVars[k]
-          const p2 = renderFromSketchPrompt(d.spec, trendClause, line)
+          const p2 = renderFromSketchPrompt(d.spec, trendClause, line, params.brand)
           try {
             const r2 = await editImage(sv.hash, p2, params.imageEngine)
             budget.spend(); extrasLeft -= 1
@@ -682,7 +685,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     // S3에서 로고를 못 얹은 건(그때 실패했거나 도식으로 떨어진 건)이 그대로 최종이 되면,
     // 브랜드가 자기 로고 없는 이미지를 최종안으로 받게 된다. 여기서 한 번 더 확인한다.
     const brandLogo = params.brand
-    if (brandLogo?.applyLogoToImages && brandLogo.logo?.dataUrl && brandLogo.logo.placement !== 'none') {
+    if (brandLogo?.applyLogoToImages && brandLogo.logo?.dataUrl && brandLogo.logo.placement !== 'none' && !brandLogo.logo.style?.prompt_clause) {
       for (const d of top) {
         const main = d.images.find(im => im.view === views[0].key && !im.colorway)
         if (!main || main.logoStamped) continue

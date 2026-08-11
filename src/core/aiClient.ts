@@ -194,7 +194,11 @@ export function sketchVariationPrompt(k: number): string {
 
 /** 스케치 → 기준 렌더 · 새로 그리지 않고 테크시트를 사진으로 옮긴다.
  *  스케치의 실루엣·패널·아웃솔 기하가 렌더에 그대로 보존된다 (Gemini QA 지적). */
-export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
+export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInput | null, line?: FootwearLineProfile, brand?: BrandIdentity): string {
+  // 브랜드 마크를 사진에 그려 넣을지는 브랜드 설정이 정한다.
+  // 참고 사진에서 배치 규칙을 읽어 두었으면 그 형태 묘사가 여기 실린다.
+  const markClause = brand ? brandPromptClause(brand) : ''
+  const drawsMark = !!brand?.applyLogoToImages && !!brand.logo?.style?.prompt_clause
   return [
     'Replace this line drawing with a full-colour photorealistic studio product photograph of the same shoe.',
     'The output must be a photograph, not a drawing: no outlines, no white fill, no flat areas.',
@@ -203,8 +207,12 @@ export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInpu
     `Materials and colour: ${shoeSpecPhrase(spec)}.`,
     linePromptClause(line),
     trendPromptClause(trend ?? null),
+    markClause,
     'Strict lateral side view, one single shoe, toe pointing to the left and heel on the right, seamless white background, sharp focus.',
-    'Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human.',
+    // 마크를 그리라고 해 놓고 같은 문장에서 로고를 금지하면 모델이 마크를 지운다.
+    drawsMark
+      ? 'Laces as clearly separated cords with distinct eyelets. No text, no lettering, no watermark, no human.'
+      : 'Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human.',
   ].filter(Boolean).join(' ')
 }
 
