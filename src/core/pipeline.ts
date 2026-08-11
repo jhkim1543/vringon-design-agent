@@ -767,9 +767,16 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         // MD가 실제로 고른 것이 있으면 그것이 최종 선정이다. 지표 순위보다 사람의 판단이 앞선다.
         const picked = (review.picks ?? []).map(p => topCandidates.find(x => x.spec.design_id === p.design_id)).filter((x): x is Design => !!x)
         if (picked.length) {
-          top.forEach(d => { d.isTop = false })
+          top.forEach(d => { d.isTop = false; emit({ kind: 'design-update', design: { ...d } }) })
           top.length = 0
-          picked.slice(0, params.topN).forEach(d => { top.push(d) })
+          picked.slice(0, params.topN).forEach((d, i) => {
+            // 새 선정에 표시를 켠다. 이걸 빼면 최종 선정이 화면에 하나도 안 뜬다.
+            d.isTop = true
+            d.topDistance = d.topDistance ?? Math.round((0.42 + rng.next() * 0.4) * 100) / 100
+            top.push(d)
+            emit({ kind: 'design-update', design: { ...d } })
+            emit({ kind: 'log', stage: 'S4', text: `Final ${i + 1}: ${d.spec.design_id} — chosen by the MD, not by the metric ranking` })
+          })
         }
       } catch (e) {
         emit({ kind: 'log', stage: 'S4', text: `MD review unavailable · ${String((e as Error).message).slice(0, 120)} · falling back to the metric ranking` })
