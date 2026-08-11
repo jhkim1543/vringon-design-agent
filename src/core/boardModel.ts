@@ -189,7 +189,7 @@ export function buildBoardModel(st: RunState): BoardModel {
     dossier.macrotrends.forEach((m, i) => {
       const id = `macro-${i}`
       nodes.push({
-        id, kind: 'research', column: 1, row: dosRow + 1 + i,
+        id, kind: 'research', column: 1, row: dosRow + 1 + i * 10,
         title: `${m.name} · ${GRADE_LABEL[m.grade] ?? m.grade}`,
         body: [
           m.statement,
@@ -205,7 +205,8 @@ export function buildBoardModel(st: RunState): BoardModel {
       withShot.forEach((k, j) => {
         const kid = `macro-${i}-item-${j}`
         nodes.push({
-          id: kid, kind: 'research', column: 1.5, row: dosRow + 1 + i * 3 + j,
+          // 반 칸(1.5)에 두면 x 범위가 조사 열과 139px 겹친다. 같은 열에 두고 아래로 쌓는다.
+          id: kid, kind: 'research', column: 1, row: dosRow + 1 + i * 10 + j + 1,
           title: k.name,
           body: [[metricText(k.metric), GRADE_LABEL[k.grade] ?? k.grade].filter(Boolean).join(' · '),
             k.silhouette_spec].filter(Boolean),
@@ -262,11 +263,21 @@ export function buildBoardModel(st: RunState): BoardModel {
     const sketches = d.images.filter(im => im.view === 'sketch' || im.view === 'sketch_var')
     sketches.forEach((im, k) => {
       const id = `sk-${d.spec.design_id}-${k}`
+      // 왜 이 스케치가 나왔는지는 스케치 옆에 있어야 한다. 디자인 칸이 아니라 여기다.
+      const pit = pitchOf(d.spec.design_id)
+      const why = k === 0
+        ? [
+            d.spec.comboLabel ? `Reads the research as: ${d.spec.comboLabel}` : '',
+            ...(pit?.why ?? []).slice(0, 2),
+            d.rationale?.narrative?.[0] ?? '',
+          ].filter(Boolean)
+        : ['Same silhouette and outsole as the base form. Only the upper is read differently.']
       nodes.push({
         id, kind: 'design', column: 4, row: skRow++,
         title: `${d.spec.design_id} · ${k === 0 ? 'Base form' : `Ink variation ${k}`}`,
-        body: [k === 0 ? 'Form decided here' : 'Same form, different upper'],
+        body: why,
         imageUrl: im.url,
+        prompts: im.promptUsed ? [`Sketch prompt: ${im.promptUsed.slice(0, 180)}${im.promptUsed.length > 180 ? '…' : ''}`] : undefined,
         tone: 'muted',
       })
       const dir = st.directions.find(x => d.rationale.driving_signals.some(ds => x.signal_ids.includes(ds.signal_id)))
@@ -294,17 +305,22 @@ export function buildBoardModel(st: RunState): BoardModel {
       const capPct = Math.round((d.cost.cap_ratio - 1) * 100)
       nodes.push({
         id: `pitch-${d.spec.design_id}`, kind: 'selection', column: 5.5, row: i,
-        title: 'Why this sketch, and the prompt behind it',
+        // 스케치가 왜 나왔는지는 스케치 레인이 말한다. 여기는 그 스케치를 어떻게 디자인으로 옮겼는가다.
+        title: 'From sketch to design: what was asked, and why',
         body: [
-          ...pit.why.slice(0, 3),
-          ...(setBy.length ? [`The research set ${setBy.length} of the spec: ${setBy.join(', ')}.`] : []),
-          ...(refused.length ? [`It also asked for ${refused.join(' and ')}. A ${TYPE_LABEL[d.spec.itemType] ?? d.spec.itemType} cannot take that.`] : []),
+          d.spec.comboLabel
+            ? `This design was asked to lead with one idea: ${d.spec.comboLabel.replace(/^Only /, '')}. That is why the prompt below names it first.`
+            : 'The prompt below carries the spec straight from the sketch.',
+          ...(setBy.length ? [`The research fixed ${setBy.length} value${setBy.length > 1 ? 's' : ''} in that prompt: ${setBy.join(', ')}.`] : []),
+          ...(refused.length ? [`It also asked for ${refused.join(' and ')}. A ${TYPE_LABEL[d.spec.itemType] ?? d.spec.itemType} cannot take that, so it is absent from the prompt.`] : []),
           `Tooling: ${d.cost.tooling.mold_count_required === 0 ? 'no new moulds' : `${d.cost.tooling.mold_count_required} new moulds`}. Cost sits ${capPct === 0 ? 'level with' : capPct > 0 ? `${capPct}% over` : `${Math.abs(capPct)}% under`} the cap.`,
-          ...(pit.objections.length ? [`Likely objection: ${pit.objections[0].q} ${pit.objections[0].a}`] : []),
+          ...(d.mdReview ? [`MD: ${d.mdReview.verdict === 'buy' ? 'would buy' : d.mdReview.verdict === 'buy_if_fixed' ? 'would buy if fixed' : 'passes'} — ${d.mdReview.why}`] : []),
+          ...(d.mdReview?.concern ? [`MD concern: ${d.mdReview.concern}`] : []),
+          ...(d.mdReview?.fix ? [`MD would need: ${d.mdReview.fix}`] : []),
         ],
         prompts: [
-          cut(basePrompt) ? `Render prompt: ${cut(basePrompt)}` : null,
-          cut(variantPrompt) ? `Variant prompt: ${cut(variantPrompt)}` : null,
+          cut(basePrompt) ? `Sketch to design: ${cut(basePrompt)}` : null,
+          cut(variantPrompt) ? `Second design from the same sketch: ${cut(variantPrompt)}` : null,
         ].filter((x): x is string => !!x),
         tone: 'muted',
         isPitch: true,
@@ -394,13 +410,23 @@ export function buildBoardModel(st: RunState): BoardModel {
     const vars = d.images.filter(im => im.view === 'variation')
     vars.forEach((im, k) => {
       const id = `var-${d.spec.design_id}-${k}`
+      // 무엇을 얼마나 밀었는지 · 슬라이더 값이 있으면 그대로 보여 준다
+      const sl = im.sliders
+        ? Object.entries(im.sliders)
+            .filter(([, v]) => Math.abs(v) > 0.2)
+            .map(([key, v]) => `${key.split('_').slice(1).join(' ')} ${v > 0 ? '+' : ''}${v.toFixed(2)}`)
+        : []
       nodes.push({
         id, kind: 'design', column: 7, row: varRow++,
-        title: `${d.spec.design_id} · ${im.variantAxis ?? 'Variation'}`,
-        body: ['One axis changed'],
+        title: `${d.spec.design_id} · ${(im.variantAxis ?? 'Variation').split(' · ')[0]}`,
+        body: [
+          im.variantAxis?.split(' · ')[1] ?? 'One axis changed',
+          sl.length ? `Sliders: ${sl.join(', ')}` : '',
+          'Structure and palette held; only this axis moved.',
+        ].filter(Boolean),
         imageUrl: im.url,
       })
-      edges.push({ from: d.spec.design_id, to: id, label: 'variation' })
+      edges.push({ from: d.spec.design_id, to: id, label: (im.variantAxis ?? 'variation').split(' · ')[0] })
     })
   })
 

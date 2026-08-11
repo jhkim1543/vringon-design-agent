@@ -115,6 +115,63 @@ function fieldsFromSignal(s: Signal, athletic: boolean): Record<string, string |
   return out
 }
 
+/** 이 분석에서 만들 수 있는 신호 조합들.
+ *
+ *  예전에는 모든 디자인이 "가장 센 신호부터 순서대로" 같은 힌트를 받았다. 그래서
+ *  한 티어 안의 안들이 서로 거의 같았다. 고를 이유가 없는 후보를 여러 장 만든 셈이다.
+ *
+ *  조사가 신호를 여섯 개 물어 왔으면 조합은 훨씬 많다. 하나만 밀어 본 안, 둘을 섞은 안,
+ *  전부 얹은 안이 각각 다른 신발이 된다. 그 조합을 디자인마다 다르게 배정한다.
+ *
+ *  순서는 좁은 것부터다: 단일 → 2개 조합 → 전체. 디자인 수가 적으면 단일안부터 채워진다. */
+export function signalCombos(signals: Signal[], tier: DesignTier, count: number): { ids: string[]; label: string }[] {
+  const usable = signals.filter(s => allowedInTier(s, tier))
+  if (!usable.length) return []
+  const rank = (s: Signal) => s.observed_count * 10
+    + (s.indices?.commercial === 'high' ? 3 : s.indices?.commercial === 'medium' ? 1 : 0)
+  const ordered = [...usable].sort((a, b) => rank(b) - rank(a))
+
+  const out: { ids: string[]; label: string }[] = []
+  // ① 단일 · 이 신호 하나만 밀면 어떤 신발이 되는가
+  for (const s of ordered) out.push({ ids: [s.signal_id], label: `Only ${s.label}` })
+  // ② 둘씩 · 서로 다른 축끼리 먼저 섞는다. 같은 축 둘은 서로를 덮는다.
+  for (let i = 0; i < ordered.length; i++) {
+    for (let j = i + 1; j < ordered.length; j++) {
+      const a = ordered[i], b = ordered[j]
+      out.push({
+        ids: [a.signal_id, b.signal_id],
+        label: `${a.label} + ${b.label}`,
+        // 다른 축 조합을 앞으로 당긴다
+        ...(a.axis !== b.axis ? { pri: 0 } : { pri: 1 }),
+      } as { ids: string[]; label: string })
+    }
+  }
+  // ③ 전부 · 조사가 말한 것을 다 얹으면 어디까지 가는가
+  if (ordered.length > 2) out.push({ ids: ordered.map(s => s.signal_id), label: `All ${ordered.length} signals combined` })
+
+  const singles = out.filter(o => o.ids.length === 1)
+  const pairs = out.filter(o => o.ids.length === 2)
+    .sort((x, y) => ((x as { pri?: number }).pri ?? 0) - ((y as { pri?: number }).pri ?? 0))
+  const all = out.filter(o => o.ids.length > 2)
+
+  // 단일과 조합을 번갈아 배치한다. 앞쪽만 보고 골라도 폭이 보인다.
+  const mixed: typeof out = []
+  const q = [singles, pairs, all]
+  let idx = 0
+  while (mixed.length < count && q.some(l => l.length)) {
+    const list = q[idx % q.length]
+    if (list.length) mixed.push(list.shift()!)
+    idx++
+  }
+  return mixed.slice(0, count)
+}
+
+/** 지정한 신호들만으로 힌트를 만든다 · 조합별 디자인이 서로 달라지는 지점 */
+export function deriveSpecHintsFrom(signals: Signal[], ids: string[], tier: DesignTier, athletic: boolean): SpecHint {
+  const picked = signals.filter(s => ids.includes(s.signal_id))
+  return deriveSpecHints(picked, tier, athletic)
+}
+
 /** 이 티어에서 실행 가능한 신호들을 스펙 힌트로 모은다.
  *  같은 필드를 여러 신호가 말하면 먼저 온 신호(관측 횟수가 많은 쪽)가 이긴다. */
 export function deriveSpecHints(signals: Signal[], tier: DesignTier, athletic: boolean): SpecHint {

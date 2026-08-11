@@ -11,7 +11,7 @@ import { geminiEdit, geminiGenerate, geminiProbe, geminiShotPlan } from './gemin
 import { compositeLogo, logoAvailable } from './logo-api.mjs'
 import { tripoMultiview, tripoProbe, readModel } from './tripo-api.mjs'
 import { brightdataProbe, unlockImage, unlockPage } from './brightdata.mjs'
-import { analyzeLogoStyle, analyzeMoodboard, analyzeSeries, saveUpload } from './upload-api.mjs'
+import { analyzeLogoStyle, analyzeMoodboard, analyzeSeries, reviewAsMd, saveUpload } from './upload-api.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..')
@@ -456,6 +456,16 @@ export async function handleApi(req, res) {
       return json(res, 200, await analyzeSeries(API_KEY, ROOT, {
         uploadIds: b.uploadIds, valueStatement: b.valueStatement,
         itemTypeEn: b.itemTypeEn, langName: b.langName,
+      }))
+    } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
+  }
+
+  // MD 페르소나가 후보를 보고 고른다
+  if (path === '/api/analyze/md-review' && req.method === 'POST') {
+    try {
+      const b = await readBody(req)
+      return json(res, 200, await reviewAsMd(API_KEY, ROOT, {
+        persona: b.persona, brand: b.brand, designs: b.designs, langName: b.langName,
       }))
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
   }

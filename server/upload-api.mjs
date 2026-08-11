@@ -325,6 +325,103 @@ prompt_clause만 영어로 씁니다.`,
   })
 }
 
+// ── MD 리뷰 ──────────────────────────────────────────────────────────
+// 지표는 이미 계산돼 있다. 여기서 필요한 건 "그래서 뭘 사겠는가"다.
+// 페르소나가 비면 부르지 않는다. 아무나 할 수 있는 말을 MD 평가라고 붙이지 않는다.
+const MD_REVIEW_SCHEMA = {
+  type: 'object', additionalProperties: false,
+  required: ['reviews', 'picks', 'floor_note'],
+  properties: {
+    reviews: {
+      type: 'array',
+      description: '후보 하나마다 한 건. 모든 후보를 다룬다',
+      items: {
+        type: 'object', additionalProperties: false,
+        required: ['design_id', 'verdict', 'why', 'concern', 'fix'],
+        properties: {
+          design_id: { type: 'string' },
+          verdict: { type: 'string', enum: ['buy', 'buy_if_fixed', 'pass'] },
+          why: { type: 'string', description: '이 판단의 근거. 담당 채널·고객·KPI에 걸어서 말한다' },
+          concern: { type: 'string', description: '팔 때 걸릴 지점. 없으면 빈 문자열' },
+          fix: { type: 'string', description: 'buy_if_fixed일 때 무엇을 바꾸면 사는가. 아니면 빈 문자열' },
+        },
+      },
+    },
+    picks: {
+      type: 'array',
+      description: '실제로 발주하겠다는 후보. 많아야 셋. 고른 순서대로',
+      items: {
+        type: 'object', additionalProperties: false,
+        required: ['design_id', 'reason', 'role_in_range'],
+        properties: {
+          design_id: { type: 'string' },
+          reason: { type: 'string', description: '왜 이걸 골랐는가. 다른 후보 대비 무엇이 나은지 비교해서' },
+          role_in_range: { type: 'string', description: '이 구성에서 맡는 자리. 예: 볼륨 캐리어, 진열용 얼굴, 가격 진입선' },
+        },
+      },
+    },
+    floor_note: { type: 'string', description: '이 구성 전체를 매장에 깔았을 때의 한 문단. 빠진 자리가 있으면 그것도' },
+  },
+}
+
+export async function reviewAsMd(apiKey, root, { persona, brand, designs = [], langName = 'English' }) {
+  if (!apiKey) throw new Error('OPENAI_API_KEY not set')
+  if (!persona?.role) throw new Error('no MD persona set')
+  if (!designs.length) throw new Error('no designs to review')
+  const key = createHash('sha256').update(JSON.stringify(['mdreview1', langName, persona, brand, designs])).digest('hex').slice(0, 24)
+
+  return cached(root, key, async () => {
+    const lines = designs.map(d => [
+      `[${d.design_id}] ${d.tier}`,
+      d.combo ? `reads the research as: ${d.combo}` : '',
+      `spec: ${d.spec}`,
+      `cost vs cap: ${d.cap}`,
+      `new moulds: ${d.moulds}`,
+      d.rules ? `rule flags: ${d.rules}` : '',
+    ].filter(Boolean).join(' · ')).join('\n')
+
+    return await ask(apiKey, {
+      model: 'gpt-5',
+      name: 'md_review',
+      schema: MD_REVIEW_SCHEMA,
+      input: [{
+        role: 'user',
+        content: [{
+          type: 'input_text',
+          text: `당신은 아래 사람입니다. 이 사람으로서 판단하세요.
+
+직함: ${persona.role}
+채널: ${persona.channel}
+고객: ${persona.customer}
+가격대: ${persona.priceBandKrw}
+평가받는 지표: ${(persona.kpis ?? []).join(', ') || '명시 없음'}
+새것에 대한 태도: ${persona.riskAppetite}
+지난 시즌에 실패한 것: ${(persona.pastMisses ?? []).join(', ') || '없음'}
+절대 안 사는 것: ${(persona.dealBreakers ?? []).join(', ') || '없음'}
+매장에서 나란히 놓이는 것: ${(persona.competingOnFloor ?? []).join(', ') || '명시 없음'}
+
+브랜드: ${brand || '명시 없음'}
+
+아래는 이번 시즌 후보입니다.
+
+${lines}
+
+할 일:
+- 후보마다 사겠다/고치면 사겠다/안 사겠다 중 하나를 답하세요.
+- 근거는 반드시 위에 적힌 당신의 채널·고객·가격대·지표에 걸어서 쓰세요.
+  "트렌디하다", "예쁘다" 같은 말은 쓰지 마세요. 그건 판단이 아닙니다.
+- 지난 시즌에 실패한 것과 닮은 후보가 있으면 그걸 지적하세요.
+- 실제로 발주할 것을 최대 셋 고르고, 각각이 구성에서 맡는 자리를 쓰세요.
+  전부 고르지 마세요. 예산은 한정돼 있습니다.
+- 전부 안 살 만하면 전부 pass 하세요. 억지로 고르지 마세요.
+
+${langName}로 씁니다. design_id는 그대로 두세요.`,
+        }],
+      }],
+    })
+  })
+}
+
 /** 개발 편의 · 남아 있는 업로드 목록 */
 export function listUploads(root) {
   const dir = uploadDir(root)

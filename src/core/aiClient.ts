@@ -153,13 +153,21 @@ export function linePromptClause(lp: FootwearLineProfile | undefined): string {
   return `The line programme fixes: ${bits.join(', ')}.`
 }
 
+/** 이 안이 무엇을 앞세우는가 · 신호 조합 이름을 프롬프트 지시로 바꾼다.
+ *  같은 티어의 안들이 서로 닮지 않으려면, 스펙 숫자만이 아니라 무엇이 먼저 읽히는지가 달라야 한다. */
+function emphasisClause(spec: DesignSpec): string {
+  const label = (spec as { comboLabel?: string }).comboLabel
+  if (!label) return ''
+  return `This design leads with one idea: ${label.replace(/^Only /, '')}. Make that the first thing the eye reads, and keep everything else quiet.`
+}
+
 export function sketchPrompt(spec: DesignSpec, engine: EngineId = 'detail', brand?: BrandIdentity, trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
   // 스케치는 측면 한 컷이다. 한 장에 여러 시점을 넣으면 카드에서 서로 겹쳐 읽히지 않는다.
   // 다른 각도는 S3에서 컬러 렌더의 뷰로 따로 만든다.
   const view = SHOE_VIEW.lateral + ', one single shoe only, one single view, nothing else in frame'
   return shapePrompt(engine, {
     subject: en(spec.itemType), spec: shoeSpecPhrase(spec), view,
-    brand: [linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
+    brand: [emphasisClause(spec), linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
     mode: 'sketch',
   })
 }
@@ -167,7 +175,7 @@ export function sketchPrompt(spec: DesignSpec, engine: EngineId = 'detail', bran
 export function renderPrompt(spec: DesignSpec, engine: EngineId = 'detail', brand?: BrandIdentity, trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
   return shapePrompt(engine, {
     subject: en(spec.itemType), spec: shoeSpecPhrase(spec), view: SHOE_VIEW.lateral,
-    brand: [linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
+    brand: [emphasisClause(spec), linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
     mode: 'render',
   })
 }
@@ -205,6 +213,7 @@ export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInpu
     'Every surface carries real material colour and texture, with studio lighting, soft shadows and highlights.',
     'Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole line exactly as drawn.',
     `Materials and colour: ${shoeSpecPhrase(spec)}.`,
+    emphasisClause(spec),
     linePromptClause(line),
     trendPromptClause(trend ?? null),
     markClause,
@@ -312,12 +321,84 @@ const VARIATION_AXES: { key: string; label: string; instruction: string }[] = [
   { key: 'shaft', label: 'Height shift', instruction: 'Keep the material, colour and toe. Raise the collar so it sits higher on the ankle, reading as a taller, more covered shape.' },
 ]
 
+// ── 스타일 슬라이더 베리에이션 ──────────────────────────────────────
+// RebuilderAI/ai-vringon-create-variation 의 방식을 그대로 따른다.
+// 그쪽은 Qwen-Image-Edit + LoRA로 돌리지만, 방식 자체는 모델과 무관하다:
+//   네 갈래(무드·실루엣·밀도·엣지)에 양극 슬라이더 여덟 개, 범위 -1..1.
+//   |값| <= 0.2 는 죽은 구간이라 문장에 안 실린다.
+//   실린 항목을 쉼표로 이어 "Edit this shoe to be ..." 한 문장으로 만들고,
+//   끝에 골격과 색은 유지하라는 제약을 붙인다.
+// 슬라이더 키 이름도 그쪽 페이로드와 같게 두었다. 나중에 그 워커로 그대로 넘길 수 있다.
+export type StyleSliders = Partial<Record<
+  | 'mood_creative_classic' | 'mood_maximal_minimal'
+  | 'silhouette_long_short' | 'silhouette_voluminous_slim'
+  | 'density_dense_airy' | 'density_chunky_balanced'
+  | 'edge_soft_sharp' | 'edge_fluid_structured',
+  number
+>>
+
+const SLIDER_WORDS: { key: keyof StyleSliders; pos: string; neg: string; group: string }[] = [
+  { key: 'mood_creative_classic', pos: 'more creative', neg: 'more classic', group: 'Mood' },
+  { key: 'mood_maximal_minimal', pos: 'more maximal', neg: 'more minimal', group: 'Mood' },
+  { key: 'silhouette_long_short', pos: 'a longer silhouette', neg: 'a shorter silhouette', group: 'Silhouette' },
+  { key: 'silhouette_voluminous_slim', pos: 'more voluminous', neg: 'slimmer', group: 'Silhouette' },
+  { key: 'density_dense_airy', pos: 'denser in detail', neg: 'airier', group: 'Density' },
+  { key: 'density_chunky_balanced', pos: 'chunkier', neg: 'more balanced in proportion', group: 'Density' },
+  { key: 'edge_soft_sharp', pos: 'sharper edged', neg: 'softer edged', group: 'Edge' },
+  { key: 'edge_fluid_structured', pos: 'more structured', neg: 'more fluid in line', group: 'Edge' },
+]
+
+const DEADZONE = 0.2
+
+/** 슬라이더 묶음 → 사람이 읽는 한 줄. 원본 build_instruction 과 같은 규칙이다. */
+export function slidersToPhrase(s: StyleSliders): string {
+  const parts = SLIDER_WORDS
+    .filter(w => Math.abs(s[w.key] ?? 0) > DEADZONE)
+    .map(w => ((s[w.key] as number) > 0 ? w.pos : w.neg))
+  return parts.join(', ')
+}
+
+/** 이 베리에이션이 무엇을 건드렸는지 · 카드에 그대로 적는다 */
+export function slidersToLabel(s: StyleSliders): string {
+  const on = SLIDER_WORDS.filter(w => Math.abs(s[w.key] ?? 0) > DEADZONE)
+  if (!on.length) return 'Subtle pass'
+  const groups = [...new Set(on.map(w => w.group))]
+  return `${groups.join(' + ')} · ${on.map(w => ((s[w.key] as number) > 0 ? w.pos : w.neg)).join(', ')}`
+}
+
+/** 베리에이션마다 서로 다른 슬라이더 조합을 준다.
+ *  같은 축을 두 번 쓰지 않도록 갈래를 돌려 가며 집는다. */
+export function variationSliders(index: number, rng?: { next: () => number }): StyleSliders {
+  const groups = ['Mood', 'Silhouette', 'Density', 'Edge']
+  const g = groups[index % groups.length]
+  const inGroup = SLIDER_WORDS.filter(w => w.group === g)
+  const out: StyleSliders = {}
+  // 그 갈래의 슬라이더 둘을 서로 반대쪽으로 민다. 방향은 회차마다 뒤집는다.
+  const flip = Math.floor(index / groups.length) % 2 === 0 ? 1 : -1
+  const strength = () => 0.45 + (rng ? rng.next() : 0.4) * 0.45
+  inGroup.forEach((w, i) => { out[w.key] = (i === 0 ? 1 : -1) * flip * strength() })
+  return out
+}
+
 export function variationAxes() {
   return VARIATION_AXES
 }
 
 /** 스케치·기준 렌더에서 갈라지는 제품 베리에이션. 편집이라 같은 계보가 유지된다. */
-export function variationPrompt(axisIndex: number): string {
+export function variationPrompt(axisIndex: number, sliders?: StyleSliders): string {
+  // 슬라이더가 있으면 그쪽이 우선이다. 없으면 옛 축 목록으로 떨어진다.
+  if (sliders) {
+    const phrase = slidersToPhrase(sliders)
+    return [
+      'This is a product design variation, not a new product.',
+      phrase
+        ? `Edit this shoe to be ${phrase}.`
+        : 'Generate a variation of this shoe with subtle style changes.',
+      'Keep the overall shoe structure and colour palette intact.',
+      'Photorealistic studio product photograph on a seamless white background, same camera angle as the original, soft even light, sharp focus.',
+      'No text, no logo, no watermark, no human.',
+    ].join(' ')
+  }
   const a = VARIATION_AXES[axisIndex % VARIATION_AXES.length]
   return [
     'This is a product design variation, not a new product.',

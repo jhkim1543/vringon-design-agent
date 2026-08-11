@@ -1,18 +1,18 @@
 // ── 파이프라인 엔진 S1~S5 · 진행 스트리밍·승인 게이트·체크포인트 ──────
 import type { Design, DesignSpec, DesignTier, PipelineEvent, Rationale, RunParams, Signal, Stage } from './types'
 import { PACKS, profileOf, resetSeq, tierCapRule, viewSetFor } from './packs'
-import { blockedNarrative, deriveSpecHints, drivingFromHint, hintNarrative, locksFromSeries, reconcileHint } from './signalSpec'
+import { blockedNarrative, deriveSpecHints, deriveSpecHintsFrom, drivingFromHint, hintNarrative, locksFromSeries, reconcileHint, signalCombos } from './signalSpec'
 import type { SpecHint } from './signalSpec'
 import { makeRng } from './rng'
 import { COMPETITORS, DIRECTIONS, SIGNALS } from './samples'
 import { COLORWAY_NAMES } from './sketch'
 import {
   colorwayEditPrompt, conceptPrompt, editImage, generateImage, renderFromSketchPrompt, renderPrompt,
-  generateModel, sketchPrompt, sketchVariationPrompt, stampLogo, turnaroundPrompt, variationAxes, variationPrompt, viewEditPrompt, wearEditPrompt,
+  generateModel, sketchPrompt, sketchVariationPrompt, stampLogo, turnaroundPrompt, slidersToLabel, variationPrompt, variationSliders, viewEditPrompt, wearEditPrompt,
 } from './aiClient'
 import type { TrendClauseInput, TripoRole } from './aiClient'
 import { fetchCompetitors, fetchDossier, fetchRetailPulse, fetchTrends, pulseToCompetitors, toBias, toCompetitors, toSignals, setRunLang } from './research'
-import { readMoodboard, readSeries, toSeriesDna } from './uploads'
+import { readMoodboard, readSeries, reviewAsMd, toSeriesDna } from './uploads'
 import { getLang, LANG_NAME } from './i18n'
 import { campaignCount, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL, TYPE_EN, TYPE_LABEL } from './types'
 import { ENGINES } from './imageEngines'
@@ -96,6 +96,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     let macroName = ''
     // 도시에가 캐시에 있으면 스케치 전에 반영되어야 한다. 새로 조사할 때만 뒤에서 따라온다.
     let dossierJob: Promise<unknown> | null = null
+    // MD가 구성 전체에 남긴 한마디 · 리포트가 이걸 싣는다
+    let st_mdFloorNote = ''
     // 무드보드가 문서에서 실제로 읽어 낸 신호. 못 읽었으면 비어 있고, 비어 있으면 비어 있다고 말한다.
     let moodSignals: Signal[] = []
     // 시리즈에서 실제로 반복된 것 중, 스펙 값으로 옮길 수 있는 것만. 사진으로 못 보는 건 안 잠근다.
@@ -419,6 +421,21 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         ? `${TIER_LABEL[t]} reads ${n} spec values out of the research: ${Object.keys(h.fields).map(k => k.replace(/_/g, ' ')).join(', ')}`
         : `${TIER_LABEL[t]} found no signal it can build without changing tooling, so its spec stays open` })
     }
+    // 디자인마다 다른 신호 조합을 준다. 같은 힌트로 열두 장을 뽑으면 열두 장이 서로 닮는다.
+    // 조합은 티어별로 따로 만든다 — Core에서 못 쓰는 신호가 Signature에서는 쓰이기 때문이다.
+    const comboByTier: Record<DesignTier, { ids: string[]; label: string }[]> = {
+      core: signalCombos(signals, 'core', tiers.filter(t => t === 'core').length),
+      push: signalCombos(signals, 'push', tiers.filter(t => t === 'push').length),
+      signature: signalCombos(signals, 'signature', tiers.filter(t => t === 'signature').length),
+    }
+    const comboCursor: Record<string, number> = { core: 0, push: 0, signature: 0 }
+    // 이미 나온 스펙 · 같은 후보를 두 번 만들지 않는다
+    const specSeen = new Set<string>()
+    for (const t of ['core', 'push', 'signature'] as DesignTier[]) {
+      const c = comboByTier[t]
+      if (c.length > 1) emit({ kind: 'log', stage: 'S2', text: `${TIER_LABEL[t]} explores ${c.length} different readings of the research, not one: ${c.slice(0, 3).map(x => x.label).join(' / ')}${c.length > 3 ? ' …' : ''}` })
+    }
+
     // 실제로 반영된 필드 수 · 제안과 반영은 다르다
     const tookByTier: Record<string, Set<string>> = { core: new Set(), push: new Set(), signature: new Set() }
     const blockedSeen = new Set<string>()
@@ -426,9 +443,24 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     for (let i = 0; i < tiers.length; i++) {
       if (cancelled) return
       const tier = tiers[i]
-      const spec = pack.generateSpec(rng, tier, params.itemType, locked, hintByTier[tier].fields)
+      // 이 디자인이 볼 신호 조합. 조합이 다르면 스펙이 다르고, 스펙이 다르면 스케치가 다르다.
+      // 조합이 달라도 스펙이 같아질 수 있다 (막힌 신호는 아무것도 못 바꾼다).
+      // 그때는 다음 조합으로 넘긴다 — 똑같은 후보를 두 장 만들 이유가 없다.
+      const combos = comboByTier[tier]
+      let combo: { ids: string[]; label: string } | null = null
+      let tierHint = hintByTier[tier]
+      let spec = null as ReturnType<typeof pack.generateSpec> | null
+      for (let tryN = 0; tryN < Math.max(1, combos.length); tryN++) {
+        combo = combos.length ? combos[comboCursor[tier]++ % combos.length] : null
+        tierHint = combo ? deriveSpecHintsFrom(signals, combo.ids, tier, athletic) : hintByTier[tier]
+        const cand = pack.generateSpec(rng, tier, params.itemType, locked, tierHint.fields)
+        const sig = JSON.stringify(cand.fields)
+        if (!specSeen.has(sig) || tryN === combos.length - 1) { spec = cand; specSeen.add(sig); break }
+      }
+      if (!spec) spec = pack.generateSpec(rng, tier, params.itemType, locked, tierHint.fields)
       // 스펙이 실제로 받아들인 필드만 근거로 남긴다
-      const hint = reconcileHint(hintByTier[tier], spec.hintApplied)
+      const hint = reconcileHint(tierHint, spec.hintApplied)
+      if (combo) spec.comboLabel = combo.label
       for (const k of spec.hintApplied ?? []) tookByTier[tier].add(k)
       for (const b of spec.hintBlocked ?? []) blockedSeen.add(`${b.field}|${b.wanted}|${b.got}`)
       const cost = pack.costModel(spec, rng)
@@ -626,21 +658,29 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         const baseImg = d.images.find(i => i.view === 'lateral' && !i.colorway)
           ?? d.images.find(i => i.origin === 'generated' && i.view !== 'sketch')
         if (baseImg) {
-          const axes = variationAxes()
-          const jobs = axes.slice(0, params.variationCount).map((a, k) => ({ a, k }))
-          emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} branching ${jobs.length} product variations from the base design` })
+          // 베리에이션 축은 스타일 슬라이더에서 나온다 (create-variation 방식).
+          // 회차마다 다른 갈래를 집으므로 네 장이면 무드·실루엣·밀도·엣지가 한 번씩 나온다.
+          const jobs = Array.from({ length: params.variationCount }, (_, k) => {
+            const sliders = variationSliders(k, rng)
+            return { k, sliders, label: slidersToLabel(sliders), prompt: variationPrompt(k, sliders) }
+          })
+          emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} branching ${jobs.length} variations · one style axis each: ${jobs.map(j => j.label.split(' · ')[0]).join(', ')}` })
           await pool(jobs.slice(0, Math.max(0, Math.min(budget.left(), extrasLeft))), 2, async (job) => {
             if (cancelled) return
             try {
-              const r = await editImage(baseImg.hash, variationPrompt(job.k), params.imageEngine)
+              const r = await editImage(baseImg.hash, job.prompt, params.imageEngine)
               budget.spend(); extrasLeft -= 1
               d.images = [...d.images, {
                 view: 'variation', url: r.url, hash: r.hash, origin: 'edited_from',
-                editedFrom: baseImg.hash, variantOf: d.spec.design_id, variantAxis: job.a.label,
+                editedFrom: baseImg.hash, variantOf: d.spec.design_id, variantAxis: job.label,
+                // 어떤 지시로 갈라졌는지 카드가 그대로 보여 준다
+                promptUsed: job.prompt,
+                sliders: job.sliders,
               }]
               emit({ kind: 'design-update', design: { ...d } })
+              emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} variation: ${job.label}` })
             } catch {
-              emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} variation "${job.a.label}" failed · skipping that one` })
+              emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} variation "${job.label}" failed · skipping that one` })
             }
           })
         }
@@ -674,13 +714,65 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     await wait(600)
     // Top N · 다양성 제약 (11.2)
     const topCandidates = advancing.filter(d => !d.rejected)
-    const top = pickTopDiverse(topCandidates, params.topN)
+    const top: Design[] = pickTopDiverse(topCandidates, params.topN)
     top.forEach((d, i) => {
       d.isTop = true
       d.topDistance = Math.round((0.42 + rng.next() * 0.4) * 100) / 100
       emit({ kind: 'design-update', design: { ...d } })
       emit({ kind: 'log', stage: 'S4', text: `Top ${i + 1}: ${d.spec.design_id} [${d.spec.tier}] · spec distance ${d.topDistance}` })
     })
+    // ── MD 리뷰 · 지표는 이미 있다. 여기서 필요한 건 "그래서 뭘 사겠는가"다 ──
+    // 페르소나가 없으면 부르지 않는다. 아무나 할 수 있는 말을 MD 평가라고 붙이지 않는다.
+    const md = params.brand?.md
+    if (md?.role && topCandidates.length) {
+      emit({ kind: 'log', stage: 'S4', text: `${md.role} is reviewing ${topCandidates.length} candidates against ${md.channel || 'the channel'} and the ${md.priceBandKrw || 'stated'} band` })
+      try {
+        const review = await reviewAsMd({
+          persona: md,
+          brand: [params.brand?.brandName, params.brand?.tagline].filter(Boolean).join(' · '),
+          langName: LANG_NAME[params.researchLang ?? getLang()],
+          designs: topCandidates.map(d => ({
+            design_id: d.spec.design_id,
+            tier: TIER_LABEL[d.spec.tier],
+            combo: d.spec.comboLabel,
+            spec: Object.entries(d.spec.fields)
+              .filter(([k]) => !k.startsWith('is_'))
+              .map(([k, v]) => `${k.replace(/_/g, ' ')} ${v}`).join(', '),
+            cap: `${Math.round((d.cost.cap_ratio - 1) * 100)}%`,
+            moulds: d.cost.tooling.mold_count_required,
+            rules: d.ruleResults.map(r => `${r.rule} ${r.severity}`).join(', '),
+          })),
+        })
+        if (cancelled) return
+        // 평가를 각 안에 붙인다. 카드가 이걸 그대로 보여 준다.
+        for (const r of review.reviews ?? []) {
+          const d = topCandidates.find(x => x.spec.design_id === r.design_id)
+          if (d) d.mdReview = r
+        }
+        for (const p of review.picks ?? []) {
+          const d = topCandidates.find(x => x.spec.design_id === p.design_id)
+          if (d) d.mdPick = p
+        }
+        st_mdFloorNote = review.floor_note ?? ''
+        const buys = (review.reviews ?? []).filter(r => r.verdict === 'buy').length
+        const fixes = (review.reviews ?? []).filter(r => r.verdict === 'buy_if_fixed').length
+        emit({ kind: 'log', stage: 'S4', text: `MD verdict: ${buys} to buy, ${fixes} to buy if fixed, ${(review.reviews ?? []).length - buys - fixes} passed${review.cached ? ' (reused an earlier pass)' : ''}` })
+        for (const p of (review.picks ?? []).slice(0, 3)) {
+          emit({ kind: 'log', stage: 'S4', text: `MD picks ${p.design_id} as ${p.role_in_range}: ${p.reason}` })
+        }
+        if (review.floor_note) emit({ kind: 'log', stage: 'S4', text: `On the floor: ${review.floor_note}` })
+        // MD가 실제로 고른 것이 있으면 그것이 최종 선정이다. 지표 순위보다 사람의 판단이 앞선다.
+        const picked = (review.picks ?? []).map(p => topCandidates.find(x => x.spec.design_id === p.design_id)).filter((x): x is Design => !!x)
+        if (picked.length) {
+          top.forEach(d => { d.isTop = false })
+          top.length = 0
+          picked.slice(0, params.topN).forEach(d => { top.push(d) })
+        }
+      } catch (e) {
+        emit({ kind: 'log', stage: 'S4', text: `MD review unavailable · ${String((e as Error).message).slice(0, 120)} · falling back to the metric ranking` })
+      }
+    }
+
     // 최종 선정 컷에는 브랜드 로고가 반드시 올라가야 한다.
     // S3에서 로고를 못 얹은 건(그때 실패했거나 도식으로 떨어진 건)이 그대로 최종이 되면,
     // 브랜드가 자기 로고 없는 이미지를 최종안으로 받게 된다. 여기서 한 번 더 확인한다.

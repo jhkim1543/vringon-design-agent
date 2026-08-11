@@ -88,6 +88,19 @@ export const readMoodboard = (b: { uploadIds: string[]; notes: string; itemTypeE
 export const readLogoStyle = (b: { logoId?: string; referenceIds: string[]; itemTypeEn: string; langName: string }) =>
   post<LogoStyle>('/api/analyze/logo-style', b)
 
+export interface MdReview {
+  reviews: { design_id: string; verdict: 'buy' | 'buy_if_fixed' | 'pass'; why: string; concern: string; fix: string }[]
+  picks: { design_id: string; reason: string; role_in_range: string }[]
+  floor_note: string
+  cached?: boolean
+}
+
+/** MD 페르소나가 후보를 보고 고른다 */
+export const reviewAsMd = (b: {
+  persona: unknown; brand: string; langName: string
+  designs: { design_id: string; tier: string; combo?: string; spec: string; cap: string; moulds: number; rules?: string }[]
+}) => post<MdReview>('/api/analyze/md-review', b)
+
 /** 읽어 낸 결과를 화면이 쓰는 SeriesDna 모양으로 옮긴다.
  *  confidence는 몇 장에서 보였는지로만 정한다. 지어내지 않는다. */
 export function toSeriesDna(r: SeriesRead): SeriesDna {

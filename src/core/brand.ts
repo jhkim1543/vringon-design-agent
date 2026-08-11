@@ -32,9 +32,43 @@ export interface BrandLogo {
   style?: LogoStyle | null
 }
 
+/** MD 페르소나 · 디자인을 고르는 사람이 누구인가.
+ *
+ *  LLM에게 "MD처럼 평가해"라고만 하면 누구에게나 통하는 말을 한다. 실제 MD의 판단은
+ *  자기가 책임지는 숫자에서 나온다 — 어느 채널에서 얼마에 팔아야 하고, 재고를 몇 주에
+ *  털어야 하고, 지난 시즌에 무엇으로 데었는가. 그래서 아래 항목은 전부 "판단을 가르는 것"만 둔다.
+ *  취향 형용사는 넣지 않는다. 그건 이미 브랜드 톤에 있다. */
+export interface MdPersona {
+  /** 직함과 담당 · 예: 백화점 여성화 바이어 8년차 */
+  role: string
+  /** 어디서 파는가 · 채널이 다르면 같은 신발도 다르게 팔린다 */
+  channel: string
+  /** 누구에게 파는가 · 나이·상황까지 구체적으로 */
+  customer: string
+  /** 무엇으로 평가받는가 · 이 사람의 KPI. 예: 정상판매율 65%, 시즌 소진 12주 */
+  kpis: string[]
+  /** 얼마에 팔 수 있는가 */
+  priceBandKrw: string
+  /** 새로운 것에 얼마나 베팅하는가 */
+  riskAppetite: 'conservative' | 'balanced' | 'aggressive'
+  /** 지난 시즌에 데인 경험 · 이게 없으면 평가가 교과서적으로 흐른다 */
+  pastMisses: string[]
+  /** 절대 안 사는 것 */
+  dealBreakers: string[]
+  /** 매장에서 무엇과 나란히 놓이는가 */
+  competingOnFloor: string[]
+}
+
+export const EMPTY_MD: MdPersona = {
+  role: '', channel: '', customer: '', kpis: [], priceBandKrw: '',
+  riskAppetite: 'balanced', pastMisses: [], dealBreakers: [], competingOnFloor: [],
+}
+
 export interface BrandIdentity {
   brandName: string
   tagline: string
+  /** 결과를 고르는 MD · 없으면 선정 단계에서 평가 없이 지표만 나온다 */
+  md?: MdPersona | null
   /** 브랜드를 알아보게 하는 조형 요소. 프롬프트에 그대로 실린다 */
   signatureElements: string[]
   /** 절대 하지 않는 것. 위반 시 카드에 경고가 붙는다 */

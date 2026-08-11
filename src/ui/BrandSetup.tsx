@@ -1,7 +1,7 @@
 // ── 브랜드 아이덴티티 설정 · 모든 에이전트 결과에 공통으로 실린다 ──────
 import { useRef, useState } from 'react'
-import type { BrandIdentity, BrandLogo } from '../core/brand'
-import { EMPTY_BRAND, brandPromptClause } from '../core/brand'
+import type { BrandIdentity, BrandLogo, MdPersona } from '../core/brand'
+import { EMPTY_BRAND, EMPTY_MD, brandPromptClause } from '../core/brand'
 import { Tag } from './bits'
 import { readLogoStyle, uploadFiles } from '../core/uploads'
 import { getLang, LANG_NAME } from '../core/i18n'
@@ -58,6 +58,8 @@ export default function BrandSetup({ brand, onSave, onClose }: {
   const [b, setB] = useState<BrandIdentity>(brand)
   const fileRef = useRef<HTMLInputElement>(null)
   const set = <K extends keyof BrandIdentity>(k: K, v: BrandIdentity[K]) => setB(p => ({ ...p, [k]: v }))
+  const md: MdPersona = b.md ?? EMPTY_MD
+  const setMd = (patch: Partial<MdPersona>) => setB(p => ({ ...p, md: { ...(p.md ?? EMPTY_MD), ...patch } }))
 
   const readLogo = (f: File) => {
     const r = new FileReader()
@@ -134,8 +136,62 @@ export default function BrandSetup({ brand, onSave, onClose }: {
             </div>
           </div>
 
+          {/* MD 페르소나 · 결과를 고르는 사람.
+              "MD처럼 평가해"라고만 하면 누구에게나 통하는 말이 돌아온다. 실제 MD의 판단은
+              자기가 책임지는 숫자에서 나오므로, 판단을 가르는 것만 묻는다. */}
           <div className="wcard">
-            <h3><span className="n">2</span> Logo</h3>
+            <h3><span className="n">2</span> The MD who picks</h3>
+            <p className="hint" style={{ marginTop: -4 }}>
+              Fill this in and the selection stage stops being a metric ranking. A buyer with this
+              brief reviews every candidate, says what they would order and what they would not, and why.
+              Leave it empty and selection falls back to the numbers alone.
+            </p>
+            <div className="row"><span className="lbl">Who</span>
+              <input className="input" style={{ flex: 1 }} value={md.role}
+                placeholder="e.g. Department store womenswear buyer, 8 years"
+                onChange={e => setMd({ role: e.target.value })} />
+            </div>
+            <div className="row"><span className="lbl">Channel</span>
+              <input className="input" style={{ flex: 1 }} value={md.channel}
+                placeholder="e.g. Lotte main store, 2nd floor, no online"
+                onChange={e => setMd({ channel: e.target.value })} />
+            </div>
+            <div className="row"><span className="lbl">Customer</span>
+              <input className="input" style={{ flex: 1 }} value={md.customer}
+                placeholder="e.g. Women 30-45 buying for work, not for weekends"
+                onChange={e => setMd({ customer: e.target.value })} />
+            </div>
+            <div className="row"><span className="lbl">Price band</span>
+              <input className="input" style={{ maxWidth: 280 }} value={md.priceBandKrw}
+                placeholder="e.g. KRW 250k-450k retail"
+                onChange={e => setMd({ priceBandKrw: e.target.value })} />
+            </div>
+            <div className="row"><span className="lbl">Risk</span>
+              <div className="chiprow">
+                {(['conservative', 'balanced', 'aggressive'] as const).map(r => (
+                  <button key={r} className={`pick sm ${md.riskAppetite === r ? 'on' : ''}`}
+                    onClick={() => setMd({ riskAppetite: r })}>
+                    {r === 'conservative' ? 'Plays safe' : r === 'balanced' ? 'Balanced' : 'Bets on new'}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <TokenList label="Judged on" hint="The numbers this person answers for"
+              items={md.kpis} onChange={v => setMd({ kpis: v })}
+              placeholder="e.g. 65% full-price sell-through" />
+            <TokenList label="Burned by" hint="What failed last season. Without this the review stays textbook"
+              items={md.pastMisses} onChange={v => setMd({ pastMisses: v })}
+              placeholder="e.g. chunky soles sat unsold" />
+            <TokenList label="Never buys" hint="Instant no"
+              items={md.dealBreakers} onChange={v => setMd({ dealBreakers: v })}
+              placeholder="e.g. over 400g per shoe" />
+            <TokenList label="Sits beside" hint="What it competes with on the floor"
+              items={md.competingOnFloor} onChange={v => setMd({ competingOnFloor: v })}
+              placeholder="e.g. Marc Jacobs, Stuart Weitzman" />
+          </div>
+
+          <div className="wcard">
+            <h3><span className="n">3</span> Logo</h3>
             <div className="row" style={{ alignItems: 'flex-start' }}>
               <span className="lbl">File</span>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -231,7 +287,7 @@ export default function BrandSetup({ brand, onSave, onClose }: {
           </div>
 
           <div className="wcard">
-            <h3><span className="n">3</span> Brand rules</h3>
+            <h3><span className="n">4</span> Brand rules</h3>
             <TokenList label="Signature" hint="The shapes people recognise you by"
               placeholder="e.g. angular metal plate at the heel"
               items={b.signatureElements} onChange={v => set('signatureElements', v)} />
@@ -271,7 +327,7 @@ export default function BrandSetup({ brand, onSave, onClose }: {
           </div>
 
           <div className="wcard">
-            <h3><span className="n">4</span> Prompt preview</h3>
+            <h3><span className="n">5</span> Prompt preview</h3>
             <p className="hint" style={{ marginBottom: 8 }}>This sentence is appended to every image prompt.</p>
             <pre className="promptprev">{brandPromptClause(b) || 'Nothing set yet'}</pre>
           </div>

@@ -682,6 +682,8 @@ export interface DesignSpec {
   fieldsLocked: string[]       // 시리즈 DNA로 잠긴 필드
   /** 조사 신호가 실제로 정한 필드 이름. 제안만 되고 반영 안 된 것은 여기 없다. */
   hintApplied?: string[]
+  /** 이 안이 어떤 신호 조합을 읽었는가 · 같은 티어 안에서도 안마다 다르다 */
+  comboLabel?: string
   /** 조사가 요구했지만 이 유형이 허용하지 않아 접힌 값 */
   hintBlocked?: { field: string; wanted: string | number; got: string | number }[]
 }
@@ -700,11 +702,16 @@ export interface DesignImage {
   promptUsed?: string
   /** 브랜드 로고를 실제로 합성한 이미지인가 · 최종 선정 컷은 이게 true여야 한다 */
   logoStamped?: boolean
+  /** 베리에이션을 만든 스타일 슬라이더 값 · 무엇을 얼마나 밀었는지 */
+  sliders?: Record<string, number>
   /** 컨셉 촬영 컷 라벨과 가상 인물 */
   conceptLabel?: string
   persona?: string
   editedFrom?: string
 }
+
+export interface MdVerdict { design_id: string; verdict: 'buy' | 'buy_if_fixed' | 'pass'; why: string; concern: string; fix: string }
+export interface MdPick { design_id: string; reason: string; role_in_range: string }
 
 export interface Design {
   spec: DesignSpec
@@ -724,6 +731,10 @@ export interface Design {
   model?: { url: string; hash: string; format: string; views: number; note?: string }
   imageError?: string          // 부분 실패 격리 · 이 건만 실패, 나머지는 진행
   isTop: boolean
+  /** MD 페르소나의 평가 · 페르소나가 설정돼 있을 때만 */
+  mdReview?: MdVerdict
+  /** MD가 실제로 고른 이유 */
+  mdPick?: MdPick
   topDistance?: number         // Top N 상호 스펙 거리
   // 품평 게이트 (계층 3)
   verdict?: 'approve' | 'reject'

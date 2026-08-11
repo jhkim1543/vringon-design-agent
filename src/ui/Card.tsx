@@ -56,29 +56,24 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
         {!heroImg && !d.rejected && <span className="simbadge">{t('Diagram')}</span>}
       </div>
 
-      {rendered && !compact && (
+      {/* 실제로 생성된 컷만 건다. 예전에는 컷이 없으면 도식(SVG)을 대신 깔았는데,
+          다섯 개짜리 회색 신발 그림이 카드 아래에 늘어서는 것은 없느니만 못했다.
+          안 만들어진 컷은 안 보여 주고, 몇 장이 남았는지만 말한다. */}
+      {rendered && !compact && extraImgs.length > 0 && (
         <div style={{ padding: '6px 10px 0' }}>
           <div className="viewstrip">
-            {extraImgs.length > 0
-              ? extraImgs.map(im => (
-                <div className="v" key={im.hash} title={im.colorway ? `${im.colorway} colourway (edit)` : `${im.view} (edit)`}>
-                  <img src={im.url} alt={im.colorway ?? im.view} />
-                </div>
-              ))
-              : (<>
-                {views.filter(v => v.required).slice(1).map(v => (
-                  <div className="v" key={v.key} title={v.label}>
-                    <img src={svgDataUri(designSVG(d.spec, 'render', v.key as any))} alt={v.label} />
-                  </div>
-                ))}
-                {d.colorways.map(cw => (
-                  <div className="v" key={cw} title={`${cw} colourway`}>
-                    <img src={svgDataUri(designSVG(d.spec, 'render', mainView, cw))} alt={cw} />
-                  </div>
-                ))}
-              </>)}
+            {extraImgs.map(im => (
+              <div className="v" key={im.hash}
+                title={im.variantAxis ? im.variantAxis : im.colorway ? `${im.colorway} colourway` : im.view}>
+                <img src={im.url} alt={im.colorway ?? im.view} />
+              </div>
+            ))}
           </div>
-          <div className="hint" style={{ marginTop: 4 }}>{t('A concept rendering of the target spec. It may not match the numbers exactly.')}</div>
+          <div className="hint" style={{ marginTop: 4 }}>
+            {extraImgs.some(im => im.variantAxis)
+              ? extraImgs.filter(im => im.variantAxis).map(im => im.variantAxis!.split(' · ')[0]).join(' · ')
+              : t('Extra views and colourways are edits of the base render, so every cut is the same product.')}
+          </div>
         </div>
       )}
 
