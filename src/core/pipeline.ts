@@ -8,7 +8,7 @@ import { COMPETITORS, DIRECTIONS, SIGNALS } from './samples'
 import { COLORWAY_NAMES } from './sketch'
 import {
   colorwayEditPrompt, conceptPrompt, editImage, generateImage, renderFromSketchPrompt, renderPrompt,
-  generateModel, sketchPrompt, sketchVariationPrompt, stampLogo, turnaroundPrompt, slidersToLabel, variationPrompt, variationSliders, viewEditPrompt, wearEditPrompt,
+  generateModel, sketchPrompt, sketchVariationPrompt, silhouetteRead, slidersToLabel, stampLogo, turnaroundPrompt, variationPrompt, variationSliders, viewEditPrompt, wearEditPrompt,
 } from './aiClient'
 import type { TrendClauseInput, TripoRole } from './aiClient'
 import { fetchCompetitors, fetchDossier, fetchRetailPulse, fetchTrends, pulseToCompetitors, toBias, toCompetitors, toSignals, setRunLang } from './research'
@@ -461,6 +461,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       // 스펙이 실제로 받아들인 필드만 근거로 남긴다
       const hint = reconcileHint(tierHint, spec.hintApplied)
       if (combo) spec.comboLabel = combo.label
+      // 선화에서 실제로 달라지는 축 · 안마다 다른 실루엣 읽기를 준다
+      spec.silhouetteRead = silhouetteRead(i).key
       for (const k of spec.hintApplied ?? []) tookByTier[tier].add(k)
       for (const b of spec.hintBlocked ?? []) blockedSeen.add(`${b.field}|${b.wanted}|${b.got}`)
       const cost = pack.costModel(spec, rng)
@@ -617,7 +619,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         for (let k = 0; k < sketchVars.length; k++) {
           if (cancelled || budget.left() <= 0 || extrasLeft <= 0) break
           const sv = sketchVars[k]
-          const p2 = renderFromSketchPrompt(d.spec, trendClause, line, params.brand)
+          // 장마다 다른 소재 해석 · 같은 지시를 두 번 주면 같은 사진이 두 장 나온다
+          const p2 = renderFromSketchPrompt(d.spec, trendClause, line, params.brand, k + 1)
           try {
             const r2 = await editImage(sv.hash, p2, params.imageEngine)
             budget.spend(); extrasLeft -= 1

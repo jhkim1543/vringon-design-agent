@@ -682,6 +682,8 @@ export interface DesignSpec {
   fieldsLocked: string[]       // 시리즈 DNA로 잠긴 필드
   /** 조사 신호가 실제로 정한 필드 이름. 제안만 되고 반영 안 된 것은 여기 없다. */
   hintApplied?: string[]
+  /** 이 안이 어떤 실루엣으로 읽혀야 하는가 · 선화에서 실제로 달라지는 유일한 축 */
+  silhouetteRead?: string
   /** 이 안이 어떤 신호 조합을 읽었는가 · 같은 티어 안에서도 안마다 다르다 */
   comboLabel?: string
   /** 조사가 요구했지만 이 유형이 허용하지 않아 접힌 값 */

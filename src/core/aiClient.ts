@@ -161,13 +161,51 @@ function emphasisClause(spec: DesignSpec): string {
   return `This design leads with one idea: ${label.replace(/^Only /, '')}. Make that the first thing the eye reads, and keep everything else quiet.`
 }
 
+// ── 실루엣 읽기 · 선화에서 실제로 달라질 수 있는 유일한 것 ─────────────
+//
+// 스케치 프롬프트에는 "no colour, no shading, no texture"가 박혀 있다. 그래서 스펙 변화가
+// 소재와 마감에 몰려 있으면 — 스웨이드든 페이턴트든 — 완전히 같은 선 그림이 나온다.
+// 힐 25mm와 30mm, 패널 4장과 5장도 이미지 모델은 구분해 그리지 못한다.
+//
+// 선으로 구분되는 것은 비례와 선 구성뿐이다. 그래서 안마다 다른 "읽기"를 하나씩 준다.
+// 어휘는 베리에이션 슬라이더와 같은 축을 쓴다 — 같은 언어를 두 벌 만들 이유가 없다.
+const SILHOUETTE_READS: { key: string; label: string; clause: string }[] = [
+  { key: 'slim', label: 'Slim and long',
+    clause: 'Draw it slim and long: a narrow waist, a low-slung sole edge, and a toe that runs out rather than up. Fewer seams, longer unbroken lines.' },
+  { key: 'volume', label: 'Voluminous',
+    clause: 'Draw it voluminous: a fuller instep, a rounder toe box with visible height, and a sole that reads thick from the side. The outline should feel inflated against the last.' },
+  { key: 'structured', label: 'Structured and sharp',
+    clause: 'Draw it structured and sharp: crisp panel breaks meeting at hard angles, a defined heel counter edge, and straight seam runs rather than curved ones.' },
+  { key: 'fluid', label: 'Soft and fluid',
+    clause: 'Draw it soft and fluid: panel seams that curve into one another, a rounded collar line, and no hard corners anywhere in the outline.' },
+  { key: 'dense', label: 'Dense detail',
+    clause: 'Draw it dense with detail: more panel divisions than usual, visible topstitch runs along each seam, and small functional pieces such as pull loops and reinforcement patches.' },
+  { key: 'airy', label: 'Stripped back',
+    clause: 'Draw it stripped back: the fewest panels the construction allows, one continuous upper wherever possible, and no decorative stitching at all.' },
+  { key: 'grounded', label: 'Grounded stance',
+    clause: 'Draw it with a grounded stance: a wider sole footprint that flares slightly beyond the upper, a lower heel-to-toe difference, and a flat contact line.' },
+  { key: 'lifted', label: 'Lifted stance',
+    clause: 'Draw it lifted: a taller heel block that steps back from the upper, a raised heel-to-toe pitch, and a visibly lighter forefoot edge.' },
+]
+
+/** 이 안이 어떤 실루엣으로 읽혀야 하는가 · 안마다 다른 것이 배정된다 */
+export function silhouetteRead(index: number): { key: string; label: string; clause: string } {
+  return SILHOUETTE_READS[index % SILHOUETTE_READS.length]
+}
+
+function silhouetteClause(spec: DesignSpec): string {
+  const r = (spec as { silhouetteRead?: string }).silhouetteRead
+  if (!r) return ''
+  return SILHOUETTE_READS.find(x => x.key === r)?.clause ?? ''
+}
+
 export function sketchPrompt(spec: DesignSpec, engine: EngineId = 'detail', brand?: BrandIdentity, trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
   // 스케치는 측면 한 컷이다. 한 장에 여러 시점을 넣으면 카드에서 서로 겹쳐 읽히지 않는다.
   // 다른 각도는 S3에서 컬러 렌더의 뷰로 따로 만든다.
   const view = SHOE_VIEW.lateral + ', one single shoe only, one single view, nothing else in frame'
   return shapePrompt(engine, {
     subject: en(spec.itemType), spec: shoeSpecPhrase(spec), view,
-    brand: [emphasisClause(spec), linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
+    brand: [silhouetteClause(spec), emphasisClause(spec), linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
     mode: 'sketch',
   })
 }
@@ -175,7 +213,7 @@ export function sketchPrompt(spec: DesignSpec, engine: EngineId = 'detail', bran
 export function renderPrompt(spec: DesignSpec, engine: EngineId = 'detail', brand?: BrandIdentity, trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
   return shapePrompt(engine, {
     subject: en(spec.itemType), spec: shoeSpecPhrase(spec), view: SHOE_VIEW.lateral,
-    brand: [emphasisClause(spec), linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
+    brand: [silhouetteClause(spec), emphasisClause(spec), linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
     mode: 'render',
   })
 }
@@ -202,11 +240,30 @@ export function sketchVariationPrompt(k: number): string {
 
 /** 스케치 → 기준 렌더 · 새로 그리지 않고 테크시트를 사진으로 옮긴다.
  *  스케치의 실루엣·패널·아웃솔 기하가 렌더에 그대로 보존된다 (Gemini QA 지적). */
-export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInput | null, line?: FootwearLineProfile, brand?: BrandIdentity): string {
+// 색이 들어가는 단계에서만 보이는 것들 · 소재 해석과 컬러 블로킹.
+// 선화는 질감을 못 그린다. 그래서 소재 변화는 여기서 갈라야 의미가 있다.
+// 스케치 한 장에서 디자인 여러 장을 뽑을 때, 이 목록이 장마다 다른 해석을 준다.
+const MATERIAL_READS: string[] = [
+  'Read the upper as one material throughout, tonal and quiet, with the panel breaks visible only as seams.',
+  'Read it as two contrasting materials: a matte body with the overlays in a glossier, darker finish so the panel structure reads at a distance.',
+  'Read it in a light neutral body with the sole unit and heel counter in a deeper contrasting tone.',
+  'Read it as a technical mix: a woven or knitted body with smooth synthetic overlays, the two surfaces clearly different under the same light.',
+  'Read it in a single deep saturated colour, sole included, so the silhouette reads as one solid mass.',
+  'Read it with a natural undyed sole and a rich pigmented upper, the join between them clearly visible.',
+]
+
+/** 이 디자인 컷이 어떤 소재 해석을 받는가 */
+export function materialRead(index: number): string {
+  return MATERIAL_READS[index % MATERIAL_READS.length]
+}
+
+export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInput | null, line?: FootwearLineProfile, brand?: BrandIdentity, variantIndex?: number): string {
   // 브랜드 마크를 사진에 그려 넣을지는 브랜드 설정이 정한다.
   // 참고 사진에서 배치 규칙을 읽어 두었으면 그 형태 묘사가 여기 실린다.
   const markClause = brand ? brandPromptClause(brand) : ''
   const drawsMark = !!brand?.applyLogoToImages && !!brand.logo?.style?.prompt_clause
+  // 같은 스케치에서 여러 장을 뽑을 때만 소재 해석을 갈라 준다
+  const matClause = typeof variantIndex === 'number' ? materialRead(variantIndex) : ''
   return [
     'Replace this line drawing with a full-colour photorealistic studio product photograph of the same shoe.',
     'The output must be a photograph, not a drawing: no outlines, no white fill, no flat areas.',
@@ -214,6 +271,7 @@ export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInpu
     'Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole line exactly as drawn.',
     `Materials and colour: ${shoeSpecPhrase(spec)}.`,
     emphasisClause(spec),
+    matClause,
     linePromptClause(line),
     trendPromptClause(trend ?? null),
     markClause,
