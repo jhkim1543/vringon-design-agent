@@ -11,6 +11,7 @@
 // 여기서는 그 구조를 강제 스키마로 만들어, 모든 수치가 출처 URL을 달고 나오게 한다.
 
 import { createHash } from 'node:crypto'
+import { familyOf, familySegments } from './category-templates.mjs'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -89,7 +90,7 @@ const MACRO = {
     palette: { type: 'array', description: '컬러 8~9개', items: COLOR },
     materials: { type: 'array', description: '소재 4개', items: METRIC },
     details: { type: 'array', description: '디테일 4개. 예: 브로그 펀칭, 모카신 웰트 심', items: METRIC },
-    key_items: { type: 'array', description: '여성 3 · 남성 3 · 키즈 3', items: KEY_ITEM },
+    key_items: { type: 'array', description: '요청된 세그먼트만 · 세그먼트당 3개', items: KEY_ITEM },
     grade: { type: 'string', enum: TREND_GRADES },
     next_season_call: { type: 'string', description: '예측 시즌에 이 매크로가 어떻게 되는가. 관측 시즌 대비 무엇이 커지고 무엇이 빠지는지 한두 문장. 근거를 함께.' },
     confidence: { type: 'string', enum: ['high', 'medium', 'low'], description: '선행 지표가 많고 서로 일치하면 high, 한 갈래뿐이면 low' },
@@ -214,7 +215,7 @@ export async function researchDossier(deps, root, opts) {
   const { ask } = deps
   const { categoryEn, season, priceBand, brands = [], deep = false, onStep, langName = 'English', line } = opts
   const lineHash = line ? createHash('sha256').update(JSON.stringify(line)).digest('hex').slice(0, 12) : ''
-  const key = createHash('sha256').update(JSON.stringify(['dossier5ft', langName, categoryEn, season, priceBand ?? '', brands, deep, lineHash])).digest('hex').slice(0, 24)
+  const key = createHash('sha256').update(JSON.stringify(['dossier6ft', langName, categoryEn, season, priceBand ?? '', brands, deep, lineHash])).digest('hex').slice(0, 24)
   const file = join(dossierDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
@@ -287,6 +288,11 @@ ${FORECAST} ${categoryEn}를 이끌 매크로트렌드 4개를 예측하세요.
   const macros = (plan.data.macros ?? []).slice(0, 4)
   let searches = plan.searches
 
+  // 계열별 키아이템 세그먼트 · 펌프스에 kids 세 개를 강제하면 지어내게 된다 (v2 카테고리 템플릿)
+  const segs = familySegments(familyOf(line?.itemType))
+  const segName = { women: '여성', men: '남성', kids: '키즈' }
+  const segLine = segs.map(s => `${segName[s]} 3`).join(', ') + `개 (총 ${segs.length * 3}개)`
+
   onStep?.(`Researching ${macros.length} macrotrends`)
   const filled = await Promise.allSettled(macros.map(async (m) => {
     const r = await ask({
@@ -301,7 +307,8 @@ ${FORECAST} ${categoryEn}를 이끌 매크로트렌드 4개를 예측하세요.
 - palette 8~9개: 실제 시즌 컬러. Pantone TCX 코드를 찾을 수 있으면 넣습니다
 - materials 4개: 소재별 전년 대비 성장
 - details 4개: 부자재·봉제·마감 디테일별 성장
-- key_items 9개: 여성 3, 남성 3, 키즈 3. 각각 이름·설명·성장률·등급·스펙 구절
+- key_items: ${segLine}. 각각 이름·설명·성장률·등급·스펙 구절.
+  이 계열이 실제로 팔리지 않는 세그먼트를 지어내지 마세요 — 위 세그먼트만 채웁니다.
 - key_items의 image_url: 그 아이템에 해당하는 실제 판매 제품 사진을 한 장씩 찾아 넣으세요.
   상품 페이지를 열고 og:image 주소를 그대로 씁니다. 브랜드 공식몰이나 편집숍 상품 이미지가 좋습니다.
   이미지 파일 주소여야 합니다 (.jpg/.png/.webp 또는 이미지 CDN). 못 찾으면 빈 문자열로 두세요.

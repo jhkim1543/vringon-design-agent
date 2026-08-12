@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { researchDossier } from './dossier-api.mjs'
+import { familyLens, familyOf, familyRetail } from './category-templates.mjs'
 
 export const RESEARCH_MODEL = 'gpt-5'
 // 딥리서치 · 계정에서 열리면 .env에 OPENAI_DEEP_RESEARCH=1 을 넣어 켠다.
@@ -412,16 +413,15 @@ const PULSE_SCHEMA = {
 export async function researchRetailPulse(apiKey, root, { typeKo: rawType, line, langName = 'English' }) {
   const LANG = langName
   const typeKo = canonTerm(rawType)
-  const key = createHash('sha256').update(JSON.stringify(['pulse2ft', LANG, typeKo, lineKey(line)])).digest('hex').slice(0, 24)
+  const key = createHash('sha256').update(JSON.stringify(['pulse3ft', LANG, typeKo, lineKey(line)])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
   const input = `당신은 신발 MD입니다. 웹 검색으로, 조사 시점 기준 백화점·명품 리테일러가 실제로
 "베스트셀러 / 판매 랭킹 / 인기 순위"로 표기한 ${typeKo} 제품을 수집하세요.
 ${lineBlock(line)}
-확인할 곳 (이 중 접근되는 곳 위주로, 국내 2곳 이상 + 해외 명품 리테일러 1곳 이상):
-- 국내: 롯데백화점몰(el)lotte), SSG 신세계백화점, 더현대닷컴, 무신사(랭킹)
-- 해외 명품: MR PORTER, NET-A-PORTER, Harrods, Selfridges, FARFETCH (bestseller/popular 정렬·배지)
+확인할 곳 (이 계열이 실제로 팔리는 지면 위주 · 국내 2곳 이상 + 해외 1곳 이상):
+${familyRetail(familyOf(line?.itemType))}
 
 규칙:
 - 4~6개 제품만. 반드시 랭킹·베스트셀러 표기가 실제로 붙은 제품이어야 합니다.
@@ -459,7 +459,7 @@ export async function researchTrends(apiKey, root, {
   const brands = (rawBrands ?? []).map(canonBrand)
   const useDeep = !!deep
   const key = createHash('sha256').update(JSON.stringify([
-    'trend6ft', LANG, typeKo, brands ?? [], season, priceBandKo ?? '', [...objectives].sort(), lineKey(line),
+    'trend7ft', LANG, typeKo, brands ?? [], season, priceBandKo ?? '', [...objectives].sort(), lineKey(line),
     useDeep ? 'deep' : wantReport ? `multi${depth}` : 'fast',
   ])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
@@ -467,6 +467,8 @@ export async function researchTrends(apiKey, root, {
 
   const lenses = (objectives.length ? objectives : ['live_commercial_pulse', 'design_trends', 'next_season_forecast'])
     .map(o => OBJECTIVE_LENS[o]).filter(Boolean)
+  // 계열 특화 렌즈 · 힐을 조사하며 스택·드롭을 묻는 낭비를 막는다 (v2 카테고리 템플릿)
+  lenses.push(...familyLens(familyOf(line?.itemType)))
 
   const input = `당신은 신발 브랜드의 트렌드 리서처입니다. 웹 검색으로 사실만 수집하세요.
 

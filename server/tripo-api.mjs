@@ -117,6 +117,48 @@ export async function tripoMultiview(root, apiKey, { views, onStep }) {
   return { hash, format: 'glb', views: usable.length, cached: false, taskId }
 }
 
+/** 단일 이미지 → 3D · 2026-08-13 방식 변경.
+ *  턴어라운드 3컷의 뷰 간 불일치가 형상을 흐리는 사례가 있었고,
+ *  선정작당 이미지 3장을 아낀다. 기준 렌더 한 장으로 만든다. */
+export async function tripoSingle(root, apiKey, { view, onStep }) {
+  if (!apiKey) throw new Error('No TRIPO_API_KEY set')
+  if (!view?.buf) throw new Error('no image to send')
+
+  const hash = createHash('sha256')
+    .update('single|' + createHash('sha256').update(view.buf).digest('hex'))
+    .digest('hex').slice(0, 24)
+  const out = join(modelDir(root), `${hash}.glb`)
+  if (existsSync(out)) return { hash, format: 'glb', views: 1, cached: true }
+
+  onStep?.('uploading', 0, 0)
+  const token = await upload(apiKey, view.buf, view.name)
+
+  const create = await fetch(`${BASE}/task`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      type: 'image_to_model',
+      file: { type: 'png', file_token: token },
+      model_version: 'v2.5-20250123',
+      texture: true,
+      pbr: true,
+    }),
+  })
+  if (!create.ok) throw new Error(`Tripo task ${create.status}: ${(await create.text()).slice(0, 240)}`)
+  const cj = await create.json()
+  const taskId = cj?.data?.task_id
+  if (!taskId) throw new Error('Tripo returned no task_id')
+
+  const done = await poll(apiKey, taskId, onStep)
+  const url = done?.output?.pbr_model ?? done?.output?.model ?? done?.result?.pbr_model?.url ?? done?.result?.model?.url
+  if (!url) throw new Error('Tripo finished but returned no model url')
+
+  const dl = await fetch(url)
+  if (!dl.ok) throw new Error(`Tripo download ${dl.status}`)
+  writeFileSync(out, Buffer.from(await dl.arrayBuffer()))
+  return { hash, format: 'glb', views: 1, cached: false, taskId }
+}
+
 export function readModel(root, name) {
   const f = join(modelDir(root), name)
   return existsSync(f) ? readFileSync(f) : null

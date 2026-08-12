@@ -9,9 +9,10 @@ import { createMiroBoard, planMiroBoard } from './miro-api.mjs'
 import { DEEP_MODEL_DEFAULT, researchCompetitors, researchRetailPulse, researchTrends, researchSeasonDossier } from './research-api.mjs'
 import { geminiEdit, geminiGenerate, geminiProbe, geminiShotPlan } from './gemini-api.mjs'
 import { compositeLogo, logoAvailable } from './logo-api.mjs'
-import { tripoMultiview, tripoProbe, readModel } from './tripo-api.mjs'
+import { tripoSingle, tripoProbe, readModel } from './tripo-api.mjs'
 import { brightdataProbe, unlockImage, unlockPage } from './brightdata.mjs'
 import { analyzeLogoStyle, analyzeMoodboard, analyzeSeries, reviewAsMd, saveUpload } from './upload-api.mjs'
+import { authorGenome, planTerritories, verifyRender } from './design-api.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..')
@@ -470,6 +471,38 @@ export async function handleApi(req, res) {
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
   }
 
+  // ── Design Genome · 디자인 저작 (지시서 v2 S3~S4) ──────────────────
+  if (path === '/api/design/territories' && req.method === 'POST') {
+    try {
+      const b = await readBody(req)
+      return json(res, 200, await planTerritories(API_KEY, ROOT, {
+        signals: b.signals, itemTypeEn: b.itemTypeEn, itemType: b.itemType,
+        brandSummary: b.brandSummary, langName: b.langName,
+      }))
+    } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
+  }
+
+  if (path === '/api/design/genome' && req.method === 'POST') {
+    try {
+      const b = await readBody(req)
+      return json(res, 200, await authorGenome(API_KEY, ROOT, {
+        territory: b.territory, tier: b.tier, signals: b.signals, profile: b.profile,
+        brandSummary: b.brandSummary, antiSimilarity: b.antiSimilarity,
+        itemTypeEn: b.itemTypeEn, langName: b.langName,
+      }))
+    } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
+  }
+
+  // 실제 비전 검증 · rng QA를 대체한다
+  if (path === '/api/verify/render' && req.method === 'POST') {
+    try {
+      const b = await readBody(req)
+      return json(res, 200, await verifyRender(API_KEY, CACHE_DIR, {
+        hash: b.hash, genome: b.genome, langName: b.langName,
+      }))
+    } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
+  }
+
   // 로고가 적용된 제품 사진에서 배치 규칙을 읽는다
   if (path === '/api/analyze/logo-style' && req.method === 'POST') {
     try {
@@ -513,27 +546,22 @@ export async function handleApi(req, res) {
   if (path === '/api/model/generate' && req.method === 'POST') {
     try {
       const b = await readBody(req)
-      // ordered: [front, left, back, right] 순서의 해시 4칸 (없는 자리는 null).
-      // 옛 클라이언트의 hashes 배열도 받아 첫 칸부터 채운다.
       const okHash = h => typeof h === 'string' && /^[a-f0-9]{8,64}$/.test(h)
-      let slots
-      if (Array.isArray(b.ordered)) {
-        slots = b.ordered.slice(0, 4).map(h => okHash(h) ? h : null)
-        while (slots.length < 4) slots.push(null)
-      } else {
-        const hashes = Array.isArray(b.hashes) ? b.hashes.filter(okHash).slice(0, 4) : []
-        slots = [...hashes, null, null, null, null].slice(0, 4)
+
+      // 단일 이미지 방식 (2026-08-13 변경) · 기준 렌더 한 장으로 만든다.
+      // single 필드가 오면 이 경로. 턴어라운드 3컷을 만들지 않아 뷰 불일치가 형상을 흐릴 일이 없다.
+      if (okHash(b.single)) {
+        const p = join(CACHE_DIR, `${b.single}.png`)
+        if (!existsSync(p)) return json(res, 404, { error: 'that render is not in the cache' })
+        const r = await tripoSingle(ROOT, TRIPO_KEY, { view: { buf: readFileSync(p), name: `${b.single}.png` } })
+        return json(res, 200, { ...r, url: `/api/model/file/${r.hash}.${r.format}` })
       }
-      if (!slots.some(Boolean)) return json(res, 400, { error: 'no view hashes given' })
 
-      const views = slots.map(h => {
-        if (!h) return null
-        const p = join(CACHE_DIR, `${h}.png`)
-        return existsSync(p) ? { buf: readFileSync(p), name: `${h}.png` } : null
-      })
-      if (!views.some(Boolean)) return json(res, 404, { error: 'none of those views are in the cache' })
-
-      const r = await tripoMultiview(ROOT, TRIPO_KEY, { views })
+      // 구 클라이언트 호환 · ordered/hashes 멀티뷰 요청은 첫 유효 뷰 한 장으로 처리한다
+      const legacy = (Array.isArray(b.ordered) ? b.ordered : Array.isArray(b.hashes) ? b.hashes : []).filter(okHash)
+      const first = legacy.map(h => join(CACHE_DIR, `${h}.png`)).find(existsSync)
+      if (!first) return json(res, 400, { error: 'no usable view given' })
+      const r = await tripoSingle(ROOT, TRIPO_KEY, { view: { buf: readFileSync(first), name: 'view.png' } })
       return json(res, 200, { ...r, url: `/api/model/file/${r.hash}.${r.format}` })
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
   }

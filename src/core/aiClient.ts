@@ -199,13 +199,31 @@ function silhouetteClause(spec: DesignSpec): string {
   return SILHOUETTE_READS.find(x => x.key === r)?.clause ?? ''
 }
 
+/** 게놈의 그리기 지시 · 단일 진실 원천 (지시서 규칙 11).
+ *  게놈이 있으면 Hero와 Supporting이 프롬프트의 구조 지시가 된다.
+ *  아톰·조합 라벨을 직접 싣던 경로는 게놈 앞에서 물러난다. */
+function genomeClause(spec: DesignSpec): string {
+  const g = spec.genome
+  if (!g) return ''
+  const stance = g.stance === 'grounded'
+    ? 'Give it a grounded stance with a flat, planted contact line.'
+    : g.stance === 'lifted'
+      ? 'Give it a lifted stance with a visibly raised heel-to-toe pitch.'
+      : ''
+  return [
+    `The one idea this design leads with: ${g.hero_mutation.drawing_instruction}`,
+    ...g.supporting.slice(0, 3),
+    stance,
+  ].filter(Boolean).join(' ')
+}
+
 export function sketchPrompt(spec: DesignSpec, engine: EngineId = 'detail', brand?: BrandIdentity, trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
   // 스케치는 측면 한 컷이다. 한 장에 여러 시점을 넣으면 카드에서 서로 겹쳐 읽히지 않는다.
   // 다른 각도는 S3에서 컬러 렌더의 뷰로 따로 만든다.
   const view = SHOE_VIEW.lateral + ', one single shoe only, one single view, nothing else in frame'
   return shapePrompt(engine, {
     subject: en(spec.itemType), spec: shoeSpecPhrase(spec), view,
-    brand: [silhouetteClause(spec), emphasisClause(spec), linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
+    brand: [silhouetteClause(spec), spec.genome ? genomeClause(spec) : emphasisClause(spec), linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
     mode: 'sketch',
   })
 }
@@ -213,7 +231,7 @@ export function sketchPrompt(spec: DesignSpec, engine: EngineId = 'detail', bran
 export function renderPrompt(spec: DesignSpec, engine: EngineId = 'detail', brand?: BrandIdentity, trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
   return shapePrompt(engine, {
     subject: en(spec.itemType), spec: shoeSpecPhrase(spec), view: SHOE_VIEW.lateral,
-    brand: [silhouetteClause(spec), emphasisClause(spec), linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
+    brand: [silhouetteClause(spec), spec.genome ? genomeClause(spec) : emphasisClause(spec), linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
     mode: 'render',
   })
 }
@@ -270,7 +288,7 @@ export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInpu
     'Every surface carries real material colour and texture, with studio lighting, soft shadows and highlights.',
     'Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole line exactly as drawn.',
     `Materials and colour: ${shoeSpecPhrase(spec)}.`,
-    emphasisClause(spec),
+    spec.genome ? genomeClause(spec) : emphasisClause(spec),
     matClause,
     linePromptClause(line),
     trendPromptClause(trend ?? null),
@@ -592,12 +610,15 @@ export async function modelProbe(): Promise<{ available: boolean; reason?: strin
 }
 
 /** ordered에는 [front, left, back, right] 순서로 해시를 넣는다. 없는 자리는 null. */
-export async function generateModel(ordered: (string | null)[], meta: {
+/** 단일 이미지 → 3D (2026-08-13 방식 변경).
+ *  턴어라운드 4뷰를 만들지 않는다 — 뷰 간 불일치가 형상을 흐렸고, 선정작당 이미지 3장이 굳는다.
+ *  기준 렌더 해시 하나만 보낸다. */
+export async function generateModel(single: string, meta: {
   subject?: string; itemType?: string
 }): Promise<ModelResult> {
   const r = await fetch('/api/model/generate', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ordered, ...meta }),
+    body: JSON.stringify({ single, ...meta }),
   })
   const j = await r.json()
   if (!r.ok) throw new Error(j.error || `model ${r.status}`)

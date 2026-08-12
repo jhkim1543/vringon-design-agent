@@ -673,6 +673,45 @@ export interface CostEstimate {
 }
 
 // ── 디자인 (스펙 + 산출물) ──────────────────────────────────────────
+/** LLM이 저작한 설계 의도 (지시서 v2 S4).
+ *  그릴 수 있는 축만 담는다 — mm·비율은 spec_sheet에 분리하고 이미지 지시에 쓰지 않는다.
+ *  이후 모든 프롬프트는 이 게놈에서만 파생된다 (단일 진실 원천). */
+export interface DesignGenome {
+  concept_thesis: string
+  consumer_role: string
+  hero_mutation: { axis: string; label: string; drawing_instruction: string }
+  supporting: string[]
+  silhouette_family: string
+  toe_family: 'round' | 'almond' | 'square' | 'pointed'
+  sole_mass: 'low' | 'mid' | 'high'
+  panel_density: 'minimal' | 'standard' | 'dense'
+  closure_form: string
+  stance: 'grounded' | 'neutral' | 'lifted'
+  spec_sheet: {
+    heel_height_mm: number
+    panel_count: number
+    sole_construction: string
+    upper_material: string
+  }
+  source_signal_ids: string[]
+  preserve: string[]
+  forbidden: string[]
+  territory_id: string
+  tier: DesignTier
+}
+
+/** 설계 영토 (지시서 v2 S3) · 서로 다른 설계 공간의 계획 */
+export interface Territory {
+  id: string
+  name: string
+  consumer_role: string
+  use_signal_ids: string[]
+  drop_signal_ids: string[]
+  drop_reason: string
+  allowed_tiers: DesignTier[]
+  season_note: string
+}
+
 export interface DesignSpec {
   design_id: string
   tier: DesignTier
@@ -688,6 +727,9 @@ export interface DesignSpec {
   comboLabel?: string
   /** 조사가 요구했지만 이 유형이 허용하지 않아 접힌 값 */
   hintBlocked?: { field: string; wanted: string | number; got: string | number }[]
+  /** 이 안을 저작한 게놈 (지시서 v2 S4) · 있으면 디자인의 저자는 LLM이고,
+   *  없으면 아키타입 폴백이다 — 카드가 그 차이를 정직하게 말해야 한다 */
+  genome?: DesignGenome
 }
 
 /** 실제 생성된 이미지 · origin은 지시서 9장 이미지 원장 */

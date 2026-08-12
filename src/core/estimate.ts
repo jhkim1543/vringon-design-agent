@@ -61,7 +61,7 @@ export function estimate(p: RunParams): Estimate {
   const realS3 = Math.min(wantS3, Math.max(0, budget - realS2))
   // 캠페인 컷과 턴어라운드는 최종 후보의 산출물이라 상한과 무관하게 생성된다
   const realS4 = campaignImgs
-  const realS5 = models * 3                     // 턴어라운드 3컷 × 최종 후보 · 상한과 무관
+  const realS5 = 0                              // 단일 이미지 3D · 추가 이미지 없음, Tripo 호출만
 
   const eng = ENGINES[p.imageEngine]
   const USD_PER_IMAGE = eng.usdPerImage

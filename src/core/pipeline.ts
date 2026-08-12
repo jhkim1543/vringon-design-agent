@@ -1,5 +1,5 @@
 // ── 파이프라인 엔진 S1~S5 · 진행 스트리밍·승인 게이트·체크포인트 ──────
-import type { Design, DesignSpec, DesignTier, PipelineEvent, Rationale, RunParams, Signal, Stage } from './types'
+import type { Design, DesignSpec, DesignTier, PipelineEvent, Rationale, RunParams, Signal, Stage, Territory } from './types'
 import { PACKS, profileOf, resetSeq, tierCapRule, viewSetFor } from './packs'
 import { blockedNarrative, deriveSpecHints, deriveSpecHintsFrom, drivingFromHint, hintNarrative, locksFromSeries, reconcileHint, signalCombos } from './signalSpec'
 import type { SpecHint } from './signalSpec'
@@ -8,11 +8,13 @@ import { COMPETITORS, DIRECTIONS, SIGNALS } from './samples'
 import { COLORWAY_NAMES } from './sketch'
 import {
   colorwayEditPrompt, conceptPrompt, editImage, generateImage, renderFromSketchPrompt, renderPrompt,
-  generateModel, sketchPrompt, sketchVariationPrompt, silhouetteRead, slidersToLabel, stampLogo, turnaroundPrompt, variationPrompt, variationSliders, viewEditPrompt, wearEditPrompt,
+  generateModel, sketchPrompt, sketchVariationPrompt, silhouetteRead, slidersToLabel, stampLogo, variationPrompt, variationSliders, viewEditPrompt, wearEditPrompt,
 } from './aiClient'
-import type { TrendClauseInput, TripoRole } from './aiClient'
+import type { TrendClauseInput } from './aiClient'
 import { fetchCompetitors, fetchDossier, fetchRetailPulse, fetchTrends, pulseToCompetitors, toBias, toCompetitors, toSignals, setRunLang } from './research'
 import { readMoodboard, readSeries, reviewAsMd, toSeriesDna } from './uploads'
+import { authorGenome, brandSummaryOf, diversityGate, genomeDigest, genomeToHint, planTerritories, verifyRender } from './genome'
+import type { Genome } from './genome'
 import { getLang, LANG_NAME } from './i18n'
 import { campaignCount, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL, TYPE_EN, TYPE_LABEL } from './types'
 import { ENGINES } from './imageEngines'
@@ -436,6 +438,45 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       if (c.length > 1) emit({ kind: 'log', stage: 'S2', text: `${TIER_LABEL[t]} explores ${c.length} different readings of the research, not one: ${c.slice(0, 3).map(x => x.label).join(' / ')}${c.length > 3 ? ' …' : ''}` })
     }
 
+    // ── Design Genome 저작 (지시서 v2 S3~S4 · 라이트 모드) ──────────────
+    // 디자인의 저자를 LLM으로 바꾼다. 영토를 먼저 계획하고, 안마다 독립 호출로 게놈을 받는다.
+    // 실패하면 위의 조합 경로로 떨어지되, 폴백임을 로그에 명시한다 (규칙 2·20).
+    const langName = LANG_NAME[params.researchLang ?? getLang()]
+    const brandSummary = brandSummaryOf(params.brand)
+    const gProf = profileOf(params.itemType)
+    const genomeProfile = {
+      heelMin: gProf.heel[0], heelMax: gProf.heel[1],
+      panelMin: gProf.panels[0], panelMax: gProf.panels[1],
+      closures: gProf.closures, constructions: gProf.constructions,
+    }
+    let territories: Territory[] = []
+    if (!brandSummary) {
+      emit({ kind: 'log', stage: 'S2', text: 'Brand lens is empty · territories will lean toward the market average. Set up the brand to pull them your way.' })
+    }
+    try {
+      emit({ kind: 'log', stage: 'S2', text: 'Planning concept territories · distinct design spaces, not intensity steps of one trend' })
+      const tr = await planTerritories({
+        signals, itemTypeEn: TYPE_EN[params.itemType] ?? 'shoe',
+        itemType: params.itemType, brandSummary, langName,
+      })
+      if (cancelled) return
+      territories = tr.territories ?? []
+      emit({ kind: 'log', stage: 'S2', text: `${territories.length} territories planned${tr.cached ? ' (reused an earlier pass)' : ''}` })
+      for (const t of territories) {
+        emit({ kind: 'log', stage: 'S2', text: `Territory ${t.name}: ${t.consumer_role}${t.drop_signal_ids?.length ? ` · drops ${t.drop_signal_ids.join(', ')} — ${t.drop_reason}` : ''}` })
+      }
+    } catch (e) {
+      emit({ kind: 'log', stage: 'S2', text: `Territory planning failed · ${String((e as Error).message).slice(0, 100)} · falling back to signal combinations — these designs are NOT LLM-authored` })
+    }
+    const acceptedGenomes: Genome[] = []
+    const terrCursor: Record<DesignTier, number> = { core: 0, push: 0, signature: 0 }
+    const pickTerritory = (tier: DesignTier): Territory | null => {
+      if (!territories.length) return null
+      const eligible = territories.filter(t => (t.allowed_tiers ?? []).includes(tier))
+      const pool = eligible.length ? eligible : territories
+      return pool[terrCursor[tier]++ % pool.length]
+    }
+
     // 실제로 반영된 필드 수 · 제안과 반영은 다르다
     const tookByTier: Record<string, Set<string>> = { core: new Set(), push: new Set(), signature: new Set() }
     const blockedSeen = new Set<string>()
@@ -446,23 +487,64 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       // 이 디자인이 볼 신호 조합. 조합이 다르면 스펙이 다르고, 스펙이 다르면 스케치가 다르다.
       // 조합이 달라도 스펙이 같아질 수 있다 (막힌 신호는 아무것도 못 바꾼다).
       // 그때는 다음 조합으로 넘긴다 — 똑같은 후보를 두 장 만들 이유가 없다.
+      // ① 게놈 저작 시도 · 독립 호출 + 다양성 게이트, 충돌 축만 지목해 1회 재저작
+      let genome: Genome | null = null
+      if (territories.length) {
+        const terr = pickTerritory(tier)!
+        let lastCollisions: string[] = []
+        for (let attempt = 0; attempt < 2 && !genome; attempt++) {
+          try {
+            const g = await authorGenome({
+              territory: terr, tier, signals, profile: genomeProfile, brandSummary,
+              antiSimilarity: [
+                ...acceptedGenomes.map(genomeDigest),
+                ...(attempt > 0 ? [`이전 시도는 다음 축이 겹쳐 탈락: ${lastCollisions.join(', ')}. 이 축들만 바꾸고 나머지는 유지하라.`] : []),
+              ],
+              itemTypeEn: TYPE_EN[params.itemType] ?? 'shoe', langName,
+            })
+            if (cancelled) return
+            const gate = diversityGate(g, acceptedGenomes, tier)
+            if (gate.pass) genome = g
+            else {
+              lastCollisions = gate.collisions
+              emit({ kind: 'log', stage: 'S2', text: `Genome for ${terr.name} collides on ${gate.collisions.join(', ')} · re-authoring those axes only` })
+            }
+          } catch (e) {
+            emit({ kind: 'log', stage: 'S2', text: `Genome authorship failed for ${terr.name} · ${String((e as Error).message).slice(0, 80)} · this slot falls back to signal combos (not LLM-authored)` })
+            break
+          }
+        }
+      }
+
       const combos = comboByTier[tier]
       let combo: { ids: string[]; label: string } | null = null
       let tierHint = hintByTier[tier]
       let spec = null as ReturnType<typeof pack.generateSpec> | null
-      for (let tryN = 0; tryN < Math.max(1, combos.length); tryN++) {
-        combo = combos.length ? combos[comboCursor[tier]++ % combos.length] : null
-        tierHint = combo ? deriveSpecHintsFrom(signals, combo.ids, tier, athletic) : hintByTier[tier]
-        const cand = pack.generateSpec(rng, tier, params.itemType, locked, tierHint.fields)
-        const sig = JSON.stringify(cand.fields)
-        if (!specSeen.has(sig) || tryN === combos.length - 1) { spec = cand; specSeen.add(sig); break }
+      if (genome) {
+        // 게놈 경로 · 프로필 클램프는 generateSpec이 그대로 적용하고 받은/거부한 값을 기록한다
+        spec = pack.generateSpec(rng, tier, params.itemType, locked, genomeToHint(genome))
+        spec.genome = genome
+        spec.silhouetteRead = genome.silhouette_family
+        spec.comboLabel = genome.hero_mutation.label
+        tierHint = { fields: {}, applied: {} }
+        acceptedGenomes.push(genome)
+        const terrName = territories.find(t => t.id === genome!.territory_id)?.name ?? genome.territory_id
+        emit({ kind: 'log', stage: 'S2', text: `${spec.design_id} authored in ${terrName} · hero: ${genome.hero_mutation.label}` })
+      } else {
+        for (let tryN = 0; tryN < Math.max(1, combos.length); tryN++) {
+          combo = combos.length ? combos[comboCursor[tier]++ % combos.length] : null
+          tierHint = combo ? deriveSpecHintsFrom(signals, combo.ids, tier, athletic) : hintByTier[tier]
+          const cand = pack.generateSpec(rng, tier, params.itemType, locked, tierHint.fields)
+          const sig = JSON.stringify(cand.fields)
+          if (!specSeen.has(sig) || tryN === combos.length - 1) { spec = cand; specSeen.add(sig); break }
+        }
+        if (!spec) spec = pack.generateSpec(rng, tier, params.itemType, locked, tierHint.fields)
+        if (combo) spec.comboLabel = combo.label
+        // 선화에서 실제로 달라지는 축 · 안마다 다른 실루엣 읽기를 준다
+        spec.silhouetteRead = silhouetteRead(i).key
       }
-      if (!spec) spec = pack.generateSpec(rng, tier, params.itemType, locked, tierHint.fields)
       // 스펙이 실제로 받아들인 필드만 근거로 남긴다
       const hint = reconcileHint(tierHint, spec.hintApplied)
-      if (combo) spec.comboLabel = combo.label
-      // 선화에서 실제로 달라지는 축 · 안마다 다른 실루엣 읽기를 준다
-      spec.silhouetteRead = silhouetteRead(i).key
       for (const k of spec.hintApplied ?? []) tookByTier[tier].add(k)
       for (const b of spec.hintBlocked ?? []) blockedSeen.add(`${b.field}|${b.wanted}|${b.got}`)
       const cost = pack.costModel(spec, rng)
@@ -689,17 +771,30 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         }
       }
 
-      d.qa = buildQA(d, rng)
-      const failed = d.qa.filter(q => !q.pass)
-      if (failed.length) {
-        emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} vision QA ${d.qa.length - failed.length}/${d.qa.length} · regenerating the mismatched view, attempt 1 of 2` })
-        await wait(300)
-        if (rng.chance(0.5)) {
-          d.qa = d.qa.map(q => ({ ...q, pass: true }))
-          emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} QA passed after regeneration` })
-        } else {
-          d.viewMismatch = true
-          emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} failed twice, flagged as a view mismatch and kept visible` })
+      // 실제 비전 검증 (지시서 규칙 13 · rng 시뮬레이션 QA 폐기).
+      // 렌더를 진짜로 보고 설계 의도와 대조한다. 검사가 실패하면 실패로 표기하고,
+      // 호출 자체가 안 되면 "미검증"으로 남긴다 — 난수로 통과를 지어내지 않는다.
+      const heroForQa = d.images.find(im => im.view === views[0].key && !im.colorway)
+      if (heroForQa) {
+        try {
+          const v = await verifyRender({
+            hash: heroForQa.hash,
+            genome: d.spec.genome ?? {
+              toe_family: String(d.spec.fields.toe_shape) as Genome['toe_family'],
+              closure_form: String(d.spec.fields.closure),
+            },
+            langName,
+          })
+          d.qa = v.checks
+          const failedN = v.checks.filter(c => !c.pass).length
+          if (!v.single_object) {
+            d.viewMismatch = true
+            emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} render shows more than one object · flagged, kept visible` })
+          }
+          emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} vision check ${v.checks.length - failedN}/${v.checks.length}${failedN ? ' · mismatches flagged, not hidden' : ''}` })
+        } catch (e) {
+          d.qa = []
+          emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} verification call failed · left unverified (no simulated pass) · ${String((e as Error).message).slice(0, 70)}` })
         }
       }
       emit({ kind: 'design-update', design: { ...d } })
@@ -853,11 +948,11 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
 
     // ══ S5 3D 쇼룸 ══
     emit({ kind: 'stage-start', stage: 'S5' })
-    // 규약 맞춤 멀티뷰 → 3D · Tripo는 [front, left, back, right] 턴어라운드를 기대한다.
-    // 기준 렌더(lateral, 토가 왼쪽)가 곧 left 뷰다. 나머지 세 방향을 편집으로 만들어
-    // 네 자리를 모두 채워 보낸다. 임의 각도 두세 장보다 형태 복원이 훨씬 정확하다.
+    // 단일 이미지 → 3D (2026-08-13 방식 변경).
+    // 턴어라운드 4뷰를 만들지 않는다 — 편집으로 돌린 뷰끼리 미세하게 어긋나 형상을 흐렸고,
+    // 선정작당 이미지 3장이 굳는다. 기준 렌더 한 장을 그대로 Tripo image_to_model에 보낸다.
     if (params.make3d) {
-      emit({ kind: 'log', stage: 'S5', text: 'Building the 3D showroom · four views of each pick become one model' })
+      emit({ kind: 'log', stage: 'S5', text: 'Building the 3D showroom · each pick becomes a model from its hero render' })
       for (const d of top) {
         if (cancelled) return
         const base = d.images.find(i => i.view === 'lateral' && !i.colorway)
@@ -866,39 +961,15 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} has no clean product render, so 3D is skipped` })
           continue
         }
-        // 턴어라운드 4뷰 · 기준 렌더 = left. 이미 만든 내측 뷰가 있으면 right로 재사용한다.
-        const roles: Record<TripoRole, string | null> = { front: null, left: base.hash, back: null, right: null }
-        const medial = d.images.find(i => i.view === 'medial' && !i.colorway)
-        if (medial) roles.right = medial.hash
-        const rear = d.images.find(i => i.view === 'rear' && !i.colorway)
-        if (rear) roles.back = rear.hash
-        for (const role of ['front', 'back', 'right'] as TripoRole[]) {
-          if (roles[role] || cancelled) continue
-          try {
-            const r = await editImage(base.hash, turnaroundPrompt(role), params.imageEngine)
-            roles[role] = r.hash
-            d.images = [...d.images, { view: `turn_${role}`, url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: base.hash }]
-            emit({ kind: 'design-update', design: { ...d } })
-            emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} turnaround ${role} view done${r.cached ? ' (reused)' : ''}` })
-          } catch (e) {
-            emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} turnaround ${role} failed · ${String((e as Error).message).slice(0, 80)}` })
-          }
-        }
-        const ordered = [roles.front, roles.left, roles.back, roles.right]
-        const have = ordered.filter(Boolean).length
-        if (have < 2) {
-          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} has only ${have} usable view, so 3D is skipped` })
-          continue
-        }
         try {
-          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} building the 3D model from ${have} views · a few minutes` })
-          const m = await generateModel(ordered, {
+          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} building the 3D model from the hero render · a few minutes` })
+          const m = await generateModel(base.hash, {
             subject: (TYPE_LABEL[params.itemType] ?? params.itemType).toLowerCase(),
             itemType: params.itemType,
           })
           d.model = { url: m.url, hash: m.hash, format: m.format, views: m.views }
           emit({ kind: 'design-update', design: { ...d } })
-          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} 3D ready from ${m.views} views${m.cached ? ' (reused)' : ''} · GLB downloadable from the card` })
+          emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} 3D ready${m.cached ? ' (reused)' : ''} · GLB downloadable from the card` })
         } catch (e) {
           emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} 3D failed · ${String((e as Error).message).slice(0, 90)}` })
         }
@@ -927,6 +998,42 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
 
 // ── 근거 추적 체인 (지시서 10.1) ─────────────────────────────────────
 function buildRationale(params: RunParams, spec: DesignSpec, signals: Signal[], rng: ReturnType<typeof makeRng>, hint: SpecHint): Rationale {
+  // ── 게놈 경로 · 근거는 게놈이 실제로 인용한 신호이고, 서사는 저작 의도 그 자체다 ──
+  if (spec.genome) {
+    const g = spec.genome
+    const cited = g.source_signal_ids
+      .map(id => signals.find(s => s.signal_id === id))
+      .filter((s): s is Signal => !!s)
+    const w = cited.length ? Math.round(100 / cited.length) / 100 : 0
+    const placementG = spec.tier === 'core'
+      ? 'Existing last and existing bottom unit, inside the cost cap. That is what Core is for.'
+      : spec.tier === 'push'
+        ? 'Keeps either the last or the bottom unit and changes the other, cost within 30% more. That is Push.'
+        : 'New last or new outsole mould allowed with amortisation stated. That is Signature.'
+    // 게놈이 요구했지만 품목 프로필이 접은 값도 그대로 말한다 (정직성 유지)
+    const clampLines = blockedNarrative(spec.hintBlocked)
+    return {
+      agent_mode: params.mode,
+      driving_signals: cited.map(s => ({ signal_id: s.signal_id, weight: w })),
+      reference_images: [],
+      reference_prompts: params.mode === 'series' && params.series.valueStatement.trim()
+        ? [{ text: params.series.valueStatement.trim(), origin: 'user_input' as const, applied_as: spec.fieldsLocked }]
+        : [],
+      series_dna_inherited: params.mode === 'series' ? spec.fieldsLocked : [],
+      type_placement_reason: placementG,
+      narrative: [
+        g.concept_thesis,
+        `${g.hero_mutation.label} — ${g.hero_mutation.drawing_instruction}`,
+        ...(g.preserve.length ? [`Kept untouched: ${g.preserve.join(', ')}.`] : []),
+        ...clampLines,
+        ...(cited.length
+          ? [`Built on ${cited.map(s => s.label).join(', ')}.`]
+          : ['No research signal cited — this concept works from the archetype grammar alone, and says so.']),
+        placementG,
+      ],
+    }
+  }
+
   // 근거는 실제로 스펙을 바꾼 신호다. 아무것도 못 바꿨을 때만 가장 센 신호로 대신한다.
   const driving = drivingFromHint(hint)
   const byId = (id: string) => signals.find(s => s.signal_id === id)
@@ -1008,23 +1115,9 @@ function buildModelEval(rng: ReturnType<typeof makeRng>): { label: string; value
   ]
 }
 
-function buildQA(d: Design, rng: ReturnType<typeof makeRng>): { check: string; target: string; observed: string; pass: boolean }[] {
-  const f = d.spec.fields as Record<string, any>
-  const heel = Number(f.heel_height_mm)
-  const dev = Math.round((rng.next() * 0.32 - 0.05) * 100) / 100
-  const seen = Math.round(heel * (1 + dev))
-  const qa = [
-    { check: 'Toe shape reads correctly', target: String(f.toe_shape), observed: String(f.toe_shape), pass: true },
-    { check: 'Heel height visual deviation', target: `${heel}mm, within 20%`, observed: `${seen}mm, off by ${Math.abs(Math.round(dev * 100))}%`, pass: Math.abs(dev) <= 0.2 },
-    { check: 'Panel count', target: String(f.panel_count), observed: String(rng.chance(0.85) ? f.panel_count : Number(f.panel_count) - 1), pass: rng.chance(0.85) },
-    { check: 'Same object across views', target: '>=0.80', observed: (0.74 + rng.next() * 0.24).toFixed(2), pass: rng.chance(0.8) },
-  ]
-  // 좌우·내외측 일관성 · 내측 뷰를 만든 경우에만 검사한다
-  if (d.images.some(i => i.view === 'medial')) {
-    qa.push({ check: 'Lateral and medial sides consistent', target: 'same sole line and panel logic', observed: rng.chance(0.85) ? 'consistent' : 'medial panel split differs', pass: rng.chance(0.85) })
-  }
-  return qa
-}
+// buildQA(난수 시뮬레이션 QA)는 2026-08-13에 폐기됐다.
+// "vision QA"라는 이름으로 이미지를 보지 않은 채 rng.chance()로 통과/실패를 지어냈다.
+// 실제 검증은 /api/verify/render (server/design-api.mjs)가 한다 — 지시서 규칙 13.
 
 // Top N 다양성 제약 (지시서 11.2 · 유형별 최소 1개 + 스펙 거리)
 function pickTopDiverse(pool: Design[], n: number): Design[] {
