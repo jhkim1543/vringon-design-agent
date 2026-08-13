@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { researchDossier } from './dossier-api.mjs'
-import { familyLens, familyOf, familyRetail } from './category-templates.mjs'
+import { familyLens, familyOf, familyRetail, typeLens } from './category-templates.mjs'
 
 export const RESEARCH_MODEL = 'gpt-5'
 // 딥리서치 · 계정에서 열리면 .env에 OPENAI_DEEP_RESEARCH=1 을 넣어 켠다.
@@ -459,7 +459,7 @@ export async function researchTrends(apiKey, root, {
   const brands = (rawBrands ?? []).map(canonBrand)
   const useDeep = !!deep
   const key = createHash('sha256').update(JSON.stringify([
-    'trend7ft', LANG, typeKo, brands ?? [], season, priceBandKo ?? '', [...objectives].sort(), lineKey(line),
+    'trend8ft', LANG, typeKo, brands ?? [], season, priceBandKo ?? '', [...objectives].sort(), lineKey(line),
     useDeep ? 'deep' : wantReport ? `multi${depth}` : 'fast',
   ])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
@@ -469,6 +469,8 @@ export async function researchTrends(apiKey, root, {
     .map(o => OBJECTIVE_LENS[o]).filter(Boolean)
   // 계열 특화 렌즈 · 힐을 조사하며 스택·드롭을 묻는 낭비를 막는다 (v2 카테고리 템플릿)
   lenses.push(...familyLens(familyOf(line?.itemType)))
+  // 품목이 계열보다 구체적이면 그 차이만큼 더 묻는다 (트레일화에 카본 플레이트를 묻지 않도록)
+  lenses.push(...typeLens(line?.itemType))
 
   const input = `당신은 신발 브랜드의 트렌드 리서처입니다. 웹 검색으로 사실만 수집하세요.
 

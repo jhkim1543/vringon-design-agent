@@ -14,6 +14,8 @@ import type { TrendClauseInput } from './aiClient'
 import { fetchCompetitors, fetchDossier, fetchRetailPulse, fetchTrends, pulseToCompetitors, toBias, toCompetitors, toSignals, setRunLang } from './research'
 import { readMoodboard, readSeries, reviewAsMd, toSeriesDna } from './uploads'
 import { authorGenome, brandSummaryOf, diversityGate, genomeDigest, genomeToHint, planTerritories, verifyRender } from './genome'
+import type { BrandIdentity } from './brand'
+import { checkBrandFit } from './brand'
 import type { Genome } from './genome'
 import { getLang, LANG_NAME } from './i18n'
 import { campaignCount, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL, TYPE_EN, TYPE_LABEL } from './types'
@@ -573,7 +575,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         spec, ruleResults, rejected, cost, rationale,
         qa: [], viewMismatch: false,
         metrics: buildMetrics(spec, cost, rationale, signals),
-        modelEval: buildModelEval(rng),
+        // 평가는 모든 안이 나온 뒤에 채운다. 서로 얼마나 다른지는 혼자서는 알 수 없다.
+        modelEval: [],
         colorways: [], images: [], isTop: false,
       }
       designs.push(d)
@@ -582,6 +585,10 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       emit({ kind: 'progress', stage: 'S2', pct: Math.round(((i + 1) / tiers.length) * 100) })
       await wait(180)
     }
+    // 안이 다 나왔으니 이제 서로 견줄 수 있다. 세 줄 평가를 여기서 실제로 센다.
+    fillModelEval(designs, params.brand, signals)
+    designs.forEach(d => emit({ kind: 'design-update', design: { ...d } }))
+
     const alive = designs.filter(d => !d.rejected)
     // 조사가 어디까지 실제로 반영됐는지 남긴다. 반영과 제안을 섞어서 적지 않는다.
     for (const t of ['core', 'push', 'signature'] as DesignTier[]) {
@@ -842,11 +849,13 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     // Top N · 다양성 제약 (11.2)
     const topCandidates = advancing.filter(d => !d.rejected)
     const top: Design[] = pickTopDiverse(topCandidates, params.topN)
+    // 선정작끼리 실제로 얼마나 다른가. 예전에는 0.42~0.82 난수를 찍어 'spec distance'라고
+    // 화면에 적었다 — 왜 이 조합을 골랐는지 설명하는 자리에 지어낸 숫자가 있었다.
     top.forEach((d, i) => {
       d.isTop = true
-      d.topDistance = Math.round((0.42 + rng.next() * 0.4) * 100) / 100
+      d.topDistance = meanDistanceTo(d, top)
       emit({ kind: 'design-update', design: { ...d } })
-      emit({ kind: 'log', stage: 'S4', text: `Top ${i + 1}: ${d.spec.design_id} [${d.spec.tier}] · spec distance ${d.topDistance}` })
+      emit({ kind: 'log', stage: 'S4', text: `Top ${i + 1}: ${d.spec.design_id} [${d.spec.tier}] · differs from the other picks on ${Math.round(d.topDistance * 100)}% of spec fields` })
     })
     // ── MD 리뷰 · 지표는 이미 있다. 여기서 필요한 건 "그래서 뭘 사겠는가"다 ──
     // 페르소나가 없으면 부르지 않는다. 아무나 할 수 있는 말을 MD 평가라고 붙이지 않는다.
@@ -896,7 +905,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           picked.slice(0, params.topN).forEach((d, i) => {
             // 새 선정에 표시를 켠다. 이걸 빼면 최종 선정이 화면에 하나도 안 뜬다.
             d.isTop = true
-            d.topDistance = d.topDistance ?? Math.round((0.42 + rng.next() * 0.4) * 100) / 100
+            d.topDistance = meanDistanceTo(d, picked.slice(0, params.topN))
             top.push(d)
             emit({ kind: 'design-update', design: { ...d } })
             emit({ kind: 'log', stage: 'S4', text: `Final ${i + 1}: ${d.spec.design_id} — chosen by the MD, not by the metric ranking` })
@@ -1067,18 +1076,12 @@ function buildRationale(params: RunParams, spec: DesignSpec, signals: Signal[], 
   const driving = drivingFromHint(hint)
   const byId = (id: string) => signals.find(s => s.signal_id === id)
   const applied = driving.map(d => byId(d.signal_id)).filter((s): s is Signal => !!s)
-  const s1 = applied[0] ?? rng.pick(signals)
-  const s2 = applied[1] ?? rng.pick(signals.filter(s => s.signal_id !== s1.signal_id))
-  const compRef = {
-    ref_id: `rf_${rng.int(100, 999)}`, source_type: 'competitor' as const,
-    source_url: 'https://competitor.example/product/8812', collected_at: '2026-05-14',
-    borrowed_attributes: [s1.attribute, s2.attribute], usage: 'attribute_only' as const,
-  }
-  const archRef = {
-    ref_id: `rf_${rng.int(100, 999)}`, source_type: 'archive' as const,
-    source_url: 'supabase://uploads/archive_112.jpg', collected_at: '2026-04-02',
-    borrowed_attributes: ['proportion'], usage: 'visual_reference' as const,
-  }
+  // 스펙을 정한 신호가 없으면 가장 많이 관측된 신호를 대신 인용한다.
+  // 예전에는 rng.pick(signals) 로 아무 신호나 골라 "이것 때문에 이렇게 됐다"고 서술했다.
+  // 무작위로 고른 것을 근거라고 부르면 그건 근거가 아니다. 적어도 세어 본 것을 고른다.
+  const strongest = [...signals].sort((a, b) => (b.observed_count ?? 0) - (a.observed_count ?? 0))
+  const s1 = applied[0] ?? strongest[0]
+  const s2 = applied[1] ?? strongest.find(s => s.signal_id !== s1?.signal_id) ?? s1
   const placement = spec.tier === 'core'
     ? 'Existing last and existing bottom unit, inside the cost cap. That is what Core is for.'
     : spec.tier === 'push'
@@ -1097,7 +1100,10 @@ function buildRationale(params: RunParams, spec: DesignSpec, signals: Signal[], 
       { signal_id: s1.signal_id, weight: 0 },
       { signal_id: s2.signal_id, weight: 0 },
     ],
-    reference_images: [compRef, archRef],
+    // 예전에는 여기에 competitor.example/product/8812 과 supabase://uploads/archive_112.jpg 를
+    // 수집 날짜까지 붙여 넣었다. 둘 다 존재한 적 없는 주소다. 실제로 본 참조가 생기기
+    // 전까지는 비워 둔다 — 없는 출처를 적는 것보다 출처가 없다고 하는 편이 낫다.
+    reference_images: [],
     // 사용자가 쓴 문장을 그대로 싣는다. 어느 필드에 반영됐는지는 실제로 잠긴 필드만 적는다.
     reference_prompts: params.mode === 'series' && params.series.valueStatement.trim()
       ? [{
@@ -1135,13 +1141,86 @@ function buildMetrics(spec: { category: string }, cost: { cap_ratio: number; too
   ]
 }
 
-function buildModelEval(rng: ReturnType<typeof makeRng>): { label: string; value: string; basis: string }[] {
-  const lv = ['High', 'Medium', 'Low']
-  return [
-    { label: 'Brand fit', value: rng.pick(lv.slice(0, 2)), basis: 'How much of the existing last and mould is reused, and silhouette distance from the archive' },
-    { label: 'Distinctiveness', value: rng.pick(lv), basis: 'Attribute distance from competitor products in the same band' },
-    { label: 'Trend backing', value: rng.pick(lv.slice(0, 2)), basis: 'Observation count and index profile of the linked signals' },
-  ]
+// ── 안 평가 · 세 줄 모두 실제로 센 것이어야 한다 ──────────────────────
+//
+// 예전 이 함수는 rng.pick(['High','Medium','Low']) 였다. 값은 난수인데 basis 에는
+// "같은 가격대 경쟁 제품과의 속성 거리" 같은 방법론이 적혀 있었다. 하지도 않은 계산의
+// 이름을 붙인 것이라, 삭제된 rng QA 와 같은 종류의 거짓말이었다.
+// 지금은 셋 다 손에 있는 데이터로 센다. 셀 수 없는 것은 셀 수 없다고 적는다.
+
+/** 두 스펙이 몇 퍼센트나 다른가 · 공통 필드만 본다 */
+function specDistance(a: DesignSpec, b: DesignSpec): number {
+  const keys = [...new Set([...Object.keys(a.fields), ...Object.keys(b.fields)])]
+    .filter(k => !k.startsWith('is_'))
+  if (!keys.length) return 0
+  const diff = keys.filter(k => String(a.fields[k]) !== String(b.fields[k])).length
+  return diff / keys.length
+}
+
+const band = (x: number, hi: number, mid: number) => (x >= hi ? 'High' : x >= mid ? 'Medium' : 'Low')
+
+/** 이 안이 같이 뽑힌 안들과 평균 몇 퍼센트나 다른가 (0~1) */
+function meanDistanceTo(d: Design, group: Design[]): number {
+  const others = group.filter(x => x !== d)
+  if (!others.length) return 0
+  const sum = others.reduce((a, o) => a + specDistance(d.spec, o.spec), 0)
+  return Math.round((sum / others.length) * 100) / 100
+}
+
+/** 모든 안이 나온 뒤 한 번에 채운다. 세 줄 각각이 무엇을 셌는지 basis 에 적는다. */
+function fillModelEval(pool: Design[], brand: BrandIdentity | undefined, signals: Signal[]): void {
+  const configured = !!brand?.brandName
+  for (const d of pool) {
+    const others = pool.filter(x => x !== d)
+    // ① 브랜드 적합 · 금지 위반과 시그니처 반영을 실제로 센다
+    const spec = d.spec
+    const violations = brand ? checkBrandFit(brand, spec.fields) : []
+    const hay = [
+      ...Object.values(spec.fields).map(String),
+      spec.genome ? [spec.genome.concept_thesis, spec.genome.hero_mutation.label, ...spec.genome.supporting].join(' ') : '',
+    ].join(' ').toLowerCase()
+    const sig: string[] = brand?.signatureElements ?? []
+    const sigHit = sig.filter(s => s.trim() && hay.includes(s.trim().toLowerCase())).length
+    const brandFit = !configured
+      ? { value: 'Not set', basis: 'No brand is configured, so there is nothing to fit to.' }
+      : violations.length
+        ? { value: 'Low', basis: `Breaks a brand rule: ${violations.join(', ')}.` }
+        : {
+            value: sig.length ? band(sigHit / sig.length, 0.5, 0.01) : 'Medium',
+            basis: sig.length
+              ? `${sigHit} of ${sig.length} signature elements show up in the spec or the concept, and no forbidden rule is broken.`
+              : 'No forbidden rule is broken. No signature elements were listed to check against.',
+          }
+
+    // ② 차별성 · 이 Run 안의 다른 안들과 실제로 얼마나 다른가
+    //    경쟁 제품 속성 벡터는 갖고 있지 않다. 가진 것으로만 말한다.
+    const dists = others.map(o => specDistance(spec, o.spec))
+    const nearest = dists.length ? Math.min(...dists) : 1
+    const overlap = spec.genome?.gate_overlap?.length ?? 0
+    const distinct = dists.length
+      ? {
+          value: overlap ? 'Low' : band(nearest, 0.5, 0.3),
+          basis: overlap
+            ? `Shares ${spec.genome!.gate_overlap!.join(', ')} with an earlier concept. Its closest neighbour in this run differs on ${Math.round(nearest * 100)}% of spec fields.`
+            : `Its closest neighbour in this run differs on ${Math.round(nearest * 100)}% of spec fields. Measured inside this run only — competitor products are not compared field by field.`,
+        }
+      : { value: 'Unknown', basis: 'Only one design in this run, so there is nothing to be distinct from.' }
+
+    // ③ 트렌드 근거 · 스펙을 실제로 정한 신호만 센다 (weight 0 은 아무것도 못 정한 신호다)
+    const cited = d.rationale.driving_signals.filter(s => s.weight > 0)
+      .map(s => signals.find(g => g.signal_id === s.signal_id)).filter((s): s is Signal => !!s)
+    const obs = cited.reduce((a, s) => a + (s.observed_count ?? 0), 0)
+    const highConf = cited.filter(s => s.confidence === 'high').length
+    const backing = !cited.length
+      ? { value: 'None', basis: 'No research signal set a value on this spec. It comes from the archetype grammar.' }
+      : { value: band(obs, 6, 3), basis: `${cited.length} signal${cited.length > 1 ? 's' : ''} set values on this spec, observed ${obs} times in total, ${highConf} of them at high confidence.` }
+
+    d.modelEval = [
+      { label: 'Brand fit', value: brandFit.value, basis: brandFit.basis },
+      { label: 'Distinctiveness', value: distinct.value, basis: distinct.basis },
+      { label: 'Trend backing', value: backing.value, basis: backing.basis },
+    ]
+  }
 }
 
 // buildQA(난수 시뮬레이션 QA)는 2026-08-13에 폐기됐다.

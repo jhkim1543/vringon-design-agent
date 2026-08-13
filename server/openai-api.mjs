@@ -13,6 +13,7 @@ import { tripoSingle, tripoProbe, readModel } from './tripo-api.mjs'
 import { brightdataProbe, unlockImage, unlockPage } from './brightdata.mjs'
 import { analyzeLogoStyle, analyzeMoodboard, analyzeSeries, reviewAsMd, saveUpload } from './upload-api.mjs'
 import { authorGenome, planTerritories, verifyRender } from './design-api.mjs'
+import { inferenceStatus, isLocal, localImageEdit, localImageGenerate, localModelFromImage, localProbe } from './inference.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..')
@@ -243,14 +244,50 @@ function json(res, code, obj) {
   res.end(JSON.stringify(obj))
 }
 
+// ── 하루 상한 · 공개 주소에 올릴 때의 안전선 ──────────────────────────
+// 링크가 공개되면 누구나 눌러 볼 수 있고, 한 장 한 장이 돈이다. 상한이 없으면
+// 하루 만에 예산이 사라진다. 캐시 히트는 돈이 안 나가므로 세지 않는다.
+// DAILY_IMAGE_CAP 을 안 정하면 상한이 없다 — 로컬에서 쓰던 대로 돈다.
+const DAILY_CAP = Number(env.DAILY_IMAGE_CAP || 0)
+let spentDay = ''
+let spentCount = 0
+
+function chargeOne() {
+  if (!DAILY_CAP) return
+  const today = new Date().toISOString().slice(0, 10)
+  if (today !== spentDay) { spentDay = today; spentCount = 0 }
+  if (spentCount >= DAILY_CAP) {
+    throw new Error(`오늘 생성 한도(${DAILY_CAP}장)에 닿았습니다. 저장된 샘플은 그대로 열립니다.`)
+  }
+  spentCount++
+}
+
+/** 남은 장수 · /api/status 에 실어 화면이 미리 알 수 있게 한다 */
+function capState() {
+  if (!DAILY_CAP) return null
+  const today = new Date().toISOString().slice(0, 10)
+  const used = today === spentDay ? spentCount : 0
+  return { cap: DAILY_CAP, used, left: Math.max(0, DAILY_CAP - used) }
+}
+
 /** 생성 — 캐시 히트면 API를 호출하지 않는다 (재개 시 중복 과금 0건) */
 async function generate({ prompt, size = '1024x1024', engine = 'detail' }) {
   const { model, quality } = pick(engine)
-  const usedModel = (!GEMINI_FALLBACK_ONLY && engine === 'fast' && GEMINI_KEY) ? 'gemini' : model
+  // 사내 GPU 로 도는 그림은 캐시 키가 달라야 한다. 같은 프롬프트라도 다른 그림이 나오고,
+  // 키가 같으면 사내로 바꾼 뒤에도 예전 그림이 계속 나온다.
+  const local = isLocal('image')
+  const usedModel = local ? 'local' : (!GEMINI_FALLBACK_ONLY && engine === 'fast' && GEMINI_KEY) ? 'gemini' : model
   ensureCache()
   const hash = keyOf(['gen', usedModel, prompt, size, quality])
   const file = join(CACHE_DIR, `${hash}.png`)
   if (existsSync(file)) return { hash, cached: true, model: usedModel }
+
+  chargeOne()
+
+  if (local) {
+    writeFileSync(file, await localImageGenerate({ prompt, size }))
+    return { hash, cached: false, model: usedModel }
+  }
   if (!API_KEY) throw new Error('OPENAI_API_KEY 미설정 — fashion-agent/.env 확인')
 
   if (!GEMINI_FALLBACK_ONLY && engine === 'fast' && GEMINI_KEY) {
@@ -281,13 +318,21 @@ async function generate({ prompt, size = '1024x1024', engine = 'detail' }) {
 /** 편집 — S3 멀티뷰·컬러웨이는 신규 생성이 아니라 기준 렌더의 편집 (지시서 S3-③) */
 async function edit({ baseHash, prompt, size = '1024x1024', engine = 'detail' }) {
   const { model, quality } = pick(engine)
-  const usedModel = (!GEMINI_FALLBACK_ONLY && engine === 'fast' && GEMINI_KEY) ? 'gemini' : model
+  const local = isLocal('image')
+  const usedModel = local ? 'local' : (!GEMINI_FALLBACK_ONLY && engine === 'fast' && GEMINI_KEY) ? 'gemini' : model
   ensureCache()
   const hash = keyOf(['edit', usedModel, baseHash, prompt, size, quality])
   const file = join(CACHE_DIR, `${hash}.png`)
   if (existsSync(file)) return { hash, cached: true }
   const basePath = join(CACHE_DIR, `${baseHash}.png`)
   if (!existsSync(basePath)) throw new Error(`기준 이미지 없음: ${baseHash}`)
+
+  chargeOne()
+
+  if (local) {
+    writeFileSync(file, await localImageEdit({ prompt, baseBuf: readFileSync(basePath), size }))
+    return { hash, cached: false, model: usedModel }
+  }
   if (!API_KEY) throw new Error('OPENAI_API_KEY 미설정')
 
   if (!GEMINI_FALLBACK_ONLY && engine === 'fast' && GEMINI_KEY) {
@@ -319,10 +364,37 @@ async function edit({ baseHash, prompt, size = '1024x1024', engine = 'detail' })
   return { hash, cached: false, model: usedModel }
 }
 
+/** 3D 한 장 → GLB. 사내 GPU 와 바깥 서비스가 같은 모양으로 돌려주므로
+ *  호출하는 쪽은 어디서 만들어졌는지 알 필요가 없다. */
+async function makeModel(view) {
+  return isLocal('model3d')
+    ? localModelFromImage(ROOT, { view })
+    : tripoSingle(ROOT, TRIPO_KEY, { view })
+}
+
+// ── 다른 도메인에서 부를 수 있게 · 화면과 API 가 갈라져 있을 때만 필요하다 ──
+// 한 서비스가 화면과 API 를 같이 내보내면(권장) 여기 아무것도 안 적어도 된다.
+// 적을 때는 반드시 주소를 하나하나 적는다. '*' 로 열면 누구나 이 키로 그림을 뽑는다.
+const ALLOWED_ORIGINS = String(env.ALLOWED_ORIGINS || '')
+  .split(',').map(s => s.trim().replace(/\/+$/, '')).filter(Boolean)
+
+function applyCors(req, res) {
+  const origin = (req.headers.origin || '').replace(/\/+$/, '')
+  if (!origin || !ALLOWED_ORIGINS.includes(origin)) return
+  res.setHeader('Access-Control-Allow-Origin', origin)
+  res.setHeader('Vary', 'Origin')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.setHeader('Access-Control-Max-Age', '86400')
+}
+
 /** connect 스타일 핸들러 — Vite dev 미들웨어와 단독 서버 양쪽에서 사용 */
 export async function handleApi(req, res) {
   const url = new URL(req.url, 'http://localhost')
   const path = url.pathname
+
+  applyCors(req, res)
+  if (req.method === 'OPTIONS') { res.statusCode = 204; return res.end() }
 
   if (path === '/api/status') {
     ensureCache()
@@ -335,7 +407,16 @@ export async function handleApi(req, res) {
       tripoConnected: !!TRIPO_KEY,
       unlockerConnected: !!BD_KEY,
       engines: { fast: ENGINE.fast.model, detail: ENGINE.detail.model },
+      // 어떤 역할이 사내에서 도는가. 유출 방지가 목적이면 이 줄이 곧 증거다.
+      inference: inferenceStatus(),
+      // 공개 주소에서 오늘 몇 장 남았는가. 상한을 안 걸었으면 null.
+      dailyCap: capState(),
     })
+  }
+
+  // 사내 추론 서버가 살아 있는지. 역할을 local 로 바꾸기 전에 눌러 본다.
+  if (path === '/api/inference/probe') {
+    return json(res, 200, { routes: inferenceStatus(), reachable: await localProbe() })
   }
 
   // 딥리서치 접근 진단 · 계정에서 열렸는지 한 번에 확인한다
@@ -533,9 +614,9 @@ export async function handleApi(req, res) {
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
   }
 
-  // 3D 모델 · 이미 만들어 둔 멀티뷰를 Tripo에 넘긴다
+  // 3D 모델 · 기준 렌더 한 장을 3D 생성기에 넘긴다. 사내 GPU 로 돌릴 수 있다.
   if (path === '/api/model/probe') {
-    return json(res, 200, await tripoProbe(TRIPO_KEY))
+    return json(res, 200, isLocal('model3d') ? (await localProbe()).model3d : await tripoProbe(TRIPO_KEY))
   }
 
   // 언락커 진단 · 계정에 zone이 있어야 실제 요청이 나간다
@@ -553,7 +634,7 @@ export async function handleApi(req, res) {
       if (okHash(b.single)) {
         const p = join(CACHE_DIR, `${b.single}.png`)
         if (!existsSync(p)) return json(res, 404, { error: 'that render is not in the cache' })
-        const r = await tripoSingle(ROOT, TRIPO_KEY, { view: { buf: readFileSync(p), name: `${b.single}.png` } })
+        const r = await makeModel({ buf: readFileSync(p), name: `${b.single}.png` })
         return json(res, 200, { ...r, url: `/api/model/file/${r.hash}.${r.format}` })
       }
 
@@ -561,7 +642,7 @@ export async function handleApi(req, res) {
       const legacy = (Array.isArray(b.ordered) ? b.ordered : Array.isArray(b.hashes) ? b.hashes : []).filter(okHash)
       const first = legacy.map(h => join(CACHE_DIR, `${h}.png`)).find(existsSync)
       if (!first) return json(res, 400, { error: 'no usable view given' })
-      const r = await tripoSingle(ROOT, TRIPO_KEY, { view: { buf: readFileSync(first), name: 'view.png' } })
+      const r = await makeModel({ buf: readFileSync(first), name: 'view.png' })
       return json(res, 200, { ...r, url: `/api/model/file/${r.hash}.${r.format}` })
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
   }

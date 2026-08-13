@@ -7,6 +7,7 @@ export function setRunLang(l: Lang | null) { runLang = l }
 // ── 리서치 클라이언트 · 서버가 웹 검색으로 실제 수집한 결과를 받는다 ──
 import type { CompetitorGroup, CompetitorProduct, FootwearLineProfile, ReportBias, ResearchObjective, Signal } from './types'
 import { asFootwearLine } from './types'
+import { apiUrl } from './apiBase'
 
 export interface CompetitorProductRaw {
   brand: string
@@ -59,7 +60,7 @@ export const shotUrl = (u: string, page?: string) => {
   const q: string[] = []
   if (u) q.push(`u=${encodeURIComponent(u)}`)
   if (page) q.push(`p=${encodeURIComponent(page)}`)
-  return `/api/shot?${q.join('&')}`
+  return apiUrl(`/api/shot?${q.join('&')}`)
 }
 
 export interface TrendResearch {
@@ -126,7 +127,7 @@ export function lineForServer(raw?: FootwearLineProfile, itemType?: string) {
 export const fetchCompetitors = (b: {
   brands: string[]; typeKo: string; priceMin: number; priceMax: number
   adjacentBand?: boolean; line?: FootwearLineProfile; itemType?: string
-}) => post<CompetitorResearch>('/api/research/competitors', {
+}) => post<CompetitorResearch>(apiUrl('/api/research/competitors'), {
   brands: b.brands, typeKo: b.typeKo, priceMin: b.priceMin, priceMax: b.priceMax,
   adjacentBand: b.adjacentBand, line: lineForServer(b.line, b.itemType),
 })
@@ -154,7 +155,7 @@ export interface RetailPulse {
 }
 
 export const fetchRetailPulse = (b: { typeKo: string; line?: FootwearLineProfile; itemType?: string }) =>
-  post<RetailPulse>('/api/research/pulse', { typeKo: b.typeKo, line: lineForServer(b.line, b.itemType) })
+  post<RetailPulse>(apiUrl('/api/research/pulse'), { typeKo: b.typeKo, line: lineForServer(b.line, b.itemType) })
 
 /** 펄스 제품 → 경쟁 제품 목록에 합쳐 넣는다. 백화점 베스트셀러는 commercial_leader다. */
 export function pulseToCompetitors(r: RetailPulse, startIdx: number): CompetitorProduct[] {
@@ -186,7 +187,7 @@ export const fetchTrends = (b: {
   typeKo: string; brands?: string[]; season: string
   priceBandKo?: string; wantReport?: boolean; depth?: number
   objectives?: ResearchObjective[]; line?: FootwearLineProfile; itemType?: string
-}) => post<TrendResearch>('/api/research/trends', {
+}) => post<TrendResearch>(apiUrl('/api/research/trends'), {
   typeKo: b.typeKo, brands: b.brands, season: b.season, priceBandKo: b.priceBandKo,
   wantReport: b.wantReport, depth: b.depth, objectives: b.objectives,
   line: lineForServer(b.line, b.itemType),
@@ -323,7 +324,7 @@ export interface SeasonDossier {
 export const fetchDossier = (b: {
   categoryEn: string; season: string; priceBand?: string; brands?: string[]
   line?: FootwearLineProfile; itemType?: string
-}) => post<SeasonDossier>('/api/research/dossier', {
+}) => post<SeasonDossier>(apiUrl('/api/research/dossier'), {
   categoryEn: b.categoryEn, season: b.season, priceBand: b.priceBand, brands: b.brands,
   line: lineForServer(b.line, b.itemType),
 })

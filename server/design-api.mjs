@@ -13,6 +13,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { familyOf } from './category-templates.mjs'
+import { askJson } from './inference.mjs'
 
 const MODEL = 'gpt-5'
 
@@ -22,23 +23,30 @@ const cacheDir = (root) => {
   return d
 }
 
-async function ask(apiKey, { input, schema, name, effort = 'medium' }) {
-  const r = await fetch('https://api.openai.com/v1/responses', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: MODEL,
-      reasoning: { effort },
-      input,
-      text: { format: { type: 'json_schema', name, schema, strict: true } },
-    }),
-    signal: AbortSignal.timeout(300_000),
+// 저작·검증은 사내 GPU 로 돌릴 수 있다. .env 에서 INFER_AUTHOR / INFER_VISION 을
+// local 로 두면 이 호출이 밖으로 안 나간다. 설정이 없으면 예전 경로 그대로다.
+async function ask(apiKey, { input, schema, name, effort = 'medium', role = 'author' }) {
+  return askJson({
+    role, input, schema, name,
+    hosted: async () => {
+      const r = await fetch('https://api.openai.com/v1/responses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: MODEL,
+          reasoning: { effort },
+          input,
+          text: { format: { type: 'json_schema', name, schema, strict: true } },
+        }),
+        signal: AbortSignal.timeout(300_000),
+      })
+      if (!r.ok) throw new Error(`design ${r.status}: ${(await r.text()).slice(0, 300)}`)
+      const j = await r.json()
+      const text = j.output?.find(o => o.type === 'message')?.content?.[0]?.text
+      if (!text) throw new Error('empty design response')
+      return JSON.parse(text)
+    },
   })
-  if (!r.ok) throw new Error(`OpenAI design ${r.status}: ${(await r.text()).slice(0, 300)}`)
-  const j = await r.json()
-  const text = j.output?.find(o => o.type === 'message')?.content?.[0]?.text
-  if (!text) throw new Error('empty design response')
-  return JSON.parse(text)
 }
 
 // ── S3 · Concept Territory ───────────────────────────────────────────
@@ -230,7 +238,7 @@ export async function verifyRender(apiKey, cacheDirImages, { hash, genome, langN
 
   const g = genome ?? {}
   const data = await ask(apiKey, {
-    name: 'render_verify', schema: VERIFY_SCHEMA, effort: 'low',
+    name: 'render_verify', schema: VERIFY_SCHEMA, effort: 'low', role: 'vision',
     input: [{
       role: 'user',
       content: [

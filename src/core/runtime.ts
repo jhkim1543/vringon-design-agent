@@ -1,9 +1,11 @@
 // ── 실행 환경 판별 ──────────────────────────────────────────────────
 // 이 앱은 두 가지 방식으로 열린다.
-//   1) 로컬 dev 서버 · 리서치와 이미지 생성이 실제로 돈다 (키가 Node 쪽에만 있다)
-//   2) 정적 배포(GitHub Pages) · API가 없다. 저장된 샘플 Run과 보드만 볼 수 있다
+//   1) API 가 붙어 있는 배포 · 리서치와 이미지 생성이 실제로 돈다 (키는 서버 쪽에만)
+//      로컬 dev 서버든, 도메인에 올린 단독 서버든 여기서는 똑같이 'live' 다.
+//   2) API 없는 정적 배포 · 저장된 샘플 Run 과 보드만 볼 수 있다
 // 두 번째에서 실행 버튼을 그냥 눌리게 두면 아무 일도 안 일어난 것처럼 보인다.
 // 그래서 시작할 때 한 번 확인하고, 없으면 화면에 분명히 적는다.
+import { apiUrl } from './apiBase'
 
 export type Runtime =
   | { kind: 'live'; keyPresent: boolean; cachedImages: number }
@@ -15,7 +17,7 @@ export function detectRuntime(): Promise<Runtime> {
   if (cached) return cached
   cached = (async (): Promise<Runtime> => {
     try {
-      const r = await fetch(`${import.meta.env.BASE_URL}api/status`, { signal: AbortSignal.timeout(4000) })
+      const r = await fetch(apiUrl('/api/status'), { signal: AbortSignal.timeout(8000) })
       if (!r.ok) return { kind: 'static', reason: `API returned ${r.status}` }
       const j = await r.json()
       return { kind: 'live', keyPresent: !!j.keyPresent, cachedImages: j.cachedImages ?? 0 }

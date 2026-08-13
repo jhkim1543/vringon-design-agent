@@ -7,6 +7,7 @@ import type { EngineId } from './imageEngines'
 import { shapePrompt } from './imageEngines'
 import type { BrandIdentity } from './brand'
 import { brandPromptClause } from './brand'
+import { apiUrl } from './apiBase'
 
 export const IMAGE_MODEL = 'gpt-image-1'
 /** gpt-image-1 medium 1024² 근사 단가 (USD) · 정확한 청구액은 OpenAI 대시보드 기준 */
@@ -15,7 +16,7 @@ export const USD_PER_IMAGE = 0.042
 export interface GenResult { url: string; hash: string; cached: boolean }
 
 export async function apiStatus(): Promise<{ keyPresent: boolean; model: string; cachedImages: number }> {
-  const r = await fetch('/api/status')
+  const r = await fetch(apiUrl('/api/status'))
   if (!r.ok) throw new Error(`status ${r.status}`)
   return r.json()
 }
@@ -25,6 +26,10 @@ export async function apiStatus(): Promise<{ keyPresent: boolean; model: string;
  *  노트북이 잠들면 진행 중이던 요청이 ERR_NETWORK_IO_SUSPENDED로 끊긴다.
  *  한 장이 끊겼다고 분석 전체를 버릴 이유는 없다 — 깨어난 뒤 다시 부르면 대개 된다.
  *  서버가 프롬프트로 캐시하므로 재시도가 중복 과금이 되지도 않는다. */
+/** 서버가 돌려준 루트 기준 주소를 실제로 열 수 있는 주소로 바꾼다. 이미 절대주소면 그대로. */
+const absolutize = (u: string | undefined): string =>
+  !u ? '' : /^(https?:|data:|blob:)/.test(u) ? u : u.startsWith('/api/') ? apiUrl(u) : u
+
 async function imageCall(url: string, body: unknown, what: string): Promise<GenResult> {
   let last: Error | null = null
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -37,7 +42,10 @@ async function imageCall(url: string, body: unknown, what: string): Promise<GenR
       })
       const j = await r.json()
       if (!r.ok) throw new Error(j.error || `${what} ${r.status}`)
-      return j
+      // 서버는 '/api/image/file/…' 처럼 루트 기준으로 답한다. 그 주소는 앱이 사이트 루트에
+      // 있을 때만 맞는다. 하위 경로 배포나 다른 도메인 API 에서는 여기서 고쳐 둬야
+      // 저장된 Run 안의 <img src> 가 나중에도 열린다.
+      return { ...j, url: absolutize(j.url) }
     } catch (e) {
       last = e as Error
       // 모델이 거절한 프롬프트는 다시 불러도 같은 답이다. 끊긴 연결만 다시 시도한다.
@@ -52,12 +60,12 @@ async function imageCall(url: string, body: unknown, what: string): Promise<GenR
 
 /** 신규 생성 · 동일 프롬프트는 서버 캐시로 재사용되어 중복 과금이 없다 */
 export function generateImage(prompt: string, engine: EngineId = 'detail'): Promise<GenResult> {
-  return imageCall('/api/image/generate', { prompt, size: '1024x1024', engine }, 'generate')
+  return imageCall(apiUrl('/api/image/generate'), { prompt, size: '1024x1024', engine }, 'generate')
 }
 
 /** 편집 · S3 추가 뷰·컬러웨이는 신규 생성이 아니라 기준 렌더의 편집 (지시서 S3-③④) */
 export function editImage(baseHash: string, prompt: string, engine: EngineId = 'detail'): Promise<GenResult> {
-  return imageCall('/api/image/edit', { baseHash, prompt, size: '1024x1024', engine }, 'edit')
+  return imageCall(apiUrl('/api/image/edit'), { baseHash, prompt, size: '1024x1024', engine }, 'edit')
 }
 
 // ── 스펙 → 프롬프트 (지시서 S2-4) ────────────────────────────────────
@@ -580,7 +588,7 @@ export function trendPromptClause(t: TrendClauseInput | null): string {
 export async function stampLogo(baseHash: string, brand: BrandIdentity): Promise<GenResult | null> {
   const logo = brand.logo
   if (!logo?.dataUrl || logo.placement === 'none') return null
-  const r = await fetch('/api/image/logo', {
+  const r = await fetch(apiUrl('/api/image/logo'), {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       baseHash, dataUrl: logo.dataUrl, placement: logo.placement, scale: logo.scale,
@@ -588,7 +596,7 @@ export async function stampLogo(baseHash: string, brand: BrandIdentity): Promise
   })
   const j = await r.json()
   if (!r.ok) throw new Error(j.error || `logo ${r.status}`)
-  return j
+  return { ...j, url: absolutize(j.url) }
 }
 
 
@@ -605,7 +613,7 @@ export interface ModelResult {
 }
 
 export async function modelProbe(): Promise<{ available: boolean; reason?: string }> {
-  const r = await fetch('/api/model/probe')
+  const r = await fetch(apiUrl('/api/model/probe'))
   return r.json()
 }
 
@@ -616,11 +624,11 @@ export async function modelProbe(): Promise<{ available: boolean; reason?: strin
 export async function generateModel(single: string, meta: {
   subject?: string; itemType?: string
 }): Promise<ModelResult> {
-  const r = await fetch('/api/model/generate', {
+  const r = await fetch(apiUrl('/api/model/generate'), {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ single, ...meta }),
   })
   const j = await r.json()
   if (!r.ok) throw new Error(j.error || `model ${r.status}`)
-  return j
+  return { ...j, url: absolutize(j.url) }
 }

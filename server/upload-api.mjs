@@ -10,6 +10,7 @@
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { askJson } from './inference.mjs'
 
 const uploadDir = (root) => join(root, '.cache', 'uploads')
 const cacheDir = (root) => join(root, '.cache', 'analysis')
@@ -58,24 +59,35 @@ function asModelInput(u) {
   return { type: 'input_image', image_url: `data:${u.type};base64,${b64}`, detail: 'high' }
 }
 
-async function ask(apiKey, { model, input, schema, name, webSearch = false }) {
-  const r = await fetch('https://api.openai.com/v1/responses', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model,
-      ...(webSearch ? { tools: [{ type: 'web_search' }] } : {}),
-      reasoning: { effort: 'high' },
-      input,
-      text: { format: { type: 'json_schema', name, schema, strict: true } },
-    }),
-    signal: AbortSignal.timeout(600_000),
+// 여기가 브랜드 자료가 지나가는 길이다 — 로고 PNG, 시리즈 실물 사진, 기획안 PDF.
+// INFER_AUTHOR=local 이면 이 파일들은 사내 GPU 밖으로 나가지 않는다.
+// 다만 웹 검색을 함께 쓰는 호출(reviewAsMd 등)은 검색이 밖에 있어 사내로 못 옮긴다 —
+// 그런 호출은 role 을 넘기지 않아 예전 경로로 간다.
+async function ask(apiKey, { model, input, schema, name, webSearch = false, role = 'author' }) {
+  return askJson({
+    // 검색을 쓰는 호출은 사내에서 처리할 수 없다. 역할을 비워 바깥으로 보낸다.
+    role: webSearch ? 'research' : role,
+    input, schema, name, timeoutMs: 600_000,
+    hosted: async () => {
+      const r = await fetch('https://api.openai.com/v1/responses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model,
+          ...(webSearch ? { tools: [{ type: 'web_search' }] } : {}),
+          reasoning: { effort: 'high' },
+          input,
+          text: { format: { type: 'json_schema', name, schema, strict: true } },
+        }),
+        signal: AbortSignal.timeout(600_000),
+      })
+      if (!r.ok) throw new Error(`upload analysis ${r.status}: ${(await r.text()).slice(0, 300)}`)
+      const j = await r.json()
+      const text = j.output?.find(o => o.type === 'message')?.content?.[0]?.text
+      if (!text) throw new Error('empty response')
+      return JSON.parse(text)
+    },
   })
-  if (!r.ok) throw new Error(`OpenAI ${r.status}: ${(await r.text()).slice(0, 300)}`)
-  const j = await r.json()
-  const text = j.output?.find(o => o.type === 'message')?.content?.[0]?.text
-  if (!text) throw new Error('empty response')
-  return JSON.parse(text)
 }
 
 const cached = (root, key, run) => {

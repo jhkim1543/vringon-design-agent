@@ -6,6 +6,7 @@
 //   ② 채택된 게놈들과 구조축이 겹치는지 검사 (다양성 게이트 · 품질 판단 금지)
 //   ③ 게놈 → 스펙 힌트 변환 (기존 hintApplied/blocked 정직성 기계를 그대로 탄다)
 import type { DesignGenome, DesignTier, Signal, Territory } from './types'
+import { apiUrl } from './apiBase'
 
 export type Genome = DesignGenome
 
@@ -22,13 +23,13 @@ async function post<T>(url: string, body: unknown): Promise<T> {
 
 export const planTerritories = (b: {
   signals: Signal[]; itemTypeEn: string; itemType: string; brandSummary: string; langName: string
-}) => post<{ territories: Territory[]; cached?: boolean }>('/api/design/territories', b)
+}) => post<{ territories: Territory[]; cached?: boolean }>(apiUrl('/api/design/territories'), b)
 
 export const authorGenome = (b: {
   territory: Territory; tier: DesignTier; signals: Signal[]
   profile: { heelMin: number; heelMax: number; panelMin: number; panelMax: number; closures: string[]; constructions: string[] }
   brandSummary: string; antiSimilarity: string[]; itemTypeEn: string; langName: string
-}) => post<Genome & { cached?: boolean }>('/api/design/genome', b)
+}) => post<Genome & { cached?: boolean }>(apiUrl('/api/design/genome'), b)
 
 export interface RenderVerify {
   checks: { check: string; target: string; observed: string; pass: boolean }[]
@@ -36,7 +37,7 @@ export interface RenderVerify {
   notes: string
 }
 export const verifyRender = (b: { hash: string; genome: Partial<Genome>; langName: string }) =>
-  post<RenderVerify>('/api/verify/render', b)
+  post<RenderVerify>(apiUrl('/api/verify/render'), b)
 
 // ── 구조 다양성 게이트 · 5축, 순수 코드 (규칙 18: 품질 판단 금지) ──────
 const AXES = ['silhouette_family', 'toe_family', 'sole_mass', 'panel_density', 'closure_form'] as const
@@ -86,14 +87,23 @@ export function genomeToHint(g: Genome): Record<string, string | number> {
 /** 브랜드 요약 · 영토·게놈 프롬프트에 들어가는 조건 텍스트.
  *  없는 항목은 없다고 두는 것이 규칙이다 (빈 브랜드 = 시장 평균 수렴을 정직하게 감수). */
 export function brandSummaryOf(b?: {
-  brandName?: string; signatureElements?: string[]; forbidden?: string[]
+  brandName?: string; tagline?: string; signatureElements?: string[]; forbidden?: string[]
   materials?: string[]; toneWords?: string[]
+  colorPalette?: { name: string; hex: string }[]
 } | null): string {
   if (!b?.brandName) return ''
   const parts: string[] = [`브랜드: ${b.brandName}`]
+  // 태그라인은 브랜드가 스스로를 뭐라고 말하는지다. 영토를 계획할 때 이걸 빼면
+  // 브랜드 설정을 아무리 고쳐도 방향이 그대로였다 — 캐시 키에도 안 들어가니까.
+  if (b.tagline?.trim()) parts.push(`브랜드 선언: ${b.tagline.trim()}`)
   if (b.signatureElements?.length) parts.push(`유지할 시그니처: ${b.signatureElements.join(', ')}`)
   if (b.forbidden?.length) parts.push(`금지: ${b.forbidden.join(', ')}`)
   if (b.materials?.length) parts.push(`선호 소재: ${b.materials.join(', ')}`)
   if (b.toneWords?.length) parts.push(`톤: ${b.toneWords.join(', ')}`)
+  // 팔레트는 색을 지시하려는 게 아니다 (색은 S3 에서 들어간다). 전부 무채색인 브랜드와
+  // 원색을 쓰는 브랜드는 애초에 다른 영토를 계획해야 한다는 신호다.
+  if (b.colorPalette?.length) parts.push(`팔레트 성격: ${b.colorPalette.map(c => c.name).join(', ')}`)
+  // MD 페르소나는 일부러 여기 없다. 저작 단계에서 MD 를 알려 주면 에이전트가
+  // MD 가 살 만한 것만 그린다 — 고를 것이 남지 않는다. MD 는 S4 에서만 개입한다.
   return parts.join('\n')
 }

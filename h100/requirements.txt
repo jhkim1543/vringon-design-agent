@@ -1,0 +1,16 @@
+# 이미지 역할
+torch>=2.4
+diffusers>=0.31
+transformers>=4.45
+accelerate>=1.0
+sentencepiece
+protobuf
+pillow
+fastapi
+uvicorn[standard]
+pydantic>=2
+
+# 3D 역할 · 쓰는 생성기에 맞춰 바꾼다. serve.py 의 load_3d_model / run_3d 두 함수만
+# 그 생성기에 맞으면 나머지는 그대로 돈다.
+# hy3dgen
+trimesh

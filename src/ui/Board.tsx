@@ -20,6 +20,7 @@ import { DesignCard } from './Card'
 import { Tag, ThemeToggle } from './bits'
 import { ModelViewer } from './ModelViewer'
 import { copyText, shareLink } from '../core/share'
+import { apiUrl } from '../core/apiBase'
 
 // 노드를 키웠으므로 열 간격·행 높이도 같이 커진다. 붙여 두면 사진이 겹친다.
 // 5번(스케치 레인)이 들어와 열이 10개다.
@@ -450,7 +451,7 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
     setMiro({ busy: true, msg: 'Converting board for Miro' })
     try {
       const model = buildBoardModel(st)
-      const r = await fetch('/api/miro/export', {
+      const r = await fetch(apiUrl('/api/miro/export'), {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model,

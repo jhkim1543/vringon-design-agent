@@ -379,7 +379,9 @@ export const shoePack: CategoryPack = {
       lines,
       tooling: { total_tooling_krw: totalTooling, mold_count_required: moldCount, size_run_count: sizeRun, amortization_volume: amort, tooling_per_unit_krw: toolingPerUnit },
       estimated_total_krw: total,
-      estimated_band_krw: [Math.round(total * 0.86), Math.round(total * (1.2 + rng.next() * 0.04))],
+      // 같은 스펙이면 같은 밴드가 나와야 한다. 위쪽 끝에 난수 폭을 얹으면
+      // 두 번 돌릴 때마다 원가 상한이 흔들리고, 그 흔들림에는 아무 근거가 없다.
+      estimated_band_krw: [Math.round(total * 0.86), Math.round(total * 1.22)],
       cap_ratio: Math.round((total / capBase) * 100) / 100,
       confidence: 'low',
       assumptions: [`MOQ ${athletic ? 1200 : 600} pairs`, `${sizeRun} sizes`, `Amortised over ${amort.toLocaleString()} pairs`, 'Material prices as of 2026-08-01'],

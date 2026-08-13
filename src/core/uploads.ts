@@ -2,6 +2,7 @@
 // 예전에는 여기가 없었다. 파일 입력이 f.name만 담고 내용은 아무도 열지 않았다.
 import type { SeriesDna, UploadRef } from './types'
 import type { LogoStyle } from './brand'
+import { apiUrl } from './apiBase'
 
 const MAX_FILES = 12
 
@@ -27,7 +28,7 @@ export async function uploadFiles(files: File[]): Promise<{ ok: UploadRef[]; fai
   for (const f of files.slice(0, MAX_FILES)) {
     try {
       const dataBase64 = await toBase64(f)
-      const r = await fetch('/api/upload', {
+      const r = await fetch(apiUrl('/api/upload'), {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ files: [{ name: f.name, type: f.type, dataBase64 }] }),
       })
@@ -79,14 +80,14 @@ async function post<T>(url: string, body: unknown): Promise<T> {
 }
 
 export const readSeries = (b: { uploadIds: string[]; valueStatement: string; itemTypeEn: string; langName: string }) =>
-  post<SeriesRead>('/api/analyze/series', b)
+  post<SeriesRead>(apiUrl('/api/analyze/series'), b)
 
 export const readMoodboard = (b: { uploadIds: string[]; notes: string; itemTypeEn: string; langName: string }) =>
-  post<MoodboardRead>('/api/analyze/moodboard', b)
+  post<MoodboardRead>(apiUrl('/api/analyze/moodboard'), b)
 
 /** 로고가 적용된 제품 사진에서 배치 규칙을 읽는다 */
 export const readLogoStyle = (b: { logoId?: string; referenceIds: string[]; itemTypeEn: string; langName: string }) =>
-  post<LogoStyle>('/api/analyze/logo-style', b)
+  post<LogoStyle>(apiUrl('/api/analyze/logo-style'), b)
 
 export interface MdReview {
   reviews: { design_id: string; verdict: 'buy' | 'buy_if_fixed' | 'pass'; why: string; concern: string; fix: string }[]
@@ -99,7 +100,7 @@ export interface MdReview {
 export const reviewAsMd = (b: {
   persona: unknown; brand: string; langName: string
   designs: { design_id: string; tier: string; combo?: string; spec: string; cap: string; moulds: number; rules?: string }[]
-}) => post<MdReview>('/api/analyze/md-review', b)
+}) => post<MdReview>(apiUrl('/api/analyze/md-review'), b)
 
 /** 읽어 낸 결과를 화면이 쓰는 SeriesDna 모양으로 옮긴다.
  *  confidence는 몇 장에서 보였는지로만 정한다. 지어내지 않는다. */
