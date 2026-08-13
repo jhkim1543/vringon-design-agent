@@ -104,6 +104,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     let moodSignals: Signal[] = []
     // 시리즈에서 실제로 반복된 것 중, 스펙 값으로 옮길 수 있는 것만. 사진으로 못 보는 건 안 잠근다.
     let seriesLocks: Record<string, string | number> = {}
+    // 설계 영토 = 디렉션. S1에서 계획해 내보내고 S2가 게놈 저작에 쓴다.
+    let territories: Territory[] = []
 
     // ══ S1 조사 ══
     const scope = MODE_SCOPE[params.mode]
@@ -370,9 +372,36 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     emit({ kind: 'log', stage: 'S1', text: `${signals.length} signals confirmed · none unsourced${lowConf ? ` · ${lowConf} single source, marked low confidence` : ''}` })
     emit({ kind: 'log', stage: 'S1', text: 'Each signal carries four indices — commercial, cultural, forecast, feasibility — never a single blended score' })
     await wait(600)
-    emit({ kind: 'directions', items: DIRECTIONS.shoe })
-    emit({ kind: 'log', stage: 'S1', text: 'Three directions built, one per tier · every claim traced to a source' })
-    emit({ kind: 'checkpoint', label: 'S1 done · signals.json · directions[3] saved' })
+    // ── 디렉션 = 설계 영토 (지시서 v2 S3) ──────────────────────────────
+    // 예전에는 DIRECTIONS.shoe라는 상수 셋을 무조건 내보냈다. 첼시 부츠를 돌려도
+    // "penny silhouette를 유지한다"는 로퍼 문구가 나왔고, 신호 id도 이 실행과
+    // 무관한 sg_014 같은 샘플 값이라 보드 연결선이 통째로 끊겨 있었다.
+    // 이제 실제 조사 신호와 브랜드로 계획한 영토가 그대로 디렉션이 된다.
+    const langName = LANG_NAME[params.researchLang ?? getLang()]
+    const brandSummary = brandSummaryOf(params.brand)
+    if (!brandSummary) {
+      emit({ kind: 'log', stage: 'S1', text: 'Brand lens is empty · directions will lean toward the market average. Set up the brand to pull them your way.' })
+    }
+    try {
+      emit({ kind: 'log', stage: 'S1', text: 'Planning design directions · distinct design spaces, not intensity steps of one trend' })
+      const tr = await planTerritories({
+        signals, itemTypeEn: TYPE_EN[params.itemType] ?? 'shoe',
+        itemType: params.itemType, brandSummary, langName,
+      })
+      if (cancelled) return
+      territories = tr.territories ?? []
+      emit({ kind: 'directions', items: territories.map(t => ({
+        id: t.id,
+        title: t.name,
+        summary: [t.consumer_role, t.drop_signal_ids?.length ? `일부러 버린 신호: ${t.drop_reason}` : '', t.season_note]
+          .filter(Boolean).join(' '),
+        signal_ids: t.use_signal_ids ?? [],
+      })) })
+      emit({ kind: 'log', stage: 'S1', text: `${territories.length} directions planned${tr.cached ? ' (reused an earlier pass)' : ''} · each cites the signals it uses and the ones it drops` })
+    } catch (e) {
+      emit({ kind: 'log', stage: 'S1', text: `Direction planning failed · ${String((e as Error).message).slice(0, 100)} · designs will fall back to signal combinations` })
+    }
+    emit({ kind: 'checkpoint', label: 'S1 done · signals and directions saved' })
     emit({ kind: 'stage-done', stage: 'S1' })
     if (upto === 0 || cancelled) { emit({ kind: 'done', endStage: 'S1' }); return }
 
@@ -438,35 +467,14 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       if (c.length > 1) emit({ kind: 'log', stage: 'S2', text: `${TIER_LABEL[t]} explores ${c.length} different readings of the research, not one: ${c.slice(0, 3).map(x => x.label).join(' / ')}${c.length > 3 ? ' …' : ''}` })
     }
 
-    // ── Design Genome 저작 (지시서 v2 S3~S4 · 라이트 모드) ──────────────
-    // 디자인의 저자를 LLM으로 바꾼다. 영토를 먼저 계획하고, 안마다 독립 호출로 게놈을 받는다.
-    // 실패하면 위의 조합 경로로 떨어지되, 폴백임을 로그에 명시한다 (규칙 2·20).
-    const langName = LANG_NAME[params.researchLang ?? getLang()]
-    const brandSummary = brandSummaryOf(params.brand)
+    // ── Design Genome 저작 (지시서 v2 S4 · 라이트 모드) ────────────────
+    // 영토는 S1에서 이미 계획해 디렉션으로 내보냈다. 여기서는 그 영토마다
+    // 독립 호출로 게놈을 받는다. 실패하면 조합 경로로 떨어지되 폴백임을 남긴다.
     const gProf = profileOf(params.itemType)
     const genomeProfile = {
       heelMin: gProf.heel[0], heelMax: gProf.heel[1],
       panelMin: gProf.panels[0], panelMax: gProf.panels[1],
       closures: gProf.closures, constructions: gProf.constructions,
-    }
-    let territories: Territory[] = []
-    if (!brandSummary) {
-      emit({ kind: 'log', stage: 'S2', text: 'Brand lens is empty · territories will lean toward the market average. Set up the brand to pull them your way.' })
-    }
-    try {
-      emit({ kind: 'log', stage: 'S2', text: 'Planning concept territories · distinct design spaces, not intensity steps of one trend' })
-      const tr = await planTerritories({
-        signals, itemTypeEn: TYPE_EN[params.itemType] ?? 'shoe',
-        itemType: params.itemType, brandSummary, langName,
-      })
-      if (cancelled) return
-      territories = tr.territories ?? []
-      emit({ kind: 'log', stage: 'S2', text: `${territories.length} territories planned${tr.cached ? ' (reused an earlier pass)' : ''}` })
-      for (const t of territories) {
-        emit({ kind: 'log', stage: 'S2', text: `Territory ${t.name}: ${t.consumer_role}${t.drop_signal_ids?.length ? ` · drops ${t.drop_signal_ids.join(', ')} — ${t.drop_reason}` : ''}` })
-      }
-    } catch (e) {
-      emit({ kind: 'log', stage: 'S2', text: `Territory planning failed · ${String((e as Error).message).slice(0, 100)} · falling back to signal combinations — these designs are NOT LLM-authored` })
     }
     const acceptedGenomes: Genome[] = []
     const terrCursor: Record<DesignTier, number> = { core: 0, push: 0, signature: 0 }
@@ -492,7 +500,9 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       if (territories.length) {
         const terr = pickTerritory(tier)!
         let lastCollisions: string[] = []
-        for (let attempt = 0; attempt < 2 && !genome; attempt++) {
+        // 게이트를 못 넘은 마지막 후보는 버리지 않고 들고 있는다. 아래를 보라.
+        let nearMiss: Genome | null = null
+        for (let attempt = 0; attempt < 3 && !genome; attempt++) {
           try {
             const g = await authorGenome({
               territory: terr, tier, signals, profile: genomeProfile, brandSummary,
@@ -507,12 +517,20 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
             if (gate.pass) genome = g
             else {
               lastCollisions = gate.collisions
+              nearMiss = g
               emit({ kind: 'log', stage: 'S2', text: `Genome for ${terr.name} collides on ${gate.collisions.join(', ')} · re-authoring those axes only` })
             }
           } catch (e) {
             emit({ kind: 'log', stage: 'S2', text: `Genome authorship failed for ${terr.name} · ${String((e as Error).message).slice(0, 80)} · this slot falls back to signal combos (not LLM-authored)` })
             break
           }
+        }
+        // 5개 축에 Signature는 3축 상이를 요구한다. 앞선 안이 여덟 개쯤 쌓이면
+        // 그 요구를 통과하는 자리가 남지 않아, 늘 뒤쪽 Signature들만 조합 폴백으로 떨어졌다.
+        // 축이 하나 겹친 LLM 저작 안이 규칙으로 뽑은 안보다 낫다. 겹친 축은 카드에 적는다.
+        if (!genome && nearMiss) {
+          genome = { ...nearMiss, gate_overlap: lastCollisions }
+          emit({ kind: 'log', stage: 'S2', text: `Kept the authored genome for ${terr.name} despite overlap on ${lastCollisions.join(', ')} · the overlap is printed on the card` })
         }
       }
 
@@ -576,11 +594,24 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     }
     emit({ kind: 'log', stage: 'S2', text: `${alive.length} of ${designs.length} specs passed · ${designs.length - alive.length} rejected early · rejects are never rendered` })
 
-    // 실제 스케치 생성 · 룰 통과분만, 상한까지. 초과분은 SVG 폴백
-    // 단계가 갈라진다: ① 외형을 잡는 기준 스케치(흑백 3뷰) → ② 같은 외형에서 흑백 스케치 변형 여러 장.
+    // 렌더로 진출할 안을 여기서 먼저 정한다.
+    // 예전에는 스케치는 alive 앞에서부터, 렌더는 원가순 정렬에서 골라 서로 다른 부분집합이었다.
+    // 그래서 스케치가 있는데 렌더가 없는 안, 스케치 없이 렌더만 있는 안이 동시에 나왔고
+    // 후자는 "스케치를 사진으로 옮긴다"는 계보가 아예 끊긴 채 새로 그려졌다.
+    // 스케치 예산보다 많이 진출시키면 다시 계보가 끊긴다. 진출 수를 스케치할 수 있는 수로 묶는다.
+    // 예산이 얕으면 안을 적게 밀고, 민 안은 스케치와 렌더를 모두 갖는다.
+    const sketchCapNow = budget.leftSketch()
+    const advanceN = Math.max(1, Math.min(
+      Math.round(alive.length * params.renderRatio),
+      sketchCapNow > 0 ? sketchCapNow : Number.POSITIVE_INFINITY,
+    ))
+    const advancing = [...alive].sort((a, b) => a.cost.cap_ratio - b.cost.cap_ratio).slice(0, advanceN)
+
+    // 실제 스케치 생성 · 렌더로 갈 안부터, 상한까지. 초과분은 도식으로 남는다.
+    // 단계가 갈라진다: ① 외형을 잡는 기준 스케치(흑백) → ② 같은 외형에서 흑백 스케치 변형.
     // 컬러는 여기서 절대 나오지 않는다. 색은 S3에서 이 스케치들을 사진으로 옮길 때 처음 들어간다.
     if (budget.leftSketch() > 0) {
-      const targets = alive.slice(0, budget.leftSketch())
+      const targets = advancing
       emit({ kind: 'log', stage: 'S2', text: `Sketching ${targets.length} base forms · black ink only, colour never enters this stage` })
       let done = 0
       await pool(targets, ENGINES[params.imageEngine].concurrency, async (d) => {
@@ -638,9 +669,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
 
     // ══ S3 디자인 (멀티뷰) ══
     emit({ kind: 'stage-start', stage: 'S3' })
-    const advanceN = Math.max(1, Math.round(alive.length * params.renderRatio))
-    const advancing = [...alive].sort((a, b) => a.cost.cap_ratio - b.cost.cap_ratio).slice(0, advanceN)
-    emit({ kind: 'log', stage: 'S3', text: `${Math.round(params.renderRatio * 100)}% move to render · ${advanceN} selected` })
+    emit({ kind: 'log', stage: 'S3', text: `${Math.round(params.renderRatio * 100)}% move to render · ${advanceN} selected, the same ones that were sketched` })
 
     // 앞선 디자인이 추가 뷰와 컬러웨이로 남은 상한을 다 써 버리면 뒤 디자인은 한 장도 못 받는다.
     // 실제로 첫 디자인이 7컷을 가져가고 나머지 넷이 0컷으로 끝난 적이 있다.

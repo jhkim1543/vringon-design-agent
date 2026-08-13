@@ -698,6 +698,9 @@ export interface DesignGenome {
   forbidden: string[]
   territory_id: string
   tier: DesignTier
+  /** 다양성 게이트를 끝내 못 넘고 채택된 경우, 앞선 안과 겹친 구조축.
+   *  비어 있으면 게이트를 통과한 안이다. 카드가 이 차이를 그대로 말한다. */
+  gate_overlap?: string[]
 }
 
 /** 설계 영토 (지시서 v2 S3) · 서로 다른 설계 공간의 계획 */

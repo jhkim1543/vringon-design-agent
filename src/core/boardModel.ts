@@ -219,6 +219,7 @@ export function buildBoardModel(st: RunState): BoardModel {
   }
 
   // ── 3 신호 ──────────────────────────────────────────────────────
+  const signalIds = new Set(st.signals.map(s => s.signal_id))
   st.signals.forEach((s, i) => {
     nodes.push({
       id: `sg-${s.signal_id}`, kind: 'signal', column: 2, row: i,
@@ -244,7 +245,9 @@ export function buildBoardModel(st: RunState): BoardModel {
       id: `dir-${d.id}`, kind: 'direction', column: 3, row: i,
       title: d.title, body: [d.summary], tone: 'accent',
     })
-    d.signal_ids.forEach(sid => edges.push({ from: `sg-${sid}`, to: `dir-${d.id}` }))
+    // 이 Run에 실제로 있는 신호만 잇는다. 저작 모델이 없는 신호 id를 부르면
+    // 선이 허공에서 시작해, 화면에는 출발지 없는 화살표가 남는다.
+    d.signal_ids.filter(sid => signalIds.has(sid)).forEach(sid => edges.push({ from: `sg-${sid}`, to: `dir-${d.id}` }))
   })
   // 시리즈 불변 요소는 디렉션 전 단계에서 스펙을 직접 잠근다
   if (p.mode === 'series' && st.seriesDna) {
@@ -283,12 +286,17 @@ export function buildBoardModel(st: RunState): BoardModel {
       const dir = st.directions.find(x => d.rationale.driving_signals.some(ds => x.signal_ids.includes(ds.signal_id)))
       if (k === 0 && dir) edges.push({ from: `dir-${dir.id}`, to: id, label: 'form' })
       if (k > 0) edges.push({ from: `sk-${d.spec.design_id}-0`, to: id, label: 'ink variation', dashed: true })
-      edges.push({ from: id, to: d.spec.design_id, label: k === 0 ? 'coloured' : undefined })
+      // 렌더가 없으면 "coloured"라고 쓸 수 없다. 색이 안 들어갔으니까.
+      const rendered = d.images.some(x => x.view !== 'sketch' && x.view !== 'sketch_var')
+      edges.push({ from: id, to: d.spec.design_id, label: k === 0 ? (rendered ? 'coloured' : 'spec only') : undefined, dashed: k === 0 && !rendered })
     })
   })
 
   alive.forEach((d, i) => {
-    const hero = d.images.find(im => !['sketch', 'sketch_var'].includes(im.view)) ?? d.images[0]
+    // 디자인 칸에는 렌더만 온다. 예전에는 렌더가 없으면 ?? d.images[0]로 스케치가 실려
+    // "색이 들어가는 칸"에 흑백 선화가 걸리고, 스케치 칸의 같은 그림과 화살표로 이어져
+    // 스케치에서 스케치로 가는 것처럼 보였다. 없으면 없다고 두는 편이 정직하다.
+    const hero = d.images.find(im => !['sketch', 'sketch_var'].includes(im.view))
     const pit = pitchOf(d.spec.design_id)
     if (pit) {
       // 카드 옆에 "어떤 근거에서 이 스케치가 나왔고, 어떤 프롬프트가 디자인으로 만들었는지"를 붙인다.
@@ -330,13 +338,25 @@ export function buildBoardModel(st: RunState): BoardModel {
     nodes.push({
       id: d.spec.design_id, kind: 'design', column: 5, row: i,
       title: `${d.spec.design_id} · ${TIER_LABEL[d.spec.tier]}`,
-      body: d.metrics.map(m => `${m.label} ${m.value}`),
+      body: [
+        ...d.metrics.map(m => `${m.label} ${m.value}`),
+        // 렌더가 없으면 그 사실을 카드가 말한다. 스케치를 대신 걸어 두지 않는다.
+        ...(hero ? [] : ['Not rendered in this run: the image cap was reached before this one. The spec and reasoning below still hold.']),
+        // 게놈 없이 나온 안은 조합 폴백이다. 저작자가 다르면 카드도 그렇게 말해야 한다.
+        ...(d.spec.genome ? [] : ['Spec built from signal combinations, not authored as a concept.']),
+        // 게이트를 못 넘고도 채택된 안은 어디가 겹치는지 말한다.
+        ...(d.spec.genome?.gate_overlap?.length
+          ? [`Shares ${d.spec.genome.gate_overlap.join(', ')} with an earlier design — kept for its concept, not its silhouette.`]
+          : []),
+      ],
       design: d, imageUrl: hero?.url,
     })
     // 어떤 신호에서 나왔는지 · 가중치가 곧 선 굵기.
     // 스펙을 실제로 정한 신호만 선을 긋는다. 예전 분석은 그 연결이 없어 가중치를 안 믿는다.
     const traced = d.spec.hintApplied !== undefined
-    d.rationale.driving_signals.filter(ds => !traced || ds.weight > 0).forEach(ds => {
+    d.rationale.driving_signals
+      .filter(ds => (!traced || ds.weight > 0) && (signalIds.has(ds.signal_id) || st.directions.some(x => x.signal_ids.includes(ds.signal_id))))
+      .forEach(ds => {
       const dir = st.directions.find(x => x.signal_ids.includes(ds.signal_id))
       edges.push({
         from: dir ? `dir-${dir.id}` : `sg-${ds.signal_id}`,
