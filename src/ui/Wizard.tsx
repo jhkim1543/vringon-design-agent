@@ -14,8 +14,9 @@ import type { Runtime } from '../core/runtime'
 import {
   asFootwearLine, DEFAULT_PARAMS, firstTypeOf, groupOf, LINE_PRESETS, MODE_LABEL, MODE_SCOPE,
   OBJECTIVE_LABEL, TAXONOMY, TYPE_LABEL, UNKNOWN, defaultLineProfile, lineFingerprint,
+  HOME_MARKETS, REFERENCE_MARKETS,
 } from '../core/types'
-import type { FootwearLineProfile, Mode, ResearchObjective, RunParams, Stage } from '../core/types'
+import type { FootwearLineProfile, MarketId, Mode, ResearchObjective, RunParams, Stage } from '../core/types'
 import { cumulative, estimate, SCOPE_COPY } from '../core/estimate'
 import { Seg, Tag } from './bits'
 import { ENGINES } from '../core/imageEngines'
@@ -509,6 +510,36 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
 
               <section className="sect">
                 <h2>{t('Where it sits in the market')}</h2>
+                {/* 시장은 조사 언어와 다른 축이다. 언어는 결과를 무슨 말로 쓸지,
+                    시장은 누구네 매대를 볼지를 정한다. 그래서 여기(경쟁·가격 옆)에 두고,
+                    3단계의 리포트 언어와는 떼어 놓는다. */}
+                <div className="stack">
+                  <span className="lbl">{t('Home market')}</span>
+                  <div className="inrow">
+                    <Seg options={HOME_MARKETS.map(m => m.id) as unknown as readonly MarketId[]}
+                      value={line.commercial.homeMarket ?? 'KR'}
+                      onChange={v => setLine('commercial', { homeMarket: v })} />
+                    <span className="hint">{t('Where you sell. Retail pages, list prices and the search language all follow this.')}</span>
+                  </div>
+                </div>
+                <div className="stack">
+                  <span className="lbl">{t('Reference markets')}</span>
+                  <div className="chiprow">
+                    {REFERENCE_MARKETS.filter(m => m.id !== (line.commercial.homeMarket ?? 'KR')).map(m => {
+                      const on = (line.commercial.referenceMarkets ?? []).includes(m.id)
+                      return (
+                        <button key={m.id} className={`pick ${on ? 'on' : ''}`}
+                          onClick={() => {
+                            const cur = line.commercial.referenceMarkets ?? []
+                            setLine('commercial', {
+                              referenceMarkets: on ? cur.filter(x => x !== m.id) : [...cur, m.id].slice(-2),
+                            })
+                          }}>{t(m.label)}</button>
+                      )
+                    })}
+                  </div>
+                  <span className="hint">{t('Markets you watch because they run ahead of yours. Up to two. They do not set your price band.')}</span>
+                </div>
                 <div className="stack">
                   <span className="lbl">{t('Tier')}</span>
                   <Seg options={['mass', 'contemporary', 'premium', 'luxury'] as const} value={p.trend.priceBand}

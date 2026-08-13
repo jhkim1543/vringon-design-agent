@@ -120,7 +120,11 @@ export function lineForServer(raw?: FootwearLineProfile, itemType?: string) {
     stackBand: lp.bottom.stackBand, dropMm: lp.bottom.dropMm, rocker: lp.bottom.rocker, heel: lp.bottom.heel,
     lasting: lp.construction.lasting, soleAttachment: lp.construction.soleAttachment,
     cushioning: lp.performance.cushioning, stability: lp.performance.stability, wetGrip: lp.performance.wetGrip,
-    markets: lp.commercial.markets, channels: lp.commercial.channels,
+    // 시장은 이제 자유 텍스트 한 줄이 아니라 구조로 간다. 서버가 이걸로
+    // 검색 언어·리테일 지면·검색 위치·가격 기준·캐시 키를 전부 가른다.
+    homeMarket: lp.commercial.homeMarket ?? (lp.commercial.markets?.[0] as string | undefined) ?? 'KR',
+    referenceMarkets: lp.commercial.referenceMarkets ?? [],
+    channels: lp.commercial.channels,
   }
 }
 

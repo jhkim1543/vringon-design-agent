@@ -153,8 +153,24 @@ export interface LinePerformance {
   flexibility: 'stiff' | 'moderate' | 'flexible' | Unknown
 }
 
+/** 조사할 수 있는 시장. GLOBAL 은 참조로만 쓴다 — 글로벌 정가라는 것은 없기 때문이다. */
+export type MarketId = 'KR' | 'US' | 'JP'
+export type ReferenceMarketId = MarketId | 'GLOBAL'
+
+export const HOME_MARKETS: { id: MarketId; label: string }[] = [
+  { id: 'KR', label: '한국' }, { id: 'US', label: '미국' }, { id: 'JP', label: '일본' },
+]
+export const REFERENCE_MARKETS: { id: ReferenceMarketId; label: string }[] = [
+  ...HOME_MARKETS, { id: 'GLOBAL', label: '글로벌' },
+]
+
 export interface LineCommercial {
-  markets: string[]                 // ['KR', 'JP']
+  /** 파는 시장. 가격 밴드·경쟁군·리테일 지면이 전부 이 시장 기준이다 */
+  homeMarket: MarketId
+  /** 먼저 보는 시장 0~2곳. 홈보다 앞서 가는 곳을 본다는 뜻이지 파는 곳이 아니다 */
+  referenceMarkets: ReferenceMarketId[]
+  /** 옛 저장본 호환 · homeMarket 이 없을 때만 읽는다 */
+  markets?: string[]
   channels: string[]                // ['DTC', 'department store', 'running specialty']
 }
 
@@ -179,7 +195,7 @@ export function defaultLineProfile(): FootwearLineProfile {
     bottom: { midsole: UNKNOWN, plate: UNKNOWN, outsole: UNKNOWN, stackBand: UNKNOWN, dropMm: UNKNOWN, rocker: UNKNOWN, heel: UNKNOWN, existingBottomReuse: true },
     construction: { lasting: UNKNOWN, soleAttachment: UNKNOWN },
     performance: { weightTargetG: UNKNOWN, cushioning: UNKNOWN, stability: UNKNOWN, wetGrip: UNKNOWN, flexibility: UNKNOWN },
-    commercial: { markets: ['KR'], channels: ['DTC'] },
+    commercial: { homeMarket: 'KR', referenceMarkets: [], channels: ['DTC'] },
   }
 }
 
@@ -191,6 +207,13 @@ export function asFootwearLine(lp: unknown): FootwearLineProfile | undefined {
   const l = lp as Partial<FootwearLineProfile> | undefined
   if (!l || !l.product || !l.lastFit || !l.upper || !l.bottom || !l.construction) return undefined
   return l as FootwearLineProfile
+}
+
+/** 시장 한 조각 · 'KR' 또는 'KR←US,JP' */
+export function marketFingerprint(c: LineCommercial | undefined): string {
+  const home = c?.homeMarket ?? (c?.markets?.[0] as string | undefined) ?? 'KR'
+  const refs = c?.referenceMarkets ?? []
+  return refs.length ? `${home}←${refs.join(',')}` : home
 }
 
 /** 라인 프로필을 사람이 읽는 짧은 지문으로. 리포트 표지와 캐시 키가 같이 쓴다. */
@@ -206,6 +229,8 @@ export function lineFingerprint(raw: FootwearLineProfile | undefined, itemType: 
     lp.bottom.outsole !== UNKNOWN ? lp.bottom.outsole : '',
     lp.construction.soleAttachment !== UNKNOWN ? lp.construction.soleAttachment : '',
     lp.product.season,
+    // 같은 라인을 다른 시장으로 돌리면 다른 조사다. 제목에서 구분되어야 한다.
+    marketFingerprint(lp.commercial),
   ].filter(Boolean)
   return bits.join(' · ')
 }
@@ -222,6 +247,7 @@ export interface LinePreset {
 const P = (base: FootwearLineProfile, patch: {
   product?: Partial<LineProduct>; lastFit?: Partial<LineLastFit>; upper?: Partial<LineUpper>
   bottom?: Partial<LineBottom>; construction?: Partial<LineConstruction>; performance?: Partial<LinePerformance>
+  commercial?: Partial<LineCommercial>
 }): FootwearLineProfile => ({
   ...base,
   product: { ...base.product, ...patch.product },
@@ -230,6 +256,7 @@ const P = (base: FootwearLineProfile, patch: {
   bottom: { ...base.bottom, ...patch.bottom },
   construction: { ...base.construction, ...patch.construction },
   performance: { ...base.performance, ...patch.performance },
+  commercial: { ...base.commercial, ...patch.commercial },
 })
 
 export const LINE_PRESETS: LinePreset[] = [

@@ -14,6 +14,7 @@ import { brightdataProbe, unlockImage, unlockPage } from './brightdata.mjs'
 import { analyzeLogoStyle, analyzeMoodboard, analyzeSeries, reviewAsMd, saveUpload } from './upload-api.mjs'
 import { authorGenome, planTerritories, verifyRender } from './design-api.mjs'
 import { inferenceStatus, isLocal, localImageEdit, localImageGenerate, localModelFromImage, localProbe } from './inference.mjs'
+import { marketOf } from './markets.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..')
@@ -116,11 +117,12 @@ async function fetchWithBackoff(u, init, tries = 3) {
 /** 벽에 막힌 응답인가 · 이때만 유료 언락커를 쓴다 */
 const isWalled = (status) => status === 403 || status === 429 || status === 401 || status === 503
 
-export async function fetchShotImage(imgUrl, referer) {
+export async function fetchShotImage(imgUrl, referer, marketId) {
   const r = await fetchWithBackoff(imgUrl, {
     headers: {
       'User-Agent': SHOT_UA,
       Accept: 'image/avif,image/webp,image/*,*/*;q=0.8',
+      'Accept-Language': marketOf(marketId).acceptLanguage,
       ...(referer ? { Referer: referer } : {}),
     },
     redirect: 'follow',
@@ -162,12 +164,15 @@ function looksLikeLogo(u) {
   try { return LOGO_LIKE.test(new URL(u).pathname) } catch { return LOGO_LIKE.test(String(u)) }
 }
 
-export async function shotFromPage(pageUrl) {
+/** 이 파이프라인에서 실제로 페이지를 여는 곳은 여기 하나뿐이다.
+ *  여기가 계속 ko-KR 을 보내면, 미국 시장을 조사했다는 말이 네트워크 층에서 거짓이 된다 —
+ *  많은 쇼핑몰이 이 헤더로 지역몰을 갈라 리다이렉트한다. 홈 시장을 따라간다. */
+export async function shotFromPage(pageUrl, marketId) {
   const r = await fetchWithBackoff(pageUrl, {
     headers: {
       'User-Agent': SHOT_UA,
       Accept: 'text/html,application/xhtml+xml,*/*;q=0.8',
-      'Accept-Language': 'ko-KR,ko;q=0.9,en;q=0.8',
+      'Accept-Language': marketOf(marketId).acceptLanguage,
     },
     redirect: 'follow', signal: AbortSignal.timeout(12_000),
   })

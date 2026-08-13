@@ -6,7 +6,8 @@ import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { researchDossier } from './dossier-api.mjs'
-import { familyLens, familyOf, familyRetail, typeLens } from './category-templates.mjs'
+import { familyLens, familyOf, typeLens } from './category-templates.mjs'
+import { resolveMarkets, retailClause, searchClause, sourceQuota, userLocation } from './markets.mjs'
 
 export const RESEARCH_MODEL = 'gpt-5'
 // 딥리서치 · 계정에서 열리면 .env에 OPENAI_DEEP_RESEARCH=1 을 넣어 켠다.
@@ -25,7 +26,7 @@ const COMPETITOR_SCHEMA = {
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['brand', 'brand_line', 'model_name', 'price_krw', 'released', 'popularity_evidence', 'evidence_strength',
+        required: ['brand', 'brand_line', 'model_name', 'price_krw', 'price_local', 'price_currency', 'released', 'popularity_evidence', 'evidence_strength',
           'rank_note', 'rank_semantics', 'competitor_group', 'construction_tier',
           'user_sentiment', 'praise_points', 'complaint_points', 'design_traits',
           'offered_sizes', 'available_sizes', 'size_status', 'colorway_count',
@@ -34,7 +35,9 @@ const COMPETITOR_SCHEMA = {
           brand: { type: 'string' },
           brand_line: { type: 'string', description: '브랜드 안의 라인·컬렉션. 예: Performance Running, Lifestyle, Court. 모르면 빈 문자열' },
           model_name: { type: 'string', description: '모델 패밀리 이름. 컬러웨이 하나하나를 별개 제품으로 내지 말 것' },
-          price_krw: { type: 'integer', description: '원화 정가. 모르면 0' },
+          price_krw: { type: 'integer', description: '한국 정가를 실제로 확인했을 때만. 환율로 어림한 값 금지. 모르면 0' },
+          price_local: { type: 'number', description: '홈 시장 현지 정가. 환산하지 말고 본 그대로. 모르면 0' },
+          price_currency: { type: 'string', description: '현지 정가의 통화 ISO 코드 (KRW·USD·JPY 등). 모르면 빈 문자열' },
           released: { type: 'string', description: '출시 시점. 모르면 unknown' },
           popularity_evidence: {
             type: 'array', items: { type: 'string' },
@@ -206,13 +209,15 @@ try {
   longFetch = (url, init = {}) => undiciFetch(url, { ...init, dispatcher: agent })
 } catch { /* undici가 없으면 내장 fetch로 진행한다 */ }
 
-async function ask(apiKey, { input, schema, name }) {
+async function ask(apiKey, { input, schema, name, location = null }) {
   const r = await longFetch('https://api.openai.com/v1/responses', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
     body: JSON.stringify({
       model: RESEARCH_MODEL,
-      tools: [{ type: 'web_search' }],
+      // 위치를 붙이면 검색 도구가 실제로 다른 결과를 집는다. 프롬프트에 나라 이름을
+      // 적는 것과 다르다 — 그건 모델이 무시할 수 있는 부탁이고, 이건 도구 인자다.
+      tools: [{ type: 'web_search', ...(location ? { user_location: location } : {}) }],
       // 비용보다 결과를 우선한다 · 추론 강도를 최고로 둔다
       reasoning: { effort: 'high' },
       input,
@@ -238,7 +243,8 @@ const BRAND_ALIAS = {
   'dr. martens': '닥터마틴', 'dr martens': '닥터마틴', 'birkenstock': '버켄스탁',
   'clarks': '클락스', 'ecco': '에코', 'camper': '캄퍼', 'timberland': '팀버랜드',
 }
-function canonBrand(b) {
+function canonBrand(b, ko = true) {
+  if (!ko) return String(b).trim()
   const raw = String(b).trim()
   // "Nike Performance Running"처럼 라인이 붙어 있으면 브랜드만 정규화하고 라인은 살린다
   const lower = raw.toLowerCase()
@@ -263,7 +269,7 @@ const TERM_ALIAS = {
   'ankle boot': '앵클 부츠', chelsea: '첼시 부츠', combat: '워커 부츠', 'knee-high': '롱부츠', hiking: '하이킹 부츠 등산화',
   strappy: '스트랩 샌들', slide: '슬라이드', sport: '스포츠 샌들', gladiator: '글래디에이터 샌들',
 }
-function canonTerm(t) { return TERM_ALIAS[String(t).trim().toLowerCase()] ?? t }
+function canonTerm(t, ko = true) { return ko ? (TERM_ALIAS[String(t).trim().toLowerCase()] ?? t) : String(t).trim() }
 
 /** 라인 프로필 → 프롬프트 블록. 조사·필터·신호 생성이 전부 이 조건을 본다. */
 function lineBlock(line) {
@@ -278,7 +284,7 @@ function lineBlock(line) {
     ['바텀', [u(line.midsole), u(line.plate) && line.plate !== 'none' && `${line.plate} plate`, u(line.outsole), u(line.stackBand) && `${line.stackBand} stack`, u(line.dropMm) && `drop ${line.dropMm}mm`, u(line.rocker) && line.rocker !== 'none' && `${line.rocker} rocker`, u(line.heel) && line.heel !== 'none' && `${line.heel} heel`].filter(Boolean).join(' · ')],
     ['공법', [u(line.lasting), u(line.soleAttachment)].filter(Boolean).join(' + ')],
     ['성능', [u(line.cushioning) && `cushioning ${line.cushioning}`, u(line.stability), u(line.wetGrip) === 'required' && 'wet grip required'].filter(Boolean).join(' · ')],
-    ['시장·채널', [...(line.markets ?? []), ...(line.channels ?? [])].join(' · ')],
+    ['채널', (line.channels ?? []).join(' · ')],
   ].filter(([, v]) => v)
   if (!rows.length) return ''
   return `\n조사 대상 신발 라인 정의 (이 조합이 곧 경쟁군이다 — 같은 외형이라도 이 조건이 다르면 다른 시장이다):
@@ -296,7 +302,8 @@ function lineKey(line) {
  *  한 요청이 커지면 상류 연결이 먼저 끊기고, 한 브랜드 실패가 전체를 날린다. */
 export async function researchCompetitors(apiKey, root, opts) {
   const { brands = [], typeKo, priceMin, priceMax, adjacentBand = false, line, langName = 'English' } = opts
-  const key = createHash('sha256').update(JSON.stringify(['comp7ft', langName, brands, typeKo, priceMin, priceMax, adjacentBand, lineKey(line)])).digest('hex').slice(0, 24)
+  const mk = resolveMarkets({ home: line?.homeMarket, reference: line?.referenceMarkets })
+  const key = createHash('sha256').update(JSON.stringify(['comp8ft', langName, brands, typeKo, priceMin, priceMax, adjacentBand, lineKey(line), mk.home.id, mk.refIds])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
@@ -322,9 +329,14 @@ export async function researchCompetitors(apiKey, root, opts) {
 
 async function researchOneBrand(apiKey, root, { brand: rawBrand, typeKo: rawType, priceMin, priceMax, adjacentBand = false, line, langName = 'English' }) {
   const LANG = langName
-  const brand = canonBrand(rawBrand)
-  const typeKo = canonTerm(rawType)
-  const key = createHash('sha256').update(JSON.stringify(['brand6ft', langName, brand, typeKo, priceMin, priceMax, adjacentBand, lineKey(line)])).digest('hex').slice(0, 24)
+  const mk = resolveMarkets({ home: line?.homeMarket, reference: line?.referenceMarkets })
+  // 한국어 별칭은 한국 시장에서만 검색을 도와준다. 미국 시장을 조사하면서
+  // 'penny loafer'를 '페니 로퍼'로 바꿔 검색하면 한국 쇼핑몰만 나온다 —
+  // 시장을 바꿔도 결과가 같아 보이던 가장 큰 이유가 여기였다.
+  const ko = mk.home.useKoreanAliases
+  const brand = canonBrand(rawBrand, ko)
+  const typeKo = canonTerm(rawType, ko)
+  const key = createHash('sha256').update(JSON.stringify(['brand7ft', langName, brand, typeKo, priceMin, priceMax, adjacentBand, lineKey(line), mk.home.id])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return JSON.parse(readFileSync(file, 'utf8'))
 
@@ -332,7 +344,8 @@ async function researchOneBrand(apiKey, root, { brand: rawBrand, typeKo: rawType
 
 대상: ${brand} (브랜드 전체가 아니라 이 품목과 맞는 라인을 본다 — 같은 브랜드라도 퍼포먼스 러닝과 라이프스타일은 별개 경쟁군이다)
 품목: ${typeKo}
-Primary 가격 밴드: ${priceMin.toLocaleString()}원 ~ ${priceMax.toLocaleString()}원 (같은 공법·기술 티어의 직접 비교 구간)
+조사 시장: ${mk.home.label} (홈)${mk.reference.length ? ` · 참조 ${mk.reference.map(r => r.label).join(', ')}` : ''}
+Primary 가격 밴드: ${priceMin.toLocaleString()}원 ~ ${priceMax.toLocaleString()}원 (KRW 기준. 같은 공법·기술 티어의 직접 비교 구간)
 ${adjacentBand ? '한 단계 위·아래 티어도 참고용으로 1개까지 포함하되 competitor_group을 aspirational/adjacent로 분류합니다.' : '이 밴드 밖 제품은 넣지 않습니다.'}
 ${lineBlock(line)}
 이 브랜드에서 최근 출시되었거나 현재 잘 팔리는 ${typeKo} 모델을 2~3개만 찾아주세요.
@@ -348,8 +361,10 @@ ${lineBlock(line)}
 규칙:
 - 실제로 검색해서 확인한 것만 적습니다. 확인하지 못한 값은 지어내지 마세요.
 - 모델 패밀리 하나가 한 항목입니다. 컬러웨이 10개를 제품 10개로 내지 말고 colorway_count에 수를 적으세요.
-- price_krw는 한국 정가를 확인한 경우에만 넣고, 모르면 0으로 둡니다. 세일가를 정가로 적지 마세요.
-- 한국 정가를 못 찾으면 브랜드의 다른 지역 공식몰 정가를 찾아 notes에 통화와 함께 남기고, price_krw는 0으로 둡니다.
+- price_local과 price_currency에 ${mk.home.priceNote ?? '홈 시장 정가'}를 그대로 넣습니다. 환산하지 마세요.
+- price_krw는 한국 정가를 실제로 확인한 경우에만 넣고, 아니면 0으로 둡니다. 환율로 추정한 값을 넣지 마세요.
+  (환산은 서버가 기록된 환율로 합니다. 모델이 어림한 환산가는 근거 없는 숫자입니다.)
+- 세일가를 정가로 적지 마세요.
 - 가격도 공법·기술 티어도 사이즈 재고도 하나도 확인하지 못한 제품은 목록에 넣지 않습니다.
   빈 값투성이 항목은 벤치마크를 오염시킵니다 — 확인된 제품 2개가 미확인 제품 3개보다 낫습니다.
 - rank_note에는 사이트에 표기된 순위를 그대로 옮기고, rank_semantics로 그 순위의 의미를 분류합니다.
@@ -368,9 +383,9 @@ ${lineBlock(line)}
   어떤 제품의 이미지 주소를 끝내 못 찾으면, 그 제품을 빼고 사진을 찾을 수 있는 다른 모델로 대체하세요.
 - product_url에는 제품 상세 페이지 주소를 넣습니다.
 - In notes, list what you could not confirm and the limits of this pass. Write it in ${LANG}.
-- Search in Korean where that finds more, but every string you output must be written in ${LANG}. Keep brand and model names as they are officially written.`
+- ${searchClause(mk, LANG)} Keep brand and model names as they are officially written.`
 
-  const { data, searches } = await ask(apiKey, { input, schema: COMPETITOR_SCHEMA, name: 'competitor_research' })
+  const { data, searches } = await ask(apiKey, { input, schema: COMPETITOR_SCHEMA, name: 'competitor_research', location: userLocation(mk.home) })
   const out = { ...data, searches }
   writeFileSync(file, JSON.stringify(out))
   return out
@@ -389,13 +404,16 @@ const PULSE_SCHEMA = {
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['retailer', 'brand', 'model_name', 'price_krw', 'rank_note', 'rank_semantics',
+        required: ['retailer', 'market', 'brand', 'model_name', 'price_krw', 'price_local', 'price_currency', 'rank_note', 'rank_semantics',
           'construction_tier', 'design_traits', 'image_urls', 'product_url', 'source_urls'],
         properties: {
           retailer: { type: 'string', description: '수집처. 예: 롯데백화점몰, SSG 신세계백화점, 더현대닷컴, Harrods, Selfridges, MR PORTER, NET-A-PORTER' },
           brand: { type: 'string' },
           model_name: { type: 'string' },
-          price_krw: { type: 'integer', description: '원화 환산가. 해외몰이면 대략 환산하고 notes에 원통화를 남긴다. 모르면 0' },
+          market: { type: 'string', description: '이 지면이 속한 시장 코드 (KR·US·JP·GLOBAL). 지시된 시장 중 하나여야 한다' },
+          price_local: { type: 'number', description: '그 지면에 표시된 가격 그대로. 환산 금지. 모르면 0' },
+          price_currency: { type: 'string', description: '표시 가격의 통화 ISO 코드. 모르면 빈 문자열' },
+          price_krw: { type: 'integer', description: '한국 지면에서 원화 가격을 직접 본 경우에만. 환율 어림 금지. 모르면 0' },
           rank_note: { type: 'string', description: '사이트에 표기된 그대로. 예: "여성 스니커즈 베스트 3위", "Best Seller 배지"' },
           rank_semantics: { type: 'string', enum: ['verified_sales_rank', 'retailer_bestseller_membership', 'surface_position', 'none'] },
           construction_tier: { type: 'string', description: '확인된 공법·기술 티어. 모르면 빈 문자열' },
@@ -412,16 +430,18 @@ const PULSE_SCHEMA = {
 
 export async function researchRetailPulse(apiKey, root, { typeKo: rawType, line, langName = 'English' }) {
   const LANG = langName
-  const typeKo = canonTerm(rawType)
-  const key = createHash('sha256').update(JSON.stringify(['pulse3ft', LANG, typeKo, lineKey(line)])).digest('hex').slice(0, 24)
+  const mk = resolveMarkets({ home: line?.homeMarket, reference: line?.referenceMarkets })
+  const typeKo = canonTerm(rawType, mk.home.useKoreanAliases)
+  const key = createHash('sha256').update(JSON.stringify(['pulse4ft', LANG, typeKo, lineKey(line), mk.home.id, mk.refIds])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
   const input = `당신은 신발 MD입니다. 웹 검색으로, 조사 시점 기준 백화점·명품 리테일러가 실제로
 "베스트셀러 / 판매 랭킹 / 인기 순위"로 표기한 ${typeKo} 제품을 수집하세요.
 ${lineBlock(line)}
-확인할 곳 (이 계열이 실제로 팔리는 지면 위주 · 국내 2곳 이상 + 해외 1곳 이상):
-${familyRetail(familyOf(line?.itemType))}
+확인할 곳 (이 계열이 실제로 팔리는 지면 · ${sourceQuota(mk)}):
+${retailClause(mk, familyOf(line?.itemType))}
+각 제품의 market 필드에 어느 시장 지면에서 봤는지 코드로 적으세요. 지면과 시장이 어긋나면 그 항목은 빼세요.
 
 규칙:
 - 4~6개 제품만. 반드시 랭킹·베스트셀러 표기가 실제로 붙은 제품이어야 합니다.
@@ -430,10 +450,11 @@ ${familyRetail(familyOf(line?.itemType))}
   단순 노출 순서는 surface_position입니다.
 - image_urls가 비는 제품은 목록에서 뺍니다. 상세 페이지 HTML의 og:image 메타 태그 값을 그대로 옮기는 것이 가장 확실하고,
   없으면 대표 상품 이미지 파일 주소(.jpg/.png/.webp/.avif)를 찾습니다. 가능하면 2개 이상 넣습니다.
-- 해외몰 가격은 원화로 대략 환산해 price_krw에 넣고 notes에 원통화 금액을 남깁니다.
-- 검색은 10회 이내. Search in Korean where that finds more, but every string you output must be written in ${LANG}.`
+- 가격은 그 지면에 표시된 그대로 price_local + price_currency 에 넣습니다. 환산하지 마세요 —
+  환율 없이 어림한 환산가는 근거 없는 숫자이고, 환산은 서버가 기록된 환율로 합니다.
+- 검색은 10회 이내. ${searchClause(mk, LANG)}`
 
-  const { data, searches } = await ask(apiKey, { input, schema: PULSE_SCHEMA, name: 'retail_pulse' })
+  const { data, searches } = await ask(apiKey, { input, schema: PULSE_SCHEMA, name: 'retail_pulse', location: userLocation(mk.home) })
   const out = { ...data, searches, collected_at: new Date().toISOString().slice(0, 10) }
   writeFileSync(file, JSON.stringify(out))
   return { ...out, cached: false }
@@ -455,11 +476,13 @@ export async function researchTrends(apiKey, root, {
   langName = 'English',
 }) {
   const LANG = langName
-  const typeKo = canonTerm(rawType)
-  const brands = (rawBrands ?? []).map(canonBrand)
+  const mk = resolveMarkets({ home: line?.homeMarket, reference: line?.referenceMarkets })
+  const ko = mk.home.useKoreanAliases
+  const typeKo = canonTerm(rawType, ko)
+  const brands = (rawBrands ?? []).map(b => canonBrand(b, ko))
   const useDeep = !!deep
   const key = createHash('sha256').update(JSON.stringify([
-    'trend8ft', LANG, typeKo, brands ?? [], season, priceBandKo ?? '', [...objectives].sort(), lineKey(line),
+    'trend9ft', LANG, typeKo, brands ?? [], season, priceBandKo ?? '', [...objectives].sort(), lineKey(line), mk.home.id, mk.refIds,
     useDeep ? 'deep' : wantReport ? `multi${depth}` : 'fast',
   ])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
@@ -476,6 +499,8 @@ export async function researchTrends(apiKey, root, {
 
 품목: ${typeKo}
 시즌: ${season}
+홈 시장: ${mk.home.label}${mk.reference.length ? `
+참조 시장: ${mk.reference.map(r => r.label).join(', ')}` : ''}
 ${brands?.length ? `참고 브랜드: ${brands.join(', ')}` : ''}
 ${lineBlock(line)}
 조사 렌즈 (사용자가 고른 조사 목적):
@@ -496,7 +521,13 @@ ${lenses.map((l, i) => `${i + 1}. ${l}`).join('\n')}
 - last_change / bottom_tooling_change / upper_pattern_change로 개발 변경 수준을 표시합니다. 문화적으로 강해도 신규 몰드가 필요하면 feasibility는 낮습니다.
 - 1회 수집으로 상승·하락 궤적을 단정하지 않습니다. adoption_stage가 애매하면 unknown으로 둡니다.
 - In report_perspective, say which market and viewpoint the material leans towards.
-- Search in Korean where that finds more, but every string you output must be written in ${LANG}.
+- ${searchClause(mk, LANG)}
+- 시장에 대해 정직할 것: 신발의 형태 트렌드(토 셰이프·스택·폼·플레이트)는 대체로 전 세계 같은
+  브랜드들이 정하므로, 시장을 바꿔도 '속성 목록'은 크게 다르지 않습니다. 시장에 따라 진짜 달라지는 것은
+  그 속성이 ${mk.home.label} 매대에 실제로 얼마나 도달했는가입니다. 없는 차이를 지어내지 말고,
+  commercial_index는 ${mk.home.label} 지면에서 확인한 근거로만 판정하세요.${mk.reference.length ? `
+  참조 시장(${mk.reference.map(r => r.label).join(', ')})에서 이미 주류인데 홈에서 아직 안 보이면, 그 사실을 evidence에 한 줄로 적으세요.
+  단, "참조 시장에는 있는데 홈에는 없다"는 판단은 홈 지면을 실제로 확인했을 때만 씁니다. 못 찾은 것과 없는 것은 다릅니다.` : ''}
 - 신호는 반드시 '제품에서 관측된 디자인 속성'이어야 합니다. 실제 판매 중인 제품 페이지·리뷰·기사에서 본 형태, 소재, 부자재, 비율, 컬러를 적으세요.
 - 데이터가 없다거나 확인이 어렵다는 서술은 신호가 아닙니다. 그런 내용은 notes에만 적고 signals에는 절대 넣지 마세요.
 - label은 디자인 속성 이름이어야 합니다. 좋은 예: 'Elongated soft square toe', 'High-stack platform trainer', 'Low block heel 25-35mm', 'Suede upper', 'Elastic gore closure'.
@@ -507,6 +538,7 @@ ${lenses.map((l, i) => `${i + 1}. ${l}`).join('\n')}
   // ① 하위 질문 설계 → ② 질문별 개별 검색 → ③ 종합 보고서 → ④ 스키마 정리
   if (!useDeep && wantReport) {
     const planned = await ask(apiKey, {
+      location: userLocation(mk.home),
       input: `${typeKo} · ${season} · 가격대 ${priceBandKo ?? '미지정'} 의 디자인 트렌드를 조사하려 합니다.
 ${lineBlock(line)}
 조사 렌즈:
@@ -527,9 +559,11 @@ ${lenses.map((l, i) => `${i + 1}. ${l}`).join('\n')}
     // 하위 질문은 서로 독립이므로 병렬로 돈다. 순차로 하면 5배 느리다.
     let totalSearch = planned.searches
     const settled = await Promise.allSettled(qs.map(q => ask(apiKey, {
+      location: userLocation(mk.home),
       input: `웹 검색으로 다음 질문에 답하세요. 확인한 사실만 쓰고 출처 URL을 함께 남기세요.
 검색은 4회 이내로 끝내세요. 이미 아는 사실은 다시 검색하지 마세요.
-대상: ${typeKo} · ${season} · 가격대 ${priceBandKo ?? '미지정'}
+대상: ${typeKo} · ${season} · 가격대 ${priceBandKo ?? '미지정'} · 시장 ${mk.home.label}
+${searchClause(mk, LANG)}
 질문: ${q}`,
       schema: {
         type: 'object', additionalProperties: false, required: ['answer', 'facts', 'sources'],
@@ -616,14 +650,14 @@ ${dr.text.slice(0, 120_000)}
     } catch (e) {
       // 모델 미개방(404) 등은 조용히 기본 경로로 되돌린다
       const fellBack = `딥리서치 사용 불가로 기본 검색으로 진행: ${String(e.message).slice(0, 120)}`
-      const { data, searches } = await ask(apiKey, { input, schema: TREND_SCHEMA, name: 'trend_research' })
+      const { data, searches } = await ask(apiKey, { input, schema: TREND_SCHEMA, name: 'trend_research', location: userLocation(mk.home) })
       const out = { ...data, searches, engine: 'fast', fallback_reason: fellBack, collected_at: new Date().toISOString().slice(0, 10) }
       writeFileSync(file, JSON.stringify(out))
       return { ...out, cached: false }
     }
   }
 
-  const { data, searches } = await ask(apiKey, { input, schema: TREND_SCHEMA, name: 'trend_research' })
+  const { data, searches } = await ask(apiKey, { input, schema: TREND_SCHEMA, name: 'trend_research', location: userLocation(mk.home) })
   const out = { ...data, searches, engine: 'fast', collected_at: new Date().toISOString().slice(0, 10) }
   writeFileSync(file, JSON.stringify(out))
   return { ...out, cached: false }
