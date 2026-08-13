@@ -1337,7 +1337,11 @@ table.mini td b { color: var(--text); font-weight: 600; }
   background: #fff; border: 1px solid var(--line-2); display: block;
 }
 .sk-shot img { width: 100%; height: 100%; object-fit: contain; display: block; }
-.sk-none { display: grid; place-items: center; height: 100%; color: var(--text-3); font-size: 12px; }
+/* 그림이 없는 자리는 흰 판이 아니라 빈 자리로 보여야 한다.
+   흰 사각형은 "여기 사진이 있어야 하는데 안 뜬 것"처럼 읽힌다. */
+.sk-shot.empty { background: var(--bg-2); border-style: dashed; }
+.sk-none { display: grid; place-items: center; height: 100%; padding: 10px; box-sizing: border-box;
+  color: var(--text-3); font-size: 11px; line-height: 1.5; text-align: center; }
 .sk-src b { font-size: 13px; }
 .sk-tier { font-size: 11px; color: var(--text-3); border: 1px solid var(--line-2); border-radius: var(--r-chip); padding: 1px 7px; width: fit-content; }
 .sk-ev { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }

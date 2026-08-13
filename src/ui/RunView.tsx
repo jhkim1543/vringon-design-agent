@@ -524,7 +524,14 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
               return (
                 <article className={`skrow ${d.rejected ? 'rejected' : ''}`} key={d.spec.design_id}>
                   <div className="sk-src">
-                    <span className="sk-shot">{sketch ? <img src={sketch.url} alt="" loading="lazy" /> : <span className="sk-none">{t('Diagram')}</span>}</span>
+                    {/* 스케치가 없으면 "도식"이라고 적힌 빈 회색 칸이 떴다.
+                        도식은 그리지 않은 지 오래고, 그 자리에 있는 것은 아무것도 아니다.
+                        왜 없는지를 적는다 — 룰에서 떨어졌거나, 상한에 걸렸거나. */}
+                    <span className={`sk-shot${sketch ? '' : ' empty'}`}>{sketch
+                      ? <img src={sketch.url} alt="" loading="lazy" />
+                      : <span className="sk-none">{d.rejected
+                          ? t('Rejected by a rule, so it was never sketched')
+                          : t('Not sketched — the sketch cap was reached before this one')}</span>}</span>
                     {sketches.slice(1).map((sv, i2) => (
                       <span className="sk-shot" key={sv.hash + i2} title={t('Ink variation, same form')}>
                         <img src={sv.url} alt="" loading="lazy" />
