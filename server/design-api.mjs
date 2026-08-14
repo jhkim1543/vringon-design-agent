@@ -141,9 +141,11 @@ const GENOME_SCHEMA = {
     stance: { type: 'string', enum: ['grounded', 'neutral', 'lifted'] },
     spec_sheet: {
       type: 'object', additionalProperties: false,
-      required: ['heel_height_mm', 'panel_count', 'sole_construction', 'upper_material'],
+      required: ['is_new_last', 'is_new_outsole_mold', 'heel_height_mm', 'panel_count', 'sole_construction', 'upper_material'],
       properties: {
-        heel_height_mm: { type: 'integer', description: '허용 범위 안에서. 범위는 입력에 있다. 같은 영토라도 30 고정 금지 — 범위를 분산해 쓴다' },
+        is_new_last: { type: 'boolean', description: '이 안이 신규 라스트를 요구하는가. Core는 반드시 false' },
+      is_new_outsole_mold: { type: 'boolean', description: '이 안이 신규 아웃솔 몰드를 요구하는가. Core는 반드시 false' },
+      heel_height_mm: { type: 'integer', description: '허용 범위 안에서. 범위는 입력에 있다. 같은 영토라도 30 고정 금지 — 범위를 분산해 쓴다' },
         panel_count: { type: 'integer' },
         sole_construction: { type: 'string', description: '허용 공법 중 하나' },
         upper_material: { type: 'string', description: '예: suede 1.4mm, calf 1.6mm, engineered mesh 0.9mm' },

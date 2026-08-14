@@ -4,7 +4,6 @@ import { PACKS, profileOf, resetSeq, tierCapRule, viewSetFor } from './packs'
 import { blockedNarrative, deriveSpecHints, deriveSpecHintsFrom, drivingFromHint, hintNarrative, locksFromSeries, reconcileHint, signalCombos } from './signalSpec'
 import type { SpecHint } from './signalSpec'
 import { makeRng } from './rng'
-import { COMPETITORS, DIRECTIONS, SIGNALS } from './samples'
 import { COLORWAY_NAMES } from './sketch'
 import {
   colorwayEditPrompt, conceptPrompt, editImage, generateImage, renderFromSketchPrompt, renderPrompt,
@@ -164,8 +163,11 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         if (r.notes) emit({ kind: 'log', stage: 'S1', text: `Limits of this pass: ${r.notes.slice(0, 160)}` })
         emit({ kind: 'competitors', items: comps })
       } catch (e) {
-        emit({ kind: 'log', stage: 'S1', text: `Competitor research failed · ${String((e as Error).message).slice(0, 120)} · falling back to sample data` })
-        emit({ kind: 'competitors', items: COMPETITORS.shoe })
+        // 여기도 샘플 상수(COMPETITORS.shoe)를 대신 내보내고 있었다. 그 제품들은
+        // 이 Run 이 조사한 시장·품목과 아무 상관이 없고, 보드의 경쟁 제품 칸에
+        // 조사해서 찾은 것처럼 걸렸다. 실패는 실패로 둔다.
+        emit({ kind: 'log', stage: 'S1', text: `Competitor research failed · ${String((e as Error).message).slice(0, 120)} · nothing is substituted, so this run has no competitor set` })
+        emit({ kind: 'competitors', items: [] })
       }
       if (cancelled) return
       emit({ kind: 'log', stage: 'S1', text: '3 Trend research · looking for design signals' })
@@ -365,9 +367,12 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     // 무드보드는 문서에서 실제로 읽어 낸 신호를 쓴다.
     // 예전에는 여기서 샘플 상수에 난수 페이지 번호를 붙여 출처인 척했다. 그건 조작이다.
     if (!signals.length && moodSignals.length) signals = moodSignals
-    if (!signals.length && params.mode !== 'moodboard') signals = SIGNALS.shoe
+    // 조사가 아무것도 못 가져왔을 때 SIGNALS.shoe(샘플 상수 6개)를 대신 끼워 넣고 있었다.
+    // 그 상수의 출처는 전부 https://observed.example/… 이다 — 존재한 적 없는 주소다.
+    // 조사가 실패한 Run 과 성공한 Run 이 화면에서 구분되지 않았고, 카드에는 가짜 URL 이
+    // 근거로 붙었다. 규칙 1·2 그대로: 실패를 기본값으로 대체하지 않는다.
     if (!signals.length) {
-      emit({ kind: 'log', stage: 'S1', text: 'No signals: the document produced none and this mode invents nothing. Specs below are archetype defaults, not research.' })
+      emit({ kind: 'log', stage: 'S1', text: 'No signals came back from research. Nothing is substituted for them — the specs below come from the archetype grammar, and every card says so.' })
     }
     emit({ kind: 'signals', signals })
     const lowConf = signals.filter(s => s.confidence === 'low').length

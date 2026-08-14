@@ -201,9 +201,18 @@ export const shoePack: CategoryPack = {
 
     // ── 티어 = 라스트·몰드 변경 수준 (지시서 9.3) ──
     // Core: 기존 라스트 + 기존 바텀. Push: 하나만 변경. Signature: 신규 허용.
-    // 일부러 위반 사례도 남긴다 — 룰이 실제로 걸러내는 것을 보여주는 지점.
+    //
+    // 게놈이 있으면 이 두 값은 저작자가 정한 것이다. 예전에는 게놈 스키마에 이 칸이 없어서,
+    // LLM 에게 "Core 는 기존 라스트를 재사용한다"고 지시해 놓고 그 답을 받을 자리를 안 만든 채
+    // 코드가 rng.chance(0.06) 으로 다시 굴렸다. 티어를 정의하는 바로 그 값이 난수였다.
+    // 이제는 저작자가 정하고, 아래 룰 엔진이 티어 위반을 잡는다 — 위반이 나오면 그건
+    // 일부러 심은 시연용이 아니라 저작자가 실제로 티어를 어긴 것이고, 그래야 룰이 의미를 갖는다.
     let newLast = false, newMold = false
-    if (tier === 'core') {
+    const toolingFromGenome = hint?.is_new_last !== undefined || hint?.is_new_outsole_mold !== undefined
+    if (toolingFromGenome) {
+      newLast = !!hint?.is_new_last
+      newMold = !!hint?.is_new_outsole_mold
+    } else if (tier === 'core') {
       newLast = rng.chance(0.06)                        // 위반 사례 (S-02가 잡는다)
       newMold = rng.chance(0.1)                         // 위반 사례 (S-01이 잡는다)
     } else if (tier === 'push') {

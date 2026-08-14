@@ -81,6 +81,10 @@ export function genomeToHint(g: Genome): Record<string, string | number> {
     closure: g.closure_form,
     sole_construction: g.spec_sheet.sole_construction,
     upper_material: g.spec_sheet.upper_material,
+    // 티어를 정하는 두 값. 저작자가 정하고 룰 엔진이 검사한다 —
+    // 여기를 안 넘기면 generateSpec 이 주사위로 다시 정해 버린다.
+    is_new_last: g.spec_sheet.is_new_last ? 1 : 0,
+    is_new_outsole_mold: g.spec_sheet.is_new_outsole_mold ? 1 : 0,
   }
 }
 

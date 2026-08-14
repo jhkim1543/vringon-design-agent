@@ -715,6 +715,10 @@ export interface DesignGenome {
   closure_form: string
   stance: 'grounded' | 'neutral' | 'lifted'
   spec_sheet: {
+    /** 티어의 정의 그 자체다. 예전에는 이 두 값이 rng.chance() 였고,
+     *  LLM 에게 "Core 는 기존 라스트를 재사용한다"고 시켜 놓고 그 답을 버렸다. */
+    is_new_last: boolean
+    is_new_outsole_mold: boolean
     heel_height_mm: number
     panel_count: number
     sole_construction: string
