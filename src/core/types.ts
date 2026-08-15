@@ -498,6 +498,8 @@ export interface RunParams {
   /** 멀티뷰 → 3D 모델 생성 */
   make3d: boolean
   approvalGate: boolean
+  /** 캠페인·3D 지출 전에 최종 선정을 사람이 확인한다 (규칙 9) · 기본 켬 */
+  finalGate?: boolean
   /** 디자인 생성 모델 · 화면에는 성격으로만 노출한다 */
   imageEngine: 'fast' | 'detail'
   /** 실제 생성 상한 (장) · 초과분은 SVG로 폴백. 비용 통제 */
@@ -523,7 +525,7 @@ export const DEFAULT_PARAMS: RunParams = {
   line: defaultLineProfile(),
   endStage: 'S3', sketchCount: 12, tierRatio: [1, 1, 1],
   renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
-  topN: 3, designsPerSketch: 2, variationCount: 3, campaignShots: 4, make3d: true, approvalGate: true,
+  topN: 3, designsPerSketch: 2, variationCount: 3, campaignShots: 4, make3d: true, approvalGate: true, finalGate: true,
   imageEngine: 'detail', imageBudget: 12,
   trend: {
     // 기본을 비워둔다. 가상의 브랜드명으로 검색하면 결과가 무의미하고 시간만 든다.
@@ -567,6 +569,9 @@ export interface Signal {
   sales_proxy_score?: number   // 트렌드 모드 (옛 샘플 호환)
   proxy_confidence?: 'high' | 'medium' | 'low' | 'none'
   evidence?: string[]          // 웹 수집 시 확인된 근거 문장
+  /** 출처 등급 · 웹 수집 출처마다 하나. T1 산업공인 / T2 시장신호 / T3 전문매체 / T4 소셜.
+   *  confidence 는 서버가 이 등급에서 계산한다 — 개수로는 high 가 되지 않는다. */
+  source_tiers?: ('T1' | 'T2' | 'T3' | 'T4')[]
   /** 함께 관측되는 속성 묶음 · "chunky"가 아니라 high stack + wide platform + …로 */
   co_occurring?: string[]
   /** 하나의 점수 대신 네 지수로 분리 */
@@ -841,6 +846,8 @@ export type PipelineEvent =
   | { kind: 'design'; design: Design }
   | { kind: 'design-update'; design: Design }
   | { kind: 'gate'; stage: Stage }         // 승인 게이트 대기
+  // 시리즈 DNA 승인 대기 · 사진에서 읽은 불변 요소는 가설이다. 사람이 승인해야 잠긴다 (규칙 16)
+  | { kind: 'dna-gate'; invariant: import('./types').SeriesDnaElement[]; of: number }
   | { kind: 'checkpoint'; label: string }
   | { kind: 'done'; endStage: Stage }
 

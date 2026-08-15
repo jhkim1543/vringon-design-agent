@@ -83,7 +83,7 @@ const TREND_SCHEMA = {
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['label', 'axis', 'attribute', 'direction', 'observed_count', 'evidence', 'source_urls', 'confidence',
+        required: ['label', 'axis', 'attribute', 'direction', 'observed_count', 'evidence', 'source_urls', 'source_tiers', 'confidence',
           'co_occurring', 'commercial_index', 'cultural_index', 'forecast_index', 'feasibility_index',
           'adoption_stage', 'last_change', 'bottom_tooling_change', 'upper_pattern_change'],
         properties: {
@@ -94,6 +94,10 @@ const TREND_SCHEMA = {
           observed_count: { type: 'integer', description: '서로 다른 출처에서 확인된 횟수' },
           evidence: { type: 'array', items: { type: 'string' } },
           source_urls: { type: 'array', items: { type: 'string' } },
+          source_tiers: {
+            type: 'array', items: { type: 'string', enum: ['T1', 'T2', 'T3', 'T4'] },
+            description: 'source_urls와 같은 순서·같은 길이. T1 산업 공인(WGSN·전시회 공식·업계 리포트) / T2 검증된 시장 신호(리테일러 랭킹·재고·베스트셀러 지면) / T3 전문 매체(트레이드 프레스) / T4 소셜·블로그·UGC',
+          },
           confidence: { type: 'string', enum: ['high', 'medium', 'low'] },
           co_occurring: {
             type: 'array', items: { type: 'string' },
@@ -113,6 +117,33 @@ const TREND_SCHEMA = {
     report_perspective: { type: 'string', description: '수집된 자료의 관점·편향' },
     notes: { type: 'string' },
   },
+}
+
+
+// ── 출처 등급 → confidence · 규칙은 코드가 강제한다 (지시서 §S1 출처 4등급제) ──
+//
+// 예전 규칙은 "출처 3곳 이상이면 high" — 개수만 셌다. 소셜 언급 세 건이 업계 리포트
+// 한 건을 이겼다. 등급 분류 자체는 여전히 모델의 판단이지만(도메인 레지스트리가 없는 한
+// 불가피하다), 등급에서 confidence 로 가는 계산은 여기서 결정적으로 한다 —
+// 모델이 뭐라고 자기 판정을 했든 이 값으로 덮어쓴다.
+function confidenceFromTiers(tiers) {
+  const arr = Array.isArray(tiers) ? tiers : []
+  const t12 = arr.filter(t => t === 'T1' || t === 'T2').length
+  const t3 = arr.filter(t => t === 'T3').length
+  if (t12 >= 2) return 'high'
+  if (t12 === 1 || t3 >= 2) return 'medium'
+  return 'low'
+}
+
+/** 신호 배열에 등급 규칙을 적용한다. 등급이 아예 없으면(옛 캐시) 건드리지 않는다. */
+function applyTierRule(signals) {
+  // 이 함수는 신선한 응답에만 돈다 (캐시는 이 앞에서 조기 반환). 그러니 빈 배열을
+  // 봐줄 이유가 없다 — source_tiers: [] 로 자기 confidence 를 high 로 적어 내는 것이
+  // 정확히 이 규칙이 막아야 할 인플레이션이다. 등급이 배열이면 무조건 규칙을 태운다:
+  // 빈 배열은 confidenceFromTiers([]) = low 다.
+  return (signals ?? []).map(sg => Array.isArray(sg.source_tiers)
+    ? { ...sg, confidence: confidenceFromTiers(sg.source_tiers) }
+    : sg)
 }
 
 // 지시서 14장 · 리포트 문체 규격
@@ -482,7 +513,7 @@ export async function researchTrends(apiKey, root, {
   const brands = (rawBrands ?? []).map(b => canonBrand(b, ko))
   const useDeep = !!deep
   const key = createHash('sha256').update(JSON.stringify([
-    'trend9ft', LANG, typeKo, brands ?? [], season, priceBandKo ?? '', [...objectives].sort(), lineKey(line), mk.home.id, mk.refIds,
+    'trend10ft', LANG, typeKo, brands ?? [], season, priceBandKo ?? '', [...objectives].sort(), lineKey(line), mk.home.id, mk.refIds,
     useDeep ? 'deep' : wantReport ? `multi${depth}` : 'fast',
   ])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
@@ -512,7 +543,8 @@ ${lenses.map((l, i) => `${i + 1}. ${l}`).join('\n')}
 규칙:
 - 실제로 검색해서 확인한 것만 적습니다. 확인하지 못한 것은 넣지 마세요.
 - observed_count는 서로 다른 출처에서 확인된 횟수입니다. 부풀리지 마세요.
-- confidence는 출처가 3곳 이상이면 high, 1곳이면 low로 둡니다.
+- source_tiers에 출처마다 등급을 적으세요. 등급이 confidence를 정합니다 — 개수가 아닙니다.
+  서버가 등급으로 confidence를 다시 계산하므로, 소셜 언급을 아무리 모아도 high가 되지 않습니다.
 - label과 axis는 반드시 ${LANG}로 씁니다. attribute만 영어 snake_case로 두세요 (기계가 쓰는 키라서 언어를 타면 안 됩니다).
 - 신호 하나는 뭉툭한 한 단어가 아니라 공존 속성 묶음이어야 합니다. co_occurring에 함께 관측되는 속성을 2~4개 적으세요.
   나쁜 예: "Chunky running shoe". 좋은 예: label "High-stack platform trainer", co_occurring ["high stack", "wide platform", "moderate rocker", "segmented rubber"].
@@ -614,6 +646,7 @@ ${rep.data.body_markdown}
 
     const out = {
       ...structured.data,
+      signals: applyTierRule(structured.data.signals),
       searches: totalSearch,
       engine: 'multi',
       report: rep.data,
@@ -641,7 +674,7 @@ ${dr.text.slice(0, 120_000)}
         schema: TREND_SCHEMA, name: 'trend_research',
       })
       const out = {
-        ...data, searches: dr.searches, engine: 'deep', elapsed_sec: dr.elapsedSec,
+        ...data, signals: applyTierRule(data.signals), searches: dr.searches, engine: 'deep', elapsed_sec: dr.elapsedSec,
         report: dr.text.slice(0, 20_000),
         collected_at: new Date().toISOString().slice(0, 10),
       }
@@ -651,14 +684,14 @@ ${dr.text.slice(0, 120_000)}
       // 모델 미개방(404) 등은 조용히 기본 경로로 되돌린다
       const fellBack = `딥리서치 사용 불가로 기본 검색으로 진행: ${String(e.message).slice(0, 120)}`
       const { data, searches } = await ask(apiKey, { input, schema: TREND_SCHEMA, name: 'trend_research', location: userLocation(mk.home) })
-      const out = { ...data, searches, engine: 'fast', fallback_reason: fellBack, collected_at: new Date().toISOString().slice(0, 10) }
+      const out = { ...data, signals: applyTierRule(data.signals), searches, engine: 'fast', fallback_reason: fellBack, collected_at: new Date().toISOString().slice(0, 10) }
       writeFileSync(file, JSON.stringify(out))
       return { ...out, cached: false }
     }
   }
 
   const { data, searches } = await ask(apiKey, { input, schema: TREND_SCHEMA, name: 'trend_research', location: userLocation(mk.home) })
-  const out = { ...data, searches, engine: 'fast', collected_at: new Date().toISOString().slice(0, 10) }
+  const out = { ...data, signals: applyTierRule(data.signals), searches, engine: 'fast', collected_at: new Date().toISOString().slice(0, 10) }
   writeFileSync(file, JSON.stringify(out))
   return { ...out, cached: false }
 }

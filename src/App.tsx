@@ -1,7 +1,7 @@
 // ── VRINGON Design Agent · 앱 셸 ─────────────────────────────────────
 import { t, useLang } from './core/i18n'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { PipelineEvent, RunParams, RunState, Stage } from './core/types'
+import type { PipelineEvent, RunParams, RunState, SeriesDnaElement, Stage } from './core/types'
 import { runPipeline } from './core/pipeline'
 import type { PipelineHandle } from './core/pipeline'
 import Wizard from './ui/Wizard'
@@ -42,6 +42,10 @@ export default function App() {
   const [st, setSt] = useState<RunState | null>(null)
   const [progress, setProgress] = useState<Record<string, number>>({})
   const [gated, setGated] = useState(false)
+  // 시리즈 DNA 승인 대기 · 사진에서 읽은 불변 요소를 사람이 확인할 때까지 파이프라인이 멈춰 있다
+  // checked 를 여기 두는 이유: RunView 로컬에 두면 보드에 갔다 오는 순간 체크가 초기화된다.
+  // 키는 index|label — 같은 라벨의 요소 두 개가 한 체크박스로 접히지 않게 한다.
+  const [dnaGate, setDnaGate] = useState<{ invariant: SeriesDnaElement[]; of: number; checked: Record<string, boolean> } | null>(null)
   const [usage, setUsage] = useState({ images: 0, searches: 0 })
   const handleRef = useRef<PipelineHandle | null>(null)
   const { theme, setTheme } = useTheme()
@@ -105,7 +109,11 @@ export default function App() {
         case 'dossier-pending': next.dossierPending = e.on; break
         case 'design': next.designs = [...next.designs, e.design]; break
         case 'design-update':
-          next.designs = next.designs.map(d => d.spec.design_id === e.design.spec.design_id ? e.design : d); break
+          // 파이프라인의 복사본에는 사람이 카드에서 내린 판정이 없다. 통째로 갈아끼우면
+          // 게이트에서 누른 거절이 다음 업데이트에 지워진다 — 판정은 화면 것을 지킨다.
+          next.designs = next.designs.map(d => d.spec.design_id === e.design.spec.design_id
+            ? { ...e.design, verdict: d.verdict ?? e.design.verdict, verdictTags: d.verdictTags ?? e.design.verdictTags }
+            : d); break
         case 'checkpoint': next.checkpoints = [...next.checkpoints, e.label]; break
         case 'done': next.finished = true; break
       }
@@ -118,6 +126,7 @@ export default function App() {
       const m = e.text.match(/(\d+) web searches/)
       if (m) setUsage(u => ({ ...u, searches: u.searches + Number(m[1]) }))
     }
+    if (e.kind === 'dna-gate') setDnaGate({ invariant: e.invariant, of: e.of, checked: Object.fromEntries(e.invariant.map((el, i) => [`${i}|${el.label}`, true])) })
     if (e.kind === 'gate') {
       setGated(true)
       setSt(prev => prev ? { ...prev, stageStatus: { ...prev.stageStatus, [e.stage]: 'gated' as const } } : prev)
@@ -145,14 +154,31 @@ export default function App() {
     setSt(freshState(params))
     setProgress({})
     setGated(false)
+    setDnaGate(null)      // 취소된 이전 Run 의 승인 패널이 새 Run 위에 뜨면 안 된다
     setView('run')
     handleRef.current = runPipeline({ ...params, brand }, onEvent, 1.6)
   }, [onEvent, brand])
 
   const resume = useCallback(() => {
     setGated(false)
-    setSt(prev => prev ? { ...prev, stageStatus: { ...prev.stageStatus, S2: 'done' } } : prev)
+    // 게이트가 걸린 단계만 풀어 준다 · S2 게이트는 stage-done 뒤에 서므로 done 이 맞고,
+    // S4 최종 게이트는 단계 중간(캠페인·3D 전)에 서므로 running 으로 돌아가야 한다.
+    setSt(prev => prev ? {
+      ...prev,
+      stageStatus: Object.fromEntries(
+        Object.entries(prev.stageStatus).map(([k, v]) => [k, v === 'gated' ? (k === 'S4' ? 'running' : 'done') : v]),
+      ) as RunState['stageStatus'],
+    } : prev)
     handleRef.current?.resume()
+  }, [])
+
+  const onApproveDna = useCallback((labels: string[]) => {
+    handleRef.current?.approveDna?.(labels)
+    setDnaGate(null)
+  }, [])
+
+  const onToggleDna = useCallback((key: string, v: boolean) => {
+    setDnaGate(g => g ? { ...g, checked: { ...g.checked, [key]: v } } : g)
   }, [])
 
   const onResolveDna = useCallback((choice: string) => {
@@ -164,6 +190,9 @@ export default function App() {
   }, [])
 
   const onVerdict = useCallback((id: string, v: 'approve' | 'reject', tags: string[]) => {
+    // 파이프라인의 Design 객체는 화면의 복사본과 다르다. 최종 게이트(규칙 9)가
+    // 거절을 보려면 핸들로 직접 넘겨야 한다.
+    handleRef.current?.setVerdict?.(id, v)
     setSt(prev => {
       if (!prev) return prev
       return {
@@ -247,13 +276,14 @@ export default function App() {
             runIdRef.current = rec.id
             setSt(rec.state)
             setGated(false)
+            setDnaGate(null)
             setView(target)
           }} />
         )}
         {view === 'run' && st && (
           <RunView st={st} progress={progress} gated={gated}
             onResume={resume} onGateVerdict={onVerdict} onOpenBoard={() => setView('board')}
-            onResolveDna={onResolveDna} />
+            onResolveDna={onResolveDna} dnaGate={dnaGate} onApproveDna={onApproveDna} onToggleDna={onToggleDna} />
         )}
         {view === 'board' && st && <Board st={st} onVerdict={onVerdict} runId={runIdRef.current}
           onBoardImage={(designId, img) => {

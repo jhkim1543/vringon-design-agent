@@ -718,6 +718,12 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                 <input type="checkbox" checked={p.approvalGate} onChange={e => set('approvalGate', e.target.checked)} />
                 {t('Show me the sketches before rendering')}
               </label>
+              {/* 최종 게이트 (규칙 9) · 캠페인·3D 는 Run 에서 제일 비싼 두 단계다.
+                  기본 켬 — LLM 이 고른 슬레이트에 그 지출을 무확인으로 싣지 않는다. */}
+              <label className="checkline">
+                <input type="checkbox" checked={p.finalGate !== false} onChange={e => set('finalGate', e.target.checked)} />
+                {t('Confirm the final picks before campaign shots and 3D')}
+              </label>
             </section>
 
             <button className="moretoggle" onClick={() => setMore(v => !v)}>

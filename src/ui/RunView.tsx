@@ -40,7 +40,7 @@ const STAGE_META: { key: 'S1' | 'S2' | 'S3' | 'S4' | 'S5'; t: string; d: string 
   { key: 'S5', t: 'Package', d: 'Board and notes' },
 ]
 
-export default function RunView({ st, progress, gated, onResume, onGateVerdict, onOpenBoard, onResolveDna }: {
+export default function RunView({ st, progress, gated, onResume, onGateVerdict, onOpenBoard, onResolveDna, dnaGate, onApproveDna, onToggleDna }: {
   st: RunState
   progress: Record<string, number>
   gated: boolean
@@ -48,6 +48,11 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
   onGateVerdict: (id: string, v: 'approve' | 'reject', tags: string[]) => void
   onOpenBoard: () => void
   onResolveDna: (choice: string) => void
+  /** 시리즈 DNA 승인 대기 · 사진에서 읽은 불변 요소는 사람이 확인해야 스펙을 잠근다 (규칙 16).
+   *  checked 는 App 이 들고 있다 — 보드에 갔다 와도 체크가 남아야 한다. */
+  dnaGate?: { invariant: import('../core/types').SeriesDnaElement[]; of: number; checked: Record<string, boolean> } | null
+  onApproveDna?: (labels: string[]) => void
+  onToggleDna?: (key: string, v: boolean) => void
 }) {
   const [showLog, setShowLog] = useState(false)
   // 디자인 상세 모달 · 캠페인 컷과 3D 를 연다
@@ -394,6 +399,34 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
           </div>
         )}
 
+        {/* 시리즈 DNA 승인 · 사진에서 읽은 것은 가설이고, 잠그는 것은 사람이다.
+            여기서 잘못 승인하면 그 오독이 이 Run 의 모든 안을 구속한다. */}
+        {dnaGate && onApproveDna && (
+          <div className="notice warn" style={{ marginBottom: 14, flexDirection: 'column', gap: 10 }}>
+            <div>
+              <b>{t('These read as fixed across your uploads. Confirm before they lock every spec.')}</b>{' '}
+              {t('Uncheck anything the photos got wrong — a misread here would constrain every design in this run.')}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {dnaGate.invariant.map((e, i) => (
+                <label key={`${i}|${e.label}`} style={{ display: 'flex', gap: 8, alignItems: 'baseline', fontSize: 13, cursor: 'pointer' }}>
+                  <input type="checkbox" checked={dnaGate.checked[`${i}|${e.label}`] ?? true}
+                    onChange={ev => onToggleDna?.(`${i}|${e.label}`, ev.target.checked)} />
+                  <span><b>{e.label}</b> · {e.observed_in}/{dnaGate.of} {t('designs')}{e.note ? ` · ${e.note}` : ''}</span>
+                </label>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button className="btn btn-primary btn-sm"
+                onClick={() => onApproveDna(dnaGate.invariant.filter((e, i) => dnaGate.checked[`${i}|${e.label}`] ?? true).map(e => e.label))}>
+                {t('Lock the checked elements and continue')}
+              </button>
+              <button className="btn btn-ghost btn-sm" onClick={() => onApproveDna([])}>
+                {t('Lock nothing — treat all as variable')}
+              </button>
+            </div>
+          </div>
+        )}
         {st.dnaConflict && !st.dnaConflict.resolved && (
           <div className="notice warn" style={{ marginBottom: 14, flexDirection: 'column' }}>
             <div>

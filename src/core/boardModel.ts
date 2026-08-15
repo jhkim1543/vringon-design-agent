@@ -226,6 +226,13 @@ export function buildBoardModel(st: RunState): BoardModel {
       title: s.label,
       body: [
         `${s.axis} · seen ${s.observed_count}x · ${s.direction === 'rising' ? 'rising' : s.direction === 'stable' ? 'holding' : 'fading'}`,
+        // 출처의 질 · 개수가 아니라 등급이 confidence 를 정했다는 것을 카드가 보여 준다
+        ...(s.source_tiers?.length
+          ? [`sources: ${(['T1', 'T2', 'T3', 'T4'] as const).map(tier => {
+              const n = s.source_tiers!.filter(x => x === tier).length
+              return n ? `${tier}×${n}` : ''
+            }).filter(Boolean).join(' ')} → ${s.confidence}`]
+          : []),
         s.sales_proxy_score != null ? `proxy ${s.sales_proxy_score} (${s.proxy_confidence})`
           : s.page_ref ? `source ${s.page_ref}` : `${s.sources.length} sources`,
       ],

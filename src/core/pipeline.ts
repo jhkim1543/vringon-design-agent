@@ -24,6 +24,10 @@ export type Emit = (e: PipelineEvent) => void
 export interface PipelineHandle {
   resume: () => void         // 승인 게이트 해제
   cancel: () => void
+  /** 시리즈 DNA 가설 승인 · 사람이 확인한 요소 label 만 스펙을 잠글 수 있다 (규칙 16) */
+  approveDna?: (approvedLabels: string[]) => void
+  /** 사람이 카드에서 내린 판정 · 최종 게이트에서 지출 대상을 거른다 (규칙 9) */
+  setVerdict?: (id: string, v: 'approve' | 'reject') => void
 }
 
 /** 컨셉 촬영에 실을 무드 한 줄. 브랜드 톤이 있으면 그것을 쓴다. */
@@ -58,11 +62,17 @@ async function pool<T>(items: T[], limit: number, worker: (item: T, i: number) =
 export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineHandle {
   let cancelled = false
   let gateResolve: (() => void) | null = null
+  let dnaResolve: ((labels: string[]) => void) | null = null
+  // 사람의 카드 판정 · App 이 넘겨준다. 파이프라인의 Design 객체는 화면의 복사본과
+  // 다른 인스턴스라, 화면에서 누른 거절이 여기로 직접 오지 않으면 게이트가 보지 못한다.
+  const humanVerdicts = new Map<string, 'approve' | 'reject'>()
   const isCancelled = () => cancelled
 
   const handle: PipelineHandle = {
     resume() { gateResolve?.(); gateResolve = null },
-    cancel() { cancelled = true; gateResolve?.() },
+    cancel() { cancelled = true; gateResolve?.(); dnaResolve?.([]) },
+    approveDna(labels) { dnaResolve?.(labels); dnaResolve = null },
+    setVerdict(id, v) { humanVerdicts.set(id, v) },
   }
 
   ;(async () => {
@@ -187,7 +197,23 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           })
           if (cancelled) return
           emit({ kind: 'series-dna', dna: toSeriesDna(read) })
-          seriesLocks = locksFromSeries(read.invariant, read.of)
+          // 사진에서 읽은 불변 요소는 가설이다 (규칙 16). 여기서 잘못 잠그면 그 오독이
+          // 이 Run 의 모든 안을 구속한다. 그래서 사람이 승인한 요소만 잠근다 —
+          // 예전에는 읽은 즉시 잠갔고, 사람이 끼어들 지점이 없었다.
+          if (read.invariant.length) {
+            emit({ kind: 'log', stage: 'S1', text: `${read.invariant.length} elements read as fixed. They lock the specs only after you confirm them — uncheck anything the photos got wrong.` })
+            emit({ kind: 'dna-gate', invariant: toSeriesDna(read).invariant, of: read.of })
+            const approved = await new Promise<string[]>(res => { dnaResolve = res })
+            if (cancelled) return
+            const kept = read.invariant.filter(e => approved.includes(e.label))
+            seriesLocks = locksFromSeries(kept, read.of)
+            const droppedN = read.invariant.length - kept.length
+            emit({ kind: 'log', stage: 'S1', text: droppedN
+              ? `You approved ${kept.length} of ${read.invariant.length} fixed elements · ${droppedN} rejected as misreads and not locked`
+              : `All ${kept.length} fixed elements confirmed · locked into every spec` })
+          } else {
+            seriesLocks = {}
+          }
           emit({ kind: 'log', stage: 'S1', text: `Read ${read.of} designs${read.cached ? ' (reused an earlier pass)' : ''} · ${read.invariant.length} elements repeat, ${read.variable.length} vary, ${read.ambiguous.length} unclear` })
           for (const inv of read.invariant.slice(0, 3)) {
             emit({ kind: 'log', stage: 'S1', text: `Repeats in ${inv.observed_in} of ${read.of}: ${inv.label} — ${inv.evidence}` })
@@ -832,12 +858,58 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
             langName,
           })
           d.qa = v.checks
-          const failedN = v.checks.filter(c => !c.pass).length
+          let failedN = v.checks.filter(c => !c.pass).length
           if (!v.single_object) {
             d.viewMismatch = true
             emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} render shows more than one object · flagged, kept visible` })
           }
           emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} vision check ${v.checks.length - failedN}/${v.checks.length}${failedN ? ' · mismatches flagged, not hidden' : ''}` })
+
+          // ── 수리 1회 (지시서 §S6·§S8) · 검사가 실패를 찾았으면 그 컷만 한 번 고쳐 본다.
+          // 실패한 항목만 짚어 편집하고, 고친 컷을 다시 검사한다. 두 번째도 실패면
+          // 실패로 표기한 채 둔다 — 무한 수리도, 못 고친 것을 고쳤다는 표기도 없다.
+          if (failedN > 0 && budget.left() > 0) {
+            const fails = v.checks.filter(c => !c.pass)
+            const repairPrompt = [
+              'Keep this exact shoe, camera angle, lighting and background. Fix only the following, changing nothing else:',
+              ...fails.map(c => `${c.check}: it currently reads as ${c.observed}, it must read as ${c.target}.`),
+              'One single shoe, photorealistic, no text, no logo.',
+            ].join(' ')
+            try {
+              emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} repairing ${failedN} mismatch${failedN > 1 ? 'es' : ''} · one pass, then re-checked` })
+              const fixed = await editImage(heroForQa.hash, repairPrompt, params.imageEngine)
+              budget.spend()
+              const v2 = await verifyRender({ hash: fixed.hash, genome: d.spec.genome ?? {
+                toe_family: String(d.spec.fields.toe_shape) as Genome['toe_family'],
+                closure_form: String(d.spec.fields.closure),
+              }, langName })
+              const failed2 = v2.checks.filter(c => !c.pass).length
+              if (failed2 < failedN) {
+                // 수리가 실제로 좁혔다 · 히어로를 교체하고 두 번째 검사 결과를 기록한다
+                const idx = d.images.indexOf(heroForQa)
+                d.images = d.images.map((im, k) => k === idx ? {
+                  ...im, url: fixed.url, hash: fixed.hash, origin: 'regenerated_hq' as const,
+                  editedFrom: heroForQa.hash, promptUsed: repairPrompt,
+                  whyUsed: `Vision check found ${failedN} mismatch${failedN > 1 ? 'es' : ''}; one repair pass closed ${failedN - failed2} of them.`,
+                  // 수리 프롬프트가 'no logo'로 끝난다 — 합성해 둔 마크가 지워졌을 수 있다.
+                  // 표시를 남겨 두면 S4 의 재합성 백스톱이 이 컷을 건너뛴다. 거짓 표시를 지운다.
+                  logoStamped: false,
+                } : im)
+                d.qa = v2.checks
+                // 다중 객체 판정도 두 번째 검사 기준으로 갱신한다. 첫 판정을 남기면
+                // 수리로 생긴 두 짝 문제를 못 잡고, 수리로 고친 문제를 계속 경고한다.
+                d.viewMismatch = !v2.single_object
+                failedN = failed2
+                emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} repair re-check ${v2.checks.length - failed2}/${v2.checks.length}${failed2 ? ' · remaining mismatches stay flagged' : ' · clean'}` })
+              } else {
+                emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} repair did not close the gap · original kept, mismatches stay flagged` })
+              }
+            } catch (e) {
+              emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} repair pass failed · ${String((e as Error).message).slice(0, 70)} · flagged as-is` })
+            }
+          } else if (failedN > 0) {
+            emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} image cap reached · mismatches flagged without repair` })
+          }
         } catch (e) {
           d.qa = []
           emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} verification call failed · left unverified (no simulated pass) · ${String((e as Error).message).slice(0, 70)}` })
@@ -886,7 +958,11 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
               .map(([k, v]) => `${k.replace(/_/g, ' ')} ${v}`).join(', '),
             cap: `${Math.round((d.cost.cap_ratio - 1) * 100)}%`,
             moulds: d.cost.tooling.mold_count_required,
-            rules: d.ruleResults.map(r => `${r.rule} ${r.severity}`).join(', '),
+            // 비전 검사 결과도 MD 가 본다 · 렌더가 스펙과 어긋난 안을 모르고 살 수는 없다
+            rules: [
+              ...d.ruleResults.map(r => `${r.rule} ${r.severity}`),
+              d.qa.length ? `vision check ${d.qa.length - qaFails(d)}/${d.qa.length}` : 'vision check not run',
+            ].join(', '),
           })),
         })
         if (cancelled) return
@@ -950,6 +1026,33 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     await wait(700)
     emit({ kind: 'log', stage: 'S4', text: 'Ground contact aligned and heel height checked visually, within 20%' })
     await wait(800)
+    // ── 최종 인간 게이트 (규칙 9) · 가장 비싼 두 단계 앞에서 사람이 슬레이트를 확인한다.
+    // 예전에는 게이트가 스케치 직후에만 있어서, 캠페인 컷과 3D 비용이 전부
+    // MD 모델이 고른 안 뒤에 실렸다. MD 가 틀리면 지출이 통째로 잘못된 안에 갔다.
+    // 카드에서 거절한 최종 후보는 이 지출에서 빠진다. 전부 거절하면 지출 없이 끝난다.
+    // 지출이 실제로 앞에 있어야 게이트가 선다. endStage 가 S4 면 3D(S5)는 돌지 않는데
+    // make3d 기본값이 true 라, 그걸 이유로 게이트를 세우면 없는 지출을 지키는 셈이다.
+    const spendAhead = (campaignCount(params) > 0 && upto >= 3) || (params.make3d && upto >= 4)
+    if (params.finalGate !== false && top.length && spendAhead) {
+      emit({ kind: 'log', stage: 'S4', text: `Final slate: ${top.map(d => d.spec.design_id).join(', ')}. Campaign shots and 3D wait for your confirmation — reject any pick on its card to drop it from the spend, then continue.` })
+      emit({ kind: 'gate', stage: 'S4' })
+      await new Promise<void>(res => { gateResolve = res })
+      if (cancelled) return
+      const dropped = top.filter(d => humanVerdicts.get(d.spec.design_id) === 'reject')
+      if (dropped.length) {
+        for (const d of dropped) {
+          d.isTop = false
+          emit({ kind: 'design-update', design: { ...d } })
+        }
+        const kept = top.filter(d => humanVerdicts.get(d.spec.design_id) !== 'reject')
+        top.length = 0
+        top.push(...kept)
+        emit({ kind: 'log', stage: 'S4', text: `You dropped ${dropped.map(d => d.spec.design_id).join(', ')} · campaign shots and 3D run only for ${top.length ? top.map(d => d.spec.design_id).join(', ') : 'nothing — all picks rejected, so the spend is skipped'}` })
+      } else {
+        emit({ kind: 'log', stage: 'S4', text: 'Slate confirmed as picked · continuing to campaign shots' })
+      }
+    }
+
     // 캠페인 컷 · 착용컷과 연출컷을 한 단계에서 같이 뽑는다.
     // 둘 다 기준 렌더의 편집이다. 새로 그리면 같은 제품이 아니게 된다.
     const shots = campaignCount(params)
@@ -1238,16 +1341,28 @@ function fillModelEval(pool: Design[], brand: BrandIdentity | undefined, signals
 // 실제 검증은 /api/verify/render (server/design-api.mjs)가 한다 — 지시서 규칙 13.
 
 // Top N 다양성 제약 (지시서 11.2 · 유형별 최소 1개 + 스펙 거리)
+/** 비전 검사에서 몇 항목이 어긋났는가 */
+const qaFails = (d: Design) => d.qa.filter(q => !q.pass).length
+
+/** 선정 정렬용 검증 점수 · 통과(0) < 미검증(0.5) < 실패(1+).
+ *  미검증을 0으로 두면 검사를 안 받은 안이 다 통과한 안과 동점이 된다 —
+ *  검증이 죽었을 때 오히려 유리해지는 구조는 검증을 무의미하게 만든다. */
+const qaScore = (d: Design) => d.qa.length === 0 ? 0.5 : qaFails(d)
+
 function pickTopDiverse(pool: Design[], n: number): Design[] {
   const byTier: Record<string, Design[]> = { core: [], push: [], signature: [] }
   pool.forEach(d => byTier[d.spec.tier].push(d))
-  for (const t of Object.keys(byTier)) byTier[t].sort((a, b) => a.cost.cap_ratio - b.cost.cap_ratio)
+  // 검증을 통과한 안이 먼저다. 예전에는 원가순뿐이라, 비전 검사에서 어긋난 안이
+  // 그대로 최종에 올랐다 — 검사를 하고도 결과가 선정에 닿지 않았다 (지시서 §S8).
+  // 같은 검증 상태 안에서는 원가순을 유지한다.
+  const rank = (a: Design, b: Design) => (qaScore(a) - qaScore(b)) || (a.cost.cap_ratio - b.cost.cap_ratio)
+  for (const t of Object.keys(byTier)) byTier[t].sort(rank)
   const picked: Design[] = []
   // 유형별 최소 1개
   for (const t of ['core', 'push', 'signature']) {
     if (picked.length < n && byTier[t].length) picked.push(byTier[t].shift()!)
   }
-  const rest = [...byTier.core, ...byTier.push, ...byTier.signature].sort((a, b) => a.cost.cap_ratio - b.cost.cap_ratio)
+  const rest = [...byTier.core, ...byTier.push, ...byTier.signature].sort(rank)
   while (picked.length < n && rest.length) picked.push(rest.shift()!)
   return picked
 }

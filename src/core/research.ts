@@ -249,6 +249,7 @@ export function toSignals(r: TrendResearch): Signal[] {
     axis: s.axis,
     observed_count: s.observed_count,
     sources: s.source_urls,
+    source_tiers: (s as { source_tiers?: ('T1'|'T2'|'T3'|'T4')[] }).source_tiers,
     price_bands: [],
     confidence: s.confidence,
     direction: s.direction,
