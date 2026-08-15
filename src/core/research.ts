@@ -97,9 +97,13 @@ async function post<T>(url: string, body: unknown): Promise<T> {
   // 조사 결과의 언어는 분석을 시작할 때 정한다. 화면 언어를 그때그때 따라가면
   // 도중에 언어를 바꿨을 때 한 리포트 안에 두 언어가 섞인다.
   const lang = runLang ?? getLang()
+  // 리서치 한 레그는 웹 검색을 수십 번 돌아 10분을 넘길 수 있다. 브라우저 fetch 는 무한정
+  // 기다리지만 Node(헤드리스 샘플 러너)의 fetch 는 헤더 300초에서 조용히 끊긴다 —
+  // 그 순간 세 레그가 동시에 'fetch failed' 로 죽는다. 상한을 명시해 두 환경을 같게 한다.
   const r = await fetch(url, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...(body as object), lang, langName: LANG_NAME[lang] }),
+    signal: AbortSignal.timeout(20 * 60_000),
   })
   const j = await r.json()
   if (!r.ok || j.error) throw new Error(j.error ?? `${url} ${r.status}`)

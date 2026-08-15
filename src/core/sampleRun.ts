@@ -4,8 +4,9 @@ import type { RunState } from './types'
 import { deleteRun, listRuns, saveRun } from './store'
 
 // 지금 파이프라인이 실제로 돌려 만든 결과만 둔다. 옛 판은 지금 하는 말과 다른 말을 한다.
+// 러닝은 최종본 파이프라인(시장 설정·출처 등급·비전 수리·최종 게이트)으로 돌린 유일한 샘플이라 맨 앞이다.
 // 시리즈는 조던 1 아카이브 12장을, 무드보드는 MICAM FW25 프레스킷 14쪽을 실제로 읽은 결과다.
-const SAMPLE_IDS = ['sample_trend_chelsea', 'sample_series_aj1', 'sample_moodboard_micam']
+const SAMPLE_IDS = ['sample_trend_running', 'sample_trend_chelsea', 'sample_series_aj1', 'sample_moodboard_micam']
 
 export async function ensureSampleRuns() {
   // 이미 있으면 건너뛰던 시절에는, 샘플을 새로 뜨면 옛 방문자에게 영영 닿지 않았다.

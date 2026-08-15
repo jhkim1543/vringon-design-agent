@@ -4,6 +4,9 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+};
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
@@ -24,10 +27,19 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
+// <define:import.meta.env>
+var define_import_meta_env_default;
+var init_define_import_meta_env = __esm({
+  "<define:import.meta.env>"() {
+    define_import_meta_env_default = { BASE_URL: "/", VITE_API_BASE: "" };
+  }
+});
+
 // node_modules/react/cjs/react.production.min.js
 var require_react_production_min = __commonJS({
   "node_modules/react/cjs/react.production.min.js"(exports) {
     "use strict";
+    init_define_import_meta_env();
     var l = Symbol.for("react.element");
     var n = Symbol.for("react.portal");
     var p = Symbol.for("react.fragment");
@@ -301,6 +313,7 @@ var require_react_production_min = __commonJS({
 var require_react_development = __commonJS({
   "node_modules/react/cjs/react.development.js"(exports, module) {
     "use strict";
+    init_define_import_meta_env();
     if (process.env.NODE_ENV !== "production") {
       (function() {
         "use strict";
@@ -2175,6 +2188,7 @@ var require_react_development = __commonJS({
 var require_react = __commonJS({
   "node_modules/react/index.js"(exports, module) {
     "use strict";
+    init_define_import_meta_env();
     if (process.env.NODE_ENV === "production") {
       module.exports = require_react_production_min();
     } else {
@@ -2184,9 +2198,14 @@ var require_react = __commonJS({
 });
 
 // tools/_audit.ts
+init_define_import_meta_env();
 import { readFileSync } from "node:fs";
 
+// src/core/boardModel.ts
+init_define_import_meta_env();
+
 // src/core/types.ts
+init_define_import_meta_env();
 var MODE_LABEL = {
   trend: "Trend",
   series: "Series",
@@ -2276,6 +2295,15 @@ var TAXONOMY = {
 var ALL_TYPES = Object.values(TAXONOMY).flatMap((gs) => gs.flatMap((g) => g.types));
 var TYPE_LABEL = Object.fromEntries(ALL_TYPES.map((t) => [t.id, t.label]));
 var TYPE_EN = Object.fromEntries(ALL_TYPES.map((t) => [t.id, t.en]));
+var HOME_MARKETS = [
+  { id: "KR", label: "\uD55C\uAD6D" },
+  { id: "US", label: "\uBBF8\uAD6D" },
+  { id: "JP", label: "\uC77C\uBCF8" }
+];
+var REFERENCE_MARKETS = [
+  ...HOME_MARKETS,
+  { id: "GLOBAL", label: "\uAE00\uB85C\uBC8C" }
+];
 var UNKNOWN = "unknown";
 function defaultLineProfile() {
   return {
@@ -2285,13 +2313,18 @@ function defaultLineProfile() {
     bottom: { midsole: UNKNOWN, plate: UNKNOWN, outsole: UNKNOWN, stackBand: UNKNOWN, dropMm: UNKNOWN, rocker: UNKNOWN, heel: UNKNOWN, existingBottomReuse: true },
     construction: { lasting: UNKNOWN, soleAttachment: UNKNOWN },
     performance: { weightTargetG: UNKNOWN, cushioning: UNKNOWN, stability: UNKNOWN, wetGrip: UNKNOWN, flexibility: UNKNOWN },
-    commercial: { markets: ["KR"], channels: ["DTC"] }
+    commercial: { homeMarket: "KR", referenceMarkets: [], channels: ["DTC"] }
   };
 }
 function asFootwearLine(lp) {
   const l = lp;
   if (!l || !l.product || !l.lastFit || !l.upper || !l.bottom || !l.construction) return void 0;
   return l;
+}
+function marketFingerprint(c) {
+  const home = c?.homeMarket ?? c?.markets?.[0] ?? "KR";
+  const refs = c?.referenceMarkets ?? [];
+  return refs.length ? `${home}\u2190${refs.join(",")}` : home;
 }
 function lineFingerprint(raw, itemType) {
   const lp = asFootwearLine(raw);
@@ -2304,7 +2337,9 @@ function lineFingerprint(raw, itemType) {
     lp.upper.outer !== UNKNOWN ? `${lp.upper.outer} upper` : "",
     lp.bottom.outsole !== UNKNOWN ? lp.bottom.outsole : "",
     lp.construction.soleAttachment !== UNKNOWN ? lp.construction.soleAttachment : "",
-    lp.product.season
+    lp.product.season,
+    // 같은 라인을 다른 시장으로 돌리면 다른 조사다. 제목에서 구분되어야 한다.
+    marketFingerprint(lp.commercial)
   ].filter(Boolean);
   return bits.join(" \xB7 ");
 }
@@ -2339,6 +2374,7 @@ var DEFAULT_PARAMS = {
   campaignShots: 4,
   make3d: true,
   approvalGate: true,
+  finalGate: true,
   imageEngine: "detail",
   imageBudget: 12,
   trend: {
@@ -2360,6 +2396,7 @@ var DEFAULT_PARAMS = {
 };
 
 // src/core/pitch.ts
+init_define_import_meta_env();
 function buildLocalPitch(st) {
   const p = st.params;
   const alive = st.designs.filter((d) => !d.rejected);
@@ -2422,7 +2459,9 @@ function buildDesignPitch(d, st) {
   if (d.viewMismatch) {
     objections.push({
       q: "The detail changes between views.",
-      a: "That gap survived a regeneration. We left it visible rather than hiding it, and the side view is the reference cut."
+      // 예전 문구는 "재생성을 거치고도 남은 차이"라고 했다. 재생성은 일어나지 않는다 —
+      // 검증은 한 번 보고 기록만 하고, 수리 단계는 없다. 없는 절차를 근거로 삼지 않는다.
+      a: "The check saw it and we left it visible rather than hiding it. Nothing was re-rendered to close the gap, so treat the side view as the reference cut."
     });
   }
   if (mold > 0) {
@@ -2441,8 +2480,17 @@ function buildDesignPitch(d, st) {
   };
 }
 
+// src/core/research.ts
+init_define_import_meta_env();
+
 // src/core/i18n.ts
+init_define_import_meta_env();
 var import_react = __toESM(require_react(), 1);
+
+// src/core/i18n.ja.ts
+init_define_import_meta_env();
+
+// src/core/i18n.ts
 var KEY = "vringon.lang";
 function initial() {
   try {
@@ -2458,13 +2506,22 @@ function initial() {
 }
 var lang = initial();
 
+// src/core/apiBase.ts
+init_define_import_meta_env();
+var RAW = String(define_import_meta_env_default.VITE_API_BASE ?? "").trim().replace(/\/+$/, "");
+function apiUrl(path) {
+  const p = path.startsWith("/") ? path : `/${path}`;
+  if (RAW) return RAW + p;
+  return `${define_import_meta_env_default.BASE_URL}${p.slice(1)}`;
+}
+
 // src/core/research.ts
 var shotUrl = (u, page) => {
   if (u && !/^https?:\/\//.test(u)) return u;
   const q = [];
   if (u) q.push(`u=${encodeURIComponent(u)}`);
   if (page) q.push(`p=${encodeURIComponent(page)}`);
-  return `/api/shot?${q.join("&")}`;
+  return apiUrl(`/api/shot?${q.join("&")}`);
 };
 var GRADE_LABEL = {
   edgy: "Edgy",
@@ -2692,6 +2749,11 @@ function buildBoardModel(st) {
       title: s.label,
       body: [
         `${s.axis} \xB7 seen ${s.observed_count}x \xB7 ${s.direction === "rising" ? "rising" : s.direction === "stable" ? "holding" : "fading"}`,
+        // 출처의 질 · 개수가 아니라 등급이 confidence 를 정했다는 것을 카드가 보여 준다
+        ...s.source_tiers?.length ? [`sources: ${["T1", "T2", "T3", "T4"].map((tier) => {
+          const n = s.source_tiers.filter((x) => x === tier).length;
+          return n ? `${tier}\xD7${n}` : "";
+        }).filter(Boolean).join(" ")} \u2192 ${s.confidence}`] : [],
         s.sales_proxy_score != null ? `proxy ${s.sales_proxy_score} (${s.proxy_confidence})` : s.page_ref ? `source ${s.page_ref}` : `${s.sources.length} sources`
       ],
       tone: s.confidence === "low" ? "muted" : "neutral"
@@ -2751,6 +2813,7 @@ function buildBoardModel(st) {
     const hero = d.images.find((im) => !["sketch", "sketch_var"].includes(im.view));
     const pit = pitchOf(d.spec.design_id);
     if (pit) {
+      const heroWhy = d.images.find((im) => im.whyUsed && im.view !== "sketch" && im.view !== "sketch_var")?.whyUsed;
       const basePrompt = d.images.find((im) => im.origin === "generated" && im.view !== "sketch")?.promptUsed;
       const variantPrompt = d.images.find((im) => im.view === "design")?.promptUsed;
       const cut = (s) => s ? s.length > 150 ? s.slice(0, 150) + "\u2026" : s : null;
@@ -2766,6 +2829,8 @@ function buildBoardModel(st) {
         title: "From sketch to design: what was asked, and why",
         body: [
           d.spec.comboLabel ? `This design was asked to lead with one idea: ${d.spec.comboLabel.replace(/^Only /, "")}. That is why the prompt below names it first.` : "The prompt below carries the spec straight from the sketch.",
+          // 소재·색 조합의 '왜' · PT 에서 제일 먼저 나오는 질문이라 제일 앞줄에 둔다
+          ...heroWhy ? [heroWhy] : [],
           ...setBy.length ? [`The research fixed ${setBy.length} value${setBy.length > 1 ? "s" : ""} in that prompt: ${setBy.join(", ")}.`] : [],
           ...refused.length ? [`It also asked for ${refused.join(" and ")}. A ${TYPE_LABEL[d.spec.itemType] ?? d.spec.itemType} cannot take that, so it is absent from the prompt.`] : [],
           `Tooling: ${d.cost.tooling.mold_count_required === 0 ? "no new moulds" : `${d.cost.tooling.mold_count_required} new moulds`}. Cost sits ${capPct === 0 ? "level with" : capPct > 0 ? `${capPct}% over` : `${Math.abs(capPct)}% under`} the cap.`,
@@ -2937,7 +3002,7 @@ function buildBoardModel(st) {
 }
 
 // tools/_audit.ts
-var files = ["sample_trend_chelsea", "sample_series_aj1", "sample_moodboard_micam"];
+var files = ["sample_trend_running", "sample_trend_chelsea", "sample_series_aj1", "sample_moodboard_micam"];
 for (const f of files) {
   const st = JSON.parse(readFileSync(`src/samples/${f}.json`, "utf8"));
   const m = buildBoardModel(st);

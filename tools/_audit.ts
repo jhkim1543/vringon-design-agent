@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { buildBoardModel } from '../src/core/boardModel'
 import type { RunState } from '../src/core/types'
 
-const files = ['sample_trend_chelsea', 'sample_series_aj1', 'sample_moodboard_micam']
+const files = ['sample_trend_running', 'sample_trend_chelsea', 'sample_series_aj1', 'sample_moodboard_micam']
 for (const f of files) {
   const st = JSON.parse(readFileSync(`src/samples/${f}.json`, 'utf8')) as RunState
   const m = buildBoardModel(st)
