@@ -553,6 +553,8 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                       <button className="sk-out" key={im.hash + i} onClick={() => setDetail(d.spec.design_id)}
                         title={t('Open campaign shots and 3D')}>
                         <img src={im.url} alt="" loading="lazy" />
+                        {/* 프롬프트가 '무엇을'이라면 이 줄은 '왜'다. PT 에서 먼저 읽히는 쪽은 이쪽이다. */}
+                        {im.whyUsed && <span className="sk-why-used">{im.whyUsed}</span>}
                         <span className="sk-prompt">{im.promptUsed
                           ? im.promptUsed.slice(0, 110) + (im.promptUsed.length > 110 ? '…' : '')
                           : t('Prompt not stored for this older run')}</span>

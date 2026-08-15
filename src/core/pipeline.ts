@@ -4,9 +4,8 @@ import { PACKS, profileOf, resetSeq, tierCapRule, viewSetFor } from './packs'
 import { blockedNarrative, deriveSpecHints, deriveSpecHintsFrom, drivingFromHint, hintNarrative, locksFromSeries, reconcileHint, signalCombos } from './signalSpec'
 import type { SpecHint } from './signalSpec'
 import { makeRng } from './rng'
-import { COLORWAY_NAMES } from './sketch'
 import {
-  colorwayEditPrompt, conceptPrompt, editImage, generateImage, renderFromSketchPrompt, renderPrompt,
+  colorwayEditPrompt, conceptPrompt, editImage, generateImage, materialRead, planColorways, renderFromSketchPrompt, renderPrompt,
   generateModel, sketchPrompt, sketchVariationPrompt, silhouetteRead, slidersToLabel, stampLogo, variationPrompt, variationSliders, viewEditPrompt, wearEditPrompt,
 } from './aiClient'
 import type { TrendClauseInput } from './aiClient'
@@ -699,7 +698,9 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       // 이 디자인이 추가 컷에 쓸 수 있는 장수 · 기준 렌더는 이 몫에서 빼지 않는다
       let extrasLeft = perDesignExtras
       emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} colour enters here: the black-ink sheet becomes a photoreal render, then ${params.viewCount - 1} more views as edits` })
-      d.colorways = COLORWAY_NAMES.slice(0, params.colorwayCount)
+      // 컬러웨이는 브랜드 팔레트 → 시즌 팔레트 → 중립 순으로 뽑는다. 취향이 아니라 출처가 있다.
+      const cwPlan = planColorways(params.colorwayCount, params.brand, trendClause)
+      d.colorways = cwPlan.map(c => c.name)
 
       if (budget.left() > 0) {
         // ① 기준 렌더 1장 · 스케치가 있으면 새로 그리지 않고 스케치를 사진으로 옮긴다.
@@ -731,7 +732,11 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
               emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} logo composite failed · ${String((e as Error).message).slice(0, 80)}` })
             }
           }
-          d.images = [...d.images, { view: views[0].key, url: baseUrl, hash: baseHash, origin: 'generated', promptUsed: basePrompt, logoStamped: drewMark || baseHash !== r.hash }]
+          // 이 컷의 소재·색이 어디서 왔는지 한 줄. 보드가 PT 자료가 되는 데 필요한 최소 단위다.
+          const baseWhy = d.spec.genome
+            ? `Material as authored: ${d.spec.genome.spec_sheet.upper_material} — part of the "${d.spec.genome.hero_mutation.label}" concept${d.spec.genome.source_signal_ids.length ? ', grounded in the cited research signals' : ''}.`
+            : 'Material from the archetype spec — no authored concept behind this one, and the card says so.'
+          d.images = [...d.images, { view: views[0].key, url: baseUrl, hash: baseHash, origin: 'generated', promptUsed: basePrompt, whyUsed: baseWhy, logoStamped: drewMark || baseHash !== r.hash }]
           emit({ kind: 'design-update', design: { ...d } })
         } catch (e) {
           d.imageError = String((e as Error).message || e)
@@ -747,7 +752,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           try {
             const r2 = await editImage(sv.hash, p2, params.imageEngine)
             budget.spend(); extrasLeft -= 1
-            d.images = [...d.images, { view: 'design', url: r2.url, hash: r2.hash, origin: 'edited_from', editedFrom: sv.hash, promptUsed: p2 }]
+            d.images = [...d.images, { view: 'design', url: r2.url, hash: r2.hash, origin: 'edited_from', editedFrom: sv.hash, promptUsed: p2, whyUsed: materialRead(k + 1).why }]
             emit({ kind: 'design-update', design: { ...d } })
             emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} sketch variation ${k + 1} coloured into a design` })
           } catch {
@@ -758,17 +763,17 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         // ③④ 추가 뷰·컬러웨이 = 기준 렌더의 편집 (동일 객체 유지)
         // 계열별 필수 뷰셋을 따른다 · 스니커즈는 내측, 힐은 후면이 반드시 있어야 한다
         if (baseHash) {
-          const jobs: { view: string; colorway?: string; prompt: string }[] = [
+          const jobs: { view: string; colorway?: string; prompt: string; why?: string }[] = [
             ...views.filter(v => v.required).slice(1, params.viewCount)
               .map(v => ({ view: v.key, prompt: viewEditPrompt(v.key) })),
-            ...d.colorways.map(cw => ({ view: views[0].key, colorway: cw, prompt: colorwayEditPrompt(cw) })),
+            ...cwPlan.map(cw => ({ view: views[0].key, colorway: cw.name, prompt: colorwayEditPrompt(cw), why: cw.why })),
           ].slice(0, Math.min(budget.left(), extrasLeft))
           await pool(jobs, 2, async (job) => {
             if (cancelled) return
             try {
               const r = await editImage(baseHash!, job.prompt, params.imageEngine)
               budget.spend(); extrasLeft -= 1
-              d.images = [...d.images, { view: job.view, colorway: job.colorway, url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: baseHash! }]
+              d.images = [...d.images, { view: job.view, colorway: job.colorway, url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: baseHash!, promptUsed: job.prompt, whyUsed: job.why }]
               emit({ kind: 'design-update', design: { ...d } })
             } catch (e) {
               emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} ${job.colorway ?? job.view} edit failed · dropping that cut only` })

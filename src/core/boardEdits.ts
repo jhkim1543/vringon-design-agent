@@ -13,6 +13,14 @@ export interface NoteNode {
   tone?: 'neutral' | 'accent' | 'warn' | 'muted'
 }
 
+/** 카드에 달린 피드백 한 건 · 누가 언제 뭐라고 했는지 */
+export interface BoardComment {
+  id: string
+  author: string
+  text: string
+  at: string                 // ISO
+}
+
 export interface BoardEdits {
   /** 노드 id → 덮어쓴 제목 */
   titles: Record<string, string>
@@ -28,10 +36,30 @@ export interface BoardEdits {
   positions: Record<string, { x: number; y: number }>
   /** 드래그로 조절한 칸 크기 · 없으면 기본 추정 크기를 쓴다 */
   sizes: Record<string, { w: number; h: number }>
+  /** 카드별 피드백 스레드 · 같이 보는 사람들의 코멘트가 여기 쌓인다 */
+  comments: Record<string, BoardComment[]>
 }
 
 export const EMPTY_EDITS: BoardEdits = {
-  titles: {}, bodies: {}, notes: [], extraColumns: [], hidden: [], positions: {}, sizes: {},
+  titles: {}, bodies: {}, notes: [], extraColumns: [], hidden: [], positions: {}, sizes: {}, comments: {},
+}
+
+// ── 참여자 이름 · 코멘트와 동시 편집 표시에 쓴다 ──────────────────────
+const ACTOR_KEY = 'vringon.actor'
+
+export function getActor(): string {
+  try {
+    let a = localStorage.getItem(ACTOR_KEY)
+    if (!a) {
+      a = `게스트-${Math.random().toString(36).slice(2, 6)}`
+      localStorage.setItem(ACTOR_KEY, a)
+    }
+    return a
+  } catch { return '게스트' }
+}
+
+export function setActor(name: string) {
+  try { localStorage.setItem(ACTOR_KEY, name.trim() || '게스트') } catch { /* 무시 */ }
 }
 
 const KEY = (runId: string) => `vringon.board.${runId}`

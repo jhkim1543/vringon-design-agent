@@ -255,7 +255,15 @@ export default function App() {
             onResume={resume} onGateVerdict={onVerdict} onOpenBoard={() => setView('board')}
             onResolveDna={onResolveDna} />
         )}
-        {view === 'board' && st && <Board st={st} onVerdict={onVerdict} runId={runIdRef.current} />}
+        {view === 'board' && st && <Board st={st} onVerdict={onVerdict} runId={runIdRef.current}
+          onBoardImage={(designId, img) => {
+            // 보드에서 프롬프트를 고쳐 다시 뽑은 컷 · 그 디자인에 그대로 붙는다.
+            // st 저장 이펙트가 이미 있어서 새로 고쳐도 남는다.
+            setSt(prev => prev ? {
+              ...prev,
+              designs: prev.designs.map(d => d.spec.design_id === designId ? { ...d, images: [...d.images, img] } : d),
+            } : prev)
+          }} />}
         {(view === 'run' || view === 'board') && !st && <div className="empty">{t('No run open. Start one from Run setup.')}</div>}
       </div>
       {brandOpen && (

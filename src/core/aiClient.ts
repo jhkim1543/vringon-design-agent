@@ -148,6 +148,55 @@ function shoeSpecPhrase(spec: DesignSpec): string {
   return parts.filter(Boolean).join(', ')
 }
 
+/** 스케치용 스펙 구절 · 선으로 그릴 수 있는 것만.
+ *
+ *  shoeSpecPhrase 는 렌더용으로 쓰였고 "mirror-like specular highlights" 같은 사진 마감과
+ *  mm 수치를 담는다. 그게 스케치 프롬프트에도 그대로 실리고 있었다 — 무색 선화에 광택을
+ *  지시하고, 이미지 모델이 구분해 그리지도 못하는 25mm/29mm 를 적는 식이다 (규칙 12 위반).
+ *  스케치가 말할 수 있는 것은 비례·선·구조뿐이다: 토 형태, 상대적 높이, 패널 분할,
+ *  클로저의 형태, 공법이 만드는 가시적 선(웰트 스티치 등), 목높이의 유무. */
+function sketchSpecPhrase(spec: DesignSpec): string {
+  const f = spec.fields as Record<string, string | number | boolean>
+  const athletic = f.heel_type === 'sport_midsole'
+  const heelH = Number(f.heel_height_mm) || 20
+  const construction = CONSTRUCTION_EN[String(f.sole_construction)]
+  const parts = [
+    TOE_EN[String(f.toe_shape)],
+    athletic ? heelQualifier(heelH, true) : `${HEEL_EN[String(f.heel_type)] ?? 'heel'}, ${heelQualifier(heelH, false)}`,
+    construction,                                        // 공법은 웰트 선·폭싱 등 '보이는 선'을 만든다
+    `upper divided into ${f.panel_count} panels`,
+    `${String(f.closure).replace(/_/g, ' ')} closure`,
+  ]
+  if (f.plate && f.plate !== 'none') parts.push('a plate line visible along the midsole sidewall')
+  const shaft = Number(f.shaft_height_mm) || 0
+  if (shaft > 0) parts.push(shaft > 250 ? 'a tall shaft' : 'an ankle-height shaft')
+  return parts.filter(Boolean).join(', ')
+}
+
+/** 스케치용 브랜드 구절 · 선으로 그릴 수 있는 것만.
+ *
+ *  brandPromptClause 는 렌더용이다 — 팔레트 hex, 선호 소재, 사진용 로고 문구가 들어 있다.
+ *  그게 "no color" 스케치 프롬프트에 그대로 실려, 무색 지시와 색 지정이 한 문장에서
+ *  싸우고 있었다. 스케치 단계의 브랜드는 둘뿐이다: 형태로 알아볼 시그니처와,
+ *  마크가 앉을 자리(선화로 표현) 또는 마크 금지. */
+function sketchBrandClause(b: BrandIdentity | undefined): string {
+  if (!b) return ''
+  const parts: string[] = []
+  if (b.signatureElements.length)
+    parts.push(`Carry the brand's structural signatures where they are drawable as line work: ${b.signatureElements.join(', ')}.`)
+  if (b.applyLogoToImages && b.logo && b.logo.placement !== 'none') {
+    const where: Record<string, string> = {
+      tongue: 'on the tongue', heel: 'on the heel counter', side: 'on the lateral side panel',
+      insole: 'on the insole', clasp: 'on the clasp', pendant: 'on the pendant face',
+    }
+    parts.push(`Reserve a clean, unmarked area ${where[b.logo.placement] ?? 'on the side panel'} where the brand mark will sit. Do not draw any logo, letters or symbol there.`)
+  } else {
+    parts.push('No logo or mark anywhere.')
+  }
+  if (b.forbidden.length) parts.push(`Never draw: ${b.forbidden.join(', ')}.`)
+  return parts.join(' ')
+}
+
 /** 라인 프로필을 프롬프트 구절로 · 조사 전에 고정한 어퍼·바텀·공법이 이미지에도 실린다 */
 export function linePromptClause(lp: FootwearLineProfile | undefined): string {
   if (!lp) return ''
@@ -228,10 +277,14 @@ function genomeClause(spec: DesignSpec): string {
 export function sketchPrompt(spec: DesignSpec, engine: EngineId = 'detail', brand?: BrandIdentity, trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
   // 스케치는 측면 한 컷이다. 한 장에 여러 시점을 넣으면 카드에서 서로 겹쳐 읽히지 않는다.
   // 다른 각도는 S3에서 컬러 렌더의 뷰로 따로 만든다.
+  //
+  // 층이 명확해야 한다: 스케치 = 형태(비례·선·구조·마크 자리), 렌더 = 소재·색·부자재.
+  // 그래서 여기는 sketchSpecPhrase / sketchBrandClause 를 쓴다. 렌더용 구절을 그대로 실으면
+  // 무색 선화에 광택·팔레트가 지시되고, 층이 섞이면 스케치와 디자인의 역할 구분이 사라진다.
   const view = SHOE_VIEW.lateral + ', one single shoe only, one single view, nothing else in frame'
   return shapePrompt(engine, {
-    subject: en(spec.itemType), spec: shoeSpecPhrase(spec), view,
-    brand: [silhouetteClause(spec), spec.genome ? genomeClause(spec) : emphasisClause(spec), linePromptClause(line), trendPromptClause(trend ?? null), brand ? brandPromptClause(brand) : ''].filter(Boolean).join(' '),
+    subject: en(spec.itemType), spec: sketchSpecPhrase(spec), view,
+    brand: [silhouetteClause(spec), spec.genome ? genomeClause(spec) : emphasisClause(spec), linePromptClause(line), sketchBrandClause(brand)].filter(Boolean).join(' '),
     mode: 'sketch',
   })
 }
@@ -269,17 +322,23 @@ export function sketchVariationPrompt(k: number): string {
 // 색이 들어가는 단계에서만 보이는 것들 · 소재 해석과 컬러 블로킹.
 // 선화는 질감을 못 그린다. 그래서 소재 변화는 여기서 갈라야 의미가 있다.
 // 스케치 한 장에서 디자인 여러 장을 뽑을 때, 이 목록이 장마다 다른 해석을 준다.
-const MATERIAL_READS: string[] = [
-  'Read the upper as one material throughout, tonal and quiet, with the panel breaks visible only as seams.',
-  'Read it as two contrasting materials: a matte body with the overlays in a glossier, darker finish so the panel structure reads at a distance.',
-  'Read it in a light neutral body with the sole unit and heel counter in a deeper contrasting tone.',
-  'Read it as a technical mix: a woven or knitted body with smooth synthetic overlays, the two surfaces clearly different under the same light.',
-  'Read it in a single deep saturated colour, sole included, so the silhouette reads as one solid mass.',
-  'Read it with a natural undyed sole and a rich pigmented upper, the join between them clearly visible.',
+const MATERIAL_READS: { clause: string; why: string }[] = [
+  { clause: 'Read the upper as one material throughout, tonal and quiet, with the panel breaks visible only as seams.',
+    why: 'Single-material read: shows the panel structure itself carrying the design, the quietest commercial option.' },
+  { clause: 'Read it as two contrasting materials: a matte body with the overlays in a glossier, darker finish so the panel structure reads at a distance.',
+    why: 'Contrast read: makes the overlay topology legible from across a shop floor.' },
+  { clause: 'Read it in a light neutral body with the sole unit and heel counter in a deeper contrasting tone.',
+    why: 'Grounded read: a darker sole visually anchors the silhouette and hides wear at the contact line.' },
+  { clause: 'Read it as a technical mix: a woven or knitted body with smooth synthetic overlays, the two surfaces clearly different under the same light.',
+    why: 'Technical read: the woven-plus-smooth mix signals function, the read performance buyers check first.' },
+  { clause: 'Read it in a single deep saturated colour, sole included, so the silhouette reads as one solid mass.',
+    why: 'Monoblock read: one saturated mass makes the outline itself the identity, a display-table device.' },
+  { clause: 'Read it with a natural undyed sole and a rich pigmented upper, the join between them clearly visible.',
+    why: 'Natural-sole read: the undyed sole cues craft and material honesty against a pigmented upper.' },
 ]
 
-/** 이 디자인 컷이 어떤 소재 해석을 받는가 */
-export function materialRead(index: number): string {
+/** 이 디자인 컷이 어떤 소재 해석을 받는가 · clause 는 프롬프트로, why 는 카드로 */
+export function materialRead(index: number): { clause: string; why: string } {
   return MATERIAL_READS[index % MATERIAL_READS.length]
 }
 
@@ -289,7 +348,7 @@ export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInpu
   const markClause = brand ? brandPromptClause(brand) : ''
   const drawsMark = !!brand?.applyLogoToImages && !!brand.logo?.style?.prompt_clause
   // 같은 스케치에서 여러 장을 뽑을 때만 소재 해석을 갈라 준다
-  const matClause = typeof variantIndex === 'number' ? materialRead(variantIndex) : ''
+  const matClause = typeof variantIndex === 'number' ? materialRead(variantIndex).clause : ''
   return [
     'Replace this line drawing with a full-colour photorealistic studio product photograph of the same shoe.',
     'The output must be a photograph, not a drawing: no outlines, no white fill, no flat areas.',
@@ -315,13 +374,54 @@ export function viewEditPrompt(viewKey: string): string {
   return `Keep the exact same product design, materials, proportions and color. Only change the camera angle to: ${v}. Same seamless white background and lighting.`
 }
 
-/** 컬러웨이 · 형태 불변, 색만 변경 */
-export function colorwayEditPrompt(colorway: string): string {
-  const desc: Record<string, string> = {
-    gold: 'warm polished gold', black: 'deep matte black', bordeaux: 'dark bordeaux red',
-    ivory: 'soft ivory cream', silver: 'brushed silver',
+// ── 컬러웨이 · 어디서 왔는지가 곧 근거다 ─────────────────────────────
+//
+// 예전에는 gold/black/bordeaux/ivory/silver 고정 목록이었다 — 주얼리 시절 잔재라,
+// 브랜드가 팔레트를 정성껏 설정해도 컬러웨이는 그걸 본 적이 없었다.
+// 순서가 곧 논리다: 브랜드 팔레트(정체성) → 시즌 팔레트(조사 근거) → 중립 안전색.
+// 각 컬러웨이는 자기가 어디서 왔는지(why)를 들고 다니고, 그 한 줄이 보드 카드에 실린다.
+
+export interface ColorwayPlan { name: string; hex?: string; clause: string; why: string }
+
+const NEUTRAL_COLORWAYS: ColorwayPlan[] = [
+  { name: 'core black', clause: 'deep matte black with tonal details', why: 'Neutral anchor: the safe volume colour in nearly every footwear range.' },
+  { name: 'off-white', clause: 'warm off-white with natural tonal stitching', why: 'Neutral anchor: reads clean at retail and photographs well against dark product walls.' },
+  { name: 'grey tonal', clause: 'mid grey, sole and upper in close tones', why: 'Neutral anchor: bridges the range when the brand and season palettes are both strong.' },
+]
+
+/** 이 Run 의 컬러웨이 계획 · 브랜드 팔레트와 시즌 팔레트에서 뽑고, 출처를 기록한다 */
+export function planColorways(count: number, brand?: BrandIdentity, trend?: TrendClauseInput | null): ColorwayPlan[] {
+  const out: ColorwayPlan[] = []
+  for (const c of brand?.colorPalette ?? []) {
+    if (out.length >= count) break
+    out.push({
+      name: c.name, hex: c.hex,
+      clause: `${c.name} (${c.hex}) as the dominant colour, applied as the brand wears it`,
+      why: `Brand palette: ${c.name} is one of the colours this brand claims as its own.`,
+    })
   }
-  return `Keep the exact same product, same camera angle, same shape and proportions. Only recolor the main material to ${desc[colorway] ?? colorway}. Same seamless white background and lighting.`
+  for (const c of trend?.colors ?? []) {
+    if (out.length >= count) break
+    if (out.some(x => x.name === c.name)) continue
+    out.push({
+      name: c.name, hex: c.hex,
+      clause: `${c.name} (${c.hex}) as the dominant colour`,
+      why: `Season palette: ${c.name} came out of the ${trend?.macroName ?? 'season'} research, not from taste.`,
+    })
+  }
+  for (const c of NEUTRAL_COLORWAYS) {
+    if (out.length >= count) break
+    if (out.some(x => x.name === c.name)) continue
+    out.push(c)
+  }
+  return out.slice(0, count)
+}
+
+/** 컬러웨이 · 형태 불변, 색만 변경 */
+export function colorwayEditPrompt(cw: ColorwayPlan | string): string {
+  // 옛 저장본 호환 · 이름 문자열만 남아 있는 Run 이 있다
+  const clause = typeof cw === 'string' ? cw : cw.clause
+  return `Keep the exact same product, same camera angle, same shape and proportions. Only recolor the main material to ${clause}. Same seamless white background and lighting.`
 }
 
 // ── 3D 멀티뷰 · Tripo가 기대하는 [front, left, back, right] 턴어라운드 ─

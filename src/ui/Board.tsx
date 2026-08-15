@@ -7,13 +7,17 @@ import {
   useReactFlow, applyNodeChanges, Handle, Position, MarkerType, NodeResizer,
 } from '@xyflow/react'
 import type { Node, Edge, NodeChange } from '@xyflow/react'
-import type { RunState } from '../core/types'
+import type { DesignImage, RunState } from '../core/types'
 import { TIER_LABEL, TYPE_LABEL } from '../core/types'
 import { buildBoardModel } from '../core/boardModel'
 import { openTrendReportPdf, saveTrendReportHtml } from '../core/reportPdf'
 import { openDossierPdf, saveDossierHtml } from '../core/dossierPdf'
 import type { BoardEdits } from '../core/boardEdits'
-import { EMPTY_EDITS, loadEdits, newNoteId, saveEdits } from '../core/boardEdits'
+import { EMPTY_EDITS, getActor, loadEdits, newNoteId, saveEdits, setActor } from '../core/boardEdits'
+import type { SyncHandle } from '../core/boardSync'
+import { connectBoardSync } from '../core/boardSync'
+import { editImage } from '../core/aiClient'
+import { detectRuntime } from '../core/runtime'
 import type { BoardNode } from '../core/boardModel'
 import { plainProse } from '../core/prose'
 import { DesignCard } from './Card'
@@ -44,6 +48,26 @@ interface NodeEdit {
   onHide: (id: string) => void
   /** 드래그로 조절한 칸 크기를 저장한다 · Run별로 남는다 */
   onSize: (id: string, w: number, h: number) => void
+  /** 카드 우측의 + · 이 카드에서 이어 만들기(프롬프트 수정·재생성·섞기)와 코멘트를 연다 */
+  onPlus?: (id: string) => void
+  /** 이 카드에 달린 코멘트 수 · 배지로 보인다 */
+  commentCount?: (id: string) => number
+}
+
+/** 카드 우측 중앙의 + 버튼과 코멘트 배지 · VIZCOM식 이어 만들기의 입구 */
+function PlusHandle({ id, ed, hover }: { id: string; ed?: NodeEdit; hover: boolean }) {
+  if (!ed?.onPlus) return null
+  const n = ed.commentCount?.(id) ?? 0
+  return (
+    <>
+      {n > 0 && (
+        <button className="bn-cbadge" title={t('Comments')}
+          onPointerDown={e => e.stopPropagation()} onClick={() => ed.onPlus!(id)}>💬 {n}</button>
+      )}
+      <button className={`bn-plus${hover ? ' show' : ''}`} title={t('Continue from this card')}
+        onPointerDown={e => e.stopPropagation()} onClick={() => ed.onPlus!(id)}>+</button>
+    </>
+  )
 }
 
 function EditableText({ value, onSave, className, multiline, editing }: {
@@ -165,6 +189,7 @@ function StepNode({ id, data, selected }: { id: string; data: { n: BoardNode; ed
           {n.prompts.map((p, i) => <div key={i} className="bn-prompt">{p}</div>)}
         </div>
       )}
+      <PlusHandle id={n.id} ed={ed} hover={hover} />
       <Handle type="source" position={Position.Right} />
     </div>
   )
@@ -185,6 +210,7 @@ function DesignFlowNode({ id, data, selected }: { id: string; data: { n: BoardNo
         onResizeEnd={(_, p) => ed?.onSize(id, Math.round(p.width), Math.round(p.height))} />
       <Handle type="target" position={Position.Left} />
       <DesignCard d={n.design} signals={st.signals} stagePassed={{ s3: true, s4: true }} onVerdict={onVerdict} />
+      <PlusHandle id={n.id} ed={ed} hover={hover} />
       <Handle type="source" position={Position.Right} />
     </div>
   )
@@ -304,13 +330,182 @@ function build(st: RunState, onVerdict: any, edits: BoardEdits, ed: NodeEdit, me
   return { nodes, edges }
 }
 
-function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; runId: string }) {
+// ── 이어 만들기 패널 · 프롬프트를 고쳐 다시 뽑고, 다른 안과 섞고, 코멘트를 단다 ──
+//
+// 보드가 결과 전시로 끝나면 PT 도구지 작업 도구가 아니다. 여기가 그 경계를 넘는 지점이다:
+// AI 가 쓴 프롬프트를 사람이 고쳐 그 자리에서 재생성해 보고, 두 안의 아이디어를 섞어 보고,
+// 같이 보는 사람이 카드에 의견을 단다. 생성은 기준 이미지의 편집(edit)이라
+// 실루엣이 유지된다 — 새로 그리는 게 아니라 그 안에서 움직인다.
+function RemixPanel({ st, nodeId, edits, live, actor, onClose, onComment, onImage }: {
+  st: RunState
+  nodeId: string
+  edits: BoardEdits
+  live: boolean
+  actor: string
+  onClose: () => void
+  onComment: (nodeId: string, text: string) => void
+  onImage: (designId: string, img: DesignImage) => void
+}) {
+  // 노드 → 기준 이미지. 디자인 카드는 히어로 렌더, 스케치 카드는 그 스케치.
+  const skMatch = nodeId.match(/^sk-(.+)-(\d+)$/)
+  const designId = skMatch ? skMatch[1] : nodeId
+  const d = st.designs.find(x => x.spec.design_id === designId)
+  const base = (() => {
+    if (!d) return null
+    if (skMatch) {
+      const sketches = d.images.filter(i => i.view === 'sketch' || i.view === 'sketch_var')
+      return sketches[Number(skMatch[2])] ?? null
+    }
+    return d.images.find(i => i.view !== 'sketch' && i.view !== 'sketch_var') ?? null
+  })()
+
+  const [prompt, setPrompt] = useState(() => base?.promptUsed ?? '')
+  const [mixWith, setMixWith] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+  const [made, setMade] = useState<DesignImage | null>(null)
+  const [draft, setDraft] = useState('')
+  const thread = edits.comments[nodeId] ?? []
+
+  // 섞기 · 상대 안의 저작된 아이디어를 프롬프트에 문장으로 넣는다.
+  // 사용자가 그 문장을 그대로 보고 고칠 수 있어야 하므로, 몰래 합치지 않고 텍스트로 얹는다.
+  const mix = (otherId: string) => {
+    setMixWith(otherId)
+    if (!otherId) return
+    const o = st.designs.find(x => x.spec.design_id === otherId)
+    if (!o) return
+    const idea = o.spec.genome
+      ? `${o.spec.genome.hero_mutation.drawing_instruction} Upper material: ${o.spec.genome.spec_sheet.upper_material}.`
+      : (o.spec.comboLabel ?? 'its lead idea')
+    setPrompt(p => `${p.trim()} Blend in the defining elements of ${otherId}: ${idea} Keep this shoe's silhouette and outsole line.`)
+  }
+
+  const generate = async () => {
+    if (!d || !base || !prompt.trim() || busy) return
+    setBusy(true); setErr('')
+    try {
+      const r = await editImage(base.hash, prompt.trim(), 'detail')
+      const img: DesignImage = {
+        view: 'design', url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: base.hash,
+        promptUsed: prompt.trim(),
+        whyUsed: `Board remix by ${actor}: the prompt was edited by hand${mixWith ? `, blending in ${mixWith}` : ''}.`,
+      }
+      onImage(d.spec.design_id, img)
+      setMade(img)
+    } catch (e) {
+      setErr(String((e as Error).message ?? e).slice(0, 140))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <aside className="remix" onPointerDown={e => e.stopPropagation()}>
+      <div className="remix-h">
+        <b>{skMatch ? `${designId} · ${t('Sketch')} ${Number(skMatch[2]) + 1}` : designId}</b>
+        <button className="btn btn-ghost btn-sm sq" onClick={onClose}>✕</button>
+      </div>
+
+      {base && (
+        <>
+          <img className="remix-img" src={made?.url ?? base.url} alt="" />
+          {made && <div className="notice info" style={{ fontSize: 12 }}>{t('Added to this design. It is on the board now.')}</div>}
+          {live ? (
+            <>
+              <span className="lbl">{t('Prompt · edit it and regenerate')}</span>
+              <textarea className="remix-ta" value={prompt} onChange={e => setPrompt(e.target.value)}
+                rows={7} placeholder={t('No prompt stored for this cut — write one')} />
+              <div className="inrow">
+                <select className="input" value={mixWith} onChange={e => mix(e.target.value)}>
+                  <option value="">{t('Blend with another design…')}</option>
+                  {st.designs.filter(x => !x.rejected && x.spec.design_id !== designId).map(x => (
+                    <option key={x.spec.design_id} value={x.spec.design_id}>{x.spec.design_id} · {x.spec.comboLabel?.slice(0, 28) ?? TIER_LABEL[x.spec.tier]}</option>
+                  ))}
+                </select>
+                <button className="btn btn-primary btn-sm" onClick={generate} disabled={busy || !prompt.trim()}>
+                  {busy ? t('Generating…') : t('Regenerate')}
+                </button>
+              </div>
+              {err && <div className="notice warn" style={{ fontSize: 12 }}>{err}</div>}
+              <p className="hint">{t('Runs as an edit of this cut, so the silhouette holds. The result lands on this design with your name on the why.')}</p>
+            </>
+          ) : (
+            <p className="hint">{t('Viewing a static copy — regeneration needs the live server. Comments still work for people on this browser.')}</p>
+          )}
+        </>
+      )}
+
+      {/* ── 코멘트 · 같이 보는 사람의 피드백이 카드에 남는다 ── */}
+      <span className="lbl">{t('Comments')} {thread.length ? `· ${thread.length}` : ''}</span>
+      <div className="remix-thread">
+        {thread.length === 0 && <span className="hint">{t('Nothing yet. Leave the first note.')}</span>}
+        {thread.map(c => (
+          <div className="remix-c" key={c.id}>
+            <b>{c.author}</b>
+            <span>{c.text}</span>
+            <i>{new Date(c.at).toLocaleString()}</i>
+          </div>
+        ))}
+      </div>
+      <div className="inrow">
+        <input className="input" value={draft} onChange={e => setDraft(e.target.value)}
+          placeholder={t('Write a comment')} onKeyDown={e => { if (e.key === 'Enter' && draft.trim()) { onComment(nodeId, draft.trim()); setDraft('') } }} />
+        <button className="btn btn-ghost btn-sm" disabled={!draft.trim()}
+          onClick={() => { onComment(nodeId, draft.trim()); setDraft('') }}>{t('Add')}</button>
+      </div>
+    </aside>
+  )
+}
+
+function BoardInner({ st, onVerdict, runId, onBoardImage }: { st: RunState; onVerdict: any; runId: string; onBoardImage?: (designId: string, img: DesignImage) => void }) {
   const [editing, setEditing] = useState(false)
   const [edits, setEdits] = useState<BoardEdits>(() => loadEdits(runId))
-  useEffect(() => { saveEdits(runId, edits) }, [runId, edits])
+
+  // ── 동시 편집 · 서버가 있으면 이 보드는 같이 보는 화면이 된다 ──────
+  const [viewers, setViewers] = useState(0)
+  const [syncNote, setSyncNote] = useState('')
+  const [live, setLive] = useState(false)
+  const [actorName, setActorName] = useState(() => getActor())
+  const syncRef = useRef<SyncHandle | null>(null)
+  const remoteRef = useRef(false)
+  const noteTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    let dead = false
+    detectRuntime().then(rt => {
+      if (dead || rt.kind !== 'live') return
+      setLive(true)
+      syncRef.current = connectBoardSync(runId, getActor(), {
+        edits: (remote) => { remoteRef.current = true; setEdits({ ...EMPTY_EDITS, ...remote }) },
+        viewers: (n, note) => {
+          setViewers(n)
+          if (note) {
+            setSyncNote(note)
+            if (noteTimer.current) clearTimeout(noteTimer.current)
+            noteTimer.current = setTimeout(() => setSyncNote(''), 4000)
+          }
+        },
+      })
+    })
+    return () => { dead = true; syncRef.current?.close(); syncRef.current = null }
+  }, [runId])
+
+  useEffect(() => {
+    saveEdits(runId, edits)
+    // 원격에서 받은 변경을 그대로 되돌려 보내면 두 브라우저가 핑퐁한다
+    if (remoteRef.current) { remoteRef.current = false; return }
+    syncRef.current?.push(edits)
+  }, [runId, edits])
 
   // 편집 콜백은 안정적이어야 한다. 매 렌더마다 새로 만들면 노드가 통째로 다시 그려진다.
   const [light, setLight] = useState(() => (localStorage.getItem('vringon.boardTheme') ?? 'light') === 'light')
+  // + 패널 · 어느 카드가 열려 있는가
+  const [panelNode, setPanelNode] = useState<string | null>(null)
+  const commentTotals = useMemo(() => {
+    const m: Record<string, number> = {}
+    for (const [k, v] of Object.entries(edits.comments ?? {})) m[k] = v.length
+    return m
+  }, [edits.comments])
+
   const ed = useMemo<NodeEdit>(() => ({
     editing,
     light,
@@ -322,7 +517,22 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
       : { ...e, hidden: [...new Set([...e.hidden, id])] }),
     // 모서리를 끌어 바꾼 크기 · 이 Run의 보드에 저장된다
     onSize: (id, w, h) => setEdits(e => ({ ...e, sizes: { ...e.sizes, [id]: { w, h } } })),
-  }), [editing, light])
+    onPlus: (id) => setPanelNode(cur => cur === id ? null : id),
+    commentCount: (id) => commentTotals[id] ?? 0,
+  }), [editing, light, commentTotals])
+
+  const addComment = useCallback((nodeId: string, text: string) => {
+    setEdits(e => ({
+      ...e,
+      comments: {
+        ...(e.comments ?? {}),
+        [nodeId]: [...((e.comments ?? {})[nodeId] ?? []), {
+          id: `c_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 5)}`,
+          author: getActor(), text, at: new Date().toISOString(),
+        }],
+      },
+    }))
+  }, [])
 
   // 카드가 렌더된 뒤 실제 높이를 알려 준다. 그 높이로 다시 쌓아야 아래 칸이 안 겹친다.
   const [measured, setMeasured] = useState<Record<string, number>>({})
@@ -502,6 +712,17 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
           <div className="bb-row bb-top">
             <span className="bb-title">{t('Review board')}</span>
             <span className="bb-sub">{t(TYPE_LABEL[st.params.itemType])} · {nodes.length} {t('cards')}</span>
+            {/* 같이 보는 사람 · 서버가 있을 때만 뜬다. 이름은 코멘트와 재생성 기록에 쓰인다. */}
+            {live && (
+              <span className="bb-live" title={t('People looking at this board right now')}>
+                <i />{viewers > 1 ? `${viewers} ${t('viewing')}` : t('Only you')}
+                <input className="bb-name" value={actorName}
+                  onChange={e => setActorName(e.target.value)}
+                  onBlur={() => setActor(actorName)}
+                  onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }} />
+              </span>
+            )}
+            {syncNote && <span className="bb-syncnote">{syncNote}</span>}
             <span className="bb-gap" />
             <ThemeToggle theme={light ? 'light' : 'dark'} onToggle={() => setLight(v => !v)} />
             <button className="btn btn-ghost btn-sm" onClick={share} title={t('Copy a link to this board')}>{t('Share')}</button>
@@ -626,6 +847,13 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
           }} />
       </ReactFlow>
 
+      {/* + 로 연 카드의 이어 만들기 패널 · 보드 위에 떠 있고, 뒤 캔버스는 계속 산다 */}
+      {panelNode && !present && (
+        <RemixPanel st={st} nodeId={panelNode} edits={edits} live={live} actor={actorName}
+          onClose={() => setPanelNode(null)} onComment={addComment}
+          onImage={(designId, img) => onBoardImage?.(designId, img)} />
+      )}
+
       {present && showNotes && currentNode && (
         <div className="present-note">
           <b>{currentNode.title}</b>
@@ -681,7 +909,7 @@ function BoardInner({ st, onVerdict, runId }: { st: RunState; onVerdict: any; ru
   )
 }
 
-export default function Board(props: { st: RunState; onVerdict: any; runId?: string }) {
+export default function Board(props: { st: RunState; onVerdict: any; runId?: string; onBoardImage?: (designId: string, img: DesignImage) => void }) {
   if (props.st.designs.length === 0 && props.st.signals.length === 0) {
     return <div className="empty" style={{ flex: 1 }}>
       <div>{t('Nothing on the board yet.')}<br /><span className="hint">{t('Run the agent and the flow from research to selection fills in.')}</span></div>

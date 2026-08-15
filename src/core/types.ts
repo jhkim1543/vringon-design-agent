@@ -778,6 +778,9 @@ export interface DesignImage {
   variantAxis?: string
   /** 이 이미지를 만든 프롬프트 · 근거 표시용. 없으면 옛 데이터다. */
   promptUsed?: string
+  /** 왜 이 소재·컬러 조합인가 · 프롬프트가 '무엇을'이라면 이것은 '왜'다.
+   *  보드가 PT 자료가 되려면 컷마다 이 한 줄이 있어야 한다. */
+  whyUsed?: string
   /** 브랜드 로고를 실제로 합성한 이미지인가 · 최종 선정 컷은 이게 true여야 한다 */
   logoStamped?: boolean
   /** 베리에이션을 만든 스타일 슬라이더 값 · 무엇을 얼마나 밀었는지 */

@@ -15,6 +15,7 @@ import { analyzeLogoStyle, analyzeMoodboard, analyzeSeries, reviewAsMd, saveUplo
 import { authorGenome, planTerritories, verifyRender } from './design-api.mjs'
 import { inferenceStatus, isLocal, localImageEdit, localImageGenerate, localModelFromImage, localProbe } from './inference.mjs'
 import { marketOf } from './markets.mjs'
+import { handleBoardSync } from './board-sync.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..')
@@ -400,6 +401,11 @@ export async function handleApi(req, res) {
 
   applyCors(req, res)
   if (req.method === 'OPTIONS') { res.statusCode = 204; return res.end() }
+
+  // 보드 동시 편집 · SSE 라우트는 일반 json 헬퍼를 타지 않는다
+  if (path.startsWith('/api/board/')) {
+    if (await handleBoardSync(req, res, ROOT, url)) return
+  }
 
   if (path === '/api/status') {
     ensureCache()

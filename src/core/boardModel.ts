@@ -301,6 +301,7 @@ export function buildBoardModel(st: RunState): BoardModel {
     if (pit) {
       // 카드 옆에 "어떤 근거에서 이 스케치가 나왔고, 어떤 프롬프트가 디자인으로 만들었는지"를 붙인다.
       // 발표할 때 카드만 보고도 계보가 말이 되게 하는 자리다.
+      const heroWhy = d.images.find(im => im.whyUsed && im.view !== 'sketch' && im.view !== 'sketch_var')?.whyUsed
       const basePrompt = d.images.find(im => im.origin === 'generated' && im.view !== 'sketch')?.promptUsed
       const variantPrompt = d.images.find(im => im.view === 'design')?.promptUsed
       const cut = (s?: string) => s ? (s.length > 150 ? s.slice(0, 150) + '…' : s) : null
@@ -319,6 +320,8 @@ export function buildBoardModel(st: RunState): BoardModel {
           d.spec.comboLabel
             ? `This design was asked to lead with one idea: ${d.spec.comboLabel.replace(/^Only /, '')}. That is why the prompt below names it first.`
             : 'The prompt below carries the spec straight from the sketch.',
+          // 소재·색 조합의 '왜' · PT 에서 제일 먼저 나오는 질문이라 제일 앞줄에 둔다
+          ...(heroWhy ? [heroWhy] : []),
           ...(setBy.length ? [`The research fixed ${setBy.length} value${setBy.length > 1 ? 's' : ''} in that prompt: ${setBy.join(', ')}.`] : []),
           ...(refused.length ? [`It also asked for ${refused.join(' and ')}. A ${TYPE_LABEL[d.spec.itemType] ?? d.spec.itemType} cannot take that, so it is absent from the prompt.`] : []),
           `Tooling: ${d.cost.tooling.mold_count_required === 0 ? 'no new moulds' : `${d.cost.tooling.mold_count_required} new moulds`}. Cost sits ${capPct === 0 ? 'level with' : capPct > 0 ? `${capPct}% over` : `${Math.abs(capPct)}% under`} the cap.`,

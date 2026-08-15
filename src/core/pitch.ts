@@ -106,7 +106,9 @@ function buildDesignPitch(d: Design, st: RunState): DesignPitch {
   if (d.viewMismatch) {
     objections.push({
       q: 'The detail changes between views.',
-      a: 'That gap survived a regeneration. We left it visible rather than hiding it, and the side view is the reference cut.',
+      // 예전 문구는 "재생성을 거치고도 남은 차이"라고 했다. 재생성은 일어나지 않는다 —
+      // 검증은 한 번 보고 기록만 하고, 수리 단계는 없다. 없는 절차를 근거로 삼지 않는다.
+      a: 'The check saw it and we left it visible rather than hiding it. Nothing was re-rendered to close the gap, so treat the side view as the reference cut.',
     })
   }
   if (mold > 0) {
