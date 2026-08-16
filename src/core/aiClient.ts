@@ -278,14 +278,21 @@ const PART_EN: Record<string, string> = {
   heel_counter: 'Heel counter', toe_cap: 'Toe cap', midsole: 'Midsole', outsole: 'Outsole',
   tongue_eyestay: 'Tongue and eyestay', collar: 'Collar', overlays: 'Overlays',
 }
-export function partsClause(spec: DesignSpec, mode: 'sketch' | 'render'): string {
+// materialFor: 파트별 소재를 갈아끼운다 (컨셉 렌더 전용).
+// 형태는 게놈이 쥔다 — 같은 스케치에서 나온 디자인들이니 실루엣·패널이 달라지면 안 된다.
+// 소재와 색만 컨셉의 축이다. 이 구분이 없으면 컨셉이 "어퍼를 모노필라먼트 메쉬로"라고
+// 말하는 같은 프롬프트 안에서 게놈이 "어퍼를 엔지니어드 메쉬로"라고 말해, 지시가 서로 싸운다.
+// 그러면 소재 전환(material_shift) 컨셉이 소재를 못 바꾼다.
+export function partsClause(spec: DesignSpec, mode: 'sketch' | 'render', materialFor?: Record<string, string>): string {
   const parts = spec.genome?.parts
   if (!parts) return ''
   const lines = Object.entries(parts)
     .filter(([, v]) => v && v.form && v.form.toLowerCase() !== 'none')
-    .map(([k, v]) => mode === 'sketch'
-      ? `${PART_EN[k] ?? k}: ${v.form}`
-      : `${PART_EN[k] ?? k}: ${v.form}${v.material && v.material.toLowerCase() !== 'none' ? `, in ${v.material}` : ''}`)
+    .map(([k, v]) => {
+      if (mode === 'sketch') return `${PART_EN[k] ?? k}: ${v.form}`
+      const mat = materialFor?.[k] ?? v.material
+      return `${PART_EN[k] ?? k}: ${v.form}${mat && mat.toLowerCase() !== 'none' ? `, in ${mat}` : ''}`
+    })
   return lines.length ? `Part by part — ${lines.join('. ')}.` : ''
 }
 
@@ -348,7 +355,9 @@ export function conceptRenderPrompt(spec: DesignSpec, concept: DesignConcept, br
     'The output must be a photograph, not a drawing: no outlines, no white fill, no flat areas.',
     'Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole line exactly as drawn — nothing about the form changes.',
     concept.render_clause,
-    partsClause(spec, 'render'),
+    // 컨셉이 파트 소재를 지정했으면 그것을 쓴다. 게놈 소재를 그대로 실으면
+    // 바로 윗줄의 render_clause 와 모순된 지시가 한 프롬프트에 두 번 들어간다.
+    partsClause(spec, 'render', concept.part_materials),
     markClause,
     'Strict lateral side view, one single shoe, toe pointing to the left and heel on the right, seamless white background, sharp focus, real material texture under studio light.',
     drawsMark

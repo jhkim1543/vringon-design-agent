@@ -67,14 +67,24 @@ async function uploadArchive(): Promise<{ id: string; name: string; type: string
     return { name: `stride-fw26-${String(i + 1).padStart(2, '0')}.png`, type: 'image/png', dataBase64: readFileSync(p).toString('base64') }
   }).filter(Boolean) as { name: string; type: string; dataBase64: string }[]
 
-  const r = await fetch(`${API}/api/upload`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ files }), signal: AbortSignal.timeout(120_000),
-  })
-  const j = await r.json()
-  if (j.error) throw new Error(j.error)
-  console.log(`archive uploaded · ${j.files.length} cuts from ${SOURCE_ID}`)
-  return j.files
+  // 한 번에 다 보내지 않는다. 서버 본문 상한은 48MB이고 base64 는 원본보다 1/3 크다.
+  // 지금 컷으로는 20MB 안쪽이지만 렌더 엔진을 올리면 장당 용량이 커진다 —
+  // 90분짜리 Run 이 첫 요청에서 죽는 것만은 막는다.
+  const out: { id: string; name: string; type: string; bytes: number }[] = []
+  const BATCH = 4
+  for (let i = 0; i < files.length; i += BATCH) {
+    const chunk = files.slice(i, i + BATCH)
+    const r = await fetch(`${API}/api/upload`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ files: chunk }), signal: AbortSignal.timeout(120_000),
+    })
+    const j = await r.json()
+    if (j.error) throw new Error(`upload batch ${i / BATCH + 1}: ${j.error}`)
+    out.push(...j.files)
+  }
+  const mb = files.reduce((a, f) => a + f.dataBase64.length, 0) / 1e6
+  console.log(`archive uploaded · ${out.length} cuts from ${SOURCE_ID} · ${mb.toFixed(1)}MB base64 in ${Math.ceil(files.length / BATCH)} batches`)
+  return out
 }
 
 const brand: BrandIdentity = {
