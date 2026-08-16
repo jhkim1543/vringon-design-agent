@@ -67,13 +67,13 @@ function paletteStrip(m: Macrotrend) {
     </div>`).join('')}</div>`
 }
 
-function keyItemCard(k: Macrotrend['key_items'][number], color: string, pic: string) {
+function keyItemCard(k: Macrotrend['key_items'][number], color: string, pic: string, frozen: boolean) {
   const [bg, fg] = GRADE_TINT[k.grade] ?? ['#EEF1F5', '#40474F']
   // 우리 렌더가 남아 있으면 그걸 쓰고, 없으면 이 아이템의 근거로 인용된 페이지에서
   // 실제 제품 사진을 끌어온다. 예측을 글로만 적어 두면 근거가 안 보인다.
   const evidence = (k as { image_url?: string }).image_url ?? ''
   const shot = pic || (evidence || k.metric?.source_url
-    ? shotUrl(evidence, k.metric?.source_url) : '')
+    ? shotUrl(evidence, k.metric?.source_url, frozen) : '')
   const src = k.metric?.source_url ? sourceHost(k.metric.source_url) : ''
   return `<div class="kitem">
     <div class="side" style="background:${color}">${esc(k.name)}</div>
@@ -315,7 +315,7 @@ function buildDeck(st: RunState): { title: string; html: string } {
         eyebrow, tag: `MACRO ${i + 1}`, page: P(),
         body: `<h2 class="stitle" style="color:${c}">KEY ITEMS <span class="thin">${esc(label)} · ${esc(m.name)}</span></h2>
           <div class="grid3" style="height:calc(100% - 24mm)">
-            ${items.slice(0, 3).map((k, j) => keyItemCard(k, c, at(pool.variation.length ? pool.variation : pool.any, i * 3 + j))).join('')}
+            ${items.slice(0, 3).map((k, j) => keyItemCard(k, c, at(pool.variation.length ? pool.variation : pool.any, i * 3 + j), !!st.sample)).join('')}
           </div>`,
       }))
     }

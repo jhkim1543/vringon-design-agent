@@ -55,8 +55,14 @@ export interface TrendReport {
  *  page를 함께 주면 직링크가 죽었을 때 서버가 페이지의 og:image로 폴백한다.
  *  이미 로컬로 굳힌 경로(/samples/…)는 그대로 쓴다 — 정적 데모에는 프록시가 없다.
  *  u가 비어 있어도 page가 있으면 페이지에서 대표 이미지를 찾는다. */
-export const shotUrl = (u: string, page?: string) => {
+/** 원격 사진을 서버 프록시로 가져온다. page 만 있으면 그 페이지에서 사진을 찾아온다.
+ *
+ *  frozen: 이 결과가 이미 굳은 샘플이면 true. 굳히기를 거치고도 로컬 경로가 아니라는 건
+ *  그때 못 가져왔다는 뜻이고, 정적 배포에는 /api/shot 이 없어 요청은 반드시 404 가 된다.
+ *  살아 있는 Run 에서는 페이지 폴백이 실제로 사진을 찾아 주므로 그대로 둔다. */
+export const shotUrl = (u: string, page?: string, frozen = false) => {
   if (u && !/^https?:\/\//.test(u)) return u
+  if (frozen) return ''
   const q: string[] = []
   if (u) q.push(`u=${encodeURIComponent(u)}`)
   if (page) q.push(`p=${encodeURIComponent(page)}`)

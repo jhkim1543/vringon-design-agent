@@ -17,10 +17,10 @@ import { IcReport, IcShoe, IcTrend } from './icons'
 const KRW = (n: number) => `₩${Math.round(n).toLocaleString('en-US')}`
 
 /** 매크로트렌드 카드에 쓸 대표 이미지 · 키아이템 사진이 있으면 그것을 쓴다 */
-function macroShot(m: Macrotrend): string | null {
+function macroShot(m: Macrotrend, frozen: boolean): string | null {
   for (const k of m.key_items ?? []) {
     const u = (k as { image_url?: string }).image_url
-    if (u) return shotUrl(u)
+    if (u) return shotUrl(u, undefined, frozen) || null
   }
   return null
 }
@@ -139,7 +139,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
           <div className="rep-head"><h2>{t('Key macro trends')}</h2></div>
           <div className="rep-macros">
             {macros.map(m => {
-              const shot = macroShot(m)
+              const shot = macroShot(m, !!st.sample)
               return (
                 <article className="rep-macro" key={m.name}>
                   {/* 대표 이미지가 없으면 팔레트를 띠로 깐다. 아이콘만 두면 임팩트가 없다. */}
@@ -251,8 +251,11 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
               {pulse.slice(0, 8).map(c => (
                 <article className="rep-design" key={c.product_id}>
                   <span className="rd-shot">
-                    <img src={shotUrl(c.image_urls?.[0] ?? '', c.product_url)} alt=""
-                      onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+                    {/* src 가 빈 문자열이면 브라우저가 현재 페이지를 이미지로 받아 깨진 칸이 된다.
+                        굳은 샘플에서 사진이 없으면 아예 그리지 않는다. */}
+                    {!!shotUrl(c.image_urls?.[0] ?? '', c.product_url, !!st.sample) &&
+                    <img src={shotUrl(c.image_urls?.[0] ?? '', c.product_url, !!st.sample)} alt=""
+                      onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />}
                   </span>
                   <span className="rd-id">{c.brand} {c.name}<i className="rd-tier">{c.retailer}</i></span>
                   <span className="rd-spec">
@@ -278,8 +281,11 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
               {rivals.slice(0, 12).map(c => (
                 <article className="rep-design" key={c.product_id}>
                   <span className="rd-shot">
-                    <img src={shotUrl(c.image_urls?.[0] ?? '', c.product_url)} alt="" loading="lazy"
-                      onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+                    {/* src 가 빈 문자열이면 브라우저가 현재 페이지를 이미지로 받아 깨진 칸이 된다.
+                        굳은 샘플에서 사진이 없으면 아예 그리지 않는다. */}
+                    {!!shotUrl(c.image_urls?.[0] ?? '', c.product_url, !!st.sample) &&
+                    <img src={shotUrl(c.image_urls?.[0] ?? '', c.product_url, !!st.sample)} alt="" loading="lazy"
+                      onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />}
                   </span>
                   <span className="rd-id">{c.brand} {c.name}
                     {c.competitor_group && <i className="rd-tier">{t(COMP_GROUP_LABEL[c.competitor_group])}</i>}
@@ -319,7 +325,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
                     <td className="rt-prods">
                       {b.items.slice(0, 3).map(p => (
                         <span className="rt-prod" key={p.product_id}>
-                          {p.image_urls?.[0] && <img src={shotUrl(p.image_urls[0], p.product_url)} alt=""
+                          {p.image_urls?.[0] && <img src={shotUrl(p.image_urls[0], p.product_url, !!st.sample)} alt=""
                             onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />}
                           <span>
                             <b>{p.name}</b>

@@ -25,11 +25,14 @@ const RANK_SEM: Record<string, string> = {
 
 /** 수집 사진 · 직링크가 죽으면 다음 후보, 다 죽으면 페이지 og:image 폴백까지 시도한다.
  *  이미지 URL이 하나도 없어도 상품 페이지가 있으면 페이지에서 대표 사진을 찾는다. */
-function CompShot({ urls, page, alt }: { urls: string[]; page?: string; alt: string }) {
+function CompShot({ urls, page, alt, frozen }: { urls: string[]; page?: string; alt: string; frozen?: boolean }) {
   const [i, setI] = useState(0)
   const list = urls.length ? urls : (page ? [''] : [])
   if (!list.length || i >= list.length) return <span className="cc-noshot">{t('No photo')}</span>
-  return <img src={shotUrl(list[i], page)} alt={alt} loading="lazy" onError={() => setI(v => v + 1)} />
+  const src = shotUrl(list[i], page, frozen)
+  // 굳은 샘플에서 로컬 경로가 아니면 그 사진은 존재하지 않는다. 죽을 요청을 보내지 않는다.
+  if (!src) return <span className="cc-noshot">{t('No photo')}</span>
+  return <img src={src} alt={alt} loading="lazy" onError={() => setI(v => v + 1)} />
 }
 
 const STAGE_META: { key: 'S1' | 'S2' | 'S3' | 'S4' | 'S5'; t: string; d: string }[] = [
@@ -94,7 +97,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
               {st.competitors.map(c => (
                 <div className={`compcard ${c.in_band ? '' : 'out'}`} key={c.product_id}>
                   <div className="cc-shot">
-                    <CompShot urls={c.image_urls ?? []} page={c.product_url} alt={c.name} />
+                    <CompShot urls={c.image_urls ?? []} page={c.product_url} alt={c.name} frozen={!!st.sample} />
                   </div>
                   <div className="cc-main">
                     <div className="cc-head">

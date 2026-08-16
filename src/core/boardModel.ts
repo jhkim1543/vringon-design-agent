@@ -115,7 +115,7 @@ export function buildBoardModel(st: RunState): BoardModel {
           c.retailer ? `${c.retailer} bestseller` : (c.competitor_group ? COMP_GROUP_LABEL[c.competitor_group] : ''),
           c.size_status === 'size_broken' ? 'size broken' : '',
         ].filter(Boolean).join(' · ')].filter(Boolean),
-        imageUrl: shotUrl(c.image_urls?.[0] ?? '', c.product_url),
+        imageUrl: shotUrl(c.image_urls?.[0] ?? '', c.product_url, !!st.sample),
         tone: c.retailer ? 'accent' : 'neutral',
       })
       edges.push({ from: 'r-comp', to: id, dashed: true })
@@ -209,7 +209,7 @@ export function buildBoardModel(st: RunState): BoardModel {
           title: k.name,
           body: [[metricText(k.metric), GRADE_LABEL[k.grade] ?? k.grade].filter(Boolean).join(' · '),
             k.silhouette_spec].filter(Boolean),
-          imageUrl: shotUrl((k as { image_url?: string }).image_url ?? '', k.metric?.source_url),
+          imageUrl: shotUrl((k as { image_url?: string }).image_url ?? '', k.metric?.source_url, !!st.sample),
           tone: 'muted',
         })
         edges.push({ from: id, to: kid, label: 'evidence', dashed: true })

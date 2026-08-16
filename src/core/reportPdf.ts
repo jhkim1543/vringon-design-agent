@@ -102,7 +102,7 @@ function build(st: RunState): { title: string; html: string } {
       body: `<h2 class="stitle">Live commercial signals <span class="thin">observed products</span></h2>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5mm;margin-top:4mm">
           ${comps.map(c => `<div style="border:.25mm solid #E3E7EC;border-radius:1.5mm;overflow:hidden">
-            <div style="height:34mm;background:#F4F6F8">${img(shotUrl(c.image_urls?.[0] ?? '', c.product_url))}</div>
+            <div style="height:34mm;background:#F4F6F8">${img(shotUrl(c.image_urls?.[0] ?? '', c.product_url, !!st.sample))}</div>
             <div style="padding:2.5mm 3mm">
               <div style="font-size:7.6pt;font-weight:800">${esc(c.brand)} ${esc(c.name)}</div>
               <div style="font-size:6.8pt;color:#565D63;margin-top:1mm;line-height:1.5">
