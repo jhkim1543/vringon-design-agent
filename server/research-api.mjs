@@ -381,9 +381,14 @@ export async function researchCompetitors(apiKey, root, opts) {
       notes.push(`${brands[i]}: 수집 실패 (${String(r.reason?.message || r.reason).slice(0, 80)})`)
     }
   })
+  const failed = results.filter(r => r.status === 'rejected').length
   const out = { products, notes: notes.join(' / '), searches, collected_at: new Date().toISOString().slice(0, 10) }
-  writeFileSync(file, JSON.stringify(out))
-  return { ...out, cached: false }
+  // 한 브랜드라도 실패했으면 캐시에 굳히지 않는다. 429 한 번에 무너진 결과를 적어 두면
+  // 이후 같은 키의 Run 이 전부 그 반쪽짜리를 즉시 돌려받고, 실패한 브랜드는 영영
+  // 다시 조사되지 않는다. 결과는 그대로 돌려주되 다음 Run 이 다시 시도하게 둔다.
+  if (failed === 0) writeFileSync(file, JSON.stringify(out))
+  else console.log(`[comp] ${failed}/${brands.length} 브랜드 수집 실패 · 캐시에 굳히지 않는다`)
+  return { ...out, cached: false, partial: failed > 0 }
 }
 
 async function researchOneBrand(apiKey, root, { brand: rawBrand, typeKo: rawType, priceMin, priceMax, adjacentBand = false, line, langName = 'English' }) {
@@ -644,12 +649,20 @@ ${searchClause(mk, LANG)}
       name: 'sub_finding',
     })))
     const findings = []
+    // 실패한 하위 질문을 조용히 버리면, 리포트는 열 개를 물어본 것처럼 보이면서
+    // 실제로는 여섯 개만 읽고 쓰인다. 무엇이 빠졌는지 남긴다.
+    const unanswered = []
     settled.forEach((r, i) => {
       if (r.status === 'fulfilled') {
         totalSearch += r.value.searches
         findings.push({ q: qs[i], ...r.value.data })
+      } else {
+        unanswered.push({ q: qs[i], reason: String(r.reason?.message || r.reason).slice(0, 120) })
       }
     })
+    if (unanswered.length) {
+      console.log(`[trend] 하위 질문 ${unanswered.length}/${qs.length} 실패 · 리포트에 표시한다`)
+    }
     onStep?.(`조사 ${findings.length}/${qs.length}건 완료 · 종합 보고서 작성 중`)
 
     const digest = findings.map((f, i) =>
@@ -686,10 +699,15 @@ ${rep.data.body_markdown}
       searches: totalSearch,
       engine: 'multi',
       report: rep.data,
+      // 물어본 것과 답을 받은 것을 나눠 적는다. 예전에는 qs 를 통째로 실어서
+      // 실패한 질문도 답을 얻은 것처럼 보였다.
       sub_questions: qs,
+      sub_questions_answered: findings.map(f => f.q),
+      sub_questions_failed: unanswered,
       collected_at: new Date().toISOString().slice(0, 10),
     }
-    writeFileSync(file, JSON.stringify(out))
+    // 하위 질문이 절반 넘게 실패했으면 굳히지 않는다 — 다음 Run 이 다시 시도해야 한다.
+    if (unanswered.length * 2 <= qs.length) writeFileSync(file, JSON.stringify(out))
     return { ...out, cached: false }
   }
 

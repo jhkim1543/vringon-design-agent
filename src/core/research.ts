@@ -178,7 +178,14 @@ export function pulseToCompetitors(r: RetailPulse, startIdx: number): Competitor
     observation_window: `${r.collected_at}, single pass`,
     confidence: 'none' as const,
     in_band: true,
-    evidence_strength: 'strong' as const,
+    // 순위가 무엇을 뜻하는지에 따라 근거의 세기가 다르다. 예전에는 전부 'strong' 이라
+    // 적어 둬서, 진열 위치 하나만 본 제품도 확인된 판매 순위와 같은 대접을 받았다.
+    evidence_strength: (
+      p.rank_semantics === 'verified_sales_rank' ? 'strong'
+        : p.rank_semantics === 'retailer_bestseller_membership' ? 'moderate'
+          : p.rank_semantics === 'surface_position' ? 'weak'
+            : 'none'
+    ) as 'strong' | 'moderate' | 'weak' | 'none',
     source_urls: p.source_urls,
     rank_note: p.rank_note,
     rank_semantics: p.rank_semantics,

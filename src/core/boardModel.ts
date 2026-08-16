@@ -3,7 +3,7 @@
 // 연결(edge)은 장식이 아니라 실제 데이터다. 디자인이 어떤 신호에서 나왔는지는
 // rationale.driving_signals에, 디렉션이 어떤 신호를 묶었는지는 signal_ids에 있다.
 import type { Design, RunState } from './types'
-import { COMP_GROUP_LABEL, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL, TYPE_LABEL } from './types'
+import { COMP_GROUP_LABEL, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL, TYPE_LABEL , isSketchView } from './types'
 import { buildLocalPitch } from './pitch'
 import type { SeasonDossier } from './research'
 import { GRADE_LABEL, shotUrl, metricText } from './research'
@@ -275,9 +275,8 @@ export function buildBoardModel(st: RunState): BoardModel {
   // ── 5 스케치 레인 · 외형이 잡히는 흑백 단계. 색이 들어간 디자인과 명확히 갈라 보인다.
   // 기준 측면 스케치 + 아웃솔(바닥면) 도면. 옛 저장본의 sketch_var(흑백 어퍼 변형)도 그대로 읽는다.
   let skRow = 0
-  const SKETCH_VIEWS = ['sketch', 'sketch_outsole', 'sketch_var']
   alive.forEach(d => {
-    const sketches = d.images.filter(im => SKETCH_VIEWS.includes(im.view))
+    const sketches = d.images.filter(im => isSketchView(im.view))
     sketches.forEach((im, k) => {
       const id = `sk-${d.spec.design_id}-${k}`
       const isBase = im.view === 'sketch'
@@ -305,7 +304,7 @@ export function buildBoardModel(st: RunState): BoardModel {
       if (isBase && dir) edges.push({ from: `dir-${dir.id}`, to: id, label: 'form' })
       if (!isBase) edges.push({ from: `sk-${d.spec.design_id}-0`, to: id, label: isOutsole ? 'same form, from below' : 'ink variation', dashed: true })
       // 렌더가 없으면 "coloured"라고 쓸 수 없다. 색이 안 들어갔으니까. 아웃솔 도면은 디자인으로 이어지지 않는다 — 참조다.
-      const rendered = d.images.some(x => !SKETCH_VIEWS.includes(x.view))
+      const rendered = d.images.some(x => !isSketchView(x.view))
       if (!isOutsole) edges.push({ from: id, to: d.spec.design_id, label: isBase ? (rendered ? 'coloured' : 'spec only') : undefined, dashed: isBase && !rendered })
     })
   })
@@ -314,12 +313,12 @@ export function buildBoardModel(st: RunState): BoardModel {
     // 디자인 칸에는 렌더만 온다. 예전에는 렌더가 없으면 ?? d.images[0]로 스케치가 실려
     // "색이 들어가는 칸"에 흑백 선화가 걸리고, 스케치 칸의 같은 그림과 화살표로 이어져
     // 스케치에서 스케치로 가는 것처럼 보였다. 없으면 없다고 두는 편이 정직하다.
-    const hero = d.images.find(im => !['sketch', 'sketch_var'].includes(im.view))
+    const hero = d.images.find(im => !isSketchView(im.view))
     const pit = pitchOf(d.spec.design_id)
     if (pit) {
       // 카드 옆에 "어떤 근거에서 이 스케치가 나왔고, 어떤 프롬프트가 디자인으로 만들었는지"를 붙인다.
       // 발표할 때 카드만 보고도 계보가 말이 되게 하는 자리다.
-      const heroWhy = d.images.find(im => im.whyUsed && im.view !== 'sketch' && im.view !== 'sketch_var')?.whyUsed
+      const heroWhy = d.images.find(im => im.whyUsed && !isSketchView(im.view))?.whyUsed
       const basePrompt = d.images.find(im => im.origin === 'generated' && im.view !== 'sketch')?.promptUsed
       const variantPrompt = d.images.find(im => im.view === 'design')?.promptUsed
       const cut = (s?: string) => s ? (s.length > 150 ? s.slice(0, 150) + '…' : s) : null

@@ -5,7 +5,7 @@ import { t } from '../core/i18n'
 import { useMemo } from 'react'
 import type { ReactNode } from 'react'
 import type { RunState } from '../core/types'
-import { CAT_LABEL, COMP_GROUP_LABEL, TYPE_LABEL, MODE_LABEL } from '../core/types'
+import { CAT_LABEL, COMP_GROUP_LABEL, TYPE_LABEL, MODE_LABEL , isSketchView } from '../core/types'
 import { GRADE_LABEL, shotUrl } from '../core/research'
 import { plainProse } from '../core/prose'
 import type { Macrotrend, SeasonDossier, TrendReport } from '../core/research'
@@ -43,7 +43,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
   const hero = useMemo(() => {
     for (const x of [...top, ...st.designs]) {
       const im = x.images.find(i => i.view === 'lateral' && !i.colorway)
-        ?? x.images.find(i => i.origin === 'generated' && !['sketch', 'sketch_var'].includes(i.view))
+        ?? x.images.find(i => i.origin === 'generated' && !isSketchView(i.view))
       if (im) return im.url
     }
     return null
@@ -181,7 +181,7 @@ export default function RunReport({ st, onOpenBoard, competitorDetail, dossierDe
           <div className="rep-designs">
             {shown.map(x => {
               const im = x.images.find(i => i.view === 'lateral' && !i.colorway)
-                ?? x.images.find(i => !['sketch', 'sketch_var'].includes(i.view)) ?? x.images[0]
+                ?? x.images.find(i => !isSketchView(i.view)) ?? x.images[0]
               // 머천다이저가 라인 리뷰 전에 봐야 하는 숫자: 원가 추정과 밴드 중간가 기준 마진 (Gemini QA 지적)
               const cogs = x.cost?.estimated_total_krw
               const bandMid = (st.params.trend.priceMinKrw + st.params.trend.priceMaxKrw) / 2

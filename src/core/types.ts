@@ -758,6 +758,21 @@ export const SHOE_PARTS: ShoePart[] = ['heel_counter', 'toe_cap', 'midsole', 'ou
 
 /** 한 스케치 위의 디자인 컨셉 · 형태 고정, 소재·컬러·창의도만 갈린다 (S7).
  *  '베리에이션'의 실제 단위다 — 스케치당 N개, 각각 다른 angle. */
+// ── 선 그림 뷰 ────────────────────────────────────────────────────
+// 제품 사진이 아닌 뷰들. 히어로 이미지·썸네일·PDF·3D 입력·캠페인 베이스를 고를 때
+// 전부 이걸로 걸러야 한다.
+//
+// 왜 상수로 두는가: 예전에는 스무 군데가 ['sketch','sketch_var'] 를 각자 적어 뒀다.
+// S2에 아웃솔 시트(sketch_outsole)가 생기자 그 스무 군데가 한꺼번에 틀렸다.
+// 아웃솔 시트는 기준 렌더보다 먼저 배열에 들어가므로, find() 가 죄다 그걸 집어
+// 보드의 디자인 카드·라이브러리 썸네일·덱 갤러리가 검은 선 트레드 도면이 되고,
+// 3D 는 그 도면으로 유료 모델을 만들 뻔했다.
+// 선화 뷰를 새로 더할 일이 있으면 여기만 고친다.
+export const SKETCH_VIEWS = ['sketch', 'sketch_outsole', 'sketch_var'] as const
+export function isSketchView(view: string): boolean {
+  return (SKETCH_VIEWS as readonly string[]).includes(view)
+}
+
 export interface DesignConcept {
   name: string
   angle: 'commercial_safe' | 'material_shift' | 'colour_shift' | 'creative_push'

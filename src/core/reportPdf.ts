@@ -2,7 +2,7 @@
 // 도시에와 같은 뼈대를 쓴다. 이쪽은 서술형 리포트라 장수가 적다.
 // 화면(Run)에서는 텍스트로 읽고, 여기서는 발표에 그대로 쓸 수 있는 형태로 나간다.
 import type { RunState, Design } from './types'
-import { asFootwearLine, CAT_LABEL, COMP_GROUP_LABEL, MODE_LABEL, TYPE_LABEL, UNKNOWN } from './types'
+import { asFootwearLine, CAT_LABEL, COMP_GROUP_LABEL, MODE_LABEL, TYPE_LABEL, UNKNOWN , isSketchView } from './types'
 import type { TrendReport } from './research'
 import { shotUrl } from './research'
 import { downloadDeck, esc, printDeck, slide } from './deck'
@@ -13,7 +13,7 @@ function pics(st: RunState) {
   const all = st.designs.flatMap((d: Design) => d.images.map(i => i.url ? { view: i.view, url: i.url } : null))
     .filter(Boolean) as { view: string; url: string }[]
   const of = (v: string) => all.filter(i => i.view === v).map(i => i.url)
-  return { concept: of('concept'), wear: of('wear'), any: all.filter(i => i.view !== 'sketch' && i.view !== 'sketch_var').map(i => i.url) }
+  return { concept: of('concept'), wear: of('wear'), any: all.filter(i => !isSketchView(i.view)).map(i => i.url) }
 }
 const at = (l: string[], i: number) => (l.length ? l[i % l.length] : '')
 const img = (url: string, cls = '') => url
@@ -124,7 +124,7 @@ function build(st: RunState): { title: string; html: string } {
 
   // 디자인 갤러리 · 이 분석이 실제로 만든 컷들 (렌더·뷰·컬러웨이·캠페인)
   const gallery = st.designs.filter(d => !d.rejected)
-    .flatMap(d => d.images.filter(i => i.view !== 'sketch' && i.view !== 'sketch_var').map(i => ({ id: d.spec.design_id, im: i })))
+    .flatMap(d => d.images.filter(i => !isSketchView(i.view)).map(i => ({ id: d.spec.design_id, im: i })))
     .slice(0, 8)
   if (gallery.length >= 4) {
     out.push(slide({

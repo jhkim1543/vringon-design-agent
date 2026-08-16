@@ -35,7 +35,7 @@ import type { BrandIdentity } from './brand'
 import { checkBrandFit } from './brand'
 import type { Genome } from './genome'
 import { getLang, LANG_NAME } from './i18n'
-import { campaignCount, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL, TYPE_EN, TYPE_LABEL } from './types'
+import { campaignCount, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL, TYPE_EN, TYPE_LABEL , isSketchView } from './types'
 import { ENGINES } from './imageEngines'
 
 export type Emit = (e: PipelineEvent) => void
@@ -104,9 +104,13 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     // 시즌 · 위저드의 season(FW26/SS27/carryover) 이 조사에 실려야 한다. 예전에는 '2026 F/W' 가 하드코딩돼
     // 컨트롤을 바꿔도 아무것도 안 바뀌었다. carryover 는 시즌이 아니라 상태라 현재 시즌으로 둔다.
     const seasonCode = String(params.line?.product?.season ?? 'FW26')
-    const seasonKo = /^FW(dd)$/.test(seasonCode) ? `20${seasonCode.slice(2)} F/W`
-      : /^SS(dd)$/.test(seasonCode) ? `20${seasonCode.slice(2)} S/S` : '2026 F/W'
-    const seasonDossier = /^(FW|SS)dd$/.test(seasonCode) ? seasonCode : 'FW26'
+    // dd 가 아니라 \d\d 다. 리터럴 'dd' 로 적혀 있던 동안에는 'FWdd' 라는 불가능한
+    // 문자열만 통과해서, 위저드가 무엇을 고르든 전부 아래 폴백으로 떨어졌다.
+    // FW26 은 폴백과 우연히 같아 티가 안 났고, SS27 을 고르면 SS27 이라 적힌 채
+    // 직전 FW 시즌을 조사하는 결과가 나왔다.
+    const seasonKo = /^FW\d\d$/.test(seasonCode) ? `20${seasonCode.slice(2)} F/W`
+      : /^SS\d\d$/.test(seasonCode) ? `20${seasonCode.slice(2)} S/S` : '2026 F/W'
+    const seasonDossier = /^(FW|SS)\d\d$/.test(seasonCode) ? seasonCode : 'FW26'
     // 실제 생성 상한 · 초과분은 SVG 폴백. 비용 통제 지점.
     //
     // 상한을 먼저 오는 단계가 다 써 버리면 뒤 단계가 통째로 굶는다. 스케치 12장이
@@ -163,7 +167,9 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       emit({ kind: 'log', stage: 'S1', text: `1 Competitor products · searching ${brands.join(', ')} for ${typeName} (1-2 min)` })
       try {
         // 경쟁 라인 조사와 백화점·명품몰 펄스는 서로 독립이다 · 병렬로 돈다
-        emit({ kind: 'log', stage: 'S1', text: 'Also sweeping department-store and luxury-retail bestseller pages: Lotte, SSG, The Hyundai, MR PORTER, Harrods' })
+        // 실제 판매처는 시장·계열에 따라 서버가 고른다 (research-api 의 retailClause).
+        // 여기에 다섯 곳을 박아 두면 미국 시장 Run 의 기록에도 롯데·SSG 가 남는다.
+        emit({ kind: 'log', stage: 'S1', text: `Also sweeping bestseller pages at the retailers that matter in ${params.line?.commercial?.homeMarket ?? 'KR'}, chosen per market and product family` })
         const [r, pulse] = await Promise.all([
           fetchCompetitors({
             brands, typeKo: typeName,
@@ -388,7 +394,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           emit({ kind: 'log', stage: 'S1', text: 'The season dossier failed to build. Signals and the report are still usable.' })
         })
         fetchTrends({
-          typeKo: typeName, season: '2026 F/W',
+          typeKo: typeName, season: seasonKo,
           brands: params.mode === 'trend' ? params.trend.competitors : undefined,
           priceBandKo: params.mode === 'trend'
             ? `KRW ${(params.trend.priceMinKrw / 10000).toFixed(0)}0k-${(params.trend.priceMaxKrw / 10000).toFixed(0)}0k ${params.trend.priceBand}`
@@ -410,7 +416,9 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         })
         emit({ kind: 'log', stage: 'S1', text: `${tr.searches} web searches, ${signals.length} signals${tr.cached ? ' (reused an earlier pass)' : ''} · each linked to a source` })
       } catch (e) {
-        emit({ kind: 'log', stage: 'S1', text: `Trend research failed · ${String((e as Error).message).slice(0, 120)} · falling back to sample data` })
+        // 예전에는 "falling back to sample data" 라고 적었다. 그런 폴백은 없다 —
+        // 예시 상수는 지웠고, 실패하면 신호 없이 계속 간다. 없는 폴백을 말하지 않는다.
+        emit({ kind: 'log', stage: 'S1', text: `Trend research failed · ${String((e as Error).message).slice(0, 120)} · continuing without trend signals, and every card will say so` })
       }
     }
     // 무드보드는 문서에서 실제로 읽어 낸 신호를 쓴다.
@@ -663,10 +671,14 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     // 후자는 "스케치를 사진으로 옮긴다"는 계보가 아예 끊긴 채 새로 그려졌다.
     // 스케치 예산보다 많이 진출시키면 다시 계보가 끊긴다. 진출 수를 스케치할 수 있는 수로 묶는다.
     // 예산이 얕으면 안을 적게 밀고, 민 안은 스케치와 렌더를 모두 갖는다.
+    // 진출한 안 하나는 스케치 예산을 두 장 쓴다 — 기준 스케치와 아웃솔 시트.
+    // 예전에는 스케치 상한 전부를 진출 수로 잡아서, 기준 스케치가 상한을 다 먹고
+    // 아웃솔 블록이 통째로 건너뛰어졌다 (기본 상한 12에서 실제로 한 장도 안 나왔다).
     const sketchCapNow = budget.leftSketch()
+    const advanceCap = sketchCapNow > 0 ? Math.max(1, Math.floor(sketchCapNow / 2)) : Number.POSITIVE_INFINITY
     const advanceN = Math.max(1, Math.min(
       Math.round(alive.length * params.renderRatio),
-      sketchCapNow > 0 ? sketchCapNow : Number.POSITIVE_INFINITY,
+      advanceCap,
     ))
     const advancing = [...alive].sort((a, b) => a.cost.cap_ratio - b.cost.cap_ratio).slice(0, advanceN)
 
@@ -754,7 +766,9 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} colour enters here: the black-ink sheet becomes a photoreal render, then ${params.viewCount - 1} more views as edits` })
       // 컬러웨이는 브랜드 팔레트 → 시즌 팔레트 → 중립 순으로 뽑는다. 취향이 아니라 출처가 있다.
       const cwPlan = planColorways(params.colorwayCount, params.brand, trendClause)
-      d.colorways = cwPlan.map(c => c.name)
+      // d.colorways 는 여기서 채우지 않는다. 예전에는 계획한 이름을 그대로 박아 둬서,
+      // 상한에 걸려 컬러웨이가 한 장도 안 나온 Run 도 리포트에는 컬러웨이 두 개가
+      // 있다고 적혔다. 실제로 렌더된 것만 아래에서 담는다.
 
       if (budget.left() > 0) {
         // ① 기준 렌더 1장 · 스케치가 있으면 새로 그리지 않고 스케치를 사진으로 옮긴다.
@@ -818,16 +832,30 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
             })
             if (cancelled) return
             const concepts = (cr.concepts ?? []).slice(0, dpsWanted)
-            // 첫 컨셉의 이름과 이유는 기준 렌더에 붙인다 — 그 렌더가 곧 commercial_safe 다
             const first = concepts[0]
-            if (first) {
+            // 필수 뷰 몫을 먼저 떼어 둔다. 컨셉과 추가 뷰·컬러웨이가 같은 extrasLeft 를
+            // 나눠 쓰는데 컨셉 루프가 먼저 돌아서, 상한이 빡빡하면 컨셉이 전부 가져가고
+            // 내측·후면이 한 장도 안 남았다. 신발을 한 방향에서만 보여 주는 카드가 된다.
+            const requiredExtraViews = views.filter(v => v.required).slice(1, params.viewCount).length
+            const conceptCap = Math.max(0, extrasLeft - requiredExtraViews)
+            if (concepts.length - 1 > conceptCap) {
+              emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} cap allows ${conceptCap} of ${concepts.length - 1} extra concepts · the required views keep their share` })
+            }
+            // 기준 렌더에는 이름표만 붙이고 이유는 건드리지 않는다.
+            // 이 컷은 컨셉이 저작되기 전에 게놈 프롬프트로 이미 만들어졌다. 컨셉의 why 를
+            // 여기에 덮어쓰면, 그 컷에 들어간 적 없는 파트별 컬러 배정을 근거라고 말하게 된다.
+            // baseWhy 는 실제로 보낸 프롬프트에서 계산한 것이라 그대로 둔다.
+            // 이름표도 commercial_safe 일 때만 붙인다 — 스키마가 순서를 강제하지 않으므로
+            // 첫 컨셉이 다른 angle 로 올 수 있고, 그러면 이 컷의 성격과 어긋난다.
+            if (first && first.angle === 'commercial_safe') {
               d.images = d.images.map(im => im.view === views[0].key && !im.colorway && !im.concept
-                ? { ...im, concept: { index: 0, name: first.name, angle: first.angle }, whyUsed: `${first.why} (${first.angle})` }
+                ? { ...im, concept: { index: 0, name: first.name, angle: first.angle } }
                 : im)
             }
             emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} ${concepts.length} concepts authored on one sketch · ${concepts.map(c => c.angle).join(' / ')}${cr.cached ? ' (reused)' : ''}` })
             for (let k = 1; k < concepts.length; k++) {
               if (cancelled || budget.left() <= 0 || extrasLeft <= 0) break
+              if (k - 1 >= conceptCap) break
               const c = concepts[k]
               const p2 = conceptRenderPrompt(d.spec, c, params.brand)
               try {
@@ -868,6 +896,12 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
               emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} ${job.colorway ?? job.view} edit failed · dropping that cut only` })
             }
           })
+          // 실제로 렌더된 컬러웨이만 적는다. 계획한 것이 아니라 나온 것이다.
+          d.colorways = d.images.map(im => im.colorway).filter((c): c is string => !!c)
+          const missed = cwPlan.length - d.colorways.length
+          if (missed > 0) {
+            emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} ${missed} of ${cwPlan.length} planned colourways did not render · the card lists only the ${d.colorways.length} that exist` })
+          }
         }
       } else {
         await wait(350)
@@ -951,7 +985,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       }
       emit({ kind: 'design-update', design: { ...d } })
       // 디자인 한 건이 끝날 때마다 남긴다. 중간에 멈추면 어디서 멈췄는지 로그가 말해 준다.
-      emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} done · ${d.images.filter(im => im.view !== 'sketch' && im.view !== 'sketch_var').length} cuts (${i + 1} of ${advancing.length})` })
+      emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} done · ${d.images.filter(im => !isSketchView(im.view)).length} cuts (${i + 1} of ${advancing.length})` })
       emit({ kind: 'progress', stage: 'S3', pct: Math.round(((i + 1) / advancing.length) * 100) })
     }
     emit({ kind: 'checkpoint', label: 'S3 done · renders, colourways and QA results saved' })
@@ -1097,7 +1131,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       const jobs: { d: Design; base: string; idx: number; kind: 'wear' | 'concept' }[] = []
       for (const d of top) {
         const base = d.images.find(i => i.view === 'lateral' && !i.colorway)
-          ?? d.images.find(i => !['sketch', 'sketch_var'].includes(i.view))
+          ?? d.images.find(i => !isSketchView(i.view))
         if (!base) continue
         for (let k = 0; k < shots; k++) {
           jobs.push({ d, base: base.hash, idx: k, kind: k < worn ? 'wear' : 'concept' })
@@ -1141,7 +1175,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       for (const d of top) {
         if (cancelled) return
         const base = d.images.find(i => i.view === 'lateral' && !i.colorway)
-          ?? d.images.find(i => !['sketch', 'sketch_var', 'wear', 'concept', 'variation'].includes(i.view))
+          ?? d.images.find(i => !isSketchView(i.view) && !['wear', 'concept', 'variation'].includes(i.view))
         if (!base) {
           emit({ kind: 'log', stage: 'S5', text: `${d.spec.design_id} has no clean product render, so 3D is skipped` })
           continue

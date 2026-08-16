@@ -1,4 +1,5 @@
 // 샘플 3종을 실제 보드 모델로 만들어 이상을 전수 점검한다.
+import { isSketchView } from '../src/core/types'
 import { readFileSync } from 'node:fs'
 import { buildBoardModel } from '../src/core/boardModel'
 import type { RunState } from '../src/core/types'
@@ -10,20 +11,20 @@ for (const f of files) {
   const issues: string[] = []
 
   // ① 디자인 칸이 스케치 이미지를 쓰고 있는가
-  const sketchHashes = new Set(st.designs.flatMap(d => d.images.filter(i => ['sketch','sketch_var'].includes(i.view)).map(i => i.hash)))
+  const sketchHashes = new Set(st.designs.flatMap(d => d.images.filter(i => isSketchView(i.view)).map(i => i.hash)))
   for (const n of m.nodes.filter(n => n.kind === 'design' && n.column === 5 && n.imageUrl)) {
     const hit = [...sketchHashes].some(h => n.imageUrl!.includes(h))
     if (hit) issues.push(`디자인 칸이 스케치 이미지 사용: ${n.id}`)
   }
   // ② 렌더 없는 디자인
   for (const d of st.designs.filter(d => !d.rejected)) {
-    const renders = d.images.filter(i => !['sketch','sketch_var'].includes(i.view))
+    const renders = d.images.filter(i => !isSketchView(i.view))
     if (!renders.length) issues.push(`렌더 0장: ${d.spec.design_id}`)
   }
   // ③ 스케치 없는 디자인 (계보 끊김)
   for (const d of st.designs.filter(d => !d.rejected)) {
-    const sk = d.images.filter(i => ['sketch','sketch_var'].includes(i.view))
-    const renders = d.images.filter(i => !['sketch','sketch_var'].includes(i.view))
+    const sk = d.images.filter(i => isSketchView(i.view))
+    const renders = d.images.filter(i => !isSketchView(i.view))
     if (!sk.length && renders.length) issues.push(`스케치 없이 렌더만: ${d.spec.design_id} (계보 끊김)`)
   }
   // ④ 끊긴 엣지
@@ -39,7 +40,7 @@ for (const f of files) {
   const noGen = st.designs.filter(d => !d.rejected && !d.spec.genome).length
   if (noGen) issues.push(`게놈 없이 살아남은 디자인 ${noGen}건 (폴백 경로)`)
   // ⑦ QA 없는 디자인 (검증 미실행)
-  const noQa = st.designs.filter(d => !d.rejected && d.images.some(i => !['sketch','sketch_var'].includes(i.view)) && !(d.qa||[]).length).length
+  const noQa = st.designs.filter(d => !d.rejected && d.images.some(i => !isSketchView(i.view)) && !(d.qa||[]).length).length
   if (noQa) issues.push(`렌더는 있는데 검증 기록 없음 ${noQa}건`)
 
   console.log(`══ ${f} · 노드 ${m.nodes.length} / 엣지 ${m.edges.length}`)

@@ -509,6 +509,13 @@ export async function handleApi(req, res) {
 
   // ── 업로드 · 파일을 실제로 받아 두고, 실제로 읽는다 ────────────────
   // 예전에는 파일명만 params에 담고 내용은 아무도 열지 않았다.
+  // 라우트 존재 확인용. 옛 서버가 포트를 쥐고 있는 채로 새 코드를 돌리는 사고가
+  // 실제로 있었다 — 20분짜리 Run 이 옛 파이프라인으로 조용히 돌았다.
+  // POST 로 떠보면 실제 추론이 돌아 과금되므로, 값싼 GET 을 따로 둔다.
+  if (path === '/api/design/concepts' && req.method === 'GET') {
+    return json(res, 200, { ok: true, route: 'concepts' })
+  }
+
   if (path === '/api/upload' && req.method === 'POST') {
     try {
       const b = await readBody(req, 48e6)

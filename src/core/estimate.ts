@@ -27,8 +27,8 @@ export function estimate(p: RunParams): Estimate {
   const extraDesigns = renders * Math.max(0, dps - 1)
   const extraViews = renders * Math.max(0, p.viewCount - 1)
   const colorways = renders * p.colorwayCount
-  // 스케치당 추가 컨셉(첫 컨셉은 기준 렌더 그 자체) · 예전 슬라이더 베리에이션 자리
-  const variations = renders * Math.max(0, (p.designsPerSketch ?? 1) - 1)
+  // (예전 자리) variations 는 extraDesigns 와 똑같은 식이었는데 wantS3 에 둘 다 더해져
+  // 스케치당 추가 컨셉이 두 번 세어졌다. 추가 컨셉은 extraDesigns 하나로 충분하다.
   const campaignImgs = p.topN * campaignCount(p)
   const models = p.make3d ? p.topN : 0
 
@@ -52,7 +52,7 @@ export function estimate(p: RunParams): Estimate {
 
   // ── 실제 생성 장수 · 상한과 실제 필요량 중 작은 쪽
   const wantS2 = n
-  const wantS3 = renders + extraDesigns + extraViews + colorways + variations
+  const wantS3 = renders + extraDesigns + extraViews + colorways
   // 파이프라인과 같은 배분 규칙을 쓴다. 여기서만 다르게 계산하면 예상과 결과가 어긋난다.
   // 색 단계까지 가는 분석이면 스케치는 상한의 40%까지만 가져간다.
   const budget = p.imageBudget

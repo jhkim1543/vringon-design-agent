@@ -2,7 +2,7 @@
 import { t } from '../core/i18n'
 import { useEffect, useRef, useState } from 'react'
 import type { RunState } from '../core/types'
-import { COMP_GROUP_LABEL, MODE_LABEL, TIER_LABEL, TYPE_LABEL } from '../core/types'
+import { COMP_GROUP_LABEL, MODE_LABEL, TIER_LABEL, TYPE_LABEL , isSketchView } from '../core/types'
 import RunReport from './RunReport'
 import { DesignCard } from './Card'
 import { ModelViewer } from './ModelViewer'
@@ -536,11 +536,11 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
             </div>
             {st.designs.map(d => {
               // 흑백 단계: 기준 외형 + 잉크 변형들 · 컬러 단계: 각 스케치가 사진이 된 디자인들
-              const sketches = d.images.filter(i => i.view === 'sketch' || i.view === 'sketch_var')
+              const sketches = d.images.filter(i => isSketchView(i.view))
               const sketch = sketches[0]
               const outs = d.images.filter(i =>
                 (i.view === 'lateral' && !i.colorway) || i.view === 'design'
-                || (i.origin === 'generated' && !['sketch', 'sketch_var'].includes(i.view)))
+                || (i.origin === 'generated' && !isSketchView(i.view)))
               // 이 스케치를 만든 근거 · 가중치 큰 신호부터.
               // 스펙을 실제로 정한 신호만 남긴다. 예전 분석에는 그 연결이 없어 가중치를 믿지 않는다.
               const traced = d.spec.hintApplied !== undefined

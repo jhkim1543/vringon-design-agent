@@ -119,7 +119,7 @@ line.lastFit = { lastFamily: 'performance running, medium volume', baseSize: 'un
 line.upper = { outer: 'engineered mesh', lining: 'moisture-management textile', reinforcement: 'light', closure: 'lace', protection: 'none' }
 line.bottom = { midsole: 'supercritical foam', plate: 'none', outsole: 'segmented rubber', stackBand: 'high', dropMm: '6-10', rocker: 'moderate', heel: 'none', existingBottomReuse: true }
 line.construction = { lasting: 'strobel', soleAttachment: 'cemented' }
-line.performance = { weightTargetG: '255-280', cushioning: 'high', stability: 'moderate', wetGrip: 'preferred', flexibility: 'moderate' }
+line.performance = { weightTargetG: '255-280', cushioning: 'high', stability: 'neutral_stable', wetGrip: 'preferred', flexibility: 'moderate' }
 line.commercial = { homeMarket: 'KR', referenceMarkets: ['US', 'JP'], channels: ['running specialty', 'DTC'] }
 
 let handle: ReturnType<typeof runPipeline>
@@ -128,10 +128,11 @@ const stamp = () => `${String(Math.floor((Date.now() - t0) / 60000)).padStart(3,
 
 async function main() {
   // 서버가 옛 코드면 조용히 옛 파이프라인으로 돈다. 먼저 막는다.
+  // GET 으로 물어본다. POST 로 빈 몸통을 보내면 서버가 그대로 받아 실제 추론 호출을
+  // 일으키고(과금), 클라이언트는 8초 뒤 끊어도 서버는 끝까지 돈다.
   const probe = await fetch(`${API}/api/design/concepts`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({}), signal: AbortSignal.timeout(8000),
-  }).catch((e: Error) => (String(e.name) === 'TimeoutError' ? { status: 200 } as Response : null))
+    method: 'GET', signal: AbortSignal.timeout(8000),
+  }).catch(() => null)
   if (!probe || probe.status === 404) {
     console.error('FAILED: this server does not have /api/design/concepts — it is running older code.')
     process.exit(1)
@@ -252,7 +253,12 @@ async function main() {
     Object.assign(st, JSON.parse(readFileSync(OUT_JSON, 'utf8')))
   } catch { console.log('freeze-sample-shots failed · remote shots stay remote') }
   ;(st as any).sample = true
-  ;(st as any).sampleTitle = 'Series · STRIDE LAB SS27, carrying the FW26 running line forward through an approved DNA read'
+  // 제목은 실제로 일어난 것만 적는다. DNA 읽기가 실패하면 파이프라인은 로그만 남기고
+  // 그냥 진행하므로, 승인 게이트를 돈 척하는 제목이 붙어 버릴 수 있다.
+  const lockedN = st.seriesDna?.invariant.length ?? 0
+  ;(st as any).sampleTitle = lockedN
+    ? `Series · STRIDE LAB SS27, carrying the FW26 running line forward through ${lockedN} approved DNA elements`
+    : 'Series · STRIDE LAB SS27, continuing the FW26 running line — the archive read returned no fixed elements'
   ;(st as any).savedAtISO = new Date().toISOString()
   writeFileSync(OUT_JSON, JSON.stringify(st, null, 1))
 

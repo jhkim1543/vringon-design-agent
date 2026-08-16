@@ -14,7 +14,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from
 import { join } from 'node:path'
 import { runPipeline } from '../src/core/pipeline'
 import type { PipelineEvent, RunParams, RunState } from '../src/core/types'
-import { DEFAULT_PARAMS, defaultLineProfile } from '../src/core/types'
+import { DEFAULT_PARAMS, defaultLineProfile , isSketchView } from '../src/core/types'
 import type { BrandIdentity } from '../src/core/brand'
 
 // Node 의 기본 fetch 는 헤더 응답을 300초까지만 기다린다 (undici 기본값). 리서치 한 레그는
@@ -153,6 +153,22 @@ const onEvent = (e: PipelineEvent) => {
 }
 
 async function main() {
+  // 서버가 옛 코드를 물고 있으면 Run 전체가 조용히 옛 파이프라인으로 돈다.
+  // 실제로 그렇게 20분을 버렸다 — Windows 에서 pkill 이 안 먹어 옛 프로세스가 포트를 쥐고 있었고,
+  // 새 서버는 바인드 실패로 죽었는데 러너는 그걸 모른 채 옛 스키마로 조사를 마쳤다.
+  // 이 Run 이 필요로 하는 새 라우트가 없으면 여기서 멈춘다.
+  {
+    const base = String(import.meta.env.VITE_API_BASE ?? '')
+    const r = await fetch(`${base}/api/design/concepts`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}), signal: AbortSignal.timeout(8000),
+    }).catch((e: Error) => (String(e.name) === 'TimeoutError' ? { status: 200 } as Response : null))
+    if (!r || r.status === 404) {
+      console.error('FAILED: the server on this port does not have /api/design/concepts — it is running older code.')
+      console.error('Kill every node "standalone.mjs" process (PowerShell: Stop-Process -Id <pid> -Force) and start it again.')
+      process.exit(1)
+    }
+  }
   console.log(`starting ${SAMPLE_ID} · endStage ${params.endStage} · budget ${params.imageBudget}`)
   await new Promise<void>((resolve, reject) => {
     const guard = setTimeout(() => reject(new Error('run exceeded 4h')), 4 * 3600_000)
@@ -195,7 +211,7 @@ async function main() {
   writeFileSync(OUT_JSON, JSON.stringify(st, null, 1))
 
   const alive = st.designs.filter(d => !d.rejected)
-  const withRender = alive.filter(d => d.images.some(i => !['sketch', 'sketch_var'].includes(i.view)))
+  const withRender = alive.filter(d => d.images.some(i => !isSketchView(i.view)))
   const withQa = alive.filter(d => d.qa.length)
   const repaired = alive.filter(d => d.images.some(i => i.origin === 'regenerated_hq'))
   const tiered = st.signals.filter(s => s.source_tiers?.length)

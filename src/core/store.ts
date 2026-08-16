@@ -1,6 +1,7 @@
 // ── Run 저장소 · 실행 이력과 즐겨찾기를 라이브러리처럼 다룬다 ──────────
 // 진행 중인 Run도 계속 저장한다. 새로고침이나 렌더 오류로 화면이 날아가도
 // 결과를 잃지 않게 하기 위한 것이다.
+import { isSketchView } from './types'
 import type { RunState } from './types'
 
 export interface RunRecord {
@@ -96,7 +97,7 @@ export function makeTitle(_st: RunState, labels: { mode: string; category: strin
 
 export function firstImage(st: RunState): string | undefined {
   for (const d of st.designs) {
-    const im = d.images.find(i => !['sketch', 'sketch_var'].includes(i.view)) ?? d.images[0]
+    const im = d.images.find(i => !isSketchView(i.view)) ?? d.images[0]
     if (im) return im.url
   }
   return undefined

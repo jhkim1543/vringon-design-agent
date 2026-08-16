@@ -323,6 +323,7 @@ export async function authorConcepts(apiKey, root, {
 컨셉의 씨앗 (게놈):
 - 컨셉 논지: ${genome?.concept_thesis ?? ''}
 - Hero: ${genome?.hero_mutation?.label ?? ''} — ${genome?.hero_mutation?.drawing_instruction ?? ''}
+- 어퍼 소재(현재): ${genome?.spec_sheet?.upper_material ?? '(미정)'}
 - 파트별 형태와 저작된 소재:
 ${partLines || '(파트 정보 없음)'}
 

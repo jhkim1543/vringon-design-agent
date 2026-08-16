@@ -8,7 +8,7 @@ import {
 } from '@xyflow/react'
 import type { Node, Edge, NodeChange } from '@xyflow/react'
 import type { DesignImage, RunState } from '../core/types'
-import { TIER_LABEL, TYPE_LABEL } from '../core/types'
+import { TIER_LABEL, TYPE_LABEL , isSketchView } from '../core/types'
 import { buildBoardModel } from '../core/boardModel'
 import { openTrendReportPdf, saveTrendReportHtml } from '../core/reportPdf'
 import { openDossierPdf, saveDossierHtml } from '../core/dossierPdf'
@@ -353,10 +353,10 @@ function RemixPanel({ st, nodeId, edits, live, actor, onClose, onComment, onImag
   const base = (() => {
     if (!d) return null
     if (skMatch) {
-      const sketches = d.images.filter(i => i.view === 'sketch' || i.view === 'sketch_var')
+      const sketches = d.images.filter(i => isSketchView(i.view))
       return sketches[Number(skMatch[2])] ?? null
     }
-    return d.images.find(i => i.view !== 'sketch' && i.view !== 'sketch_var') ?? null
+    return d.images.find(i => !isSketchView(i.view)) ?? null
   })()
 
   const [prompt, setPrompt] = useState(() => base?.promptUsed ?? '')
