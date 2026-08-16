@@ -1,6 +1,7 @@
 // ── 이미지 생성 클라이언트 · OpenAI (서버 프록시 경유) · 신발 전용 ────
 // 키는 서버(Vite dev 미들웨어 / server/openai-api.mjs)에만 존재한다.
 // 브라우저 번들에는 키가 들어가지 않는다 (VITE_ prefix 사용 금지).
+import { withRetry } from './net'
 import type { DesignConcept, DesignSpec, FootwearLineProfile } from './types'
 import { TYPE_EN, UNKNOWN } from './types'
 import type { EngineId } from './imageEngines'
@@ -25,31 +26,26 @@ const absolutize = (u: string | undefined): string =>
   !u ? '' : /^(https?:|data:|blob:)/.test(u) ? u : u.startsWith('/api/') ? apiUrl(u) : u
 
 async function imageCall(url: string, body: unknown, what: string): Promise<GenResult> {
-  let last: Error | null = null
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      const r = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        signal: AbortSignal.timeout(330_000),
-      })
-      const j = await r.json()
-      if (!r.ok) throw new Error(j.error || `${what} ${r.status}`)
-      // 서버는 '/api/image/file/…' 처럼 루트 기준으로 답한다. 그 주소는 앱이 사이트 루트에
-      // 있을 때만 맞는다. 하위 경로 배포나 다른 도메인 API 에서는 여기서 고쳐 둬야
-      // 저장된 Run 안의 <img src> 가 나중에도 열린다.
-      return { ...j, url: absolutize(j.url) }
-    } catch (e) {
-      last = e as Error
-      // 모델이 거절한 프롬프트는 다시 불러도 같은 답이다. 끊긴 연결만 다시 시도한다.
-      const msg = String(last.message || last)
-      const worthRetrying = /fetch|network|timeout|abort|suspend|502|503|504|429/i.test(msg)
-      if (!worthRetrying || attempt === 2) break
-      await new Promise(res => setTimeout(res, 4000 * (attempt + 1)))
-    }
-  }
-  throw last ?? new Error(`${what} failed`)
+  // 재시도 규칙은 net.ts 하나로 모았다. 예전에는 여기 손으로 쓴 루프가 4초·8초만 쉬어서
+  // 1분짜리 상류 장애를 못 넘겼다 — 실제로 그 창에서 스케치 두 장이 그대로 날아갔다.
+  // 서버가 프롬프트로 캐시하므로 다시 걸어도 중복 과금은 없다.
+  return withRetry(async () => {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(330_000),
+    })
+    const j = await r.json()
+    if (!r.ok) throw new Error(j.error || `${what} ${r.status}`)
+    // 서버는 '/api/image/file/…' 처럼 루트 기준으로 답한다. 그 주소는 앱이 사이트 루트에
+    // 있을 때만 맞는다. 하위 경로 배포나 다른 도메인 API 에서는 여기서 고쳐 둬야
+    // 저장된 Run 안의 <img src> 가 나중에도 열린다.
+    return { ...j, url: absolutize(j.url) } as GenResult
+  }, {
+    tries: 3,
+    onRetry: (n, wait, msg) => console.warn(`[image] ${what} 실패(${msg}) · ${wait / 1000}초 뒤 ${n + 1}번째 시도`),
+  })
 }
 
 /** 신규 생성 · 동일 프롬프트는 서버 캐시로 재사용되어 중복 과금이 없다 */

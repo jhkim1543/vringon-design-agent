@@ -1,13 +1,14 @@
+// ── 리서치 클라이언트 · 서버가 웹 검색으로 실제 수집한 결과를 받는다 ──
 import { getLang, LANG_NAME } from './i18n'
 import type { Lang } from './i18n'
+import type { CompetitorGroup, CompetitorProduct, FootwearLineProfile, ReportBias, ResearchObjective, Signal } from './types'
+import { asFootwearLine } from './types'
+import { apiUrl } from './apiBase'
+import { withRetry } from './net'
 
 /** 이 분석이 쓰는 언어. 파이프라인이 시작할 때 한 번 정하고 끝까지 유지한다. */
 let runLang: Lang | null = null
 export function setRunLang(l: Lang | null) { runLang = l }
-// ── 리서치 클라이언트 · 서버가 웹 검색으로 실제 수집한 결과를 받는다 ──
-import type { CompetitorGroup, CompetitorProduct, FootwearLineProfile, ReportBias, ResearchObjective, Signal } from './types'
-import { asFootwearLine } from './types'
-import { apiUrl } from './apiBase'
 
 export interface CompetitorProductRaw {
   brand: string
@@ -106,14 +107,21 @@ async function post<T>(url: string, body: unknown): Promise<T> {
   // 리서치 한 레그는 웹 검색을 수십 번 돌아 10분을 넘길 수 있다. 브라우저 fetch 는 무한정
   // 기다리지만 Node(헤드리스 샘플 러너)의 fetch 는 헤더 300초에서 조용히 끊긴다 —
   // 그 순간 세 레그가 동시에 'fetch failed' 로 죽는다. 상한을 명시해 두 환경을 같게 한다.
-  const r = await fetch(url, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...(body as object), lang, langName: LANG_NAME[lang] }),
-    signal: AbortSignal.timeout(20 * 60_000),
+  // 조사 한 레그는 비싸고 오래 걸린다. 끊겨서 잃으면 그 Run 은 도시에나 리포트 없이 끝난다.
+  // 다만 20분을 기다린 끝의 타임아웃까지 세 번 걸면 한 시간이 날아가므로 두 번까지만 건다.
+  return withRetry(async () => {
+    const r = await fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...(body as object), lang, langName: LANG_NAME[lang] }),
+      signal: AbortSignal.timeout(20 * 60_000),
+    })
+    const j = await r.json()
+    if (!r.ok || j.error) throw new Error(j.error ?? `${url} ${r.status}`)
+    return j as T
+  }, {
+    tries: 2,
+    onRetry: (n, wait, msg) => console.warn(`[research] ${url.split('/').pop()} 실패(${msg}) · ${wait / 1000}초 뒤 ${n + 1}번째 시도`),
   })
-  const j = await r.json()
-  if (!r.ok || j.error) throw new Error(j.error ?? `${url} ${r.status}`)
-  return j as T
 }
 
 /** 라인 프로필을 서버에 넘길 요약으로. 검색어·필터·캐시 키가 모두 이 값을 쓴다. */
