@@ -1,18 +1,22 @@
-// ── 러닝화 시리즈 샘플 · 앞선 트렌드 Run 이 만든 라인을 이어 간다 ─────
+// ── 시리즈 샘플 · 코트 하이 아카이브를 읽어 다음 시즌을 저작한다 ─────
 //
-// 시리즈 모드가 하는 일: 이미 있는 시리즈의 사진을 읽어 "이 라인이 늘 지키는 것"을 뽑고,
-// 사람이 승인한 것만 스펙에 잠근 뒤, 그 잠금 안에서 다음 시즌을 저작한다.
+// 시리즈 모드가 하는 일: 이미 있는 라인의 사진을 읽어 "이 라인이 늘 지키는 것"을 뽑고,
+// 사람이 승인한 것만 잠근 뒤, 그 잠금 안에서 다음 시즌을 저작한다.
 //
-// 아카이브를 지어내지 않는다. sample_trend_running 이 실제로 만든 히어로 렌더를 올린다 —
-// "우리 FW26 라인을 이어 간다"가 되므로 근거가 진짜다. 경쟁사 사진을 자기 아카이브라고
-// 부르는 것은 이 제품이 걷어내 온 종류의 거짓말이다.
+// 아카이브는 실제 에어 조던 1 제품 사진이다 (tools/fetch-archive.mjs 가 공개된 제품
+// 소개 페이지에서 받아 업로드해 둔다). 한 실루엣의 여러 컬러웨이라 "반복되는 것"과
+// "매번 바뀌는 것"이 실제로 갈린다 — 시리즈 판정을 시험하기에 맞는 입력이다.
 //
+// 브랜드는 가상으로 둔다. 사진은 분석 입력일 뿐이고, 그 브랜드인 척하지 않는다.
+// 사진 자체는 업로드 캐시에만 남고 배포물에는 실리지 않는다 (굳힌 샘플에는 파일명과 크기만).
+//
+//   node tools/fetch-archive.mjs <제품 소개 페이지 URL ...>     ← 먼저
 //   npx esbuild tools/run-sample-series.ts --bundle --platform=node --format=esm \
 //     --outfile=.cache/run-series.mjs --external:undici \
 //     --define:import.meta.env='{"BASE_URL":"/","VITE_API_BASE":"http://localhost:8080"}' --loader:.json=json
 //   node .cache/run-series.mjs
 //
-// 앞선 sample_trend_running.json 이 있어야 한다. 서버(8080)도 떠 있어야 한다.
+// .cache/archive-uploads.json 과 서버(8080)가 있어야 한다.
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { runPipeline } from '../src/core/pipeline'
@@ -37,90 +41,66 @@ Object.defineProperty(globalThis, 'navigator', { value: { language: 'ko-KR' }, c
 
 const ROOT = process.cwd()
 const API = String(import.meta.env.VITE_API_BASE ?? '')
-const SOURCE_ID = 'sample_trend_running'
-const SAMPLE_ID = 'sample_series_running'
+const SAMPLE_ID = 'sample_series_aj1'
 const CACHE_IMG = join(ROOT, '.cache', 'images')
 const CACHE_MODEL = join(ROOT, '.cache', 'models')
 const PUBLIC = join(ROOT, 'public', 'samples')
 const OUT_JSON = join(ROOT, 'src', 'samples', `${SAMPLE_ID}.json`)
 
-// ── 앞 Run 의 디자인 컷을 아카이브로 올린다 ──────────────────────────
-async function uploadArchive(): Promise<{ id: string; name: string; type: string; bytes: number }[]> {
-  const src = join(ROOT, 'src', 'samples', `${SOURCE_ID}.json`)
-  if (!existsSync(src)) throw new Error(`${SOURCE_ID}.json is not there yet — run the trend sample first`)
-  const prev = JSON.parse(readFileSync(src, 'utf8')) as RunState
-
-  // 컬러가 들어간 제품 컷만 아카이브가 된다.
-  // 스케치·아웃솔 시트는 선 그림이고, wear/concept 뷰는 캠페인 사진이라 제품 아카이브가 아니다.
-  // 'design' 뷰에는 스케치당 컨셉 베리에이션이 들어 있다 — 한 시즌 라인의 실제 폭이라 넣는다.
-  const cuts = prev.designs
-    .filter(d => !d.rejected)
-    .flatMap(d => d.images.filter(i => i.view === 'lateral' || i.view === 'design'))
-    .slice(0, 12)
-  if (cuts.length < 4) throw new Error(`only ${cuts.length} archive cuts available — the series read needs more`)
-
-  const files = cuts.map((im, i) => {
-    // 굳힌 샘플은 /samples/<hash>.png · 원본은 public/samples 아니면 이미지 캐시에 있다
-    const name = basename(im.url)
-    const p = [join(PUBLIC, name), join(CACHE_IMG, name)].find(existsSync)
-    if (!p) return null
-    return { name: `stride-fw26-${String(i + 1).padStart(2, '0')}.png`, type: 'image/png', dataBase64: readFileSync(p).toString('base64') }
-  }).filter(Boolean) as { name: string; type: string; dataBase64: string }[]
-
-  // 한 번에 다 보내지 않는다. 서버 본문 상한은 48MB이고 base64 는 원본보다 1/3 크다.
-  // 지금 컷으로는 20MB 안쪽이지만 렌더 엔진을 올리면 장당 용량이 커진다 —
-  // 90분짜리 Run 이 첫 요청에서 죽는 것만은 막는다.
-  const out: { id: string; name: string; type: string; bytes: number }[] = []
-  const BATCH = 4
-  for (let i = 0; i < files.length; i += BATCH) {
-    const chunk = files.slice(i, i + BATCH)
-    const r = await fetch(`${API}/api/upload`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ files: chunk }), signal: AbortSignal.timeout(120_000),
-    })
-    const j = await r.json()
-    if (j.error) throw new Error(`upload batch ${i / BATCH + 1}: ${j.error}`)
-    out.push(...j.files)
+// ── 아카이브 사진 목록을 읽는다 ─────────────────────────────────────
+// 사진은 tools/fetch-archive.mjs 가 공개된 제품 소개 페이지에서 미리 받아 업로드해 뒀다.
+// 여기서는 그 업로드 id 만 읽는다. 사진 자체는 업로드 캐시에만 있고 배포물에는 실리지
+// 않는다 — 굳힌 샘플에는 파일명과 크기만 남는다.
+function loadArchiveUploads(): { id: string; name: string; type: string; bytes: number }[] {
+  const manifest = join(ROOT, '.cache', 'archive-uploads.json')
+  if (!existsSync(manifest)) {
+    throw new Error('.cache/archive-uploads.json 이 없다 — 먼저 tools/fetch-archive.mjs 로 아카이브 사진을 받아라')
   }
-  const mb = files.reduce((a, f) => a + f.dataBase64.length, 0) / 1e6
-  console.log(`archive uploaded · ${out.length} cuts from ${SOURCE_ID} · ${mb.toFixed(1)}MB base64 in ${Math.ceil(files.length / BATCH)} batches`)
-  return out
+  const ups = JSON.parse(readFileSync(manifest, 'utf8')) as { id: string; name: string; type: string; bytes: number }[]
+  // DNA 읽기는 "몇 장 중 몇 장에서 보였나"로 불변 요소를 가른다. 장수가 너무 적으면
+  // 10/10 같은 수치가 의미를 잃는다.
+  if (ups.length < 5) throw new Error(`아카이브가 ${ups.length}장뿐이다 — 시리즈 판정에는 부족하다`)
+  console.log(`archive · ${ups.length} reference photos of one silhouette`)
+  for (const u of ups) console.log(`  ${u.name} · ${(u.bytes / 1000).toFixed(0)}KB`)
+  return ups
 }
 
+// 브랜드는 가상이다. 아카이브로 읽는 사진은 실제 제품이지만, 그 브랜드인 척하지 않는다.
+// 시리즈 모드가 하는 일은 "이 실루엣이 늘 지키는 것"을 읽어 우리 라인으로 이어 가는 것이다.
 const brand: BrandIdentity = {
-  brandName: 'STRIDE LAB',
-  tagline: '매일 달리는 사람을 위한 도구. 장식은 무게다.',
-  signatureElements: ['노출 미드솔 사이드월', '최소 패널 어퍼', '힐 카운터 리플렉티브 스트립'],
-  forbidden: ['장식용 하드웨어', '과장된 청키 실루엣', '가짜 통기구'],
+  brandName: 'COURT SEVEN',
+  tagline: '85년의 코트 하이를 지금 신을 수 있게. 형태는 그대로, 만듦새는 오늘 것으로.',
+  signatureElements: ['하이 컷 파이핑 칼라', '통가죽 패널 분할', '토 박스 천공'],
+  forbidden: ['과장된 청키 솔', '형광 컬러 블로킹', '합성 피혁 어퍼'],
   colorPalette: [
-    { name: '무광 블랙', hex: '#1A1A1C' }, { name: '코발트', hex: '#1F49C4' },
-    { name: '실버', hex: '#C8CCD2' }, { name: '라임', hex: '#C7F04A' },
+    { name: '오프 화이트', hex: '#F1EDE6' }, { name: '딥 레드', hex: '#9E2B2B' },
+    { name: '차콜', hex: '#2A2A2C' }, { name: '샌드', hex: '#C7B49A' },
   ],
-  materials: ['엔지니어드 메시', '수퍼크리티컬 EVA', '리사이클 니트'],
-  toneWords: ['절제된', '기능적', '날카로운'],
+  materials: ['풀그레인 카프', '텀블드 레더', '스웨이드'],
+  toneWords: ['견고한', '고전적인', '군더더기 없는'],
   logo: null,
   applyLogoToImages: false,
   md: {
-    role: '러닝 전문점 바이어 9년차',
-    channel: '러닝 전문 편집숍 · 러닝 크루 커뮤니티 공동구매',
-    customer: '주 3회 이상 달리는 30-40대, 하프 이상 대회 경험',
-    kpis: ['정상판매율 70%', '리오더율 30%', '시즌 소진 14주'],
-    priceBandKrw: '17만~26만원',
-    riskAppetite: 'conservative',
-    pastMisses: ['작년 광폭 플랫폼 모델이 러너들에게 무겁다고 반품됐다', '리플렉티브만 강조한 모델이 낮에 안 팔렸다'],
-    dealBreakers: ['300g 초과', '접지력이 불명확한 아웃솔', '세탁 불가 어퍼'],
-    competingOnFloor: ['경쟁사 데일리 트레이너 2종', '자사 전작', '해외 카본 레이서'],
+    role: '스니커 편집숍 바이어 8년차',
+    channel: '자사몰 + 스니커 편집숍 30곳',
+    customer: '20-35세, 아카이브 실루엣을 알고 사는 사람',
+    kpis: ['정상판매율 68%', '리오더율 25%', '시즌 소진 15주'],
+    priceBandKrw: '18만~28만원',
+    riskAppetite: 'balanced',
+    pastMisses: ['작년 로우컷 변형이 하이컷 수요를 못 가져왔다', '스웨이드 단독 어퍼가 우기에 반품이 많았다'],
+    dealBreakers: ['합성 피혁 어퍼', '칼라 폼이 3개월 만에 주저앉는 것', '아웃솔 조기 마모'],
+    competingOnFloor: ['수입 코트화 3종', '자사 전작', '복각 러닝화'],
   },
 }
 
 const line = defaultLineProfile()
-line.product = { useCase: 'running', environment: 'urban', targetConsumer: 'unisex', season: 'SS27', climate: 'all_season' }
-line.lastFit = { lastFamily: 'performance running, medium volume', baseSize: 'unknown', width: 'unknown', toeShape: 'round', toeVolume: 'medium', heelHold: 'secure', existingLastReuse: true }
-line.upper = { outer: 'engineered mesh', lining: 'moisture-management textile', reinforcement: 'light', closure: 'lace', protection: 'none' }
-line.bottom = { midsole: 'supercritical foam', plate: 'none', outsole: 'segmented rubber', stackBand: 'high', dropMm: '6-10', rocker: 'moderate', heel: 'none', existingBottomReuse: true }
-line.construction = { lasting: 'strobel', soleAttachment: 'cemented' }
-line.performance = { weightTargetG: '255-280', cushioning: 'high', stability: 'neutral_stable', wetGrip: 'preferred', flexibility: 'moderate' }
-line.commercial = { homeMarket: 'KR', referenceMarkets: ['US', 'JP'], channels: ['running specialty', 'DTC'] }
+line.product = { useCase: 'daily', environment: 'urban', targetConsumer: 'unisex', season: 'SS27', climate: 'all_season' }
+line.lastFit = { lastFamily: 'court basketball, medium volume', baseSize: 'unknown', width: 'unknown', toeShape: 'round', toeVolume: 'medium', heelHold: 'secure', existingLastReuse: true }
+line.upper = { outer: 'full-grain leather', lining: 'textile', reinforcement: 'medium', closure: 'lace', protection: 'none' }
+line.bottom = { midsole: 'EVA', plate: 'none', outsole: 'rubber cupsole', stackBand: 'low', dropMm: '0-4', rocker: 'none', heel: 'none', existingBottomReuse: true }
+line.construction = { lasting: 'board', soleAttachment: 'cemented' }
+line.performance = { weightTargetG: '380-430', cushioning: 'moderate', stability: 'neutral', wetGrip: 'preferred', flexibility: 'low' }
+line.commercial = { homeMarket: 'KR', referenceMarkets: ['US', 'JP'], channels: ['sneaker specialty', 'DTC'] }
 
 let handle: ReturnType<typeof runPipeline>
 const t0 = Date.now()
@@ -138,11 +118,11 @@ async function main() {
     process.exit(1)
   }
 
-  const uploads = await uploadArchive()
+  const uploads = loadArchiveUploads()
 
   const params: RunParams = {
     ...DEFAULT_PARAMS,
-    mode: 'series', category: 'shoe', itemType: 'running', line, linePreset: 'road_daily',
+    mode: 'series', category: 'shoe', itemType: 'court_sneaker', line,
     endStage: 'S5',
     // 장수를 맞춰 둔 근거 (파이프라인 예산 모델 그대로 계산):
     //   sketchCap = imageBudget * 0.4 = 19  ← 스케치 8 + 아웃솔 시트 8 = 16, 들어간다
@@ -160,8 +140,8 @@ async function main() {
     imageEngine: 'detail', imageBudget: 48,
     series: {
       ...DEFAULT_PARAMS.series,
-      seriesName: 'STRIDE LAB FW26 데일리 트레이너',
-      valueStatement: '노출 미드솔 사이드월과 최소 패널 어퍼로 알아본다. 무게를 늘리는 장식은 넣지 않는다.',
+      seriesName: 'COURT SEVEN 코트 하이 아카이브',
+      valueStatement: '하이컷 파이핑 칼라와 통가죽 패널 분할로 알아본다. 실루엣은 그대로 두고 만듦새만 오늘 것으로 바꾼다.',
       archiveFiles: uploads.map(u => u.name),
       uploads,
       trendSearch: true,
@@ -257,8 +237,8 @@ async function main() {
   // 그냥 진행하므로, 승인 게이트를 돈 척하는 제목이 붙어 버릴 수 있다.
   const lockedN = st.seriesDna?.invariant.length ?? 0
   ;(st as any).sampleTitle = lockedN
-    ? `Series · STRIDE LAB SS27, carrying the FW26 running line forward through ${lockedN} approved DNA elements`
-    : 'Series · STRIDE LAB SS27, continuing the FW26 running line — the archive read returned no fixed elements'
+    ? `Series · a court high read from ${uploads.length} Air Jordan 1 reference photos, continued as an original SS27 line under ${lockedN} approved invariants`
+    : `Series · a court high read from ${uploads.length} Air Jordan 1 reference photos — the archive read returned no fixed elements`
   ;(st as any).savedAtISO = new Date().toISOString()
   writeFileSync(OUT_JSON, JSON.stringify(st, null, 1))
 

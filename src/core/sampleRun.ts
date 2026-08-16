@@ -3,13 +3,15 @@
 import type { RunState } from './types'
 import { deleteRun, listRuns, saveRun } from './store'
 
-// 지금 파이프라인이 실제로 돌려 만든 결과만 둔다. 옛 판은 지금 하는 말과 다른 말을 한다.
-// 앞의 둘이 러닝화다. 트렌드 판은 최종본 파이프라인(시장 설정·출처 등급·파트별 게놈·
-// 아웃솔 시트·스케치당 컨셉 베리에이션·비전 수리·최종 게이트)으로 돌렸고,
-// 시리즈 판은 그 트렌드 판이 만든 디자인을 아카이브로 올려 DNA 승인 게이트까지 태운 결과다.
-// 두 모드가 같은 품목을 다르게 다루는 것을 나란히 보라고 앞에 뒀다.
-// 첼시는 이전 판, 시리즈(AJ1)는 조던 1 아카이브 12장, 무드보드는 MICAM FW25 프레스킷 14쪽을 실제로 읽은 결과다.
-const SAMPLE_IDS = ['sample_trend_running', 'sample_series_running', 'sample_trend_chelsea', 'sample_series_aj1', 'sample_moodboard_micam']
+// 에이전트 모드마다 하나씩. 셋 다 지금 파이프라인으로 실제로 돌린 결과다.
+// 옛 판은 지금 하는 말과 다른 말을 하므로 남기지 않는다.
+//
+//   trend     러닝화 · 경쟁사와 시장을 조사해 시즌을 읽는다 (조사 깊이를 보는 자리)
+//   series    코트 하이 · 에어 조던 1 참조 사진에서 반복되는 요소를 읽어 사람이 승인한
+//             것만 잠그고 다음 시즌을 저작한다 (DNA 승인 게이트를 보는 자리)
+//   moodboard 코트 스니커 · 올린 MICAM FW25 프레스킷 한 부만 읽는다. 외부 조사 없음
+//             (문서만으로 근거가 서는지 보는 자리)
+const SAMPLE_IDS = ['sample_trend_running', 'sample_series_aj1', 'sample_moodboard_micam']
 
 export async function ensureSampleRuns() {
   // 이미 있으면 건너뛰던 시절에는, 샘플을 새로 뜨면 옛 방문자에게 영영 닿지 않았다.
