@@ -212,10 +212,14 @@ function lineFocus(line) {
 }
 
 export async function researchDossier(deps, root, opts) {
-  const { ask } = deps
+  // marketClause/marketLabel 은 research-api 가 넣어 준다. 없으면 시장 지시 없이 돈다
+  // (옛 호출부 호환) — 그 경우에도 검색은 되지만 지면이 시장에 맞춰지지 않는다.
+  const { ask, marketClause = '', marketLabel = '' } = deps
   const { categoryEn, season, priceBand, brands = [], deep = false, onStep, langName = 'English', line } = opts
   const lineHash = line ? createHash('sha256').update(JSON.stringify(line)).digest('hex').slice(0, 12) : ''
-  const key = createHash('sha256').update(JSON.stringify(['dossier6ft', langName, categoryEn, season, priceBand ?? '', brands, deep, lineHash])).digest('hex').slice(0, 24)
+  // dossier7ft: 프롬프트에 시장 지시가 들어갔다. 6ft 캐시는 시장 구분 없이 돌린 결과라
+  //             그대로 쓰면 시장을 바꿔도 같은 답이 나온다.
+  const key = createHash('sha256').update(JSON.stringify(['dossier7ft', langName, categoryEn, season, priceBand ?? '', brands, deep, lineHash, marketLabel])).digest('hex').slice(0, 24)
   const file = join(dossierDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
@@ -227,8 +231,8 @@ export async function researchDossier(deps, root, opts) {
 
 이 문서는 **${FORECAST} 예측서**다. ${season}은 근거이지 주제가 아니다.
 대상 시즌: ${FORECAST} (예측)  ·  근거 시즌: ${season} (관측)
-품목: ${categoryEn}${priceBand ? ` · 가격대 ${priceBand}` : ''}${brands.length ? ` · 참고 브랜드 ${brands.join(', ')}` : ''}
-${lineFocus(line)}
+품목: ${categoryEn}${priceBand ? ` · 가격대 ${priceBand}` : ''}${brands.length ? ` · 참고 브랜드 ${brands.join(', ')}` : ''}${marketLabel ? ` · 주 시장 ${marketLabel}` : ''}
+${lineFocus(line)}${marketClause ? `\n${marketClause}\n` : ''}
 
 예측 방법:
 - ${season}에서 실제로 관측된 것(쇼, 리테일 랭킹, 품절, 검색량, 소재 조달)을 근거로 삼는다.

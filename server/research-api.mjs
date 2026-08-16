@@ -751,7 +751,17 @@ ${dr.text.slice(0, 120_000)}
 }
 
 
-/** 시즌 도시에 · MICAM 형식. ask()를 주입해 dossier-api가 같은 검색 경로를 쓰게 한다. */
+/** 시즌 도시에 · MICAM 형식. ask()를 주입해 dossier-api가 같은 검색 경로를 쓰게 한다.
+ *
+ *  시장은 여기서 묶어 넘긴다. 신호·경쟁사 조사는 검색 도구에 user_location 을 붙이고
+ *  프롬프트에 지면 지시를 실어서 시장마다 실제로 다른 결과를 집는데, 도시에만 그게
+ *  빠져 있었다. homeMarket 은 캐시 키에는 들어가 있어서, 시장이 다르면 캐시는 갈라지고
+ *  검색은 똑같이 도는 상태였다 — 비용은 두 배인데 결과에는 시장 구분이 없었다. */
 export async function researchSeasonDossier(apiKey, root, opts) {
-  return researchDossier({ ask: (a) => ask(apiKey, a) }, root, opts)
+  const mk = resolveMarkets({ home: opts.line?.homeMarket, reference: opts.line?.referenceMarkets })
+  return researchDossier({
+    ask: (a) => ask(apiKey, { ...a, location: a.location ?? userLocation(mk.home) }),
+    marketClause: searchClause(mk, opts.langName ?? 'English'),
+    marketLabel: mk.home.label,
+  }, root, opts)
 }
