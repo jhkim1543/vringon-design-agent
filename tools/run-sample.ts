@@ -83,10 +83,14 @@ const params: RunParams = {
   ...DEFAULT_PARAMS,
   mode: 'trend', category: 'shoe', itemType: 'running', line, linePreset: 'road_daily',
   endStage: 'S5',
-  sketchCount: 12, tierRatio: [1, 1, 1], renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
-  topN: 3, designsPerSketch: 2, variationCount: 3, campaignShots: 4, make3d: true,
+  // 상한 24로 돌렸을 때는 perDesignExtras 가 1이라, 그 한 장을 컨셉이 가져가고
+  // 컬러웨이도 추가 뷰도 한 장 없이 끝났다. 스케치를 8로 줄여 스케치 상한(40%) 안에
+  // 아웃솔 시트까지 들어가게 하고, 남는 몫으로 컨셉·뷰·컬러웨이가 모두 나오게 한다.
+  sketchCount: 8, tierRatio: [1, 1, 1], renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
+  // 3이면 commercial_safe / material_shift / colour_shift 까지 나온다 (서버가 이 순서로 저작한다).
+  topN: 3, designsPerSketch: 3, variationCount: 3, campaignShots: 4, make3d: true,
   approvalGate: true, finalGate: true,
-  imageEngine: 'detail', imageBudget: 24,
+  imageEngine: 'detail', imageBudget: 48,
   trend: {
     ...DEFAULT_PARAMS.trend,
     competitors: ['ASICS', 'Nike Running', 'HOKA'],
