@@ -96,10 +96,10 @@ const brand: BrandIdentity = {
 const line = defaultLineProfile()
 line.product = { useCase: 'daily', environment: 'urban', targetConsumer: 'unisex', season: 'SS27', climate: 'all_season' }
 line.lastFit = { lastFamily: 'court basketball, medium volume', baseSize: 'unknown', width: 'unknown', toeShape: 'round', toeVolume: 'medium', heelHold: 'secure', existingLastReuse: true }
-line.upper = { outer: 'full-grain leather', lining: 'textile', reinforcement: 'medium', closure: 'lace', protection: 'none' }
+line.upper = { outer: 'full-grain leather', lining: 'textile', reinforcement: 'structured', closure: 'lace', protection: 'none' }
 line.bottom = { midsole: 'EVA', plate: 'none', outsole: 'rubber cupsole', stackBand: 'low', dropMm: '0-4', rocker: 'none', heel: 'none', existingBottomReuse: true }
 line.construction = { lasting: 'board', soleAttachment: 'cemented' }
-line.performance = { weightTargetG: '380-430', cushioning: 'moderate', stability: 'neutral', wetGrip: 'preferred', flexibility: 'low' }
+line.performance = { weightTargetG: '380-430', cushioning: 'moderate', stability: 'neutral', wetGrip: 'preferred', flexibility: 'stiff' }
 line.commercial = { homeMarket: 'KR', referenceMarkets: ['US', 'JP'], channels: ['sneaker specialty', 'DTC'] }
 
 let handle: ReturnType<typeof runPipeline>
@@ -132,7 +132,7 @@ async function main() {
     // 트렌드 샘플은 예산 24라 perDesignExtras 가 1이었고, 그 한 장을 컨셉이 가져가
     // 컬러웨이도 추가 뷰도 한 장도 안 나왔다. 두 샘플이 서로 다른 걸 보여 주게 둔다 —
     // 트렌드는 조사 깊이, 시리즈는 디자인 깊이.
-    sketchCount: 8, tierRatio: [1, 1, 1], renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
+    sketchCount: 6, tierRatio: [1, 1, 1], renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
     // 4로 두면 네 angle 이 모두 나온다. 서버는 commercial_safe → material_shift →
     // colour_shift → creative_push 순으로 저작하므로, 2에서는 뒤의 둘이 영영 안 보인다.
     topN: 3, designsPerSketch: 4, campaignShots: 4, make3d: true,
@@ -200,7 +200,7 @@ async function main() {
     }
   }
 
-  console.log(`starting ${SAMPLE_ID} · series of ${SOURCE_ID} · endStage ${params.endStage}`)
+  console.log(`starting ${SAMPLE_ID} · series of ${uploads.length} archive photos · endStage ${params.endStage}`)
   await new Promise<void>((resolve, reject) => {
     const guard = setTimeout(() => reject(new Error('run exceeded 4h')), 4 * 3600_000)
     handle = runPipeline(params, (e) => {

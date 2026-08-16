@@ -76,7 +76,7 @@ line.lastFit = { lastFamily: 'performance running, medium volume', baseSize: 'un
 line.upper = { outer: 'engineered mesh', lining: 'moisture-management textile', reinforcement: 'light', closure: 'lace', protection: 'none' }
 line.bottom = { midsole: 'supercritical foam', plate: 'none', outsole: 'segmented rubber', stackBand: 'high', dropMm: '6-10', rocker: 'moderate', heel: 'none', existingBottomReuse: false }
 line.construction = { lasting: 'strobel', soleAttachment: 'cemented' }
-line.performance = { weightTargetG: '260-290', cushioning: 'high', stability: 'moderate', wetGrip: 'preferred', flexibility: 'moderate' }
+line.performance = { weightTargetG: '260-290', cushioning: 'high', stability: 'neutral_stable', wetGrip: 'preferred', flexibility: 'moderate' }
 line.commercial = { homeMarket: 'KR', referenceMarkets: ['US', 'JP'], channels: ['running specialty', 'DTC'] }
 
 const params: RunParams = {
@@ -86,7 +86,7 @@ const params: RunParams = {
   // 상한 24로 돌렸을 때는 perDesignExtras 가 1이라, 그 한 장을 컨셉이 가져가고
   // 컬러웨이도 추가 뷰도 한 장 없이 끝났다. 스케치를 8로 줄여 스케치 상한(40%) 안에
   // 아웃솔 시트까지 들어가게 하고, 남는 몫으로 컨셉·뷰·컬러웨이가 모두 나오게 한다.
-  sketchCount: 8, tierRatio: [1, 1, 1], renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
+  sketchCount: 12, tierRatio: [1, 1, 1], renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
   // 3이면 commercial_safe / material_shift / colour_shift 까지 나온다 (서버가 이 순서로 저작한다).
   topN: 3, designsPerSketch: 3, variationCount: 3, campaignShots: 4, make3d: true,
   approvalGate: true, finalGate: true,
@@ -95,7 +95,7 @@ const params: RunParams = {
     ...DEFAULT_PARAMS.trend,
     competitors: ['ASICS', 'Nike Running', 'HOKA'],
     priceBand: 'contemporary', priceMinKrw: 170000, priceMaxKrw: 260000, adjacentBand: true,
-    objectives: ['live_commercial_pulse', 'design_trends', 'performance_tech', 'next_season_forecast'],
+    objectives: ['live_commercial_pulse', 'design_trends', 'performance_technology', 'next_season_forecast'],
   },
   researchLang: 'ko',
   brand,

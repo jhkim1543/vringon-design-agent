@@ -71,8 +71,8 @@ const brand: BrandIdentity = {
 
 const line = defaultLineProfile()
 line.product = { useCase: 'daily', environment: 'urban', targetConsumer: 'unisex', season: 'FW26', climate: 'all_season' }
-line.upper = { outer: 'full-grain leather', lining: 'pigskin', reinforcement: 'medium', closure: 'lace', protection: 'none' }
-line.bottom = { midsole: 'EVA', plate: 'none', outsole: 'rubber cupsole', stackBand: 'low', dropMm: '0-4', rocker: 'none', heel: 'none' }
+line.upper = { outer: 'full-grain leather', lining: 'pigskin', reinforcement: 'structured', closure: 'lace', protection: 'none' }
+line.bottom = { midsole: 'EVA', plate: 'none', outsole: 'rubber cupsole', stackBand: 'low', dropMm: '0-4', rocker: 'none', heel: 'none', existingBottomReuse: true }
 line.construction = { lasting: 'board', soleAttachment: 'cemented' }
 line.commercial = { homeMarket: 'KR', referenceMarkets: ['JP'], channels: ['multi-brand retail', 'DTC'] }
 
@@ -96,7 +96,7 @@ async function main() {
     mode: 'moodboard', category: 'shoe', itemType: 'court_sneaker', line,
     endStage: 'S5',
     // 시리즈 샘플과 같은 배분. 상한 48이면 디자인마다 컨셉 2 + 추가 뷰 2 + 컬러웨이 2 가 들어간다.
-    sketchCount: 8, tierRatio: [1, 1, 1], renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
+    sketchCount: 12, tierRatio: [1, 1, 1], renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
     // 3이면 commercial_safe / material_shift / colour_shift 까지 나온다.
     topN: 3, designsPerSketch: 3, campaignShots: 4, make3d: true,
     approvalGate: true, finalGate: true,
