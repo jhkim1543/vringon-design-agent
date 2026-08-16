@@ -143,10 +143,20 @@ async function main() {
     ...DEFAULT_PARAMS,
     mode: 'series', category: 'shoe', itemType: 'running', line, linePreset: 'road_daily',
     endStage: 'S5',
-    sketchCount: 12, tierRatio: [1, 1, 1], renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
-    topN: 3, designsPerSketch: 2, campaignShots: 4, make3d: true,
+    // 장수를 맞춰 둔 근거 (파이프라인 예산 모델 그대로 계산):
+    //   sketchCap = imageBudget * 0.4 = 19  ← 스케치 8 + 아웃솔 시트 8 = 16, 들어간다
+    //   S3 진입 시 남은 장수 32, 렌더로 넘어가는 디자인 4 (renderRatio 0.5 × 8)
+    //   perDesignExtras = floor((32 - 4) / 4) = 7
+    //   디자인 한 장당: 컨셉 3 + 추가 뷰 2 + 컬러웨이 2 = 7  ← 딱 맞는다
+    // 트렌드 샘플은 예산 24라 perDesignExtras 가 1이었고, 그 한 장을 컨셉이 가져가
+    // 컬러웨이도 추가 뷰도 한 장도 안 나왔다. 두 샘플이 서로 다른 걸 보여 주게 둔다 —
+    // 트렌드는 조사 깊이, 시리즈는 디자인 깊이.
+    sketchCount: 8, tierRatio: [1, 1, 1], renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
+    // 4로 두면 네 angle 이 모두 나온다. 서버는 commercial_safe → material_shift →
+    // colour_shift → creative_push 순으로 저작하므로, 2에서는 뒤의 둘이 영영 안 보인다.
+    topN: 3, designsPerSketch: 4, campaignShots: 4, make3d: true,
     approvalGate: true, finalGate: true,
-    imageEngine: 'detail', imageBudget: 24,
+    imageEngine: 'detail', imageBudget: 48,
     series: {
       ...DEFAULT_PARAMS.series,
       seriesName: 'STRIDE LAB FW26 데일리 트레이너',
