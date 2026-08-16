@@ -209,12 +209,15 @@ export async function authorGenome(apiKey, root, {
   assets = { lastReuse: true, bottomReuse: true },
   // 시리즈 모드 · 사람이 승인한 불변 요소. 저작자가 모르면 그 축을 바꾸려다 클램프에 걸려 조용히 잘린다.
   locked = {},
+  invariantNotes = [],
 }) {
   if (!apiKey) throw new Error('OPENAI_API_KEY not set')
   const used = signals.filter(s => (territory?.use_signal_ids ?? []).includes(s.signal_id))
   const sigText = used.map(s => `${s.signal_id}: ${s.label} — 공존 속성 ${(s.co_occurring ?? []).join(', ') || '없음'}`).join('\n')
   const key = createHash('sha256').update(JSON.stringify([
-    'genome4', langName, tier, territory?.id, sigText, JSON.stringify(profile), brandSummary, antiSimilarity, assets, locked,
+    // genome5: 승인된 불변 요소 문장이 프롬프트에 들어갔다. genome4 캐시는 그것 없이
+    //          저작된 결과라, 그대로 쓰면 승인해도 아무것도 안 달라진다.
+    'genome5', langName, tier, territory?.id, sigText, JSON.stringify(profile), brandSummary, antiSimilarity, assets, locked, invariantNotes,
   ])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
@@ -245,6 +248,10 @@ ${sigText || '(신호 없음 — 품목의 고전 문법으로 저작하되 sour
 
 ${brandSummary ? `브랜드 조건:\n${brandSummary}` : ''}
 ${Object.keys(locked).length ? `시리즈 불변 요소 (사람이 승인한 것 · 이 값은 바꾸지 마세요. Hero 는 다른 축에서 찾으세요):\n${Object.entries(locked).map(([k, v]) => `- ${k}: ${v}`).join('\n')}` : ''}
+${invariantNotes.length ? `이 시리즈가 사진에서 항상 지켜 온 것 (사람이 승인함 · 스펙 칸이 없는 것들이라 문장으로 옵니다):
+${invariantNotes.map(s => `- ${s}`).join('\n')}
+위 요소는 이 라인을 알아보게 하는 표식입니다. parts 의 form 과 hero_mutation 이 이것들과
+어긋나면 안 됩니다. Hero 는 이것들을 지운 자리가 아니라 다른 축에서 찾으세요.` : ''}
 ${antiSimilarity.length ? `이미 채택된 안들과 겹치지 마세요 (구조 요약):\n${antiSimilarity.map((a, i) => `${i + 1}. ${a}`).join('\n')}` : ''}
 
 규칙:

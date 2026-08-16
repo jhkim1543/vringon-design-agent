@@ -33,6 +33,11 @@ export const authorGenome = (b: {
   assets?: { lastReuse: boolean; bottomReuse: boolean }
   /** 시리즈 모드 · 사람이 승인한 불변 요소. 저작자가 알아야 그 축을 피한다 */
   locked?: Record<string, string | number>
+  /** 사람이 승인한 시리즈 불변 요소를 사람 말 그대로. locked 는 스펙 필드로 옮길 수 있는
+   *  것만 담는데, 그 표는 toe_shape·closure·sole_construction 셋뿐이라 대부분이 떨어져
+   *  나간다. 노출 미드솔 사이드월이나 록커 지오메트리처럼 스펙 칸이 없는 요소도
+   *  시리즈를 시리즈로 만드는 규칙이므로, 문장 그대로 저작자에게 넘긴다. */
+  invariantNotes?: string[]
 }) => post<Genome & { cached?: boolean }>(apiUrl('/api/design/genome'), b)
 
 /** 스케치 하나 → 디자인 컨셉 N개 · 서버가 조사·게놈·브랜드를 근거로 저작한다 */

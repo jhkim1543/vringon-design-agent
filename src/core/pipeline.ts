@@ -142,6 +142,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     let moodSignals: Signal[] = []
     // 시리즈에서 실제로 반복된 것 중, 스펙 값으로 옮길 수 있는 것만. 사진으로 못 보는 건 안 잠근다.
     let seriesLocks: Record<string, string | number> = {}
+    /** 승인된 불변 요소를 사람 말 그대로 · 스펙 칸이 없는 것까지 게놈 저작자에게 넘긴다 */
+    let seriesInvariantNotes: string[] = []
     // 설계 영토 = 디렉션. S1에서 계획해 내보내고 S2가 게놈 저작에 쓴다.
     let territories: Territory[] = []
 
@@ -237,6 +239,11 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
             if (cancelled) return
             const kept = read.invariant.filter(e => approved.includes(e.label))
             seriesLocks = locksFromSeries(kept, read.of)
+            // 승인한 것 전부를 문장으로도 들고 간다. locksFromSeries 가 스펙 값으로 옮길 수
+            // 있는 건 toe_shape·closure·sole_construction 셋뿐이고 그 표는 드레스화 어휘라,
+            // 러닝화에서는 여덟 개를 승인해도 하나만 남는다. 나머지 일곱은 어디에도 닿지
+            // 않으면서 게이트는 "every design inherits these" 라고 말하고 있었다.
+            seriesInvariantNotes = kept.map(e => e.label)
             const droppedN = read.invariant.length - kept.length
             emit({ kind: 'log', stage: 'S1', text: droppedN
               ? `You approved ${kept.length} of ${read.invariant.length} fixed elements · ${droppedN} rejected as misreads and not locked`
@@ -490,7 +497,15 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     // 드레스 라스트가 박히면 S-11이 전부 걸려 결과가 통째로 버려졌다.
     // 라스트 아이디는 사진으로 알 수 없다. 모델도 "같은 라스트인지 확인 불가"라고 말한다. 그래서 안 잠근다.
     const locked = params.mode === 'series' ? seriesLocks : {}
+    const invariantNotes = params.mode === 'series' ? seriesInvariantNotes : []
     if (params.mode === 'series') {
+      // 스펙 값으로 잠긴 것과 문장으로만 전달되는 것을 나눠 말한다. 예전에는 잠금 한 줄만
+      // 적으면서 "every design inherits these" 라고 해서, 여덟 개를 승인해도 하나만
+      // 효력이 있다는 사실이 로그 어디에도 안 보였다.
+      const noteOnly = invariantNotes.length - Object.keys(locked).length
+      if (noteOnly > 0) {
+        emit({ kind: 'log', stage: 'S2', text: `${invariantNotes.length} approved elements go to the design author; ${Object.keys(locked).length} of them also pin a spec field. The rest have no spec column, so they ride as written rules the author must not break.` })
+      }
       emit({ kind: 'log', stage: 'S2', text: Object.keys(locked).length
         ? `Series DNA locked from your uploads: ${Object.entries(locked).map(([k, v]) => `${k}=${v}`).join(', ')} · every design inherits these`
         : 'Nothing locked: the uploads did not show a repeating feature that maps to a spec value, so all fields stay open' })
@@ -576,7 +591,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
               ],
               itemTypeEn: TYPE_EN[params.itemType] ?? 'shoe', langName,
               assets: { lastReuse: params.line?.lastFit?.existingLastReuse ?? true, bottomReuse: params.line?.bottom?.existingBottomReuse ?? true },
-              locked,
+              locked, invariantNotes,
             })
             if (cancelled) return
             const gate = diversityGate(g, acceptedGenomes, tier)
