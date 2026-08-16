@@ -64,6 +64,9 @@ const SHOE_PROFILE: Record<string, ShoeProfile> = {
   tempo_racer: { heel: [30, 40], closures: ['lace'], panels: [4, 8], constructions: ['cemented'], athletic: true, lastFamily: 'running', foams: ['PEBA', 'PEBA blend'], plates: ['carbon', 'nylon', 'carbon'], drop: [4, 8] },
   trail: { heel: [24, 36], closures: ['lace'], panels: [6, 12], constructions: ['cemented'], athletic: true, lastFamily: 'running', foams: ['EVA', 'supercritical EVA'], plates: ['none', 'rock plate'], drop: [4, 8], lugs: [3.5, 5.5] },
   court_sneaker: { heel: [18, 28], closures: ['lace'], panels: [4, 9], constructions: ['cemented', 'vulcanized', 'cupsole'], athletic: true, lastFamily: 'running', foams: ['EVA'], plates: ['none', 'tpu shank'] },
+  // 하이컷은 로우탑과 같은 바텀을 쓰되 목이 복사뼈를 덮는다. 그 높이가 패널을 하나 더
+  // 만들기 때문에(칼라 플랩) 패널 수 하한도 로우탑보다 높다.
+  court_high: { heel: [18, 28], closures: ['lace'], panels: [5, 10], constructions: ['cemented', 'vulcanized', 'cupsole'], athletic: true, lastFamily: 'running', foams: ['EVA'], plates: ['none', 'tpu shank'], shaft: 100 },
   lifestyle_runner: { heel: [24, 36], closures: ['lace'], panels: [6, 12], constructions: ['cemented'], athletic: true, lastFamily: 'running', foams: ['EVA'], plates: ['none'], drop: [8, 12] },
   chunky_sneaker: { heel: [30, 55], closures: ['lace'], panels: [6, 12], constructions: ['cemented'], athletic: true, lastFamily: 'running', foams: ['EVA', 'PU'], plates: ['none'] },
   // ── Dress ──

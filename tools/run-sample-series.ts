@@ -95,7 +95,7 @@ const brand: BrandIdentity = {
 
 const line = defaultLineProfile()
 line.product = { useCase: 'daily', environment: 'urban', targetConsumer: 'unisex', season: 'SS27', climate: 'all_season' }
-line.lastFit = { lastFamily: 'court basketball, medium volume', baseSize: 'unknown', width: 'unknown', toeShape: 'round', toeVolume: 'medium', heelHold: 'secure', existingLastReuse: true }
+line.lastFit = { lastFamily: 'court basketball high-top, medium volume', baseSize: 'unknown', width: 'unknown', toeShape: 'round', toeVolume: 'medium', heelHold: 'secure', existingLastReuse: true }
 line.upper = { outer: 'full-grain leather', lining: 'textile', reinforcement: 'structured', closure: 'lace', protection: 'none' }
 line.bottom = { midsole: 'EVA', plate: 'none', outsole: 'rubber cupsole', stackBand: 'low', dropMm: '0-4', rocker: 'none', heel: 'none', existingBottomReuse: true }
 line.construction = { lasting: 'board', soleAttachment: 'cemented' }
@@ -122,7 +122,7 @@ async function main() {
 
   const params: RunParams = {
     ...DEFAULT_PARAMS,
-    mode: 'series', category: 'shoe', itemType: 'court_sneaker', line,
+    mode: 'series', category: 'shoe', itemType: 'court_high', line,
     endStage: 'S5',
     // 장수를 맞춰 둔 근거 (파이프라인 예산 모델 그대로 계산):
     //   sketchCap = imageBudget * 0.4 = 19  ← 스케치 8 + 아웃솔 시트 8 = 16, 들어간다

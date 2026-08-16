@@ -103,6 +103,12 @@ export const TYPE_LENS = {
     '컵솔 대 발크라이즈 비중과 사이드월 높이',
     '어퍼 가죽 등급·패널 분할의 변화',
   ],
+  court_high: [
+    '하이컷 칼라의 높이·패딩 두께와 발목 가동성의 절충',
+    '칼라 플랩·힐 카운터 구조와 그 마감(파이핑 대 접어박기)',
+    '토캡 천공 패턴과 아이스테이 분할이 세대별로 어떻게 달라지는가',
+    '컵솔 립의 색 분리와 미드솔 도색(에이징 마감 포함) 경향',
+  ],
   lifestyle_runner: [
     '아카이브 러너 실루엣 중 무엇이 다시 올라오는가 (연대·모델 계열)',
     '기능 요소가 장식으로 옮겨 가는 방식 (더미 플레이트·가짜 통기구 등)',
@@ -128,7 +134,7 @@ export const familySegments = (familyId) => FAMILY_SEGMENTS[familyId] ?? ['women
 // 품목 → 계열 · 클라이언트 TAXONOMY 그룹과 동일해야 한다
 const TYPE_FAMILY = {
   running: 'sneaker', max_cushion: 'sneaker', tempo_racer: 'sneaker', trail: 'sneaker',
-  court_sneaker: 'sneaker', lifestyle_runner: 'sneaker', chunky_sneaker: 'sneaker',
+  court_sneaker: 'sneaker', court_high: 'sneaker', lifestyle_runner: 'sneaker', chunky_sneaker: 'sneaker',
   loafer: 'dress', horsebit_loafer: 'dress', chunky_loafer: 'dress',
   derby: 'dress', oxford: 'dress', monk: 'dress',
   pump: 'heel', slingback: 'heel', mary_jane: 'heel', mule: 'heel',

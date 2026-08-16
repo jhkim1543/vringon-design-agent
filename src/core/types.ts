@@ -37,6 +37,10 @@ export const TAXONOMY: Record<Category, GroupDef[]> = {
         { id: 'tempo_racer', label: 'Tempo / racing', en: 'lightweight tempo racing shoe with a low-slung aggressive rocker midsole and thin engineered mesh upper' },
         { id: 'trail', label: 'Trail', en: 'trail running shoe with aggressive lugged outsole, toe bumper and reinforced upper' },
         { id: 'court_sneaker', label: 'Court', en: 'low-top court sneaker with leather upper and cupsole' },
+        // 하이컷 코트화는 스니커에서 가장 흔한 원형 중 하나인데 자리가 없었다.
+        // court_sneaker 는 'low-top' 이라고 못박혀 있어서, 하이컷 아카이브를 올리면
+        // 조사와 프롬프트가 로우탑을 말하고 사진은 하이컷인 상태가 된다.
+        { id: 'court_high', label: 'Court high', en: 'high-top court sneaker with leather upper, padded ankle collar and rubber cupsole' },
         { id: 'lifestyle_runner', label: 'Lifestyle runner', en: 'retro lifestyle runner with layered suede and nylon mesh upper and EVA wedge midsole' },
         { id: 'chunky_sneaker', label: 'Chunky', en: 'chunky dad sneaker with layered exaggerated midsole' },
       ],
