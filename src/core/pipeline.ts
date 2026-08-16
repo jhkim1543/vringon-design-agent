@@ -973,7 +973,10 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
                 d.images = d.images.map((im, k) => k === idx ? {
                   ...im, url: fixed.url, hash: fixed.hash, origin: 'regenerated_hq' as const,
                   editedFrom: heroForQa.hash, promptUsed: repairPrompt,
-                  whyUsed: `Vision check found ${failedN} mismatch${failedN > 1 ? 'es' : ''}; one repair pass closed ${failedN - failed2} of them.`,
+                  // 수리 사실만 남기고 덮어쓰면, 그 카드에서 소재 근거가 사라진다.
+                  // 둘 다 참이므로 둘 다 남긴다 — 무엇을 의도했고, 그 컷에 무슨 일이 있었는지.
+                  whyUsed: [im.whyUsed, `Vision check found ${failedN} mismatch${failedN > 1 ? 'es' : ''}; one repair pass closed ${failedN - failed2} of them.`]
+                    .filter(Boolean).join(' '),
                   // 수리 프롬프트가 'no logo'로 끝난다 — 합성해 둔 마크가 지워졌을 수 있다.
                   // 표시를 남겨 두면 S4 의 재합성 백스톱이 이 컷을 건너뛴다. 거짓 표시를 지운다.
                   logoStamped: false,

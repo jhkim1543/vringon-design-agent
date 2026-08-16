@@ -55,8 +55,18 @@ for (const name of targets) {
     // 2)(3) 기준 렌더 · 컨셉이 덮어쓴 이유를 되돌리고 이름표를 정리한다
     for (const im of d.images ?? []) {
       if (!im.concept || im.concept.index !== 0) continue
+      // 기준 렌더의 이유는 세 가지 상태로 온다.
       const want = baseWhyOf(d.spec)
-      if (im.whyUsed !== want) {
+      const cur = String(im.whyUsed ?? '')
+      if (cur.startsWith(want)) {
+        // ① 이미 계산된 근거로 시작한다 (뒤에 수리 기록이 붙었을 수 있다) · 그대로 둔다
+      } else if (im.origin === 'regenerated_hq') {
+        // ② 수리된 컷인데 수리 기록만 남아 소재 근거가 사라졌다.
+        //    수리 기록도 참이므로 지우지 않고 근거를 앞에 되돌려 붙인다.
+        if (!checkOnly) im.whyUsed = [want, cur].filter(Boolean).join(' ')
+        whyFixed++
+      } else {
+        // ③ 컨셉의 why 가 계산된 근거를 통째로 덮어쓴 옛 판 · 근거로 되돌린다
         if (!checkOnly) im.whyUsed = want
         whyFixed++
       }
