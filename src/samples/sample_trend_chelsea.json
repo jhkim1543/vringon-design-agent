@@ -3024,10 +3024,7 @@
      "basis": "Observation count and index profile of the linked signals"
     }
    ],
-   "colorways": [
-    "gold",
-    "black"
-   ],
+   "colorways": [],
    "images": [
     {
      "view": "sketch",
@@ -3537,10 +3534,7 @@
      "basis": "Observation count and index profile of the linked signals"
     }
    ],
-   "colorways": [
-    "gold",
-    "black"
-   ],
+   "colorways": [],
    "images": [
     {
      "view": "sketch",
@@ -4101,10 +4095,7 @@
      "basis": "Observation count and index profile of the linked signals"
     }
    ],
-   "colorways": [
-    "gold",
-    "black"
-   ],
+   "colorways": [],
    "images": [
     {
      "view": "sketch",
@@ -5035,10 +5026,7 @@
      "basis": "Observation count and index profile of the linked signals"
     }
    ],
-   "colorways": [
-    "gold",
-    "black"
-   ],
+   "colorways": [],
    "images": [
     {
      "view": "lateral",
@@ -5692,10 +5680,7 @@
      "basis": "Observation count and index profile of the linked signals"
     }
    ],
-   "colorways": [
-    "gold",
-    "black"
-   ],
+   "colorways": [],
    "images": [
     {
      "view": "lateral",
