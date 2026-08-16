@@ -145,7 +145,7 @@ function buildDeck(st: RunState): { title: string; html: string } {
     body: `<h2 class="stitle">INTRO <span class="thin">how this was built</span></h2>
       <div class="grid2" style="gap:10mm">
         ${quad('WHAT', '#8A3B3B', `A season dossier for ${esc(item)}, assembled by an agent that researches first and designs second. It maps the season into four macrotrends and carries each one down to key items a buyer can act on.`)}
-        ${quad('WHO', '#3F8FA8', 'Built by the VRINGON Design Agent. Web research runs on OpenAI with search enabled; imagery is generated, not photographed. No stock library is used.')}
+        ${quad('WHO', '#3F8FA8', 'Built by the VRINGON Design Agent. Web research runs on a reasoning model with live web search enabled; imagery is generated, not photographed. No stock library is used.')}
         ${quad('WHY', '#C06A22', 'Trend decks usually assert. This one shows its working: every figure states which data source produced it and links to the page it came from, so a buyer can disagree with the evidence rather than the conclusion.')}
         ${quad('HOW', '#2F6B8F', 'Four sources are read separately and always year on year: e-commerce assortments, Instagram visibility, runway appearances and search volume. Anything unverified is marked as a direction rather than given a made-up percentage.')}
       </div>`,

@@ -767,7 +767,7 @@
    "evidence": [
     "블런드스톤 코리아 DRESS #1306 제품 설명에 ‘스퀘어토의 세련된 실루엣’ 표현과 함께 AU3~AU11 사이즈 판매, 289,000원 표기(국내 DTC). ([blundstone.kr](https://blundstone.kr/m/product.html?GfDT=bW93Vg%3D%3D&branduid=42&cur_code=006&mcode=002&scode=001&search=&sort=regdate&type=Y&xcode=006))",
     "블런드스톤 US Dress Boots 컬렉션 설명에서 ‘sleek profile’로 드레스 성격을 강조, 드레스 라인 SKU 다수 운영. ([blundstone.com](https://www.blundstone.com/collections/dress-boots))",
-    "블런드스톤 Dress #063 공식 제품 페이지에 ‘These chisel toe boots…’로 치즐 토 명시. ([blundstone.com](https://www.blundstone.com/products/black-full-grain-leather-chelsea-boots-mens-style-063?variant=51894984442163&utm_source=openai))"
+    "블런드스톤 Dress #063 공식 제품 페이지에 ‘These chisel toe boots…’로 치즐 토 명시. ([blundstone.com](https://www.blundstone.com/products/black-full-grain-leather-chelsea-boots-mens-style-063?variant=51894984442163))"
    ],
    "co_occurring": [
     "낮은 스택",
@@ -803,9 +803,9 @@
    "dedup_group": "dg_2",
    "oem_group": null,
    "evidence": [
-    "Church’s 클래식 첼시 부츠 리테일 페이지에 ‘Goodyear construction, storm welt, Commando rubber sole’ 명시(포멀 실루엣에 러그 적용). ([farfetch.com](https://www.farfetch.com/my/shopping/men/churchs-classic-chelsea-boots-item-37027182.aspx?lang=en-US&size=12&utm_source=openai))",
-    "Church’s Off Town 컬렉션 설명에서 ‘Storm welting protects from wet weather’로 스톰 웰트의 방수/내구 목적 강조, 첼시 포함. ([church-footwear.com](https://www.church-footwear.com/us/en/men/collections/off-town-collection/c/10508US?utm_source=openai))",
-    "버터스코치 ‘Midnight Chelsea’ 제품 설명에 360도 Goodyear storm welt와 Commando 솔 조합 명시(aspirational 레퍼런스). ([butterscotchlb.com](https://butterscotchlb.com/blogs/news/blog-post-no-41-the-midnight-chelsea?utm_source=openai))"
+    "Church’s 클래식 첼시 부츠 리테일 페이지에 ‘Goodyear construction, storm welt, Commando rubber sole’ 명시(포멀 실루엣에 러그 적용). ([farfetch.com](https://www.farfetch.com/my/shopping/men/churchs-classic-chelsea-boots-item-37027182.aspx?lang=en-US&size=12))",
+    "Church’s Off Town 컬렉션 설명에서 ‘Storm welting protects from wet weather’로 스톰 웰트의 방수/내구 목적 강조, 첼시 포함. ([church-footwear.com](https://www.church-footwear.com/us/en/men/collections/off-town-collection/c/10508US))",
+    "버터스코치 ‘Midnight Chelsea’ 제품 설명에 360도 Goodyear storm welt와 Commando 솔 조합 명시(aspirational 레퍼런스). ([butterscotchlb.com](https://butterscotchlb.com/blogs/news/blog-post-no-41-the-midnight-chelsea))"
    ],
    "co_occurring": [
     "Goodyear 웰트",
@@ -841,8 +841,8 @@
    "dedup_group": "dg_3",
    "oem_group": null,
    "evidence": [
-    "Dr. Martens 2976 Leonore 공식 제품 페이지에서 ‘Faux Fur Lined Chelsea Boots’로 보온 라이닝 명시. ([drmartens.com](https://www.drmartens.com/us/en/2976-leonore-faux-fur-lined-chelsea-boots-oxblood/p/26332601?utm_source=openai))",
-    "Zappos/YouTube 리뷰에서 2976 Leonore의 ‘faux-fur lining’ 설명 확인. ([youtube.com](https://www.youtube.com/watch?v=x5vG_OH1X00&utm_source=openai))",
+    "Dr. Martens 2976 Leonore 공식 제품 페이지에서 ‘Faux Fur Lined Chelsea Boots’로 보온 라이닝 명시. ([drmartens.com](https://www.drmartens.com/us/en/2976-leonore-faux-fur-lined-chelsea-boots-oxblood/p/26332601))",
+    "Zappos/YouTube 리뷰에서 2976 Leonore의 ‘faux-fur lining’ 설명 확인. ([youtube.com](https://www.youtube.com/watch?v=x5vG_OH1X00))",
     "국내 SSF Shop ‘[닥터마틴공식] 2976 레오노어’ 판매 페이지: 할인 진행(2026-08-10~17 쿠폰), 구매 버튼과 ‘품절/재입고 알림 신청’ UI 노출(국내 DTC 판매 활발). ([m.ssfshop.com](https://m.ssfshop.com/DR-MARTENS/GRCR24101731515/good))"
    ],
    "co_occurring": [
@@ -879,9 +879,9 @@
    "dedup_group": "dg_4",
    "oem_group": null,
    "evidence": [
-    "Blundstone Thermal Series: ‘Removable Sheepskin Footbed’, ‘Lined with 200g Thinsulate’ 공식 소개. ([blundstone.com](https://www.blundstone.com/pages/thermal-series-spotlight?utm_source=openai))",
-    "Thermal #566 제품명에 ‘Premium waterproof leather’ 및 Thermal 표기(방수 가죽+보온 패키지). ([blundstone.com](https://www.blundstone.com/products/black-premium-waterproof-leather-chelsea-boots-mens-style-566?variant=51895004791091&utm_source=openai))",
-    "Thermal Sheepskin Footbed는 Thermal 라인 기본 구성으로 안내. ([blundstone.co.uk](https://www.blundstone.co.uk/products/blundstone-thermal-sheepskin-footbed?utm_source=openai))"
+    "Blundstone Thermal Series: ‘Removable Sheepskin Footbed’, ‘Lined with 200g Thinsulate’ 공식 소개. ([blundstone.com](https://www.blundstone.com/pages/thermal-series-spotlight))",
+    "Thermal #566 제품명에 ‘Premium waterproof leather’ 및 Thermal 표기(방수 가죽+보온 패키지). ([blundstone.com](https://www.blundstone.com/products/black-premium-waterproof-leather-chelsea-boots-mens-style-566?variant=51895004791091))",
+    "Thermal Sheepskin Footbed는 Thermal 라인 기본 구성으로 안내. ([blundstone.co.uk](https://www.blundstone.co.uk/products/blundstone-thermal-sheepskin-footbed))"
    ],
    "co_occurring": [
     "생활방수 어퍼",
@@ -917,9 +917,9 @@
    "dedup_group": "dg_5",
    "oem_group": null,
    "evidence": [
-    "Dr. Martens ‘2976 Women’s Double Zip’에서 2976 첼시 기반에 ‘set of side zips’ 적용(고어+지퍼 하이브리드). ([drmartens.com](https://www.drmartens.com/us/en/2976-womens-double-zip-leather-chelsea-boots-black/p/27621001?utm_source=openai))",
-    "Dr. Martens UK ‘2976 Waxed Full Grain Zip’로 양측/단측 지퍼 변형 출시(가죽/피니시 변경과 함께 전개). ([drmartens.com](https://www.drmartens.com/uk/en_gb/2976-waxed-full-grain-zip-leather-chelsea-boots-black/p/30722001?utm_source=openai))",
-    "사용자 커뮤니티에서 ‘2976 Twin Zip’ 실사용 피드백 다수(착화감·사이징 이슈 언급). ([reddit.com](https://www.reddit.com/r/DrMartens/comments/z6gcha?utm_source=openai))"
+    "Dr. Martens ‘2976 Women’s Double Zip’에서 2976 첼시 기반에 ‘set of side zips’ 적용(고어+지퍼 하이브리드). ([drmartens.com](https://www.drmartens.com/us/en/2976-womens-double-zip-leather-chelsea-boots-black/p/27621001))",
+    "Dr. Martens UK ‘2976 Waxed Full Grain Zip’로 양측/단측 지퍼 변형 출시(가죽/피니시 변경과 함께 전개). ([drmartens.com](https://www.drmartens.com/uk/en_gb/2976-waxed-full-grain-zip-leather-chelsea-boots-black/p/30722001))",
+    "사용자 커뮤니티에서 ‘2976 Twin Zip’ 실사용 피드백 다수(착화감·사이징 이슈 언급). ([reddit.com](https://www.reddit.com/r/DrMartens/comments/z6gcha))"
    ],
    "co_occurring": [
     "왁스드 풀그레인 레더",
@@ -955,8 +955,8 @@
    "dedup_group": "dg_6",
    "oem_group": null,
    "evidence": [
-    "국내 유통(코오롱몰) DRESS-1306 페이지에 ‘3cm 통굽 및 로우힐’로 낮은 힐/스택 표기. ([kolonmall.com](https://www.kolonmall.com/Brands/blundstone/Product/K1769754829197095NO01?utm_source=openai))",
-    "Dainite 공식 사이트에서 스터디드 솔이 ‘no cleats or heavy grooves… maintaining a smart timeless styling’로 포멀한 저프로파일 러버 솔을 강조. ([dainite.com](https://dainite.com/about/?utm_source=openai))",
+    "국내 유통(코오롱몰) DRESS-1306 페이지에 ‘3cm 통굽 및 로우힐’로 낮은 힐/스택 표기. ([kolonmall.com](https://www.kolonmall.com/Brands/blundstone/Product/K1769754829197095NO01))",
+    "Dainite 공식 사이트에서 스터디드 솔이 ‘no cleats or heavy grooves… maintaining a smart timeless styling’로 포멀한 저프로파일 러버 솔을 강조. ([dainite.com](https://dainite.com/about/))",
     "블런드스톤 Dress 컬렉션 설명에서 ‘sleek profile’로 슬림/로우한 바닥 프로파일을 일관되게 어필. ([blundstone.com](https://www.blundstone.com/collections/dress-boots))"
    ],
    "co_occurring": [
@@ -1397,9 +1397,9 @@
    "price_krw": 0,
    "sales_proxy_score": null,
    "proxy_signals": [
-    "AW25 캠페인 기사에서 Amberley를 시즌 아이콘으로 언급했다. ([church-footwear.com](https://www.church-footwear.com/us/en/churchs-world/2025/aw25-campaign.html?utm_source=openai))",
+    "AW25 캠페인 기사에서 Amberley를 시즌 아이콘으로 언급했다. ([church-footwear.com](https://www.church-footwear.com/us/en/churchs-world/2025/aw25-campaign.html))",
     "Goodyear 2.0 컬렉션 페이지에 Chelsea 부츠로 노출되어 있다. ([church-footwear.com](https://www.church-footwear.com/us/en/men/collections/goodyear-20-collection/c/10734US))",
-    "남성 부츠 카테고리에 Amberley R 2.0 여러 색상이 함께 진열되어 있다. ([church-footwear.com](https://www.church-footwear.com/us/en/men/style/boots/c/10405US?utm_source=openai))"
+    "남성 부츠 카테고리에 Amberley R 2.0 여러 색상이 함께 진열되어 있다. ([church-footwear.com](https://www.church-footwear.com/us/en/men/style/boots/c/10405US))"
    ],
    "observation_count": 1,
    "observation_window": "2026-08-12, single pass",
@@ -1425,7 +1425,7 @@
     "엘라스틱 고어와 풀온 탭을 갖춘 슬림한 앵클 실루엣이다. ([neimanmarcus.com](https://www.neimanmarcus.com/p/churchs-mens-amberley-r-2-0-leather-chelsea-boots-prod289820088))",
     "라운드 토 형태이며 낮은 스택드 힐을 쓴다. ([neimanmarcus.com](https://www.neimanmarcus.com/p/churchs-mens-amberley-r-2-0-leather-chelsea-boots-prod289820088))",
     "러버 아웃솔과 유연한 Goodyear 2.0 솔을 사용한다. ([neimanmarcus.com](https://www.neimanmarcus.com/p/churchs-mens-amberley-r-2-0-leather-chelsea-boots-prod289820088))",
-    "폴리시드 퓨메, 블리치드 칼프, 왁스드 스웨이드 등의 어퍼가 있다. ([church-footwear.com](https://www.church-footwear.com/us/en/p/polished-fume-leather-chelsea-boot/ETC315_9EM_F0AAB_F_000000?utm_source=openai))"
+    "폴리시드 퓨메, 블리치드 칼프, 왁스드 스웨이드 등의 어퍼가 있다. ([church-footwear.com](https://www.church-footwear.com/us/en/p/polished-fume-leather-chelsea-boot/ETC315_9EM_F0AAB_F_000000))"
    ],
    "size_status": "sold_out",
    "colorway_count": 8,
@@ -1441,9 +1441,9 @@
    "price_krw": 0,
    "sales_proxy_score": null,
    "proxy_signals": [
-    "AW25 캠페인 ‘Explore the selection’ 섹션에 Mc Carthy가 포함되었다. ([church-footwear.com](https://www.church-footwear.com/us/en/churchs-world/2025/aw25-campaign.html?utm_source=openai))",
-    "Goodyear 2.0 컬렉션의 Chelsea 부츠로 소개되어 있다. ([church-footwear.com](https://www.church-footwear.com/us/en/men/collections/goodyear-20-collection/c/10734US?utm_source=openai))",
-    "Off Town 컬렉션에도 등장하며 컬렉션 설명에서 스톰 웰트를 강조한다. ([church-footwear.com](https://www.church-footwear.com/us/en/men/collections/off-town-collection/c/10508US?utm_source=openai))"
+    "AW25 캠페인 ‘Explore the selection’ 섹션에 Mc Carthy가 포함되었다. ([church-footwear.com](https://www.church-footwear.com/us/en/churchs-world/2025/aw25-campaign.html))",
+    "Goodyear 2.0 컬렉션의 Chelsea 부츠로 소개되어 있다. ([church-footwear.com](https://www.church-footwear.com/us/en/men/collections/goodyear-20-collection/c/10734US))",
+    "Off Town 컬렉션에도 등장하며 컬렉션 설명에서 스톰 웰트를 강조한다. ([church-footwear.com](https://www.church-footwear.com/us/en/men/collections/off-town-collection/c/10508US))"
    ],
    "observation_count": 1,
    "observation_window": "2026-08-12, single pass",
@@ -1466,9 +1466,9 @@
    "praise_points": [],
    "complaint_points": [],
    "design_traits": [
-    "칼프 가죽 어퍼와 엘라스틱 고어를 갖춘 포멀 첼시다. ([church-footwear.com](https://www.church-footwear.com/us/en/p/calfskin-chelsea-boot/ETC205_9AAH_F0AAB_F_000000?utm_source=openai))",
+    "칼프 가죽 어퍼와 엘라스틱 고어를 갖춘 포멀 첼시다. ([church-footwear.com](https://www.church-footwear.com/us/en/p/calfskin-chelsea-boot/ETC205_9AAH_F0AAB_F_000000))",
     "러그 아웃솔과 낮은 스택드 힐이 적용되었다. ([mrporter.com](https://www.mrporter.com/en-us/mens/product/church-s/shoes/chelsea-boots/mccarthy-leather-chelsea-boots/46376663162896228))",
-    "오프 타운 설명에 따라 스톰 웰트로 습기에 대비한다. ([church-footwear.com](https://www.church-footwear.com/us/en/men/collections/off-town-collection/c/10508US?utm_source=openai))"
+    "오프 타운 설명에 따라 스톰 웰트로 습기에 대비한다. ([church-footwear.com](https://www.church-footwear.com/us/en/men/collections/off-town-collection/c/10508US))"
    ],
    "size_status": "sold_out",
    "colorway_count": 2,
@@ -1612,12 +1612,12 @@
   "evidence_season": "FW26",
   "season_title": "SS27 FOOTWEAR",
   "powershift": "FW26 관측을 근거로, SS27에는 첼시·정장 앵클이 유니섹스 포멀 베이스로 재정렬된다. 카프·수에드의 표면과 러버 드레스솔, 고어디어 웰트가 상업 핵심으로 수렴한다.",
-  "season_narrative": "SS27은 첼시와 포멀 앵클의 재정리 시즌이 된다. FW26 런웨이에서 샤프 토와 포멀 가죽 부츠가 다시 앞에 섰다. 여름 전환은 앵클 라스트에서 실행된다. ([whowhatwear.com](https://www.whowhatwear.com/fashion/fall-winter-shoe-trends-2026?utm_source=openai))\n선행지표는 포멀 복귀와 유연한 굿이어 구조다. Church's는 AW26에서 New Formal 그룹을 내세우며 첼시를 재정의했다. Goodyear 2.0은 더 유연한 밸런스를 예고한다. ([church-footwear.com](https://www.church-footwear.com/fr/en/churchs-world/2026/aw26-campaign.html?utm_source=openai))\n고무 아웃솔 투자는 SS27의 품질 기준을 바꾼다. Aigle의 SS26 카탈로그는 내추럴 러버 첼시 구성을 명시했다. Blundstone의 Vibram All Terrain은 100퍼센트 러버와 ISO 대응을 알렸다. ([touris.eu](https://www.touris.eu/storage/brands/pdf_catalogs/SS26-WORKBOOK---FOOTWEAR-AIGLE-%281%29.pdf?utm_source=openai))\n수요 신호는 경량화 필요를 말한다. SS26 스트리트는 스톰피 부츠를 사계절로 사용했다. 2026년 1분기 데이터는 앵클과 미드 샤프트의 단위 약세를 지적했다. ([vogue.com](https://www.vogue.com/article/street-style-shoes?utm_source=openai))\n브랜드와 리테일은 첼시의 상시성을 유지했다. Dr. Martens는 FY26에서 2976을 아이콘으로 못박았다. Nordstrom과 Saint Laurent 상품군은 첼시 노출을 이어간다. 수선망과 리페어 서비스는 재구매 장벽을 낮춘다. ([drmartensplc.com](https://www.drmartensplc.com/application/files/6117/7917/0496/Dr._Martens_plc_FY26_Results_Statement.pdf))\n이번 시즌 매크로는 네 개로 묶인다. CLEAN CHELSEA는 매끈한 토와 얇은 웰트의 포멀 첼시다. SAND SUEDE는 샌드톤 스웨이드 앵클의 라이트한 선택이다. CITY STUDDED는 절제된 스터드와 스퀘어 하드웨어의 도시 감도다. RECRAFT READY는 굿이어와 공식 수선망을 전제로 한 설계다.",
+  "season_narrative": "SS27은 첼시와 포멀 앵클의 재정리 시즌이 된다. FW26 런웨이에서 샤프 토와 포멀 가죽 부츠가 다시 앞에 섰다. 여름 전환은 앵클 라스트에서 실행된다. ([whowhatwear.com](https://www.whowhatwear.com/fashion/fall-winter-shoe-trends-2026))\n선행지표는 포멀 복귀와 유연한 굿이어 구조다. Church's는 AW26에서 New Formal 그룹을 내세우며 첼시를 재정의했다. Goodyear 2.0은 더 유연한 밸런스를 예고한다. ([church-footwear.com](https://www.church-footwear.com/fr/en/churchs-world/2026/aw26-campaign.html))\n고무 아웃솔 투자는 SS27의 품질 기준을 바꾼다. Aigle의 SS26 카탈로그는 내추럴 러버 첼시 구성을 명시했다. Blundstone의 Vibram All Terrain은 100퍼센트 러버와 ISO 대응을 알렸다. ([touris.eu](https://www.touris.eu/storage/brands/pdf_catalogs/SS26-WORKBOOK---FOOTWEAR-AIGLE-%281%29.pdf))\n수요 신호는 경량화 필요를 말한다. SS26 스트리트는 스톰피 부츠를 사계절로 사용했다. 2026년 1분기 데이터는 앵클과 미드 샤프트의 단위 약세를 지적했다. ([vogue.com](https://www.vogue.com/article/street-style-shoes))\n브랜드와 리테일은 첼시의 상시성을 유지했다. Dr. Martens는 FY26에서 2976을 아이콘으로 못박았다. Nordstrom과 Saint Laurent 상품군은 첼시 노출을 이어간다. 수선망과 리페어 서비스는 재구매 장벽을 낮춘다. ([drmartensplc.com](https://www.drmartensplc.com/application/files/6117/7917/0496/Dr._Martens_plc_FY26_Results_Statement.pdf))\n이번 시즌 매크로는 네 개로 묶인다. CLEAN CHELSEA는 매끈한 토와 얇은 웰트의 포멀 첼시다. SAND SUEDE는 샌드톤 스웨이드 앵클의 라이트한 선택이다. CITY STUDDED는 절제된 스터드와 스퀘어 하드웨어의 도시 감도다. RECRAFT READY는 굿이어와 공식 수선망을 전제로 한 설계다.",
   "macrotrends": [
    {
     "name": "CLEAN CHELSEA",
     "statement": "FW26의 드레스 무드가 힘을 얻었고 SS27엔 슬림 첼시와 정장 앵클이 유니섹스로 확대된다.",
-    "narrative": "FW26 남성 쇼에서 유광 카프와 슬림한 첼시가 눈에 띄었다. Berluti는 알레시오를 첼시형 앵클로 재해석해 무드를 선명하게 했다. 이는 SS27의 포멀 앵클 수요 확대로 연결된다. ([vogue.com](https://www.vogue.com/fashion-shows/fall-2026-menswear/berluti?utm_source=openai))\n이커머스의 첼시 부문은 설명 복귀와 재고 갱신이 잦아졌다. SSENSE는 최신 컬렉션과의 결합성을 강조하며 유비쿼티를 명시했다. SS27에는 드레스·캐주얼 교차 착화가 더 자연스러워진다. ([ssense.com](https://www.ssense.com/en-us/men/chelsea-boots?utm_source=openai))\n거리 패션에선 성별 구분을 흐리는 ‘시티 첼시’가 부각됐다. SS27에는 라이트 스터디드 러버와 블랙·다크 브라운 팔레트가 상업 핵심으로 굳어진다. 제작사 Dainite와 C&J의 시티 솔이 이를 뒷받침한다. ([vogue.com](https://www.vogue.com/article/street-style-shoes?utm_source=openai))",
+    "narrative": "FW26 남성 쇼에서 유광 카프와 슬림한 첼시가 눈에 띄었다. Berluti는 알레시오를 첼시형 앵클로 재해석해 무드를 선명하게 했다. 이는 SS27의 포멀 앵클 수요 확대로 연결된다. ([vogue.com](https://www.vogue.com/fashion-shows/fall-2026-menswear/berluti))\n이커머스의 첼시 부문은 설명 복귀와 재고 갱신이 잦아졌다. SSENSE는 최신 컬렉션과의 결합성을 강조하며 유비쿼티를 명시했다. SS27에는 드레스·캐주얼 교차 착화가 더 자연스러워진다. ([ssense.com](https://www.ssense.com/en-us/men/chelsea-boots))\n거리 패션에선 성별 구분을 흐리는 ‘시티 첼시’가 부각됐다. SS27에는 라이트 스터디드 러버와 블랙·다크 브라운 팔레트가 상업 핵심으로 굳어진다. 제작사 Dainite와 C&J의 시티 솔이 이를 뒷받침한다. ([vogue.com](https://www.vogue.com/article/street-style-shoes))",
     "sub_trends": [
      "세미 스퀘어 토 앵클부츠 라스트",
      "홀컷 풀그레인 카프 어퍼",
@@ -1780,7 +1780,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "토 세미라운드·힐 30mm 블록·소재 카프·클로저 엘라스틱·부자재 힐루프",
-      "image_url": "https://cdn.media.amplience.net/i/drmartens/26695001.80?%24smart576%24=&fmt=auto"
+      "image_url": "/samples/c205963b26e693661e82b6fe.webp"
      },
      {
       "segment": "women",
@@ -1796,7 +1796,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "토 알몬드·힐 30mm 블록·소재 풀그레인 카프·클로저 엘라스틱·부자재 더블 탭",
-      "image_url": "https://mainstreetclothing.com.au/cdn/shop/products/1_2ceaf04a-e88f-4d9b-9e78-cca69be6ab03_300x.png?v=1680239208"
+      "image_url": "/samples/201ec62d7263686f3ccfb103.webp"
      },
      {
       "segment": "women",
@@ -1828,7 +1828,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "토 라운드·힐 로우 스택·소재 러프아웃 카프·클로저 엘라스틱·부자재 스톰 웰트",
-      "image_url": "https://us.crockettandjones.com/cdn/shop/files/Chelsea529542A-S52D26_eec63825-b4ea-4c5f-bf39-572aa3484041_1400x.png?v=1729151512"
+      "image_url": "/samples/e1328536e53bf46fbbb71d96.webp"
      },
      {
       "segment": "men",
@@ -1860,7 +1860,7 @@
       },
       "grade": "stable",
       "silhouette_spec": "토 알몬드·힐 로우·소재 카프·클로저 엘라스틱·부자재 Dainite",
-      "image_url": "https://www.loakeshoes.com.au/cdn/shop/products/loake-chatsworth-lea-calf-leather-black_8d2ed988-8129-4c54-86e6-b091ff52544a.jpg"
+      "image_url": "/samples/2326b84080d193ba78b60971.webp"
      }
     ],
     "grade": "safe",
@@ -1870,7 +1870,7 @@
    {
     "name": "SAND SUEDE",
     "statement": "SS27에는 스톤·샌드 톤 수에드 첼시·포멀 부츠가 생활방수 가공과 고무 드레스솔, 고어디어 웰트를 앞세워 유니섹스로 확대된다.",
-    "narrative": "FW26 런웨이에서 라이트 톤 수에드 부츠가 반복 등장했다. 질 샌더는 카멜 계열 수에드를, 베를루티는 첼시형 수에드 부츠를 제안했다. 이 무드는 SS27에 한층 밝은 샌드 팔레트로 가벼워진다. ([vogue.com](https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jil-sander?utm_source=openai))\nFW26 리테일과 에디토리얼은 “스웨이드 앵클·첼시”를 안전한 선택으로 상기시켰다. 가벼운 뉴트럴 수에드가 일상 포멀에 섞이며, 드레스러버솔과 얇은 웰트로 정제된다. SS27에는 여름셋업과도 어울리는 샌드 수에드가 표준이 된다. ([vogue.com](https://www.vogue.com/article/best-suede-boots?utm_source=openai))\n동기간 소셜과 커뮤니티에서 수에드 첼시에 대한 토론이 이어졌다. 2026년 스레드에선 라이트 수에드 선호 반응이 확인됐다. SS27에는 유니섹스 사이징과 슬릭 라스트로 구매 허들을 낮춘 구성이 유효해진다. ([reddit.com](https://www.reddit.com/r/mensfashion/comments/1tdom8m/are_chelsea_boots_still_in_fashion_or_have_they/?utm_source=openai))",
+    "narrative": "FW26 런웨이에서 라이트 톤 수에드 부츠가 반복 등장했다. 질 샌더는 카멜 계열 수에드를, 베를루티는 첼시형 수에드 부츠를 제안했다. 이 무드는 SS27에 한층 밝은 샌드 팔레트로 가벼워진다. ([vogue.com](https://www.vogue.com/fashion-shows/fall-2026-ready-to-wear/jil-sander))\nFW26 리테일과 에디토리얼은 “스웨이드 앵클·첼시”를 안전한 선택으로 상기시켰다. 가벼운 뉴트럴 수에드가 일상 포멀에 섞이며, 드레스러버솔과 얇은 웰트로 정제된다. SS27에는 여름셋업과도 어울리는 샌드 수에드가 표준이 된다. ([vogue.com](https://www.vogue.com/article/best-suede-boots))\n동기간 소셜과 커뮤니티에서 수에드 첼시에 대한 토론이 이어졌다. 2026년 스레드에선 라이트 수에드 선호 반응이 확인됐다. SS27에는 유니섹스 사이징과 슬릭 라스트로 구매 허들을 낮춘 구성이 유효해진다. ([reddit.com](https://www.reddit.com/r/mensfashion/comments/1tdom8m/are_chelsea_boots_still_in_fashion_or_have_they/))",
     "sub_trends": [
      "스톤·샌드·모카 수에드",
      "생활방수 가공 수에드",
@@ -2117,13 +2117,13 @@
      }
     ],
     "grade": "safe",
-    "next_season_call": "프리폴 27에는 샌드·모카 수에드가 더 밝아진다. 스톰웰트+다이나이트 조합이 상용화되고, 유니섹스 사이즈 범위가 소형으로 확장된다. FW26 대비 컬러는 라이트하고, 라스트는 더 슬림해진다. ([dainite.com](https://dainite.com/about/?utm_source=openai))",
+    "next_season_call": "프리폴 27에는 샌드·모카 수에드가 더 밝아진다. 스톰웰트+다이나이트 조합이 상용화되고, 유니섹스 사이즈 범위가 소형으로 확장된다. FW26 대비 컬러는 라이트하고, 라스트는 더 슬림해진다. ([dainite.com](https://dainite.com/about/))",
     "confidence": "medium"
    },
    {
     "name": "CITY STUDDED",
-    "statement": "FW26 드레스 부츠에 스터디드 러버솔이 보편화되었고 SS27엔 다이나이트 계열 미니러그가 포멀 기준선으로 자리 잡는다. ([us.crockettandjones.com](https://us.crockettandjones.com/blogs/the-article/aw17-city-sole-collection?utm_source=openai))",
-    "narrative": "FW26 리테일과 쇼에서 드레스 부츠에 스터디드 러버솔 채택이 늘었다. 영국식 시티 솔과 마이크로 스터드 아웃솔이 비·마른 노면 모두에 대응하며 정숙성을 보였다. SS27에는 이 미니러그가 가죽솔을 대체해 출근용 포멀 부츠의 표준으로 굳어진다. ([us.crockettandjones.com](https://us.crockettandjones.com/blogs/the-article/aw17-city-sole-collection?utm_source=openai))\n미니러그는 옆모습이 얇고 힐 스택이 낮다. 도시 보행에서 소음을 줄이고 사무실 바닥에 자국을 남기지 않는 점이 장점으로 부각된다. SS27 제품군은 얇은 고무 힐과 로우 프로파일을 결합해 수트 핏을 해치지 않는다. ([stridewise.com](https://stridewise.com/thursday-cavalier-boot-review/?utm_source=openai))\nFW26 남성복 무대에서도 컬러 러버솔 앵클부츠가 룩을 지탱했다. 쇼의 채택이 리테일 확장으로 이어졌고 SS27 프리드롭에서도 동일한 사양이 보인다. SS27에는 유니섹스 체시가 고급 박스칼프·스웨이드와 스터디드 솔 조합으로 넓게 제안된다. ([vogue.com](https://www.vogue.com/fashion-shows/fall-2026-menswear/hermes?utm_source=openai))",
+    "statement": "FW26 드레스 부츠에 스터디드 러버솔이 보편화되었고 SS27엔 다이나이트 계열 미니러그가 포멀 기준선으로 자리 잡는다. ([us.crockettandjones.com](https://us.crockettandjones.com/blogs/the-article/aw17-city-sole-collection))",
+    "narrative": "FW26 리테일과 쇼에서 드레스 부츠에 스터디드 러버솔 채택이 늘었다. 영국식 시티 솔과 마이크로 스터드 아웃솔이 비·마른 노면 모두에 대응하며 정숙성을 보였다. SS27에는 이 미니러그가 가죽솔을 대체해 출근용 포멀 부츠의 표준으로 굳어진다. ([us.crockettandjones.com](https://us.crockettandjones.com/blogs/the-article/aw17-city-sole-collection))\n미니러그는 옆모습이 얇고 힐 스택이 낮다. 도시 보행에서 소음을 줄이고 사무실 바닥에 자국을 남기지 않는 점이 장점으로 부각된다. SS27 제품군은 얇은 고무 힐과 로우 프로파일을 결합해 수트 핏을 해치지 않는다. ([stridewise.com](https://stridewise.com/thursday-cavalier-boot-review/))\nFW26 남성복 무대에서도 컬러 러버솔 앵클부츠가 룩을 지탱했다. 쇼의 채택이 리테일 확장으로 이어졌고 SS27 프리드롭에서도 동일한 사양이 보인다. SS27에는 유니섹스 체시가 고급 박스칼프·스웨이드와 스터디드 솔 조합으로 넓게 제안된다. ([vogue.com](https://www.vogue.com/fashion-shows/fall-2026-menswear/hermes))",
     "sub_trends": [
      "다이나이트 계열 미니러그",
      "저두께 고무 힐과 로우 프로파일",
@@ -2137,7 +2137,7 @@
       "magnitude": "rising",
       "source_kind": "consumer",
       "source_url": "https://www.vogue.de/artikel/chelsea-boots-stiefel-trend-herbst",
-      "observed_note": "FW25/26 시즌 체시 부츠가 ‘어디에나 등장’으로 요약되며 소비자 관심이 상향 구간에 진입했다. ([vogue.de](https://www.vogue.de/artikel/chelsea-boots-stiefel-trend-herbst?utm_source=openai))"
+      "observed_note": "FW25/26 시즌 체시 부츠가 ‘어디에나 등장’으로 요약되며 소비자 관심이 상향 구간에 진입했다. ([vogue.de](https://www.vogue.de/artikel/chelsea-boots-stiefel-trend-herbst))"
      },
      {
       "label": "소셜 담론의 실사용 피드백 증가",
@@ -2145,7 +2145,7 @@
       "magnitude": "rising",
       "source_kind": "social",
       "source_url": "https://www.reddit.com/r/goodyearwelt/comments/1refjoj/the_question_thread_022526/",
-      "observed_note": "2026년 질의 스레드에서 다이나이트·마이크로스터드 사용 경험과 선호 토론이 다수 발생했다. ([reddit.com](https://www.reddit.com/r/goodyearwelt/comments/1refjoj/the_question_thread_022526/?utm_source=openai))"
+      "observed_note": "2026년 질의 스레드에서 다이나이트·마이크로스터드 사용 경험과 선호 토론이 다수 발생했다. ([reddit.com](https://www.reddit.com/r/goodyearwelt/comments/1refjoj/the_question_thread_022526/))"
      },
      {
       "label": "쇼 채택의 신호 강화",
@@ -2153,7 +2153,7 @@
       "magnitude": "rising",
       "source_kind": "shows",
       "source_url": "https://www.vogue.com/fashion-shows/fall-2026-menswear/hermes",
-      "observed_note": "FW26 남성복에서 컬러 러버솔 앵클부츠가 룩을 앵커링하며 채택을 확인했다. ([vogue.com](https://www.vogue.com/fashion-shows/fall-2026-menswear/hermes?utm_source=openai))"
+      "observed_note": "FW26 남성복에서 컬러 러버솔 앵클부츠가 룩을 앵커링하며 채택을 확인했다. ([vogue.com](https://www.vogue.com/fashion-shows/fall-2026-menswear/hermes))"
      }
     ],
     "palette": [
@@ -2210,7 +2210,7 @@
       "magnitude": "rising",
       "source_kind": "market",
       "source_url": "https://dainite.com/popular-ranges/",
-      "observed_note": "다수 브랜드 채택과 컬러 라인업 확장 공지로 시티용 채택이 견조했다. ([dainite.com](https://dainite.com/popular-ranges/?utm_source=openai))"
+      "observed_note": "다수 브랜드 채택과 컬러 라인업 확장 공지로 시티용 채택이 견조했다. ([dainite.com](https://dainite.com/popular-ranges/))"
      },
      {
       "label": "마이크로 스터드 러버(Grant Stone 사양)",
@@ -2234,7 +2234,7 @@
       "magnitude": "rising",
       "source_kind": "market",
       "source_url": "https://milled.com/cheaney-co-uk/meet-the-new-chelsea-boot-britney-PrFFSQvmHAxdkovX",
-      "observed_note": "Cheaney 메일러에서 Waxy Commander와 Dainite 조합이 여성·남성 라인 모두에 반복 소개되었다. ([milled.com](https://milled.com/cheaney-co-uk/meet-the-new-chelsea-boot-britney-PrFFSQvmHAxdkovX?utm_source=openai))"
+      "observed_note": "Cheaney 메일러에서 Waxy Commander와 Dainite 조합이 여성·남성 라인 모두에 반복 소개되었다. ([milled.com](https://milled.com/cheaney-co-uk/meet-the-new-chelsea-boot-britney-PrFFSQvmHAxdkovX))"
      }
     ],
     "details": [
@@ -2252,7 +2252,7 @@
       "magnitude": "rising",
       "source_kind": "social",
       "source_url": "https://stridewise.com/thursday-cavalier-boot-review/",
-      "observed_note": "리뷰에서 아웃솔 스티치가 벌크를 줄여 드레스 인상을 강화한다고 설명했다. ([stridewise.com](https://stridewise.com/thursday-chelsea-boots-duke-cavalier/?utm_source=openai))"
+      "observed_note": "리뷰에서 아웃솔 스티치가 벌크를 줄여 드레스 인상을 강화한다고 설명했다. ([stridewise.com](https://stridewise.com/thursday-chelsea-boots-duke-cavalier/))"
      },
      {
       "label": "다이나이트·리지웨이 등 미니러그 패턴 확산",
@@ -2260,7 +2260,7 @@
       "magnitude": "rising",
       "source_kind": "market",
       "source_url": "https://dainite.com/the-ridgeway-sole-behind-the-name/",
-      "observed_note": "클래식 리지웨이가 시티·아웃도어 겸용으로 상시 생산됨을 확인했다. ([dainite.com](https://dainite.com/the-ridgeway-sole-behind-the-name/?utm_source=openai))"
+      "observed_note": "클래식 리지웨이가 시티·아웃도어 겸용으로 상시 생산됨을 확인했다. ([dainite.com](https://dainite.com/the-ridgeway-sole-behind-the-name/))"
      },
      {
       "label": "그립과 정숙성 균형 설계",
@@ -2268,7 +2268,7 @@
       "magnitude": "rising",
       "source_kind": "market",
       "source_url": "https://www.allenedmonds.com/the-journal/made-here/our-soles?icid=ShoeCare_ContentPage_OurSoles",
-      "observed_note": "드레스 슈즈에도 스터디드 솔을 폭넓게 쓰는 이유로 내구·그립·정숙성을 제시했다. ([allenedmonds.com](https://www.allenedmonds.com/the-journal/made-here/our-soles?icid=ShoeCare_ContentPage_OurSoles&utm_source=openai))"
+      "observed_note": "드레스 슈즈에도 스터디드 솔을 폭넓게 쓰는 이유로 내구·그립·정숙성을 제시했다. ([allenedmonds.com](https://www.allenedmonds.com/the-journal/made-here/our-soles?icid=ShoeCare_ContentPage_OurSoles))"
      }
     ],
     "key_items": [
@@ -2286,7 +2286,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "토 셰이프 알몬드 · 힐 25-30mm 로우 · 소가죽 풀그레인 · 클로저 엘라스틱 고어 · 부자재 스터디드 러버솔",
-      "image_url": "https://thursdayboots.com/cdn/shop/files/2800x1080-Men-Cavalier-Black-1_800x533_crop_right.jpg?v=1614294393"
+      "image_url": "/samples/0afa5c292838b658f291d798.webp"
      },
      {
       "segment": "men",
@@ -2334,7 +2334,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "토 셰이프 라운드-알몬드 · 힐 25mm · 소가죽 박스칼프 · 클로저 엘라스틱 고어 · 부자재 경량 클리티드 러버",
-      "image_url": "https://meermin.com/cdn/shop/files/R2_516054_480x480.jpg?v=1717790792"
+      "image_url": "/samples/ba424cc0aa1423466be2aacf.webp"
      },
      {
       "segment": "women",
@@ -2350,7 +2350,7 @@
       },
       "grade": "early_sign",
       "silhouette_spec": "토 셰이프 알몬드 · 힐 20mm · 소가죽 Chromexcel · 클로저 엘라스틱 고어 · 부자재 텍스처 러버솔",
-      "image_url": "https://www.carminashoemaker.com/cdnassets/chelsea_boots_natural_chromexcel_1600_l.webp"
+      "image_url": "/samples/9820ebb50f74114d42fb07a4.webp"
      },
      {
       "segment": "women",
@@ -2376,7 +2376,7 @@
    {
     "name": "RECRAFT READY",
     "statement": "EU 내구·수선 규제가 가속되며 SS27에 고어디어 웰트와 리솔 친화 설계가 표준으로 굳어진다.",
-    "narrative": "FW26에 유럽의 Ecodesign 규제가 확정되자 브랜드가 수선 가능 설계를 서둘러 재정비했다. SS27에는 교체와 추적을 전제로 한 제품 기획이 기본값이 된다. 디지털 패스포트 준비가 모든 커뮤니케이션을 재편한다. ([eur-lex.europa.eu](https://eur-lex.europa.eu/eli/reg/2024/1781/eng?utm_source=openai))\nFW26 리테일과 쇼에서 체시와 드레스성 앵클 부츠가 재등장했다. SS27에는 고어디어 웰트와 러버솔을 결합해 리솔 주기를 전제로 제안이 늘어난다. 공식 리페어 네트워크 연동이 상품페이지와 포장에 명시된다. ([mrporter.com](https://www.mrporter.com/en-us/mens/list/shoes-best-sellers/shoes/boots?utm_source=openai))\nSS27 팔레트는 리페어 마크가 덜 두드러지는 실용 중명도 컬러가 중심이 된다. 카프의 결을 살리는 브라운과 스톤, 포멀한 블랙과 네이비가 유지된다. 여름용 스웨이드는 더운 톤으로 확장된다.",
+    "narrative": "FW26에 유럽의 Ecodesign 규제가 확정되자 브랜드가 수선 가능 설계를 서둘러 재정비했다. SS27에는 교체와 추적을 전제로 한 제품 기획이 기본값이 된다. 디지털 패스포트 준비가 모든 커뮤니케이션을 재편한다. ([eur-lex.europa.eu](https://eur-lex.europa.eu/eli/reg/2024/1781/eng))\nFW26 리테일과 쇼에서 체시와 드레스성 앵클 부츠가 재등장했다. SS27에는 고어디어 웰트와 러버솔을 결합해 리솔 주기를 전제로 제안이 늘어난다. 공식 리페어 네트워크 연동이 상품페이지와 포장에 명시된다. ([mrporter.com](https://www.mrporter.com/en-us/mens/list/shoes-best-sellers/shoes/boots))\nSS27 팔레트는 리페어 마크가 덜 두드러지는 실용 중명도 컬러가 중심이 된다. 카프의 결을 살리는 브라운과 스톤, 포멀한 블랙과 네이비가 유지된다. 여름용 스웨이드는 더운 톤으로 확장된다.",
     "sub_trends": [
      "고어디어 웰트 표준화",
      "러버솔 리솔 서비스 연계",
@@ -2539,7 +2539,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "라운드 토. 30~35mm 힐. 스무스 카프 어퍼. 엘라스틱 고어 클로저. 웰트 스티치·웹 힐탭.",
-      "image_url": "https://cdn.media.amplience.net/i/drmartens/11853001.80?%24smart576%24=&fmt=auto"
+      "image_url": "/samples/382a35fade158bb926f9fdd3.webp"
      },
      {
       "segment": "women",
@@ -2555,7 +2555,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "알몬드 토. 40~45mm 블록 힐. 풀그레인 카프. 엘라스틱 고어. 스택 힐·스티치 웰트.",
-      "image_url": "https://www.davidjones.com/productimages/medium/1/2228608_20798008_5138333.jpg"
+      "image_url": "/samples/f00810dd849fc80f1bab4122.jpg"
      },
      {
       "segment": "women",
@@ -2571,7 +2571,7 @@
       },
       "grade": "early_sign",
       "silhouette_spec": "알몬드 토. 25~30mm 힐. 리버스 스웨이드. 엘라스틱 고어. 스터드 러버솔·풀 라이닝.",
-      "image_url": "https://www.loake.com/wp-content/uploads/2019/08/LLCHADKS-ANGLE-min.jpg"
+      "image_url": "/samples/da60de120b0f5bd3527908a8.jpg"
      },
      {
       "segment": "men",
@@ -2603,7 +2603,7 @@
       },
       "grade": "early_sign",
       "silhouette_spec": "라운드 토. 30~35mm 힐. 카프 어퍼. 엘라스틱 고어. 라이트 커맨도·더블 스티치 웰트.",
-      "image_url": "https://www.loake.com/wp-content/uploads/2021/08/HUXCH-SIDE-min-900x1035.jpg"
+      "image_url": "/samples/f7b9816820028e99776235c9.jpg"
      },
      {
       "segment": "men",
@@ -2623,7 +2623,7 @@
      }
     ],
     "grade": "safe",
-    "next_season_call": "SS27에는 체시·포멀 앵클에서 웰트 봉합 노출과 러버솔 규격 표기가 늘어난다. FW26 대비 리솔 연결 링크와 DPP QR가 더 보편화되고, 힐 탑리프트 교체 부품 판매가 대중화된다. EU ESPR 시행 준비가 제품설명과 포장에 직접 반영된다. ([eur-lex.europa.eu](https://eur-lex.europa.eu/eli/reg/2024/1781/eng?utm_source=openai))",
+    "next_season_call": "SS27에는 체시·포멀 앵클에서 웰트 봉합 노출과 러버솔 규격 표기가 늘어난다. FW26 대비 리솔 연결 링크와 DPP QR가 더 보편화되고, 힐 탑리프트 교체 부품 판매가 대중화된다. EU ESPR 시행 준비가 제품설명과 포장에 직접 반영된다. ([eur-lex.europa.eu](https://eur-lex.europa.eu/eli/reg/2024/1781/eng))",
     "confidence": "medium"
    }
   ],

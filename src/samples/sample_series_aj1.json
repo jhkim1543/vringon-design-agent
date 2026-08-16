@@ -715,9 +715,9 @@
    "dedup_group": "dg_1",
    "oem_group": null,
    "evidence": [
-    "아디다스 ‘스탠 스미스 플랫폼(IF7013)’이 ‘두툼한 플랫폼 아웃솔’을 명시한 채 클래식 어퍼에 플랫폼 툴링을 결합(정가 149,000원). ([adidas.co.kr](https://www.adidas.co.kr/%25EC%258A%25A4%25ED%2583%25A0-%25EC%258A%25A4%25EB%25AF%25B8%25EC%258A%25A4-%25ED%2594%258C%25EB%259E%25AB%25ED%258F%25BC/IF7013.html?utm_source=openai))",
-    "나이키 ‘코트 레거시 리프트’가 ‘플랫폼 중창’으로 동일한 라스트 핏을 유지하면서 볼륨을 키운 여성용 코트 스니커즈로 전개(109,000원·225–260mm). ([nike.com](https://www.nike.com/kr/t/%EB%82%98%EC%9D%B4%ED%82%A4-%EC%BD%94%ED%8A%B8-%EB%A0%88%EA%B1%B0%EC%8B%9C-%EB%A6%AC%ED%94%84%ED%8A%B8-%EC%97%AC%EC%84%B1-%EC%8B%A0%EB%B0%9C-InXsCqgL?utm_source=openai))",
-    "뉴발란스 CT302는 ‘stacked height midsole’, ‘outsized cup outsole’과 ‘rubber toe wrap’를 명시해 플랫폼 비례와 확장 폭싱을 강조. ([karenwalker.com](https://www.karenwalker.com/products/new-balance-ct302-white?utm_source=openai))"
+    "아디다스 ‘스탠 스미스 플랫폼(IF7013)’이 ‘두툼한 플랫폼 아웃솔’을 명시한 채 클래식 어퍼에 플랫폼 툴링을 결합(정가 149,000원). ([adidas.co.kr](https://www.adidas.co.kr/%25EC%258A%25A4%25ED%2583%25A0-%25EC%258A%25A4%25EB%25AF%25B8%25EC%258A%25A4-%25ED%2594%258C%25EB%259E%25AB%25ED%258F%25BC/IF7013.html))",
+    "나이키 ‘코트 레거시 리프트’가 ‘플랫폼 중창’으로 동일한 라스트 핏을 유지하면서 볼륨을 키운 여성용 코트 스니커즈로 전개(109,000원·225–260mm). ([nike.com](https://www.nike.com/kr/t/%EB%82%98%EC%9D%B4%ED%82%A4-%EC%BD%94%ED%8A%B8-%EB%A0%88%EA%B1%B0%EC%8B%9C-%EB%A6%AC%ED%94%84%ED%8A%B8-%EC%97%AC%EC%84%B1-%EC%8B%A0%EB%B0%9C-InXsCqgL))",
+    "뉴발란스 CT302는 ‘stacked height midsole’, ‘outsized cup outsole’과 ‘rubber toe wrap’를 명시해 플랫폼 비례와 확장 폭싱을 강조. ([karenwalker.com](https://www.karenwalker.com/products/new-balance-ct302-white))"
    ],
    "co_occurring": [
     "높은 스택",
@@ -754,9 +754,9 @@
    "dedup_group": "dg_2",
    "oem_group": null,
    "evidence": [
-    "오니츠카타이거 GSM은 ‘넓은 토박스’와 토의 퍼포레이션, OrthoLite 안창을 명시(유니섹스·180,000원). ([onitsukatiger.com](https://www.onitsukatiger.com/kr/ko-kr/product/gsm/1183a353.127?utm_source=openai))",
-    "리복 ‘클럽 C 85 빈티지’ 라인이 컵솔·가죽 어퍼의 클래식 코트 구조로 DTC에서 지속 전개(일부 사이즈 품절 케이스 확인). ([reebok.co.kr](https://www.reebok.co.kr/goods/goods_main.php?groupSno=881&sno=254&utm_source=openai))",
-    "나이키 ‘킬샷 2’는 ‘오리지널 로우 프로파일 테니스화에서 영감’을 강조해 낮은 카라와 슬림 토 라인을 유지. ([nike.com](https://www.nike.com/kr/t/%ED%82%AC%EC%83%B7-2-%ED%94%84%EB%A6%AC%EB%AF%B8%EC%97%84-%EB%82%A8%EC%84%B1-%EC%8B%A0%EB%B0%9C-RA1M6Rei/HQ3489-010?utm_source=openai))"
+    "오니츠카타이거 GSM은 ‘넓은 토박스’와 토의 퍼포레이션, OrthoLite 안창을 명시(유니섹스·180,000원). ([onitsukatiger.com](https://www.onitsukatiger.com/kr/ko-kr/product/gsm/1183a353.127))",
+    "리복 ‘클럽 C 85 빈티지’ 라인이 컵솔·가죽 어퍼의 클래식 코트 구조로 DTC에서 지속 전개(일부 사이즈 품절 케이스 확인). ([reebok.co.kr](https://www.reebok.co.kr/goods/goods_main.php?groupSno=881&sno=254))",
+    "나이키 ‘킬샷 2’는 ‘오리지널 로우 프로파일 테니스화에서 영감’을 강조해 낮은 카라와 슬림 토 라인을 유지. ([nike.com](https://www.nike.com/kr/t/%ED%82%AC%EC%83%B7-2-%ED%94%84%EB%A6%AC%EB%AF%B8%EC%97%84-%EB%82%A8%EC%84%B1-%EC%8B%A0%EB%B0%9C-RA1M6Rei/HQ3489-010))"
    ],
    "co_occurring": [
     "넓은 토박스",
@@ -793,9 +793,9 @@
    "dedup_group": "dg_3",
    "oem_group": null,
    "evidence": [
-    "나이키 ‘코트 레거시 넥스트 네이처’는 ‘헤링본 패턴’의 풀레ング스 고무 아웃솔을 명시. ([nike.com](https://www.nike.com/t/court-legacy-next-nature-womens-shoes-8r07x0?utm_source=openai))",
-    "나이키 ‘킬샷 2 프리미엄’은 ‘검 소재 고무 밑창’과 레트로 코트 무드를 강조. ([nike.com](https://www.nike.com/kr/t/%ED%82%AC%EC%83%B7-2-%ED%94%84%EB%A6%AC%EB%AF%B8%EC%97%84-%EB%82%A8%EC%84%B1-%EC%8B%A0%EB%B0%9C-RA1M6Rei/HQ3489-010?utm_source=openai))",
-    "아디다스 ‘그랜드 코트 LO’는 ‘Gum’ 컬러 아웃솔과 코트 베이스 어퍼 조합으로 전개. ([adidas.co.kr](https://www.adidas.co.kr/%EA%B7%B8%EB%9E%9C%EB%93%9C-%EC%BD%94%ED%8A%B8-lo/JQ9690.html?utm_source=openai))"
+    "나이키 ‘코트 레거시 넥스트 네이처’는 ‘헤링본 패턴’의 풀레ング스 고무 아웃솔을 명시. ([nike.com](https://www.nike.com/t/court-legacy-next-nature-womens-shoes-8r07x0))",
+    "나이키 ‘킬샷 2 프리미엄’은 ‘검 소재 고무 밑창’과 레트로 코트 무드를 강조. ([nike.com](https://www.nike.com/kr/t/%ED%82%AC%EC%83%B7-2-%ED%94%84%EB%A6%AC%EB%AF%B8%EC%97%84-%EB%82%A8%EC%84%B1-%EC%8B%A0%EB%B0%9C-RA1M6Rei/HQ3489-010))",
+    "아디다스 ‘그랜드 코트 LO’는 ‘Gum’ 컬러 아웃솔과 코트 베이스 어퍼 조합으로 전개. ([adidas.co.kr](https://www.adidas.co.kr/%EA%B7%B8%EB%9E%9C%EB%93%9C-%EC%BD%94%ED%8A%B8-lo/JQ9690.html))"
    ],
    "co_occurring": [
     "검 아웃솔",
@@ -832,9 +832,9 @@
    "dedup_group": "dg_4",
    "oem_group": null,
    "evidence": [
-    "오트리 ‘메달리스트 슈퍼 빈티지’는 어퍼·솔에 ‘handcrafted used effect/dirty effect’를 명시(솔 높이 2.5–3.5cm). ([autry-usa.com](https://www.autry-usa.com/en/woman/sneakers/medalist/medalist-low-super-vintage-sneakers-in-white-mesh-gold-suede-and-black-leather-3187.html?utm_source=openai))",
-    "유통 채널 설명에서도 ‘worn effect/aged effect’ 등 의도적 에이징 요소를 반복 표기. ([lyst.com](https://www.lyst.com/shoes/autry-medalist-242/?utm_source=openai))",
-    "리복 ‘클럽 C 85 빈티지’가 DTC에서 베스트 라벨로 상시 운영되어 레트로·크림톤 피니시 수요를 시사. ([reebok.co.kr](https://www.reebok.co.kr/goods/goods_main.php?groupSno=881&sno=254&utm_source=openai))"
+    "오트리 ‘메달리스트 슈퍼 빈티지’는 어퍼·솔에 ‘handcrafted used effect/dirty effect’를 명시(솔 높이 2.5–3.5cm). ([autry-usa.com](https://www.autry-usa.com/en/woman/sneakers/medalist/medalist-low-super-vintage-sneakers-in-white-mesh-gold-suede-and-black-leather-3187.html))",
+    "유통 채널 설명에서도 ‘worn effect/aged effect’ 등 의도적 에이징 요소를 반복 표기. ([lyst.com](https://www.lyst.com/shoes/autry-medalist-242/))",
+    "리복 ‘클럽 C 85 빈티지’가 DTC에서 베스트 라벨로 상시 운영되어 레트로·크림톤 피니시 수요를 시사. ([reebok.co.kr](https://www.reebok.co.kr/goods/goods_main.php?groupSno=881&sno=254))"
    ],
    "co_occurring": [
     "크림/세일 미드솔",
@@ -871,9 +871,9 @@
    "dedup_group": "dg_5",
    "oem_group": null,
    "evidence": [
-    "온 ‘THE ROGER Centre Court’는 CloudTec(고반발 폼)과 Speedboard(히든 플레이트) 채택을 공식 보도자료로 명시. ([press.on-running.com](https://press.on-running.com/roger-federer-and-on-launch-a-highly-technical-tennis-inspired-sneaker?utm_source=openai))",
-    "온 투자자 문서에도 Helion superfoam·Speedboard 등 핵심 쿠셔닝·보드 기술을 지속 강조. ([investors.on-running.com](https://investors.on-running.com/files/doc_financials/2024/q4/Ex-99-3_Annual-Report_FY2024-Website.pdf?utm_source=openai))",
-    "아디다스 ‘그랜드 코트 3.0’은 라이프스타일 코트 실루엣에 ‘CLOUDFOAM 기술’로 쿠셔닝 강화. ([adidas.co.kr](https://www.adidas.co.kr/%EA%B7%B8%EB%9E%9C%EB%93%9C-%EC%BD%94%ED%8A%B8-3.0/IH1473.html?utm_source=openai))"
+    "온 ‘THE ROGER Centre Court’는 CloudTec(고반발 폼)과 Speedboard(히든 플레이트) 채택을 공식 보도자료로 명시. ([press.on-running.com](https://press.on-running.com/roger-federer-and-on-launch-a-highly-technical-tennis-inspired-sneaker))",
+    "온 투자자 문서에도 Helion superfoam·Speedboard 등 핵심 쿠셔닝·보드 기술을 지속 강조. ([investors.on-running.com](https://investors.on-running.com/files/doc_financials/2024/q4/Ex-99-3_Annual-Report_FY2024-Website.pdf))",
+    "아디다스 ‘그랜드 코트 3.0’은 라이프스타일 코트 실루엣에 ‘CLOUDFOAM 기술’로 쿠셔닝 강화. ([adidas.co.kr](https://www.adidas.co.kr/%EA%B7%B8%EB%9E%9C%EB%93%9C-%EC%BD%94%ED%8A%B8-3.0/IH1473.html))"
    ],
    "co_occurring": [
     "히든 플레이트(Speedboard)",
@@ -909,8 +909,8 @@
    "dedup_group": "dg_6",
    "oem_group": null,
    "evidence": [
-    "뉴발란스 CT302가 ‘outsized cup outsole’과 ‘rubber toe wrap extending from the outsole’를 명시해 높은 폭싱·토랩을 디자인 키로 사용. ([karenwalker.com](https://www.karenwalker.com/products/new-balance-ct302-white?utm_source=openai))",
-    "오트리 ‘메달리스트 슈퍼 빈티지’는 2.5–3.5cm의 높은 천연 고무 솔과 대비 트레드로 사이드월 존재감을 키움. ([autry-usa.com](https://www.autry-usa.com/en/woman/sneakers/medalist/medalist-low-super-vintage-sneakers-in-white-mesh-gold-suede-and-black-leather-3187.html?utm_source=openai))"
+    "뉴발란스 CT302가 ‘outsized cup outsole’과 ‘rubber toe wrap extending from the outsole’를 명시해 높은 폭싱·토랩을 디자인 키로 사용. ([karenwalker.com](https://www.karenwalker.com/products/new-balance-ct302-white))",
+    "오트리 ‘메달리스트 슈퍼 빈티지’는 2.5–3.5cm의 높은 천연 고무 솔과 대비 트레드로 사이드월 존재감을 키움. ([autry-usa.com](https://www.autry-usa.com/en/woman/sneakers/medalist/medalist-low-super-vintage-sneakers-in-white-mesh-gold-suede-and-black-leather-3187.html))"
    ],
    "co_occurring": [
     "토랩 러버",
@@ -948,9 +948,9 @@
    "dedup_group": "dg_7",
    "oem_group": null,
    "evidence": [
-    "베자 ‘CAMPO’는 ChromeFree 레더 어퍼, 인솔·아웃솔에 아마조니안 러버·바이오 기반 EVA·재생 EVA 비율을 상세 표기. ([veja-store.com](https://www.veja-store.com/en_us/p/campo-leather-white-california-CP0503121.html?utm_source=openai))",
-    "나이키 ‘코트 레거시 넥스트 네이처’는 제품 중량 기준 최소 20% 재생 소재 사용을 명시. ([nike.com](https://www.nike.com/t/court-legacy-next-nature-womens-shoes-8r07x0?utm_source=openai))",
-    "아디다스 ‘스탠 스미스(프라임그린·키즈)’는 갑피 50% 이상 재생 원료 사용을 표기해 코트 실루엣 내 지속가능 소재 전개를 확인. ([adidas.co.kr](https://www.adidas.co.kr/%EC%8A%A4%ED%83%A0-%EC%8A%A4%EB%AF%B8%EC%8A%A4/H05274.html?utm_source=openai))"
+    "베자 ‘CAMPO’는 ChromeFree 레더 어퍼, 인솔·아웃솔에 아마조니안 러버·바이오 기반 EVA·재생 EVA 비율을 상세 표기. ([veja-store.com](https://www.veja-store.com/en_us/p/campo-leather-white-california-CP0503121.html))",
+    "나이키 ‘코트 레거시 넥스트 네이처’는 제품 중량 기준 최소 20% 재생 소재 사용을 명시. ([nike.com](https://www.nike.com/t/court-legacy-next-nature-womens-shoes-8r07x0))",
+    "아디다스 ‘스탠 스미스(프라임그린·키즈)’는 갑피 50% 이상 재생 원료 사용을 표기해 코트 실루엣 내 지속가능 소재 전개를 확인. ([adidas.co.kr](https://www.adidas.co.kr/%EC%8A%A4%ED%83%A0-%EC%8A%A4%EB%AF%B8%EC%8A%A4/H05274.html))"
    ],
    "co_occurring": [
     "ChromeFree 레더",
@@ -1205,7 +1205,7 @@
   "publisher": "Web, collected 2026-08-12 across 26 searches",
   "perspective": "KR DTC 중심(아디다스 코리아·나이키 코리아·리복 코리아·오니츠카타이거 코리아) 제품 페이지와 글로벌 브랜드 공식 보도자료/공식 스토어(온·베자·오트리) 보완 관점. 라이프스타일 코트 스니커즈에 초점, 테니스 퍼포먼스 신발은 배경 자료로만 참고.",
   "notes": [
-   "채널·시장(대한민국·DTC) 기준으로 확인된 주류 경쟁군은 스탠 스미스/그랜드 코트(아디다스), 코트 레거시/킬샷 2(나이키), 클럽 C 85(리복), GSM(오니츠카타이거)입니다. 이외 온 ‘THE ROGER’(테크 코트, plate·foam)와 베자(ChromeFree·아마존 러버), 오트리(의도적 에이징 피니시)는 KR DTC 직접 판매 비중이 낮아 aspirational 또는 adjacent로 분류했습니다. 가격帯(2026-08-12 기준): 아디다스 그랜드 코트 2.0/3.0 99,000원대, 나이키 코트 레거시 리프트 109,000원, 리복 클럽 C 85 89,000–119,000원, 오니츠카타이거 GSM 180,000원, 베자 CAMPO 175달러, 오트리 메달리스트 255–360달러. 품절·재입고 신호: 리복 ‘클럽 C 85 빈티지’ 일부 사이즈(예: 270) 품절, 오니츠카타이거 ‘GSM’ 베스트 카테고리 노출, 아디다스 일부 코트·테라스 파생(예: Gazelle Bold)은 adjacent로 보되 ‘Sold out’ 노출이 잦음(가격·프로모션 영향 가능). ([reebok.co.kr](https://reebok.co.kr/goods/goods_view.php?goodsNo=1000003022&utm_source=openai)) 구성 요소별 개발 난이도: 플랫폼/폭싱 상승·토랩(신규 컵솔/아웃솔 몰드 필요) > 히든 플레이트·고반발 폼(중창/보드 구조 신규) > 검·헤링본(러버 컴파운드/패턴 변경) > 에이징 피니시·ChromeFree(소재/피니시 변경). 시즌 관점(FW26): 플랫폼 컵솔·에이징 피니시·지속가능 소재는 상업성과 실현성이 높아 상용화 확대가 유력. 히든 플레이트·슈퍼폼 코트는 프리미엄 라인에서 하향 확산 가능성이 있으나 신규 툴링·원가 고려 필요."
+   "채널·시장(대한민국·DTC) 기준으로 확인된 주류 경쟁군은 스탠 스미스/그랜드 코트(아디다스), 코트 레거시/킬샷 2(나이키), 클럽 C 85(리복), GSM(오니츠카타이거)입니다. 이외 온 ‘THE ROGER’(테크 코트, plate·foam)와 베자(ChromeFree·아마존 러버), 오트리(의도적 에이징 피니시)는 KR DTC 직접 판매 비중이 낮아 aspirational 또는 adjacent로 분류했습니다. 가격帯(2026-08-12 기준): 아디다스 그랜드 코트 2.0/3.0 99,000원대, 나이키 코트 레거시 리프트 109,000원, 리복 클럽 C 85 89,000–119,000원, 오니츠카타이거 GSM 180,000원, 베자 CAMPO 175달러, 오트리 메달리스트 255–360달러. 품절·재입고 신호: 리복 ‘클럽 C 85 빈티지’ 일부 사이즈(예: 270) 품절, 오니츠카타이거 ‘GSM’ 베스트 카테고리 노출, 아디다스 일부 코트·테라스 파생(예: Gazelle Bold)은 adjacent로 보되 ‘Sold out’ 노출이 잦음(가격·프로모션 영향 가능). ([reebok.co.kr](https://reebok.co.kr/goods/goods_view.php?goodsNo=1000003022)) 구성 요소별 개발 난이도: 플랫폼/폭싱 상승·토랩(신규 컵솔/아웃솔 몰드 필요) > 히든 플레이트·고반발 폼(중창/보드 구조 신규) > 검·헤링본(러버 컴파운드/패턴 변경) > 에이징 피니시·ChromeFree(소재/피니시 변경). 시즌 관점(FW26): 플랫폼 컵솔·에이징 피니시·지속가능 소재는 상업성과 실현성이 높아 상용화 확대가 유력. 히든 플레이트·슈퍼폼 코트는 프리미엄 라인에서 하향 확산 가능성이 있으나 신규 툴링·원가 고려 필요."
   ]
  },
  "trendReport": {
@@ -1274,8 +1274,8 @@
    "https://kswiss.co.kr/product/%EB%82%A8%EC%84%B1-%EC%BD%94%ED%8A%B8-%EB%B0%94%EC%8B%9C%ED%8B%B0-%EC%8A%A4%EB%8B%88%EC%BB%A4%EC%A6%88/654/category/24/display/1/",
    "https://kswiss.co.kr/product/%EC%97%AC%EC%84%B1-%EC%BD%94%ED%8A%B8-%EB%B0%94%EC%8B%9C%ED%8B%B0-%EC%8A%A4%EB%8B%88%EC%BB%A4%EC%A6%88/651/category/24/display/1/",
    "https://kswiss.co.kr/category/shoes/24/",
-   "https://www.fila.co.kr/products/1100fs261od03x006031?utm_source=openai",
-   "https://www.fila.co.kr/products/1100fs261od03x006452?utm_source=openai",
+   "https://www.fila.co.kr/products/1100fs261od03x006031",
+   "https://www.fila.co.kr/products/1100fs261od03x006452",
    "https://www.adidas.co.kr/stan_smith",
    "https://korea.coach.com/products/c201-low-top-sneaker-in-signature-canvas/CW891.html",
    "https://www.autry-usa.com/ko/%EC%97%AC%EC%84%B1/%EC%8A%A4%EB%8B%88%EC%BB%A4%EC%A6%88/super-vintage/",

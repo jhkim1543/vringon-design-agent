@@ -12,6 +12,28 @@ const SAMPLES = join(ROOT, 'src', 'samples')
 const OUT = join(ROOT, 'public', 'samples')
 const EXT = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/avif': 'avif', 'image/gif': 'gif' }
 
+// 인용 URL 끝에 붙어 오는 추적 파라미터를 떼어 낸다.
+// 검색 도구가 모든 링크에 utm_source=<공급사> 를 붙여 돌려주는데, 그게 신호·경쟁사·
+// 리포트 본문에 실려 저장되고 샘플 JSON을 타고 배포 번들까지 들어간다.
+// 공급사명은 UI·저장소·히스토리·바이너리 어디에도 남기지 않는다.
+// 서버(research-api.mjs)에서도 저장 전에 떼지만, 이미 굳어 있는 옛 샘플과
+// 그 수정 전에 시작된 Run 이 있으니 굳히는 자리에서 한 번 더 훑는다.
+// utm_* 는 순수 추적용이라 떼어 내도 링크는 그대로 열린다.
+function scrubTracking(v) {
+  if (typeof v === 'string') {
+    return v
+      .replace(/\?utm_[a-z_]+=[^&\s)"'\]]*&/gi, '?')
+      .replace(/[?&]utm_[a-z_]+=[^&\s)"'\]]*/gi, '')
+  }
+  if (Array.isArray(v)) return v.map(scrubTracking)
+  if (v && typeof v === 'object') {
+    const o = {}
+    for (const [k, val] of Object.entries(v)) o[k] = scrubTracking(val)
+    return o
+  }
+  return v
+}
+
 const names = process.argv.slice(2).length
   ? process.argv.slice(2)
   : readdirSync(SAMPLES).filter(f => f.endsWith('.json') && f !== 'raw.json').map(f => f.replace(/\.json$/, ''))
@@ -70,6 +92,8 @@ for (const name of names) {
     }
   }
 
-  writeFileSync(file, JSON.stringify(st, null, 1))
-  console.log(`${name}: 경쟁사 새로 굳힘 ${frozen} · 이미 로컬 ${already} · 사진 없음 ${failed} / 도시에 키아이템 굳힘 ${dosFrozen} · 실패 ${dosFailed}`)
+  const before = (JSON.stringify(st).match(/utm_[a-z_]+=/gi) ?? []).length
+  const clean = scrubTracking(st)
+  writeFileSync(file, JSON.stringify(clean, null, 1))
+  console.log(`${name}: 경쟁사 새로 굳힘 ${frozen} · 이미 로컬 ${already} · 사진 없음 ${failed} / 도시에 키아이템 굳힘 ${dosFrozen} · 실패 ${dosFailed}${before ? ` / 추적 파라미터 ${before}건 제거` : ''}`)
 }

@@ -232,7 +232,8 @@ async function deepResearch(apiKey, { input, model, onProgress }) {
   const searches = (job.output ?? []).filter(o => o.type === 'web_search_call').length
   const citations = (msg?.content?.[0]?.annotations ?? [])
     .filter(a => a.type === 'url_citation').map(a => a.url)
-  return { text, searches, citations, elapsedSec: Math.round((Date.now() - started) / 1000) }
+  // 딥리서치는 본문이 마크다운이라 링크가 문장 안에 인라인으로 박혀 있다. 같이 훑는다.
+  return { text: scrubTracking(text), searches, citations: scrubTracking(citations), elapsedSec: Math.round((Date.now() - started) / 1000) }
 }
 
 // 웹 검색이 붙은 호출은 기본 헤더 타임아웃(5분)을 넘길 수 있다.
@@ -245,6 +246,27 @@ try {
   const agent = new Agent({ headersTimeout: 20 * 60_000, bodyTimeout: 20 * 60_000, connectTimeout: 30_000 })
   longFetch = (url, init = {}) => undiciFetch(url, { ...init, dispatcher: agent })
 } catch { /* undici가 없으면 내장 fetch로 진행한다 */ }
+
+// ── 인용 URL의 추적 파라미터 제거 ──────────────────────────────────
+// 검색 도구는 돌려주는 모든 인용 링크 끝에 utm_source=<공급사> 를 붙인다.
+// 그 URL이 신호·경쟁사·리포트 본문에 그대로 실려 저장되고, 샘플 JSON을 타고
+// 배포 번들까지 들어간다 — 공급사명은 UI·저장소·바이너리 어디에도 남기지 않는다는
+// 규칙을 정면으로 어긴다. utm_* 는 순수 추적용이라 떼어 내도 링크는 그대로 열린다.
+// 저장 전에 한 번만 훑으면 되도록 모델 출력이 들어오는 자리에서 처리한다.
+function scrubTracking(v) {
+  if (typeof v === 'string') {
+    return v
+      .replace(/\?utm_[a-z_]+=[^&\s)"'\]]*&/gi, '?')   // 첫 파라미터이고 뒤가 더 있다
+      .replace(/[?&]utm_[a-z_]+=[^&\s)"'\]]*/gi, '')   // 유일하거나 마지막이다
+  }
+  if (Array.isArray(v)) return v.map(scrubTracking)
+  if (v && typeof v === 'object') {
+    const o = {}
+    for (const [k, val] of Object.entries(v)) o[k] = scrubTracking(val)
+    return o
+  }
+  return v
+}
 
 async function ask(apiKey, { input, schema, name, location = null }) {
   const r = await longFetch('https://api.openai.com/v1/responses', {
@@ -267,7 +289,7 @@ async function ask(apiKey, { input, schema, name, location = null }) {
   const text = msg?.content?.[0]?.text
   if (!text) throw new Error('리서치 응답이 비어 있습니다')
   const searches = (j.output ?? []).filter(o => o.type === 'web_search_call').length
-  return { data: JSON.parse(text), searches }
+  return { data: scrubTracking(JSON.parse(text)), searches }
 }
 
 // 화면에는 영문으로 노출하지만, 국내 검색은 한글 브랜드명이 훨씬 잘 걸린다.
