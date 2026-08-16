@@ -7,12 +7,11 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createMiroBoard, planMiroBoard } from './miro-api.mjs'
 import { DEEP_MODEL_DEFAULT, researchCompetitors, researchRetailPulse, researchTrends, researchSeasonDossier } from './research-api.mjs'
-import { geminiEdit, geminiGenerate, geminiProbe, geminiShotPlan } from './gemini-api.mjs'
 import { compositeLogo, logoAvailable } from './logo-api.mjs'
 import { tripoSingle, tripoProbe, readModel } from './tripo-api.mjs'
 import { brightdataProbe, unlockImage, unlockPage } from './brightdata.mjs'
 import { analyzeLogoStyle, analyzeMoodboard, analyzeSeries, reviewAsMd, saveUpload } from './upload-api.mjs'
-import { authorGenome, planTerritories, verifyRender } from './design-api.mjs'
+import { authorConcepts, authorGenome, planTerritories, verifyRender } from './design-api.mjs'
 import { inferenceStatus, isLocal, localImageEdit, localImageGenerate, localModelFromImage, localProbe } from './inference.mjs'
 import { marketOf } from './markets.mjs'
 import { handleBoardSync } from './board-sync.mjs'
@@ -27,7 +26,6 @@ export const IMAGE_MODEL = 'gpt-image-1'
 // 계정에서 실제 호출되는 것을 확인한 최신 모델을 쓴다.
 //   gpt-image-1.5  medium  16초   · 빠른 쪽
 //   gpt-image-2    medium  57초   · 디테일 쪽
-// Gemini 경로는 GEMINI_API_KEY가 있을 때만 활성화된다 (없으면 위 경로 유지).
 // 최고 사양으로 둔다. 비용보다 결과를 우선한다는 지시.
 //   gpt-image-1.5 high  29초  · 빠른 쪽
 //   gpt-image-2   high  136초 · 디테일 쪽
@@ -35,9 +33,6 @@ const ENGINE = {
   fast:   { model: 'gpt-image-1.5', quality: 'high', provider: 'openai' },
   detail: { model: 'gpt-image-2',   quality: 'high', provider: 'openai' },
 }
-// Gemini는 OpenAI가 실패했을 때의 예비 경로로만 쓴다.
-// 기본값이 아니다 — 최고 사양은 OpenAI 쪽이다.
-const GEMINI_FALLBACK_ONLY = true
 const pick = (e) => ENGINE[e] || ENGINE.detail
 
 function loadEnv() {
@@ -56,8 +51,6 @@ function loadEnv() {
 const env = { ...loadEnv(), ...process.env }
 const API_KEY = env.OPENAI_API_KEY || ''
 const MIRO_TOKEN = env.MIRO_ACCESS_TOKEN || ''
-// Gemini 키가 있으면 "빠른 모델"이 그쪽으로 간다. 없으면 OpenAI 경로를 유지한다.
-const GEMINI_KEY = env.GEMINI_API_KEY || env.GOOGLE_API_KEY || ''
 // 딥리서치는 같은 키를 쓴다. 계정에서 열린 뒤 이 값을 1로 두면 켜진다.
 const DEEP_RESEARCH = env.OPENAI_DEEP_RESEARCH === '1'
 // 딥리서치는 전용 키가 있으면 그쪽을 쓴다 (조직 인증이 끝난 프로젝트 키)
@@ -282,7 +275,7 @@ async function generate({ prompt, size = '1024x1024', engine = 'detail' }) {
   // 사내 GPU 로 도는 그림은 캐시 키가 달라야 한다. 같은 프롬프트라도 다른 그림이 나오고,
   // 키가 같으면 사내로 바꾼 뒤에도 예전 그림이 계속 나온다.
   const local = isLocal('image')
-  const usedModel = local ? 'local' : (!GEMINI_FALLBACK_ONLY && engine === 'fast' && GEMINI_KEY) ? 'gemini' : model
+  const usedModel = local ? 'local' : model
   ensureCache()
   const hash = keyOf(['gen', usedModel, prompt, size, quality])
   const file = join(CACHE_DIR, `${hash}.png`)
@@ -295,14 +288,6 @@ async function generate({ prompt, size = '1024x1024', engine = 'detail' }) {
     return { hash, cached: false, model: usedModel }
   }
   if (!API_KEY) throw new Error('OPENAI_API_KEY 미설정 — fashion-agent/.env 확인')
-
-  if (!GEMINI_FALLBACK_ONLY && engine === 'fast' && GEMINI_KEY) {
-    try {
-      const { buf, model: gm } = await geminiGenerate(GEMINI_KEY, { prompt })
-      writeFileSync(file, buf)
-      return { hash, cached: false, model: gm }
-    } catch { /* Gemini 실패 시 OpenAI로 이어서 시도한다 */ }
-  }
 
   // 시간 제한이 없으면 한 건이 매달렸을 때 분석 전체가 영원히 멈춘다.
   // 실제로 렌더 한 장에서 17분을 기다리다 멈춘 적이 있다. gpt-image-2 high가
@@ -325,7 +310,7 @@ async function generate({ prompt, size = '1024x1024', engine = 'detail' }) {
 async function edit({ baseHash, prompt, size = '1024x1024', engine = 'detail' }) {
   const { model, quality } = pick(engine)
   const local = isLocal('image')
-  const usedModel = local ? 'local' : (!GEMINI_FALLBACK_ONLY && engine === 'fast' && GEMINI_KEY) ? 'gemini' : model
+  const usedModel = local ? 'local' : model
   ensureCache()
   const hash = keyOf(['edit', usedModel, baseHash, prompt, size, quality])
   const file = join(CACHE_DIR, `${hash}.png`)
@@ -340,14 +325,6 @@ async function edit({ baseHash, prompt, size = '1024x1024', engine = 'detail' })
     return { hash, cached: false, model: usedModel }
   }
   if (!API_KEY) throw new Error('OPENAI_API_KEY 미설정')
-
-  if (!GEMINI_FALLBACK_ONLY && engine === 'fast' && GEMINI_KEY) {
-    try {
-      const { buf, model: gm } = await geminiEdit(GEMINI_KEY, { prompt, baseImage: readFileSync(basePath) })
-      writeFileSync(file, buf)
-      return { hash, cached: false, model: gm }
-    } catch { /* Gemini 실패 시 OpenAI 편집으로 넘어간다 */ }
-  }
 
   const form = new FormData()
   form.append('model', model)
@@ -414,7 +391,6 @@ export async function handleApi(req, res) {
       keyPresent: !!API_KEY, model: IMAGE_MODEL, cachedImages: n,
       miroConnected: !!MIRO_TOKEN,
       deepResearch: DEEP_RESEARCH, deepModel: DEEP_MODEL,
-      geminiConnected: !!GEMINI_KEY,
       tripoConnected: !!TRIPO_KEY,
       unlockerConnected: !!BD_KEY,
       engines: { fast: ENGINE.fast.model, detail: ENGINE.detail.model },
@@ -485,10 +461,9 @@ export async function handleApi(req, res) {
   }
 
   if (path === '/api/image/providers') {
-    const out = { openai: { keyPresent: !!API_KEY, fast: ENGINE.fast.model, detail: ENGINE.detail.model },
-                  gemini: { keyPresent: !!GEMINI_KEY } }
-    if (GEMINI_KEY) { try { out.gemini = { ...out.gemini, ...(await geminiProbe(GEMINI_KEY)) } } catch (e) { out.gemini.error = String(e.message) } }
-    return json(res, 200, out)
+    // 이미지 공급자는 하나(호스티드) + 사내 GPU 뿐이다. 예전에는 두 번째 벤더 분기가 코드에 있었지만
+    // 상수 하나로 영구히 꺼져 있어 도달할 수 없었고, 상태 화면에는 '연결됨' 으로 떴다. 걷어냈다.
+    return json(res, 200, { openai: { keyPresent: !!API_KEY, fast: ENGINE.fast.model, detail: ENGINE.detail.model }, inference: inferenceStatus() })
   }
 
   if (path === '/api/research/competitors' && req.method === 'POST') {
@@ -580,6 +555,18 @@ export async function handleApi(req, res) {
       return json(res, 200, await authorGenome(API_KEY, ROOT, {
         territory: b.territory, tier: b.tier, signals: b.signals, profile: b.profile,
         brandSummary: b.brandSummary, antiSimilarity: b.antiSimilarity,
+        itemTypeEn: b.itemTypeEn, langName: b.langName, assets: b.assets, locked: b.locked,
+      }))
+    } catch (e) { return json(res, 500, { error: String(e.message || e) }) }
+  }
+
+  // 스케치 하나 → 디자인 컨셉 N개 · 소재·컬러·창의도만 갈리고 형태는 고정
+  if (path === '/api/design/concepts' && req.method === 'POST') {
+    try {
+      const b = await readBody(req)
+      return json(res, 200, await authorConcepts(API_KEY, ROOT, {
+        count: b.count, genome: b.genome, signals: b.signals, brandSummary: b.brandSummary,
+        brandPalette: b.brandPalette, seasonPalette: b.seasonPalette, seasonMaterials: b.seasonMaterials,
         itemTypeEn: b.itemTypeEn, langName: b.langName,
       }))
     } catch (e) { return json(res, 500, { error: String(e.message || e) }) }

@@ -116,7 +116,7 @@ const GENOME_SCHEMA = {
   type: 'object', additionalProperties: false,
   required: ['concept_thesis', 'consumer_role', 'hero_mutation', 'supporting',
     'silhouette_family', 'toe_family', 'sole_mass', 'panel_density', 'closure_form', 'stance',
-    'spec_sheet', 'source_signal_ids', 'preserve', 'forbidden'],
+    'parts', 'spec_sheet', 'source_signal_ids', 'preserve', 'forbidden'],
   properties: {
     concept_thesis: { type: 'string', description: '이 안이 무엇인지 두 문장. 요청된 출력 언어로. 보드 카드에 그대로 실린다' },
     consumer_role: { type: 'string', description: '누가 왜 사는가 한 문장' },
@@ -139,6 +139,50 @@ const GENOME_SCHEMA = {
     panel_density: { type: 'string', enum: ['minimal', 'standard', 'dense'] },
     closure_form: { type: 'string', description: '품목 프로필이 허용하는 클로저 중 하나. 허용 목록은 입력에 있다' },
     stance: { type: 'string', enum: ['grounded', 'neutral', 'lifted'] },
+    // 파트별 지시 · 신발은 어퍼 하나가 아니다. 백카운터·토캡·미드솔·아웃솔·설포/아이스테이·칼라·오버레이가
+    // 각각 형태와 소재를 갖는다. 예전에는 upper_material 하나가 신발 전체의 소재였고, 미드솔·아웃솔은
+    // mm 수치 하나로만 언급됐다. 스케치는 form 만, 렌더는 form+material 을 쓴다.
+    parts: {
+      type: 'object', additionalProperties: false,
+      required: ['heel_counter', 'toe_cap', 'midsole', 'outsole', 'tongue_eyestay', 'collar', 'overlays'],
+      properties: {
+        heel_counter: { type: 'object', additionalProperties: false, required: ['form', 'material'],
+          properties: {
+            form: { type: 'string', description: '힐 카운터(백카운터) · 형태만, 영어 한 문장. 선으로 그릴 수 있는 것: 높이·윤곽·분할·각도. 소재·색 금지' },
+            material: { type: 'string', description: '힐 카운터(백카운터) · 소재와 마감, 영어 한 구절. 렌더 단계에서만 쓴다. 예: "compression-moulded EVA, matte, tonal"' },
+          } },
+        toe_cap: { type: 'object', additionalProperties: false, required: ['form', 'material'],
+          properties: {
+            form: { type: 'string', description: '토캡/토 범퍼 · 형태만, 영어 한 문장. 선으로 그릴 수 있는 것: 높이·윤곽·분할·각도. 소재·색 금지' },
+            material: { type: 'string', description: '토캡/토 범퍼 · 소재와 마감, 영어 한 구절. 렌더 단계에서만 쓴다. 예: "compression-moulded EVA, matte, tonal"' },
+          } },
+        midsole: { type: 'object', additionalProperties: false, required: ['form', 'material'],
+          properties: {
+            form: { type: 'string', description: '미드솔 · 사이드월 조형·두께 변화·홈 · 형태만, 영어 한 문장. 선으로 그릴 수 있는 것: 높이·윤곽·분할·각도. 소재·색 금지' },
+            material: { type: 'string', description: '미드솔 · 사이드월 조형·두께 변화·홈 · 소재와 마감, 영어 한 구절. 렌더 단계에서만 쓴다. 예: "compression-moulded EVA, matte, tonal"' },
+          } },
+        outsole: { type: 'object', additionalProperties: false, required: ['form', 'material'],
+          properties: {
+            form: { type: 'string', description: '아웃솔 · 러그/세그먼트 패턴·플렉스 그루브·컴파운드 분할 — 바닥면 스케치의 근거 · 형태만, 영어 한 문장. 선으로 그릴 수 있는 것: 높이·윤곽·분할·각도. 소재·색 금지' },
+            material: { type: 'string', description: '아웃솔 · 러그/세그먼트 패턴·플렉스 그루브·컴파운드 분할 — 바닥면 스케치의 근거 · 소재와 마감, 영어 한 구절. 렌더 단계에서만 쓴다. 예: "compression-moulded EVA, matte, tonal"' },
+          } },
+        tongue_eyestay: { type: 'object', additionalProperties: false, required: ['form', 'material'],
+          properties: {
+            form: { type: 'string', description: '설포와 아이스테이 · 레이싱 기하 · 형태만, 영어 한 문장. 선으로 그릴 수 있는 것: 높이·윤곽·분할·각도. 소재·색 금지' },
+            material: { type: 'string', description: '설포와 아이스테이 · 레이싱 기하 · 소재와 마감, 영어 한 구절. 렌더 단계에서만 쓴다. 예: "compression-moulded EVA, matte, tonal"' },
+          } },
+        collar: { type: 'object', additionalProperties: false, required: ['form', 'material'],
+          properties: {
+            form: { type: 'string', description: '칼라/개구부 · 형태만, 영어 한 문장. 선으로 그릴 수 있는 것: 높이·윤곽·분할·각도. 소재·색 금지' },
+            material: { type: 'string', description: '칼라/개구부 · 소재와 마감, 영어 한 구절. 렌더 단계에서만 쓴다. 예: "compression-moulded EVA, matte, tonal"' },
+          } },
+        overlays: { type: 'object', additionalProperties: false, required: ['form', 'material'],
+          properties: {
+            form: { type: 'string', description: '어퍼 오버레이/보강 · 없으면 "none" · 형태만, 영어 한 문장. 선으로 그릴 수 있는 것: 높이·윤곽·분할·각도. 소재·색 금지' },
+            material: { type: 'string', description: '어퍼 오버레이/보강 · 없으면 "none" · 소재와 마감, 영어 한 구절. 렌더 단계에서만 쓴다. 예: "compression-moulded EVA, matte, tonal"' },
+          } },
+      },
+    },
     spec_sheet: {
       type: 'object', additionalProperties: false,
       required: ['is_new_last', 'is_new_outsole_mold', 'heel_height_mm', 'panel_count', 'sole_construction', 'upper_material'],
@@ -160,18 +204,24 @@ const GENOME_SCHEMA = {
 export async function authorGenome(apiKey, root, {
   territory, tier = 'core', signals = [], profile = {}, brandSummary = '',
   antiSimilarity = [], itemTypeEn = 'footwear', langName = 'English',
+  // 라인이 이미 라스트·바텀을 재사용한다고 선언했으면 그게 Core 의 출발 자산이다.
+  // 위저드에 이 스위치가 있는데 어디도 읽지 않았다 — 저작자가 알아야 지킬 수 있다.
+  assets = { lastReuse: true, bottomReuse: true },
+  // 시리즈 모드 · 사람이 승인한 불변 요소. 저작자가 모르면 그 축을 바꾸려다 클램프에 걸려 조용히 잘린다.
+  locked = {},
 }) {
   if (!apiKey) throw new Error('OPENAI_API_KEY not set')
   const used = signals.filter(s => (territory?.use_signal_ids ?? []).includes(s.signal_id))
   const sigText = used.map(s => `${s.signal_id}: ${s.label} — 공존 속성 ${(s.co_occurring ?? []).join(', ') || '없음'}`).join('\n')
   const key = createHash('sha256').update(JSON.stringify([
-    'genome1', langName, tier, territory?.id, sigText, JSON.stringify(profile), brandSummary, antiSimilarity,
+    'genome4', langName, tier, territory?.id, sigText, JSON.stringify(profile), brandSummary, antiSimilarity, assets, locked,
   ])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
+  const assetNote = `라인 선언: 라스트 ${assets.lastReuse ? '기존 재사용' : '신규 개발 예정'} · 바텀 유닛 ${assets.bottomReuse ? '기존 재사용' : '신규 개발 예정'}.`
   const tierRule = tier === 'core'
-    ? 'Core: 기존 라스트와 바텀 유닛을 재사용합니다. 실루엣·솔을 크게 바꾸지 마세요. Hero는 어퍼 토폴로지나 클로저에서.'
+    ? `Core: 기존 라스트와 바텀 유닛을 재사용합니다 (${assetNote}). 실루엣·솔을 크게 바꾸지 마세요. Hero는 어퍼 토폴로지나 클로저에서.`
     : tier === 'push'
       ? 'Push: 라스트 또는 바텀 중 하나만 바꿀 수 있습니다.'
       : 'Signature: 새 라스트·새 몰드가 허용됩니다. 가장 멀리 가는 안입니다.'
@@ -194,15 +244,108 @@ ${sigText || '(신호 없음 — 품목의 고전 문법으로 저작하되 sour
 - 공법 허용: ${(profile.constructions ?? []).join(', ') || 'cemented'}
 
 ${brandSummary ? `브랜드 조건:\n${brandSummary}` : ''}
+${Object.keys(locked).length ? `시리즈 불변 요소 (사람이 승인한 것 · 이 값은 바꾸지 마세요. Hero 는 다른 축에서 찾으세요):\n${Object.entries(locked).map(([k, v]) => `- ${k}: ${v}`).join('\n')}` : ''}
 ${antiSimilarity.length ? `이미 채택된 안들과 겹치지 마세요 (구조 요약):\n${antiSimilarity.map((a, i) => `${i + 1}. ${a}`).join('\n')}` : ''}
 
 규칙:
 - Hero Mutation은 정확히 하나. 모든 신호를 한 제품에 넣지 마세요.
 - drawing_instruction과 supporting은 선으로 그릴 수 있는 것만: 비례, 선의 방향, 패널 분할, 구조.
   "미니멀한", "모던한" 같은 형용사 단독 금지. 소재 질감·색은 spec_sheet에만.
-- concept_thesis·consumer_role·hero_mutation.label은 ${langName}로, drawing_instruction·supporting은 영어로.`,
+- parts 는 일곱 파트 전부 채웁니다. form 은 선으로 그릴 것만(높이·윤곽·분할·각도·러그 패턴), material 은 소재·마감만.
+  아웃솔 form 은 바닥면 스케치가 그대로 그릴 수 있게 구체적으로: 러그 형태·배열·플렉스 그루브·힐/전족 컴파운드 분할.
+- concept_thesis·consumer_role·hero_mutation.label은 ${langName}로, drawing_instruction·supporting·parts는 영어로.`,
   })
   const out = { ...data, territory_id: territory?.id ?? '', tier }
+  writeFileSync(file, JSON.stringify(out))
+  return out
+}
+
+// ── S7 · 스케치 하나에서 여러 디자인 컨셉 ────────────────────────────
+//
+// 이게 '베리에이션'의 실제 의미다. 스케치(형태)는 고정하고, 그 위에 서로 다른 소재·컬러·
+// 창의도 조합을 N개 저작한다. 예전에는 두 갈래가 따로 있었다 — 고정 6개 표(MATERIAL_READS)를
+// 인덱스로 돌리는 것과, 렌더 뒤에 스타일 슬라이더로 다시 편집하는 것. 둘 다 조사·게놈·브랜드를
+// 안 봤다. 여기서는 그 셋을 근거로 컨셉을 저작하고, 컨셉마다 파트별 소재·컬러와 '왜'를 남긴다.
+const CONCEPTS_SCHEMA = {
+  type: 'object', additionalProperties: false,
+  required: ['concepts'],
+  properties: {
+    concepts: {
+      type: 'array',
+      items: {
+        type: 'object', additionalProperties: false,
+        required: ['name', 'angle', 'palette', 'part_materials', 'why', 'render_clause'],
+        properties: {
+          name: { type: 'string', description: '컨셉 이름. 출력 언어로. 카드 제목이 된다' },
+          angle: { type: 'string', enum: ['commercial_safe', 'material_shift', 'colour_shift', 'creative_push'], description: '이 컨셉이 앞선 컨셉과 다른 축' },
+          palette: {
+            type: 'array', minItems: 2, maxItems: 4,
+            items: { type: 'object', additionalProperties: false, required: ['role', 'name', 'hex'],
+              properties: { role: { type: 'string', enum: ['upper', 'midsole', 'outsole', 'accent'] }, name: { type: 'string' }, hex: { type: 'string' } } },
+          },
+          part_materials: {
+            type: 'object', additionalProperties: false,
+            required: ['upper', 'heel_counter', 'toe_cap', 'midsole', 'outsole', 'tongue_eyestay', 'collar', 'overlays'],
+            properties: Object.fromEntries(['upper', 'heel_counter', 'toe_cap', 'midsole', 'outsole', 'tongue_eyestay', 'collar', 'overlays']
+              .map(k => [k, { type: 'string', description: `${k} 소재·마감·색. 영어 한 구절. 형태는 바꾸지 않는다` }])),
+          },
+          why: { type: 'string', description: '왜 이 소재·색 조합인가. 조사 신호·브랜드 팔레트·시즌 팔레트 중 무엇에서 왔는지 한두 문장. 출력 언어로. 보드 카드에 실린다' },
+          render_clause: { type: 'string', description: '이미지 편집 프롬프트에 그대로 들어갈 영어 문단. 파트별 소재·색을 다 적고, 형태·실루엣·아웃솔 라인은 스케치 그대로 유지하라고 명시' },
+        },
+      },
+    },
+  },
+}
+
+export async function authorConcepts(apiKey, root, {
+  count = 2, genome, signals = [], brandSummary = '', brandPalette = [], seasonPalette = [], seasonMaterials = [],
+  itemTypeEn = 'footwear', langName = 'English',
+}) {
+  if (!apiKey) throw new Error('OPENAI_API_KEY not set')
+  const used = signals.filter(s => (genome?.source_signal_ids ?? []).includes(s.signal_id))
+  const sigText = used.map(s => `${s.signal_id}: ${s.label} — ${(s.co_occurring ?? []).join(', ') || ''}`).join('\n')
+  const key = createHash('sha256').update(JSON.stringify([
+    'concepts1', langName, count, genome?.hero_mutation?.label, JSON.stringify(genome?.parts), sigText, brandSummary,
+    brandPalette.map(c => c.hex), seasonPalette.map(c => c.hex), seasonMaterials,
+  ])).digest('hex').slice(0, 24)
+  const file = join(cacheDir(root), `${key}.json`)
+  if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
+
+  const parts = genome?.parts ?? {}
+  const partLines = Object.entries(parts).map(([k, v]) => `- ${k}: form "${v.form}" · authored material "${v.material}"`).join('\n')
+
+  const data = await ask(apiKey, {
+    name: 'concepts', schema: CONCEPTS_SCHEMA, effort: 'medium',
+    input: `당신은 신발 CMF 디자이너입니다. 하나의 확정된 형태(스케치) 위에 서로 다른 디자인 컨셉 ${count}개를 저작하세요.
+
+형태는 바꾸지 않습니다. 실루엣·패널 분할·아웃솔 라인은 스케치 그대로입니다. 바꾸는 것은 소재·마감·컬러·창의도뿐입니다.
+
+컨셉의 씨앗 (게놈):
+- 컨셉 논지: ${genome?.concept_thesis ?? ''}
+- Hero: ${genome?.hero_mutation?.label ?? ''} — ${genome?.hero_mutation?.drawing_instruction ?? ''}
+- 파트별 형태와 저작된 소재:
+${partLines || '(파트 정보 없음)'}
+
+이 게놈이 쓴 조사 신호:
+${sigText || '(없음)'}
+
+${brandSummary ? `브랜드 조건:\n${brandSummary}\n` : ''}
+브랜드 팔레트: ${brandPalette.length ? brandPalette.map(c => `${c.name} ${c.hex}`).join(', ') : '(없음)'}
+시즌 팔레트(조사): ${seasonPalette.length ? seasonPalette.map(c => `${c.name} ${c.hex}`).join(', ') : '(없음)'}
+시즌 소재(조사): ${seasonMaterials.join(', ') || '(없음)'}
+
+규칙:
+- ${count}개는 서로 다른 angle 이어야 합니다. 첫 번째는 commercial_safe (게놈의 소재를 브랜드 팔레트로), 두 번째부터는
+  material_shift / colour_shift / creative_push 를 순서대로 씁니다. 같은 angle 두 번 금지.
+- 컬러는 브랜드 팔레트 → 시즌 팔레트 → 중립 순으로 근거를 둡니다. why 에 그 출처를 적으세요.
+  "취향" 은 근거가 아닙니다. 조사 신호나 팔레트를 못 대면 그 조합을 쓰지 마세요.
+- part_materials 는 여덟 파트 전부. 미드솔·아웃솔의 소재와 색은 어퍼와 독립적으로 정합니다 — 어퍼 소재 하나가
+  신발 전체를 덮지 않게.
+- render_clause 는 이미지 모델에게 바로 주는 영어 문단입니다. 파트별로 "The heel counter is …, the midsole is …" 식으로
+  다 적고, 마지막에 형태 유지 문장을 넣습니다.
+- name·why 는 ${langName}로.`,
+  })
+  const out = { ...data, collected_at: new Date().toISOString().slice(0, 10) }
   writeFileSync(file, JSON.stringify(out))
   return out
 }

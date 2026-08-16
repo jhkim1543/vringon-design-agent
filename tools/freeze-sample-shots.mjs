@@ -48,6 +48,28 @@ for (const name of names) {
     if (local) frozen++; else failed++
   }
 
+  // 도시에 키아이템 사진도 같은 이유로 굳혀야 한다. 정적 배포에서 /api/shot 이 없으면
+  // 시즌 도시에의 실제 제품 사진이 전부 빈 칸이 된다 — 경쟁사 사진과 똑같은 구멍이었다.
+  let dosFrozen = 0, dosFailed = 0
+  for (const m of st.dossier?.macrotrends ?? []) {
+    for (const k of m.key_items ?? []) {
+      const u = k.image_url ?? ''
+      if (!u || !/^https?:/.test(u)) continue
+      const page = k.metric?.source_url || ''
+      try {
+        let got = null
+        try { got = await fetchShotImage(u, page || undefined) } catch { /* 페이지 폴백 */ }
+        if (!got && page) got = await fetchShotImage(await shotFromPage(page), page)
+        if (!got) { dosFailed++; continue }
+        const key = createHash('sha256').update(got.buf).digest('hex').slice(0, 24)
+        const fname = `${key}.${EXT[got.type] ?? 'jpg'}`
+        writeFileSync(join(OUT, fname), got.buf)
+        k.image_url = `/samples/${fname}`
+        dosFrozen++
+      } catch { dosFailed++ }
+    }
+  }
+
   writeFileSync(file, JSON.stringify(st, null, 1))
-  console.log(`${name}: 새로 굳힘 ${frozen} · 이미 로컬 ${already} · 사진 없음 ${failed}`)
+  console.log(`${name}: 경쟁사 새로 굳힘 ${frozen} · 이미 로컬 ${already} · 사진 없음 ${failed} / 도시에 키아이템 굳힘 ${dosFrozen} · 실패 ${dosFailed}`)
 }

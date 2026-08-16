@@ -3,7 +3,6 @@ import { t } from '../core/i18n'
 import { useState } from 'react'
 import type { Design, Signal } from '../core/types'
 import { TIER_LABEL, TYPE_LABEL, VERDICT_TAGS } from '../core/types'
-import { viewSetFor } from '../core/packs'
 import { Tag } from './bits'
 
 export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
@@ -16,7 +15,6 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
   const [showRationale, setShowRationale] = useState(false)
   const [pendingReject, setPendingReject] = useState(false)
   const [tags, setTags] = useState<string[]>([])
-  const views = viewSetFor(d.spec.itemType)
   const rendered = stagePassed.s3 && !d.rejected && d.colorways.length >= 0 && d.qa.length > 0
   const mainView = 'lateral'
   const f = d.spec.fields

@@ -28,7 +28,7 @@ const COMPETITOR_SCHEMA = {
         additionalProperties: false,
         required: ['brand', 'brand_line', 'model_name', 'price_krw', 'price_local', 'price_currency', 'released', 'popularity_evidence', 'evidence_strength',
           'rank_note', 'rank_semantics', 'competitor_group', 'construction_tier',
-          'user_sentiment', 'praise_points', 'complaint_points', 'design_traits',
+          'user_sentiment', 'praise_points', 'complaint_points', 'purchase_drivers', 'design_traits',
           'offered_sizes', 'available_sizes', 'size_status', 'colorway_count',
           'image_urls', 'product_url', 'source_urls'],
         properties: {
@@ -57,6 +57,7 @@ const COMPETITOR_SCHEMA = {
           user_sentiment: { type: 'string', enum: ['positive', 'mixed', 'negative', 'unknown'] },
           praise_points: { type: 'array', items: { type: 'string' }, description: '리뷰에서 반복되는 칭찬. 확인한 것만' },
           complaint_points: { type: 'array', items: { type: 'string' }, description: '리뷰에서 반복되는 불만. 핏·폭·힐 슬립·토 압박을 특히 살핀다' },
+          purchase_drivers: { type: 'array', items: { type: 'string' }, description: '왜 사는가 · 리뷰·언급에서 반복되는 구매 이유. 인기의 근거(품절·랭킹)가 아니라 이유. 확인한 것만' },
           design_traits: { type: 'array', items: { type: 'string' }, description: '눈에 보이는 디자인 특징 (실루엣·라스트 볼륨·솔 구조·소재·클로저)' },
           offered_sizes: { type: 'integer', description: '판매 페이지에 표시된 사이즈 수. 확인 못 하면 0' },
           available_sizes: { type: 'integer', description: '그중 지금 구매 가능한 사이즈 수. 확인 못 하면 -1' },
@@ -85,7 +86,8 @@ const TREND_SCHEMA = {
         additionalProperties: false,
         required: ['label', 'axis', 'attribute', 'direction', 'observed_count', 'evidence', 'source_urls', 'source_tiers', 'confidence',
           'co_occurring', 'commercial_index', 'cultural_index', 'forecast_index', 'feasibility_index',
-          'adoption_stage', 'last_change', 'bottom_tooling_change', 'upper_pattern_change'],
+          'adoption_stage', 'last_change', 'bottom_tooling_change', 'upper_pattern_change',
+          'part', 'social_platforms', 'mentioned_with', 'purchase_drivers'],
         properties: {
           label: { type: 'string', description: 'Signal name, in the requested output language' },
           axis: { type: 'string', description: 'Attribute axis, in the requested output language (e.g. Toe shape, Sole thickness, Midsole and plate)' },
@@ -111,6 +113,10 @@ const TREND_SCHEMA = {
           last_change: { type: 'string', enum: ['not_required', 'modification', 'required', 'unknown'], description: '이 신호를 실행할 때 라스트 변경이 필요한가' },
           bottom_tooling_change: { type: 'string', enum: ['not_required', 'modification', 'required', 'unknown'], description: '아웃솔·미드솔 몰드 변경이 필요한가' },
           upper_pattern_change: { type: 'string', enum: ['minor', 'major', 'unknown'], description: '어퍼 패턴 변경의 크기' },
+          part: { type: 'string', enum: ['upper', 'midsole', 'outsole', 'last_fit', 'closure', 'colour_material', 'cross_category', 'other'], description: '이 신호가 주로 다루는 파트. 미드솔·아웃솔은 반드시 따로 표시 — 어퍼에 묻히지 않게' },
+          social_platforms: { type: 'array', items: { type: 'string' }, description: '이 신호를 소셜에서 봤다면 어느 플랫폼인지 (Instagram, TikTok, YouTube, Reddit, 네이버 카페 등). 없으면 빈 배열' },
+          mentioned_with: { type: 'array', items: { type: 'string' }, description: '이 속성/제품이 함께 언급되는 것들 — 다른 신발, 의류, 가방, 활동, 크리에이터. 확인한 것만. 없으면 빈 배열' },
+          purchase_drivers: { type: 'array', items: { type: 'string' }, description: '왜 사는가 / 왜 잘 팔리는가 · 리뷰·언급에서 반복되는 이유. 인기의 근거가 아니라 이유. 없으면 빈 배열' },
         },
       },
     },
@@ -307,14 +313,14 @@ function lineBlock(line) {
   if (!line) return ''
   const u = (v) => v && v !== 'unknown' ? v : null
   const rows = [
-    ['용도·환경', [u(line.useCase), u(line.climate)].filter(Boolean).join(' · ')],
+    ['용도·환경', [u(line.useCase), u(line.environment), u(line.climate)].filter(Boolean).join(' · ')],
     ['타깃', u(line.targetConsumer)],
     ['시즌', u(line.season)],
-    ['라스트·핏', [u(line.lastFamily), u(line.toeShape) && `${line.toeShape} toe`].filter(Boolean).join(' · ')],
-    ['어퍼', [u(line.upperOuter), u(line.closure) && `${line.closure} closure`, u(line.protection)].filter(Boolean).join(' · ')],
+    ['라스트·핏', [u(line.lastFamily), u(line.toeShape) && `${line.toeShape} toe`, u(line.toeVolume) && `${line.toeVolume} toe volume`].filter(Boolean).join(' · ')],
+    ['어퍼', [u(line.upperOuter), u(line.lining) && `${line.lining} lining`, u(line.reinforcement) && line.reinforcement !== 'none' && `${line.reinforcement} reinforcement`, u(line.closure) && `${line.closure} closure`, u(line.protection)].filter(Boolean).join(' · ')],
     ['바텀', [u(line.midsole), u(line.plate) && line.plate !== 'none' && `${line.plate} plate`, u(line.outsole), u(line.stackBand) && `${line.stackBand} stack`, u(line.dropMm) && `drop ${line.dropMm}mm`, u(line.rocker) && line.rocker !== 'none' && `${line.rocker} rocker`, u(line.heel) && line.heel !== 'none' && `${line.heel} heel`].filter(Boolean).join(' · ')],
     ['공법', [u(line.lasting), u(line.soleAttachment)].filter(Boolean).join(' + ')],
-    ['성능', [u(line.cushioning) && `cushioning ${line.cushioning}`, u(line.stability), u(line.wetGrip) === 'required' && 'wet grip required'].filter(Boolean).join(' · ')],
+    ['성능', [u(line.cushioning) && `cushioning ${line.cushioning}`, u(line.stability), u(line.wetGrip) === 'required' && 'wet grip required', u(line.weightTargetG) && `target ${line.weightTargetG}g`].filter(Boolean).join(' · ')],
     ['채널', (line.channels ?? []).join(' · ')],
   ].filter(([, v]) => v)
   if (!rows.length) return ''
@@ -334,7 +340,7 @@ function lineKey(line) {
 export async function researchCompetitors(apiKey, root, opts) {
   const { brands = [], typeKo, priceMin, priceMax, adjacentBand = false, line, langName = 'English' } = opts
   const mk = resolveMarkets({ home: line?.homeMarket, reference: line?.referenceMarkets })
-  const key = createHash('sha256').update(JSON.stringify(['comp8ft', langName, brands, typeKo, priceMin, priceMax, adjacentBand, lineKey(line), mk.home.id, mk.refIds])).digest('hex').slice(0, 24)
+  const key = createHash('sha256').update(JSON.stringify(['comp9ft', langName, brands, typeKo, priceMin, priceMax, adjacentBand, lineKey(line), mk.home.id, mk.refIds])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return { ...JSON.parse(readFileSync(file, 'utf8')), cached: true }
 
@@ -367,7 +373,7 @@ async function researchOneBrand(apiKey, root, { brand: rawBrand, typeKo: rawType
   const ko = mk.home.useKoreanAliases
   const brand = canonBrand(rawBrand, ko)
   const typeKo = canonTerm(rawType, ko)
-  const key = createHash('sha256').update(JSON.stringify(['brand7ft', langName, brand, typeKo, priceMin, priceMax, adjacentBand, lineKey(line), mk.home.id])).digest('hex').slice(0, 24)
+  const key = createHash('sha256').update(JSON.stringify(['brand8ft', langName, brand, typeKo, priceMin, priceMax, adjacentBand, lineKey(line), mk.home.id])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
   if (existsSync(file)) return JSON.parse(readFileSync(file, 'utf8'))
 
@@ -513,7 +519,7 @@ export async function researchTrends(apiKey, root, {
   const brands = (rawBrands ?? []).map(b => canonBrand(b, ko))
   const useDeep = !!deep
   const key = createHash('sha256').update(JSON.stringify([
-    'trend10ft', LANG, typeKo, brands ?? [], season, priceBandKo ?? '', [...objectives].sort(), lineKey(line), mk.home.id, mk.refIds,
+    'trend11ft', LANG, typeKo, brands ?? [], season, priceBandKo ?? '', [...objectives].sort(), lineKey(line), mk.home.id, mk.refIds,
     useDeep ? 'deep' : wantReport ? `multi${depth}` : 'fast',
   ])).digest('hex').slice(0, 24)
   const file = join(cacheDir(root), `${key}.json`)
@@ -564,7 +570,10 @@ ${lenses.map((l, i) => `${i + 1}. ${l}`).join('\n')}
 - 데이터가 없다거나 확인이 어렵다는 서술은 신호가 아닙니다. 그런 내용은 notes에만 적고 signals에는 절대 넣지 마세요.
 - label은 디자인 속성 이름이어야 합니다. 좋은 예: 'Elongated soft square toe', 'High-stack platform trainer', 'Low block heel 25-35mm', 'Suede upper', 'Elastic gore closure'.
 - 나쁜 예(넣지 말 것): 'No quantified shares', 'Access constraints', 'Data not available', 'GTM requirement'.
-- 정량 통계를 못 찾더라도, 개별 제품에서 반복 관측되는 속성이면 confidence를 low로 두고 신호로 올리세요.`
+- 정량 통계를 못 찾더라도, 개별 제품에서 반복 관측되는 속성이면 confidence를 low로 두고 신호로 올리세요.
+- 신호 중 최소 2개는 part 가 midsole 또는 outsole 이어야 합니다. 미드솔·아웃솔은 어퍼만큼 중요하고, 어퍼 이야기에 묻히면 안 됩니다.
+- 소셜에서 본 것은 social_platforms 에 플랫폼 이름을 적고, 무엇과 함께 언급되는지(mentioned_with)와 왜 사는지(purchase_drivers)를 확인한 범위에서 적으세요.
+- 같은 스포츠의 의류·가방에서 넘어오는 소재·컬러 단서가 있으면 part 를 cross_category 로 두고 신호로 올리되, 신발에 어떻게 옮겨지는지를 evidence 에 적으세요.`
 
   // 딥리서치 모델이 없어도 상세 보고서가 나오도록, 조사를 여러 단계로 쪼갠다.
   // ① 하위 질문 설계 → ② 질문별 개별 검색 → ③ 종합 보고서 → ④ 스키마 정리
@@ -585,8 +594,13 @@ ${lenses.map((l, i) => `${i + 1}. ${l}`).join('\n')}
       },
       name: 'research_plan',
     })
-    const qs = (planned.data.questions ?? []).slice(0, depth)
-    onStep?.(`하위 질문 ${qs.length}개 설계 완료`)
+    // 계획된 질문 뒤에 세 질문을 항상 붙인다. 계획에만 맡기면 렌즈 아홉 개 중 넷만 검색되고,
+    // 미드솔·아웃솔은 '디자인'에 묻혀 사라졌다. 이 셋은 사용자가 사실 기반으로 꼭 알아야 한다고 지목한 것이다.
+    const bottomQ = `${typeKo}의 미드솔과 아웃솔만 따로: 지금 잘 팔리는 모델들의 폼 종류·스택·드롭·플레이트, 아웃솔 러그/세그먼트 패턴·컴파운드·플렉스 그루브가 어떻게 되어 있고 무엇이 바뀌고 있는가. 어퍼 이야기는 빼고 바텀 유닛만.`
+    const socialQ = `${typeKo} 중 최근 SNS(인스타그램·틱톡·유튜브·레딧·커뮤니티)에서 가장 많이 언급되는 실제 판매 모델은 무엇이고, 어느 플랫폼에서, 무엇과 함께(다른 신발·의류·가방·활동·크리에이터) 언급되며, 언급의 이유(왜 산다/왜 좋다)는 무엇인가. 플랫폼 이름을 꼭 적을 것.`
+    const crossQ = `같은 스포츠·용도의 의류와 가방(예: 러닝 재킷·타이츠·러닝 벨트·백팩)에서 지금 뜨는 소재·컬러·디테일 트렌드는 무엇이고, 그중 ${typeKo} 디자인에 참고할 만한 것은 무엇인가.`
+    const qs = [...(planned.data.questions ?? []).slice(0, depth), bottomQ, socialQ, crossQ]
+    onStep?.(`하위 질문 ${qs.length}개 설계 완료 (바텀 유닛·소셜 언급·인접 카테고리 3개 고정 포함)`)
 
     // 하위 질문은 서로 독립이므로 병렬로 돈다. 순차로 하면 5배 느리다.
     let totalSearch = planned.searches

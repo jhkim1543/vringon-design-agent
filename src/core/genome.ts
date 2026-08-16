@@ -5,7 +5,7 @@
 //   ① 게놈이 품목 프로필을 어겼는지 검사 (하드 실현성 — generateSpec의 클램프 재사용)
 //   ② 채택된 게놈들과 구조축이 겹치는지 검사 (다양성 게이트 · 품질 판단 금지)
 //   ③ 게놈 → 스펙 힌트 변환 (기존 hintApplied/blocked 정직성 기계를 그대로 탄다)
-import type { DesignGenome, DesignTier, Signal, Territory } from './types'
+import type { DesignConcept, DesignGenome, DesignTier, Signal, Territory } from './types'
 import { apiUrl } from './apiBase'
 
 export type Genome = DesignGenome
@@ -29,7 +29,18 @@ export const authorGenome = (b: {
   territory: Territory; tier: DesignTier; signals: Signal[]
   profile: { heelMin: number; heelMax: number; panelMin: number; panelMax: number; closures: string[]; constructions: string[] }
   brandSummary: string; antiSimilarity: string[]; itemTypeEn: string; langName: string
+  /** 라인이 선언한 출발 자산 · Core 가 무엇을 재사용하는지 */
+  assets?: { lastReuse: boolean; bottomReuse: boolean }
+  /** 시리즈 모드 · 사람이 승인한 불변 요소. 저작자가 알아야 그 축을 피한다 */
+  locked?: Record<string, string | number>
 }) => post<Genome & { cached?: boolean }>(apiUrl('/api/design/genome'), b)
+
+/** 스케치 하나 → 디자인 컨셉 N개 · 서버가 조사·게놈·브랜드를 근거로 저작한다 */
+export const authorConcepts = (b: {
+  count: number; genome: Genome; signals: Signal[]; brandSummary: string
+  brandPalette: { name: string; hex: string }[]; seasonPalette: { name: string; hex: string }[]; seasonMaterials: string[]
+  itemTypeEn: string; langName: string
+}) => post<{ concepts: DesignConcept[]; cached?: boolean }>(apiUrl('/api/design/concepts'), b)
 
 export interface RenderVerify {
   checks: { check: string; target: string; observed: string; pass: boolean }[]

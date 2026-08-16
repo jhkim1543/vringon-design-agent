@@ -136,6 +136,7 @@ const onEvent = (e: PipelineEvent) => {
       if (n !== images) { images = n }
       break
     }
+    case 'md-floor-note': st.mdFloorNote = e.text; break
     case 'checkpoint': st.checkpoints.push(e.label); console.log(`${stamp()} ✓ ${e.label}`); break
     case 'done': st.finished = true; console.log(`\n${stamp()} ══ done (${e.endStage}) ══`); break
     // 게이트는 데모용으로 자동 통과 · 로그에 사람 자리가 있었음을 남긴다
@@ -177,6 +178,16 @@ async function main() {
   for (const d of st.designs) {
     d.images = d.images.map(im => ({ ...im, url: rewrite(im.url) }))
     if (d.model) d.model = { ...d.model, url: rewrite(d.model.url) }
+  }
+  // 수집 사진(경쟁 제품·도시에 키아이템)은 아직 원격 URL 이다. 정적 배포에는 /api/shot 프록시가
+  // 없어 전부 빈 칸이 된다 — 첫 러닝 샘플에서 실제로 그랬다. 굳히기까지 러너의 일이다.
+  writeFileSync(OUT_JSON, JSON.stringify(st, null, 1))
+  const { execFileSync } = await import('node:child_process')
+  try {
+    execFileSync('node', ['tools/freeze-sample-shots.mjs', SAMPLE_ID], { cwd: ROOT, stdio: 'inherit' })
+    Object.assign(st, JSON.parse(readFileSync(OUT_JSON, 'utf8')))
+  } catch (e) {
+    console.log('freeze-sample-shots failed · remote shots stay remote:', String((e as Error).message).slice(0, 120))
   }
   ;(st as any).sample = true
   ;(st as any).sampleTitle = 'Trend · Road running FW26, market-scoped research, tiered sources, repaired renders and a human gate'

@@ -204,15 +204,60 @@ local, because the static build has no proxy and remote links would show nothing
 
 ---
 
-## Layout
+## Layout — where to look for each stage
+
+Read this before touching anything. Each stage of a run has one file that owns it; comments at the
+top of that file explain the *why*, and inline comments mark every place a past bug was closed.
 
 ```
-src/core/      pipeline, line profile, research clients, board model, PDF builders
-src/ui/        wizard, run view, review board, library
-server/        Node-only API: images, research, dossier, logo compositing, Tripo
-src/samples/   the saved runs behind the hosted demo
-docs/          static build for GitHub Pages
+STAGE                     OWNS IT                          ALSO TOUCHES
+─────────────────────────────────────────────────────────────────────────────────────────────
+S0 input                  src/ui/Wizard.tsx                src/core/types.ts (RunParams, FootwearLineProfile,
+                                                            LINE_PRESETS, HOME_MARKETS)
+                          src/ui/BrandSetup.tsx            src/core/brand.ts (BrandIdentity, MdPersona)
+S1 research               server/research-api.mjs          server/markets.mjs (home/reference market, retail
+                          server/dossier-api.mjs             rosters, search language)
+                                                            server/category-templates.mjs (per-family and
+                                                            per-type lenses)
+                                                            src/core/research.ts (client, lineForServer,
+                                                            toSignals)
+S1b signals → hints       src/core/signalSpec.ts           hintApplied / hintBlocked honesty machinery
+S2 territories, genomes   server/design-api.mjs            src/core/genome.ts (client, diversityGate,
+                                                            genomeToHint, brandSummaryOf)
+S2 spec, rules, cost      src/core/packs.ts                SHOE_PROFILE, LAST_LIBRARY, rules S-01..S-11
+S2 sketch + outsole sheet src/core/aiClient.ts             sketchPrompt, outsoleSketchPrompt, partsClause
+S3 render + N concepts    src/core/pipeline.ts (S3 block)  server/design-api.mjs authorConcepts,
+                                                            aiClient conceptRenderPrompt
+S3 vision check + repair  src/core/pipeline.ts             server/design-api.mjs verifyRender
+S4 selection, MD, gate    src/core/pipeline.ts (S4 block)  server/upload-api.mjs reviewAsMd
+S5 campaign, 3D           src/core/pipeline.ts (S5 block)  server/tripo-api.mjs (single image → GLB)
+board                     src/core/boardModel.ts           src/ui/Board.tsx (RemixPanel, comments, sync)
+                                                            server/board-sync.mjs (SSE room per run)
+outputs                   src/core/reportPdf.ts,           src/core/pitch.ts (per-design objections)
+                          src/core/dossierPdf.ts
+persistence               src/core/store.ts                src/core/boardEdits.ts, src/core/sampleRun.ts
+serving                   server/standalone.mjs            server/openai-api.mjs (every /api route)
+inference routing         server/inference.mjs             h100/ (in-house GPU serve contract)
+sample generation         tools/run-sample.ts              tools/freeze-sample-shots.mjs
 ```
+
+The pipeline is one file on purpose: `src/core/pipeline.ts`. It reads top to bottom as S1 → S5,
+and every gate (`approvalGate` after sketches, `dna-gate` in Series mode, `finalGate` before
+campaign/3D spend) is a `Promise` the UI resolves through `PipelineHandle`. Search for `══ S` to
+jump between stages.
+
+Prompt layering is deliberate: `sketchPrompt` speaks only in what a line can draw (form,
+proportion, panel split, a reserved unmarked area for the logo); `conceptRenderPrompt` and
+`renderFromSketchPrompt` add material, colour, finish, hardware — part by part via `partsClause`.
+If you add a field to the genome, decide which layer it belongs to before it reaches a prompt.
+
+Caches: research legs cache by prompt hash under `.cache/research`; when you change a research
+prompt, bump its prefix (`trend11ft`, `comp9ft`, `pulse4ft`, `brand8ft`, `genome4`, `concepts1`)
+or old answers keep being served. Image generation caches by prompt hash under `.cache/images` and
+re-runs are never re-billed.
+
+Design tokens come from `VRINGON UI 시스템 ver3` and live in `src/tokens.css` — 68 colour pairs plus
+the spacing and radius scales. Nothing in the stylesheet uses an off-scale value.
 
 Design tokens come from `VRINGON UI 시스템 ver3` and live in `src/tokens.css` — 68 colour pairs plus
 the spacing and radius scales. Nothing in the stylesheet uses an off-scale value.

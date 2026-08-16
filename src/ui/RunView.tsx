@@ -36,8 +36,8 @@ const STAGE_META: { key: 'S1' | 'S2' | 'S3' | 'S4' | 'S5'; t: string; d: string 
   { key: 'S1', t: 'Research', d: 'Signals and directions' },
   { key: 'S2', t: 'Sketch', d: 'Specs, rules, rationale' },
   { key: 'S3', t: 'Design', d: 'Renders and views' },
-  { key: 'S4', t: 'Worn', d: 'Metrics and top picks' },
-  { key: 'S5', t: 'Package', d: 'Board and notes' },
+  { key: 'S4', t: 'Selection', d: 'MD review, final gate, campaign shots' },
+  { key: 'S5', t: '3D showroom', d: 'One GLB per pick' },
 ]
 
 export default function RunView({ st, progress, gated, onResume, onGateVerdict, onOpenBoard, onResolveDna, dnaGate, onApproveDna, onToggleDna }: {
@@ -60,8 +60,6 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
   const logRef = useRef<HTMLDivElement>(null)
   useEffect(() => { if (showLog) logRef.current?.scrollTo({ top: 1e9 }) }, [st.logs.length, showLog])
 
-  const s3done = st.stageStatus.S3 === 'done'
-  const s4done = st.stageStatus.S4 === 'done'
   const approvedCount = st.designs.filter(d => d.verdict === 'approve').length
   const rejectedCount = st.designs.filter(d => d.verdict === 'reject').length
   const lastCheckpoint = st.checkpoints[st.checkpoints.length - 1]
@@ -76,7 +74,6 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
       : `${st.competitors.length} products (sample)`
     : ''
   const rising = st.signals.filter(s => s.direction === 'rising').length
-  const topSig = [...st.signals].sort((a, b) => b.observed_count - a.observed_count)[0]
   const sigSummary = st.signals.length ? `${st.signals.length} signals · ${rising} rising` : ''
 
   // 아래 세 블록은 리포트 섹션 안으로 들어간다 (예전에는 화면 맨 밑에 따로 있었다)

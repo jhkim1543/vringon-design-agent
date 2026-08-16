@@ -27,7 +27,8 @@ export function estimate(p: RunParams): Estimate {
   const extraDesigns = renders * Math.max(0, dps - 1)
   const extraViews = renders * Math.max(0, p.viewCount - 1)
   const colorways = renders * p.colorwayCount
-  const variations = renders * p.variationCount
+  // 스케치당 추가 컨셉(첫 컨셉은 기준 렌더 그 자체) · 예전 슬라이더 베리에이션 자리
+  const variations = renders * Math.max(0, (p.designsPerSketch ?? 1) - 1)
   const campaignImgs = p.topN * campaignCount(p)
   const models = p.make3d ? p.topN : 0
 

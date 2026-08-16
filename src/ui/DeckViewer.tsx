@@ -18,7 +18,7 @@ const VIEWER_CSS = `
   .slide.on { display: block; }
 `
 
-export function DeckViewer({ html, title, onPrint, onSave, height }: {
+export function DeckViewer({ html, title, onPrint, onSave, height: _height }: {
   html: string
   title: string
   onPrint: () => void

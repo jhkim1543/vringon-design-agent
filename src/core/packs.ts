@@ -337,7 +337,7 @@ export const shoePack: CategoryPack = {
       r.push({ rule: 'S-15', severity: 'warn', message: `${f.lug_depth_mm}mm lugs on a ${NAME(spec.itemType)}. Under 3mm reads as a road outsole.` })
     return r
   },
-  costModel(spec, rng) {
+  costModel(spec, _rng) {
     const f = spec.fields
     const athletic = isAthletic(spec.itemType)
     const open = isOpen(spec.itemType)

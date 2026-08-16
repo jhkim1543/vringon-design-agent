@@ -365,20 +365,8 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                       onChange={v => setLine('lastFit', { toeVolume: v })} format={U_FMT} />
                   </div>
                 </div>
-                <div className="stack"><span className="lbl">{t('Fit programme')}</span>
-                  <div className="inrow">
-                    <input className="input" style={{ maxWidth: 120 }} placeholder={t('Base size')}
-                      value={line.lastFit.baseSize === UNKNOWN ? '' : line.lastFit.baseSize}
-                      onChange={e => setLine('lastFit', { baseSize: e.target.value.trim() || UNKNOWN })} />
-                    <input className="input" style={{ maxWidth: 110 }} placeholder={t('Width, e.g. D, 2E')}
-                      value={line.lastFit.width === UNKNOWN ? '' : line.lastFit.width}
-                      onChange={e => setLine('lastFit', { width: e.target.value.trim() || UNKNOWN })} />
-                    <span className="lbl sub">{t('Heel hold')}</span>
-                    <Seg options={[UNKNOWN, 'relaxed', 'standard', 'secure'] as const} value={line.lastFit.heelHold}
-                      onChange={v => setLine('lastFit', { heelHold: v })} format={U_FMT} />
-                  </div>
-                  <p className="note">{t('No numbers yet is fine — unknown is honest. Last dimensions are never decided from product photos.')}</p>
-                </div>
+                {/* 사이즈·볼넓이·힐홀드 입력은 뺐다. 어느 단계도 읽지 않았다 — 조사·프롬프트·룰·리포트 어디에도.
+                    화면에서 고를 수 있는데 결과가 안 바뀌는 컨트롤은 없느니만 못하다. 타입에는 남겨 옛 저장본을 그대로 읽는다. */}
                 {/* ── 어퍼 프로그램 ── */}
                 <div className="stack"><span className="lbl">{t('Upper')}</span>
                   <div className="inrow">
@@ -752,12 +740,6 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                   <span className="lbl sub">{t('Colorways')}</span>
                   <Seg options={[0, 1, 2, 3] as const} value={p.colorwayCount} onChange={v => set('colorwayCount', v)} />
                   <span className="hint">{t('Colourways are SKUs of one Design ID, never counted as separate designs')}</span>
-                </div>
-              </div>
-              <div className="stack"><span className="lbl">{t('Variations')}</span>
-                <div className="inrow">
-                  <Seg options={[0, 2, 3, 4, 6, 8] as const} value={p.variationCount} onChange={v => set('variationCount', v)} />
-                  <span className="hint">{t('Branches off one sketch, one axis changed each')}</span>
                 </div>
               </div>
               <div className="stack"><span className="lbl">{t('Campaign cuts')}</span>

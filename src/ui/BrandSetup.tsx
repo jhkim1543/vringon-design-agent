@@ -218,7 +218,7 @@ export default function BrandSetup({ brand, onSave, onClose }: {
             {b.logo && (<>
               <div className="row"><span className="lbl">Placement</span>
                 <div className="chiprow">
-                  {PLACEMENTS.map(p => (
+                  {PLACEMENTS.filter(p => p.forShoe).map(p => (
                     <button key={p.id} className={`pick sm ${b.logo!.placement === p.id ? 'on' : ''}`}
                       onClick={() => set('logo', { ...b.logo!, placement: p.id })}>{p.label}</button>
                   ))}

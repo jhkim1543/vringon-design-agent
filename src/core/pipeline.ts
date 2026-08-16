@@ -1,17 +1,36 @@
-// ── 파이프라인 엔진 S1~S5 · 진행 스트리밍·승인 게이트·체크포인트 ──────
+// ── 파이프라인 엔진 S1~S5 · 진행 스트리밍·승인 게이트·체크포인트 ────
+//
+// 이 파일은 일부러 하나다. 위에서 아래로 S1 → S5 순서로 읽힌다. '══ S' 로 단계 사이를 뛴다.
+//
+//   S1  조사        경쟁사(브랜드별 병렬) · 리테일 펄스 · 트렌드 신호(다단계, 미드솔/아웃솔·소셜·인접 카테고리
+//                   하위 질문 고정) · 시즌 도시에. 전부 주 시장 + 참조 시장 안에서. 실패는 실패로 두고 대체하지 않는다.
+//   S1b 신호→힌트   신호가 스펙 필드를 요구하면 프로필 범위에 통과시켜 hintApplied/hintBlocked 로 남긴다.
+//   S2  영토·게놈   LLM 이 설계 영토 6개를 계획하고, 안마다 게놈(구조 축 + 파트별 form/material + 툴링)을 저작한다.
+//                   다양성 게이트가 겹치는 축만 지목해 재저작. 3회 실패면 겹침을 카드에 적고 채택.
+//   S2  스펙·룰     generateSpec 이 게놈 힌트를 클램프하고, 룰 엔진(S-01..S-11)과 원가 모델이 검사한다.
+//   S2  스케치      기준 측면 선화 + 아웃솔(바닥면) 도면. 형태만 — 색·소재는 여기 없다. → approvalGate
+//   S3  디자인      스케치를 사진으로. 스케치당 컨셉 N개(첫 번째=기준 렌더=commercial_safe, 이후 소재/컬러/창의) —
+//                   컨셉은 서버가 조사·게놈·브랜드를 근거로 저작하고 파트별 소재·색과 '왜'를 들고 온다.
+//                   추가 뷰·컬러웨이는 기준 렌더의 편집. 비전 검사 → 실패 항목만 1회 수리 → 재검사.
+//   S4  선정        통과 > 미검증 > 실패 순 + 원가순 → MD 페르소나 리뷰(있으면 그 선택이 최종) → finalGate
+//                   (캠페인·3D 지출 전에 사람이 슬레이트 확인) → 캠페인 컷(착용·연출)
+//   S5  3D          선정작마다 히어로 렌더 한 장 → GLB.
+//
+// 게이트 셋(approvalGate·dna-gate·finalGate)은 전부 Promise 다. UI 가 PipelineHandle 로 풀어 준다.
+// 사람의 카드 판정은 handle.setVerdict 로 들어온다 — 화면의 Design 복사본과 파이프라인 인스턴스는 다르다.──
 import type { Design, DesignSpec, DesignTier, PipelineEvent, Rationale, RunParams, Signal, Stage, Territory } from './types'
 import { PACKS, profileOf, resetSeq, tierCapRule, viewSetFor } from './packs'
 import { blockedNarrative, deriveSpecHints, deriveSpecHintsFrom, drivingFromHint, hintNarrative, locksFromSeries, reconcileHint, signalCombos } from './signalSpec'
 import type { SpecHint } from './signalSpec'
 import { makeRng } from './rng'
 import {
-  colorwayEditPrompt, conceptPrompt, editImage, generateImage, materialRead, planColorways, renderFromSketchPrompt, renderPrompt,
-  generateModel, sketchPrompt, sketchVariationPrompt, silhouetteRead, slidersToLabel, stampLogo, variationPrompt, variationSliders, viewEditPrompt, wearEditPrompt,
+  colorwayEditPrompt, conceptPrompt, conceptRenderPrompt, editImage, generateImage, outsoleSketchPrompt, planColorways, renderFromSketchPrompt, renderPrompt,
+  generateModel, sketchPrompt, silhouetteRead, stampLogo, viewEditPrompt, wearEditPrompt,
 } from './aiClient'
 import type { TrendClauseInput } from './aiClient'
 import { fetchCompetitors, fetchDossier, fetchRetailPulse, fetchTrends, pulseToCompetitors, toBias, toCompetitors, toSignals, setRunLang } from './research'
 import { readMoodboard, readSeries, reviewAsMd, toSeriesDna } from './uploads'
-import { authorGenome, brandSummaryOf, diversityGate, genomeDigest, genomeToHint, planTerritories, verifyRender } from './genome'
+import { authorConcepts, authorGenome, brandSummaryOf, diversityGate, genomeDigest, genomeToHint, planTerritories, verifyRender } from './genome'
 import type { BrandIdentity } from './brand'
 import { checkBrandFit } from './brand'
 import type { Genome } from './genome'
@@ -82,6 +101,12 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     const views = viewSetFor(params.itemType)
     const wait = (ms: number) => sleep(ms / speed, isCancelled)
     const upto = STAGE_ORDER.indexOf(params.endStage)
+    // 시즌 · 위저드의 season(FW26/SS27/carryover) 이 조사에 실려야 한다. 예전에는 '2026 F/W' 가 하드코딩돼
+    // 컨트롤을 바꿔도 아무것도 안 바뀌었다. carryover 는 시즌이 아니라 상태라 현재 시즌으로 둔다.
+    const seasonCode = String(params.line?.product?.season ?? 'FW26')
+    const seasonKo = /^FW(dd)$/.test(seasonCode) ? `20${seasonCode.slice(2)} F/W`
+      : /^SS(dd)$/.test(seasonCode) ? `20${seasonCode.slice(2)} S/S` : '2026 F/W'
+    const seasonDossier = /^(FW|SS)dd$/.test(seasonCode) ? seasonCode : 'FW26'
     // 실제 생성 상한 · 초과분은 SVG 폴백. 비용 통제 지점.
     //
     // 상한을 먼저 오는 단계가 다 써 버리면 뒤 단계가 통째로 굶는다. 스케치 12장이
@@ -109,7 +134,6 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
     // 도시에가 캐시에 있으면 스케치 전에 반영되어야 한다. 새로 조사할 때만 뒤에서 따라온다.
     let dossierJob: Promise<unknown> | null = null
     // MD가 구성 전체에 남긴 한마디 · 리포트가 이걸 싣는다
-    let st_mdFloorNote = ''
     // 무드보드가 문서에서 실제로 읽어 낸 신호. 못 읽었으면 비어 있고, 비어 있으면 비어 있다고 말한다.
     let moodSignals: Signal[] = []
     // 시리즈에서 실제로 반복된 것 중, 스펙 값으로 옮길 수 있는 것만. 사진으로 못 보는 건 안 잠근다.
@@ -314,7 +338,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       try {
         // 신호는 빠른 경로로 먼저 받는다. 상세 보고서는 S1을 막지 않고 뒤에서 따라온다.
         const tr = await fetchTrends({
-          typeKo: typeName, season: '2026 F/W',
+          typeKo: typeName, season: seasonKo,
           brands: params.mode === 'trend' ? params.trend.competitors : undefined,
           priceBandKo: params.mode === 'trend'
             ? `KRW ${(params.trend.priceMinKrw / 10000).toFixed(0)}0k-${(params.trend.priceMaxKrw / 10000).toFixed(0)}0k ${params.trend.priceBand}`
@@ -336,7 +360,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         emit({ kind: 'log', stage: 'S1', text: 'Building the season dossier: macrotrends, palettes, materials, key items. It attaches when done.' })
         dossierJob = fetchDossier({
           categoryEn: 'Footwear',
-          season: 'FW26',
+          season: seasonDossier,
           priceBand: params.mode === 'trend'
             ? `KRW ${(params.trend.priceMinKrw / 10000).toFixed(0)}0k-${(params.trend.priceMaxKrw / 10000).toFixed(0)}0k ${params.trend.priceBand}`
             : undefined,
@@ -543,6 +567,8 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
                 ...(attempt > 0 ? [`이전 시도는 다음 축이 겹쳐 탈락: ${lastCollisions.join(', ')}. 이 축들만 바꾸고 나머지는 유지하라.`] : []),
               ],
               itemTypeEn: TYPE_EN[params.itemType] ?? 'shoe', langName,
+              assets: { lastReuse: params.line?.lastFit?.existingLastReuse ?? true, bottomReuse: params.line?.bottom?.existingBottomReuse ?? true },
+              locked,
             })
             if (cancelled) return
             const gate = diversityGate(g, acceptedGenomes, tier)
@@ -670,25 +696,27 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
       if (alive.length > targets.length)
         emit({ kind: 'log', stage: 'S2', text: `${alive.length - targets.length} past the cap show as diagrams (cap ${params.imageBudget} images)` })
 
-      // ② 스케치 변형 · 하나의 외형에서 여러 흑백 안 (designsPerSketch가 변형 수를 정한다)
-      const dpsWanted = params.designsPerSketch ?? 1
-      if (dpsWanted > 1 && budget.leftSketch() > 0) {
-        const withSketch = targets.filter(d => d.images.some(i => i.view === 'sketch'))
-        emit({ kind: 'log', stage: 'S2', text: `Branching ${dpsWanted - 1} black-ink variations from each base form · same silhouette and outsole, different upper takes` })
-        await pool(withSketch, 2, async (d) => {
-          const base = d.images.find(i => i.view === 'sketch')!
-          for (let k = 0; k < dpsWanted - 1; k++) {
-            if (cancelled || budget.leftSketch() <= 0) return
-            try {
-              const p = sketchVariationPrompt(k)
-              const r = await editImage(base.hash, p, params.imageEngine)
-              budget.spendSketch()
-              d.images = [...d.images, { view: 'sketch_var', url: r.url, hash: r.hash, origin: 'edited_from', editedFrom: base.hash, promptUsed: p }]
-              emit({ kind: 'design-update', design: { ...d } })
-              emit({ kind: 'log', stage: 'S2', text: `${d.spec.design_id} sketch variation ${k + 1} of ${dpsWanted - 1} done` })
-            } catch {
-              emit({ kind: 'log', stage: 'S2', text: `${d.spec.design_id} sketch variation ${k + 1} failed · skipping` })
-            }
+      // ② 아웃솔(바닥면) 스케치 · 기준 스케치와 짝을 이룬다.
+      // 미드솔·아웃솔은 어퍼만큼 중요한데, 측면 스케치에는 러그·플렉스 그루브·컴파운드 분할이 안 보인다.
+      // 게놈의 parts.outsole.form 이 이 도면의 지시다. 스케치 예산에서 나가고, 없으면 측면만 남는다.
+      //
+      // 예전에 이 자리에 있던 '스케치 변형'(같은 외형의 흑백 어퍼 재해석)은 없앴다.
+      // 스케치당 여러 디자인은 이제 S3 에서 컨셉으로 갈린다 — 형태는 하나, 소재·컬러가 N개.
+      const withSketch = targets.filter(d => d.images.some(i => i.view === 'sketch'))
+      if (withSketch.length && budget.leftSketch() > 0) {
+        emit({ kind: 'log', stage: 'S2', text: `Outsole sheets · a bottom-view tread drawing for each base form, from the genome's outsole instruction` })
+        await pool(withSketch, ENGINES[params.imageEngine].concurrency, async (d) => {
+          if (cancelled || budget.leftSketch() <= 0) return
+          try {
+            const p = outsoleSketchPrompt(d.spec)
+            const r = await generateImage(p, params.imageEngine)
+            budget.spendSketch()
+            d.images = [...d.images, { view: 'sketch_outsole', url: r.url, hash: r.hash, origin: 'generated', promptUsed: p,
+              whyUsed: d.spec.genome?.parts?.outsole?.form ? `Outsole as authored: ${d.spec.genome.parts.outsole.form}` : 'Outsole from the archetype tread grammar.' }]
+            emit({ kind: 'design-update', design: { ...d } })
+            emit({ kind: 'log', stage: 'S2', text: `${d.spec.design_id} outsole sheet drawn${r.cached ? ' (reused)' : ''}` })
+          } catch (e) {
+            emit({ kind: 'log', stage: 'S2', text: `${d.spec.design_id} outsole sheet failed · ${String((e as Error).message).slice(0, 70)} · side view only` })
           }
         })
       }
@@ -768,21 +796,56 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           d.imageError = String((e as Error).message || e)
           emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} base render failed · ${d.imageError}` })
         }
-        // ② 스케치 변형들도 각각 컬러 디자인이 된다 · 흑백 스케치가 원본, 색은 여기서 처음 입혀진다
-        const sketchVars = d.images.filter(i => i.view === 'sketch_var')
-        for (let k = 0; k < sketchVars.length; k++) {
-          if (cancelled || budget.left() <= 0 || extrasLeft <= 0) break
-          const sv = sketchVars[k]
-          // 장마다 다른 소재 해석 · 같은 지시를 두 번 주면 같은 사진이 두 장 나온다
-          const p2 = renderFromSketchPrompt(d.spec, trendClause, line, params.brand, k + 1)
+        // ② 스케치당 디자인 컨셉 N개 · 형태는 그대로, 소재·컬러·창의도만 갈린다.
+        //
+        // 이게 사용자가 말한 '베리에이션'이다. 예전에는 흑백 스케치 변형 → 고정 6개 소재 표 →
+        // 렌더 뒤 슬라이더 편집, 세 갈래가 따로 있었고 어느 것도 조사·게놈·브랜드를 보지 않았다.
+        // 이제 컨셉은 서버가 그 셋을 근거로 저작한다: 첫 번째는 상업 안전(게놈 소재 + 브랜드 팔레트),
+        // 이후는 소재 전환 / 컬러 전환 / 창의 밀기. 각각 파트별 소재·색과 '왜'를 들고 온다.
+        // 첫 컨셉은 기준 렌더 그 자체다 (위에서 이미 만들었다). 두 번째부터가 여기서 나온다.
+        const dpsWanted = params.designsPerSketch ?? 1
+        const sketchIm2 = d.images.find(i => i.view === 'sketch')
+        if (dpsWanted > 1 && sketchIm2 && d.spec.genome && budget.left() > 0 && extrasLeft > 0) {
           try {
-            const r2 = await editImage(sv.hash, p2, params.imageEngine)
-            budget.spend(); extrasLeft -= 1
-            d.images = [...d.images, { view: 'design', url: r2.url, hash: r2.hash, origin: 'edited_from', editedFrom: sv.hash, promptUsed: p2, whyUsed: materialRead(k + 1).why }]
-            emit({ kind: 'design-update', design: { ...d } })
-            emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} sketch variation ${k + 1} coloured into a design` })
-          } catch {
-            emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} design from sketch variation ${k + 1} failed · skipping` })
+            // trendClause 는 S1 안의 try 에서 채워진다 · TS 흐름분석이 여기서는 null 로 좁히므로 명시적으로 넓힌다
+            const tc = trendClause as TrendClauseInput | null
+            const seasonPalette = tc?.colors ?? []
+            const seasonMaterials = tc?.materials ?? []
+            const cr = await authorConcepts({
+              count: dpsWanted, genome: d.spec.genome, signals, brandSummary,
+              brandPalette: params.brand?.colorPalette ?? [], seasonPalette, seasonMaterials,
+              itemTypeEn: TYPE_EN[params.itemType] ?? 'shoe', langName,
+            })
+            if (cancelled) return
+            const concepts = (cr.concepts ?? []).slice(0, dpsWanted)
+            // 첫 컨셉의 이름과 이유는 기준 렌더에 붙인다 — 그 렌더가 곧 commercial_safe 다
+            const first = concepts[0]
+            if (first) {
+              d.images = d.images.map(im => im.view === views[0].key && !im.colorway && !im.concept
+                ? { ...im, concept: { index: 0, name: first.name, angle: first.angle }, whyUsed: `${first.why} (${first.angle})` }
+                : im)
+            }
+            emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} ${concepts.length} concepts authored on one sketch · ${concepts.map(c => c.angle).join(' / ')}${cr.cached ? ' (reused)' : ''}` })
+            for (let k = 1; k < concepts.length; k++) {
+              if (cancelled || budget.left() <= 0 || extrasLeft <= 0) break
+              const c = concepts[k]
+              const p2 = conceptRenderPrompt(d.spec, c, params.brand)
+              try {
+                const r2 = await editImage(sketchIm2.hash, p2, params.imageEngine)
+                budget.spend(); extrasLeft -= 1
+                d.images = [...d.images, {
+                  view: 'design', url: r2.url, hash: r2.hash, origin: 'edited_from', editedFrom: sketchIm2.hash,
+                  promptUsed: p2, whyUsed: `${c.why} (${c.angle})`,
+                  concept: { index: k, name: c.name, angle: c.angle },
+                }]
+                emit({ kind: 'design-update', design: { ...d } })
+                emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} concept ${k + 1}: ${c.name} · ${c.angle}` })
+              } catch {
+                emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} concept ${k + 1} render failed · skipping that one` })
+              }
+            }
+          } catch (e) {
+            emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} concept authoring failed · ${String((e as Error).message).slice(0, 80)} · base render only` })
           }
         }
 
@@ -810,38 +873,9 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
         await wait(350)
       }
 
-      // 스케치 한 장에서 갈라지는 제품 베리에이션 · 축을 하나씩만 바꿔 계보를 유지한다
-      if (params.variationCount > 0 && budget.left() > 0 && extrasLeft > 0) {
-        const baseImg = d.images.find(i => i.view === 'lateral' && !i.colorway)
-          ?? d.images.find(i => i.origin === 'generated' && i.view !== 'sketch')
-        if (baseImg) {
-          // 베리에이션 축은 스타일 슬라이더에서 나온다 (create-variation 방식).
-          // 회차마다 다른 갈래를 집으므로 네 장이면 무드·실루엣·밀도·엣지가 한 번씩 나온다.
-          const jobs = Array.from({ length: params.variationCount }, (_, k) => {
-            const sliders = variationSliders(k, rng)
-            return { k, sliders, label: slidersToLabel(sliders), prompt: variationPrompt(k, sliders) }
-          })
-          emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} branching ${jobs.length} variations · one style axis each: ${jobs.map(j => j.label.split(' · ')[0]).join(', ')}` })
-          await pool(jobs.slice(0, Math.max(0, Math.min(budget.left(), extrasLeft))), 2, async (job) => {
-            if (cancelled) return
-            try {
-              const r = await editImage(baseImg.hash, job.prompt, params.imageEngine)
-              budget.spend(); extrasLeft -= 1
-              d.images = [...d.images, {
-                view: 'variation', url: r.url, hash: r.hash, origin: 'edited_from',
-                editedFrom: baseImg.hash, variantOf: d.spec.design_id, variantAxis: job.label,
-                // 어떤 지시로 갈라졌는지 카드가 그대로 보여 준다
-                promptUsed: job.prompt,
-                sliders: job.sliders,
-              }]
-              emit({ kind: 'design-update', design: { ...d } })
-              emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} variation: ${job.label}` })
-            } catch {
-              emit({ kind: 'log', stage: 'S3', text: `${d.spec.design_id} variation "${job.label}" failed · skipping that one` })
-            }
-          })
-        }
-      }
+      // (예전 자리) 렌더 뒤 스타일 슬라이더 베리에이션은 없앴다.
+      // 스케치당 여러 디자인은 위 ② 에서 컨셉으로 나온다 — 조사·게놈·브랜드를 근거로.
+      // 슬라이더 편집은 근거 없는 축(무드·엣지 등)을 렌더에 덧씌우는 것이라 카드가 '왜'를 말할 수 없었다.
 
       // 실제 비전 검증 (지시서 규칙 13 · rng 시뮬레이션 QA 폐기).
       // 렌더를 진짜로 보고 설계 의도와 대조한다. 검사가 실패하면 실패로 표기하고,
@@ -975,7 +1009,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           const d = topCandidates.find(x => x.spec.design_id === p.design_id)
           if (d) d.mdPick = p
         }
-        st_mdFloorNote = review.floor_note ?? ''
+        if (review.floor_note) emit({ kind: 'md-floor-note', text: review.floor_note })
         const buys = (review.reviews ?? []).filter(r => r.verdict === 'buy').length
         const fixes = (review.reviews ?? []).filter(r => r.verdict === 'buy_if_fixed').length
         emit({ kind: 'log', stage: 'S4', text: `MD verdict: ${buys} to buy, ${fixes} to buy if fixed, ${(review.reviews ?? []).length - buys - fixes} passed${review.cached ? ' (reused an earlier pass)' : ''}` })
@@ -1148,7 +1182,7 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
 }
 
 // ── 근거 추적 체인 (지시서 10.1) ─────────────────────────────────────
-function buildRationale(params: RunParams, spec: DesignSpec, signals: Signal[], rng: ReturnType<typeof makeRng>, hint: SpecHint): Rationale {
+function buildRationale(params: RunParams, spec: DesignSpec, signals: Signal[], _rng: ReturnType<typeof makeRng>, hint: SpecHint): Rationale {
   // ── 게놈 경로 · 근거는 게놈이 실제로 인용한 신호이고, 서사는 저작 의도 그 자체다 ──
   if (spec.genome) {
     const g = spec.genome
@@ -1239,7 +1273,7 @@ function buildRationale(params: RunParams, spec: DesignSpec, signals: Signal[], 
   }
 }
 
-function buildMetrics(spec: { category: string }, cost: { cap_ratio: number; tooling: { mold_count_required: number } }, rationale: Rationale, signals: Signal[]): { label: string; value: string }[] {
+function buildMetrics(_spec: { category: string }, cost: { cap_ratio: number; tooling: { mold_count_required: number } }, rationale: Rationale, signals: Signal[]): { label: string; value: string }[] {
   const linked = rationale.driving_signals
     .map(ds => signals.find(s => s.signal_id === ds.signal_id))
     .filter((s): s is Signal => !!s)

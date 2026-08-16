@@ -21,7 +21,7 @@ import { detectRuntime } from '../core/runtime'
 import type { BoardNode } from '../core/boardModel'
 import { plainProse } from '../core/prose'
 import { DesignCard } from './Card'
-import { Tag, ThemeToggle } from './bits'
+import { ThemeToggle } from './bits'
 import { ModelViewer } from './ModelViewer'
 import { copyText, shareLink } from '../core/share'
 import { apiUrl } from '../core/apiBase'
@@ -701,8 +701,6 @@ function BoardInner({ st, onVerdict, runId, onBoardImage }: { st: RunState; onVe
   }, [miroDraft, exportMiro])
 
   const currentNode = present ? buildBoardModel(st).nodes.find(n => n.id === focusOrder[presentIdx]) : undefined
-  const approved = st.designs.filter(d => d.verdict === 'approve').length
-  const rejectedByUser = st.designs.filter(d => d.verdict === 'reject').length
 
   return (
     <div className={`board ${light ? 'board-light' : ''}${tool !== 'select' ? ' placing' : ''}`} data-theme={light ? 'light' : 'dark'}>

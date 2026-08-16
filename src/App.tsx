@@ -1,7 +1,7 @@
 // ── VRINGON Design Agent · 앱 셸 ─────────────────────────────────────
 import { t, useLang } from './core/i18n'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { PipelineEvent, RunParams, RunState, SeriesDnaElement, Stage } from './core/types'
+import type { PipelineEvent, RunParams, RunState, SeriesDnaElement } from './core/types'
 import { runPipeline } from './core/pipeline'
 import type { PipelineHandle } from './core/pipeline'
 import Wizard from './ui/Wizard'
@@ -16,8 +16,7 @@ import { useTheme } from './ui/useTheme'
 import Library from './ui/Library'
 import ErrorBoundary from './ui/ErrorBoundary'
 import { clearCurrent, firstImage, loadCurrent, newRunId, saveCurrent, saveRun } from './core/store'
-import type { RunRecord } from './core/store'
-import { CAT_LABEL, MODE_LABEL, TYPE_LABEL } from './core/types'
+import { MODE_LABEL, TYPE_LABEL } from './core/types'
 import { ensureSampleRuns } from './core/sampleRun'
 import { getRun } from './core/store'
 import { pushShareTarget, readShareTarget } from './core/share'
@@ -108,12 +107,17 @@ export default function App() {
         case 'dossier': next.dossier = e.dossier; next.dossierPending = false; break
         case 'dossier-pending': next.dossierPending = e.on; break
         case 'design': next.designs = [...next.designs, e.design]; break
-        case 'design-update':
+        case 'design-update': {
           // 파이프라인의 복사본에는 사람이 카드에서 내린 판정이 없다. 통째로 갈아끼우면
           // 게이트에서 누른 거절이 다음 업데이트에 지워진다 — 판정은 화면 것을 지킨다.
+          const before = next.designs.find(d => d.spec.design_id === e.design.spec.design_id)?.images.length ?? 0
+          const after = e.design.images.length
+          if (after > before) setUsage(u => ({ ...u, images: u.images + (after - before) }))
           next.designs = next.designs.map(d => d.spec.design_id === e.design.spec.design_id
             ? { ...e.design, verdict: d.verdict ?? e.design.verdict, verdictTags: d.verdictTags ?? e.design.verdictTags }
             : d); break
+        }
+        case 'md-floor-note': next.mdFloorNote = e.text; break
         case 'checkpoint': next.checkpoints = [...next.checkpoints, e.label]; break
         case 'done': next.finished = true; break
       }
@@ -122,7 +126,7 @@ export default function App() {
     if (e.kind === 'progress') setProgress(p => ({ ...p, [e.stage]: e.pct }))
     // 사용량 집계 · 로그 문구에서 실제 발생한 호출만 센다
     if (e.kind === 'log') {
-      if (/sketch done|render done/.test(e.text)) setUsage(u => ({ ...u, images: u.images + 1 }))
+      // (이미지 수는 아래 design-update 델타로 센다 · 로그 문구 매칭은 문구가 바뀔 때마다 깨졌다)
       const m = e.text.match(/(\d+) web searches/)
       if (m) setUsage(u => ({ ...u, searches: u.searches + Number(m[1]) }))
     }

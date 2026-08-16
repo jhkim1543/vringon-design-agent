@@ -1,8 +1,7 @@
-// ── Tripo · 멀티뷰 → 3D 모델 ────────────────────────────────────────
-// 파이프라인이 이미 각도별 컷을 만들어 둔다(신발: 측면·3/4·탑, 주얼리: 정면·45도·디테일).
-// 한 장으로 추론시키는 것보다 여러 각도를 함께 주는 쪽이 형태가 훨씬 정확하다.
+// ── Tripo · 단일 이미지 → 3D 모델 ────────────────────────────────────
+// 기준 렌더(측면 히어로) 한 장으로 image_to_model 을 돌린다.
 //
-// 흐름: 이미지 업로드 → multiview_to_model 태스크 생성 → 폴링 → GLB 내려받아 캐시
+// 흐름: 이미지 업로드 → image_to_model 태스크 생성 → 폴링 → GLB 내려받아 캐시
 // 키는 .env 의 TRIPO_API_KEY 에만 둔다. 브라우저로 나가지 않는다.
 
 import { createHash } from 'node:crypto'
@@ -66,60 +65,9 @@ async function poll(apiKey, taskId, onStep) {
   }
 }
 
-/** 멀티뷰 → 3D. views 는 [front, left, back, right] 순서의 4칸 배열이다.
- *  파이프라인이 규약에 맞는 턴어라운드 4뷰를 만들어 자리에 맞춰 넣는다.
- *  없는 자리는 null — Tripo에는 빈 객체로 나간다. */
-export async function tripoMultiview(root, apiKey, { views, onStep }) {
-  if (!apiKey) throw new Error('No TRIPO_API_KEY set')
-  const slots = [...views.slice(0, 4)]
-  while (slots.length < 4) slots.push(null)
-  const usable = slots.filter(Boolean)
-  if (!usable.length) throw new Error('no views to send')
+// (예전 자리) 멀티뷰 → 3D 는 2026-08-13 에 단일 이미지 방식으로 바뀌며 제거됐다.
+// 뷰 간 불일치가 형상을 흐렸고, 선정작마다 이미지 3장이 굳었다. tripoSingle 만 남는다.
 
-  // 캐시 키는 자리까지 포함한다 · 같은 넉 장이라도 순서가 다르면 다른 모델이다
-  const hash = createHash('sha256')
-    .update(slots.map(v => v ? createHash('sha256').update(v.buf).digest('hex') : 'x').join('|'))
-    .digest('hex').slice(0, 24)
-  const out = join(modelDir(root), `${hash}.glb`)
-  if (existsSync(out)) return { hash, format: 'glb', views: usable.length, cached: true }
-
-  onStep?.('uploading', 0, 0)
-  // [front, left, back, right] 자리 그대로 업로드한다
-  const files = []
-  for (const v of slots) {
-    if (!v) { files.push({}); continue }
-    files.push({ type: 'png', file_token: await upload(apiKey, v.buf, v.name) })
-  }
-
-  const create = await fetch(`${BASE}/task`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      type: 'multiview_to_model',
-      files,
-      model_version: 'v2.5-20250123',
-      texture: true,
-      pbr: true,
-    }),
-  })
-  if (!create.ok) throw new Error(`Tripo task ${create.status}: ${(await create.text()).slice(0, 240)}`)
-  const cj = await create.json()
-  const taskId = cj?.data?.task_id
-  if (!taskId) throw new Error('Tripo returned no task_id')
-
-  const done = await poll(apiKey, taskId, onStep)
-  const url = done?.output?.pbr_model ?? done?.output?.model ?? done?.result?.pbr_model?.url ?? done?.result?.model?.url
-  if (!url) throw new Error('Tripo finished but returned no model url')
-
-  const dl = await fetch(url)
-  if (!dl.ok) throw new Error(`Tripo download ${dl.status}`)
-  writeFileSync(out, Buffer.from(await dl.arrayBuffer()))
-  return { hash, format: 'glb', views: usable.length, cached: false, taskId }
-}
-
-/** 단일 이미지 → 3D · 2026-08-13 방식 변경.
- *  턴어라운드 3컷의 뷰 간 불일치가 형상을 흐리는 사례가 있었고,
- *  선정작당 이미지 3장을 아낀다. 기준 렌더 한 장으로 만든다. */
 export async function tripoSingle(root, apiKey, { view, onStep }) {
   if (!apiKey) throw new Error('No TRIPO_API_KEY set')
   if (!view?.buf) throw new Error('no image to send')

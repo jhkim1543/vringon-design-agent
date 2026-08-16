@@ -486,10 +486,11 @@ export interface RunParams {
   /** 후보별 컬러웨이 수 · 컬러웨이는 별도 디자인이 아니라 같은 Design ID의 SKU다 */
   colorwayCount: 0 | 1 | 2 | 3
   topN: number                              // 1~5
-  /** 스케치 한 장마다 몇 개의 디자인을 뽑을지. 트렌드 근거로 프롬프트를 바꿔 가며 생성한다. */
+  /** 스케치 한 장마다 몇 개의 디자인 컨셉을 뽑을지 · 형태는 고정, 소재·컬러·창의도만 갈린다.
+   *  첫 번째는 상업 안전(게놈 소재+브랜드 팔레트), 이후 소재 전환/컬러 전환/창의 밀기. 각각 '왜'를 들고 온다. */
   designsPerSketch?: 1 | 2 | 3 | 4
-  /** 스케치 한 장에서 갈라지는 제품 베리에이션 수 */
-  variationCount: 0 | 2 | 3 | 4 | 6 | 8
+  /** (옛 저장본 호환) 렌더 뒤 슬라이더 베리에이션 수 · 지금은 designsPerSketch 가 그 역할을 한다 */
+  variationCount?: 0 | 2 | 3 | 4 | 6 | 8
   /** 캠페인 컷 · 착용컷과 연출컷을 한 묶음으로 뽑는다 (top 하나당 장수) */
   campaignShots: 0 | 2 | 4 | 6
   /** 옛 샘플 호환 · 저장된 Run이 아직 이 두 값을 들고 있다 */
@@ -525,7 +526,7 @@ export const DEFAULT_PARAMS: RunParams = {
   line: defaultLineProfile(),
   endStage: 'S3', sketchCount: 12, tierRatio: [1, 1, 1],
   renderRatio: 0.5, viewCount: 3, colorwayCount: 2,
-  topN: 3, designsPerSketch: 2, variationCount: 3, campaignShots: 4, make3d: true, approvalGate: true, finalGate: true,
+  topN: 3, designsPerSketch: 2, campaignShots: 4, make3d: true, approvalGate: true, finalGate: true,
   imageEngine: 'detail', imageBudget: 12,
   trend: {
     // 기본을 비워둔다. 가상의 브랜드명으로 검색하면 결과가 무의미하고 시간만 든다.
@@ -572,6 +573,14 @@ export interface Signal {
   /** 출처 등급 · 웹 수집 출처마다 하나. T1 산업공인 / T2 시장신호 / T3 전문매체 / T4 소셜.
    *  confidence 는 서버가 이 등급에서 계산한다 — 개수로는 high 가 되지 않는다. */
   source_tiers?: ('T1' | 'T2' | 'T3' | 'T4')[]
+  /** 이 신호가 주로 다루는 파트 · 미드솔·아웃솔은 어퍼에 묻히지 않게 따로 표시된다 */
+  part?: 'upper' | 'midsole' | 'outsole' | 'last_fit' | 'closure' | 'colour_material' | 'cross_category' | 'other'
+  /** 소셜에서 봤다면 어느 플랫폼인지 */
+  social_platforms?: string[]
+  /** 함께 언급되는 것들 · 다른 신발·의류·가방·활동·크리에이터 */
+  mentioned_with?: string[]
+  /** 왜 사는가 · 인기의 근거가 아니라 이유 */
+  purchase_drivers?: string[]
   /** 함께 관측되는 속성 묶음 · "chunky"가 아니라 high stack + wide platform + …로 */
   co_occurring?: string[]
   /** 하나의 점수 대신 네 지수로 분리 */
@@ -601,6 +610,8 @@ export interface CompetitorProduct {
   user_sentiment?: 'positive' | 'mixed' | 'negative' | 'unknown'
   praise_points?: string[]
   complaint_points?: string[]
+  /** 왜 사는가 · 리뷰·언급에서 반복되는 구매 이유 */
+  purchase_drivers?: string[]
   design_traits?: string[]
   image_urls?: string[]
   product_url?: string
@@ -719,6 +730,8 @@ export interface DesignGenome {
   panel_density: 'minimal' | 'standard' | 'dense'
   closure_form: string
   stance: 'grounded' | 'neutral' | 'lifted'
+  /** 파트별 지시 · form 은 스케치(선), material 은 렌더에서만. 신발은 어퍼 하나가 아니다. */
+  parts?: Record<ShoePart, { form: string; material: string }>
   spec_sheet: {
     /** 티어의 정의 그 자체다. 예전에는 이 두 값이 rng.chance() 였고,
      *  LLM 에게 "Core 는 기존 라스트를 재사용한다"고 시켜 놓고 그 답을 버렸다. */
@@ -737,6 +750,21 @@ export interface DesignGenome {
   /** 다양성 게이트를 끝내 못 넘고 채택된 경우, 앞선 안과 겹친 구조축.
    *  비어 있으면 게이트를 통과한 안이다. 카드가 이 차이를 그대로 말한다. */
   gate_overlap?: string[]
+}
+
+/** 신발의 주요 파트 · 게놈·컨셉·프롬프트가 같은 키를 쓴다 */
+export type ShoePart = 'heel_counter' | 'toe_cap' | 'midsole' | 'outsole' | 'tongue_eyestay' | 'collar' | 'overlays'
+export const SHOE_PARTS: ShoePart[] = ['heel_counter', 'toe_cap', 'midsole', 'outsole', 'tongue_eyestay', 'collar', 'overlays']
+
+/** 한 스케치 위의 디자인 컨셉 · 형태 고정, 소재·컬러·창의도만 갈린다 (S7).
+ *  '베리에이션'의 실제 단위다 — 스케치당 N개, 각각 다른 angle. */
+export interface DesignConcept {
+  name: string
+  angle: 'commercial_safe' | 'material_shift' | 'colour_shift' | 'creative_push'
+  palette: { role: 'upper' | 'midsole' | 'outsole' | 'accent'; name: string; hex: string }[]
+  part_materials: Record<'upper' | ShoePart, string>
+  why: string
+  render_clause: string
 }
 
 /** 설계 영토 (지시서 v2 S3) · 서로 다른 설계 공간의 계획 */
@@ -786,6 +814,8 @@ export interface DesignImage {
   /** 왜 이 소재·컬러 조합인가 · 프롬프트가 '무엇을'이라면 이것은 '왜'다.
    *  보드가 PT 자료가 되려면 컷마다 이 한 줄이 있어야 한다. */
   whyUsed?: string
+  /** 이 컷이 어느 디자인 컨셉인가 · 같은 스케치의 N개 디자인을 카드에서 가른다 */
+  concept?: { index: number; name: string; angle: DesignConcept['angle'] }
   /** 브랜드 로고를 실제로 합성한 이미지인가 · 최종 선정 컷은 이게 true여야 한다 */
   logoStamped?: boolean
   /** 베리에이션을 만든 스타일 슬라이더 값 · 무엇을 얼마나 밀었는지 */
@@ -846,6 +876,8 @@ export type PipelineEvent =
   | { kind: 'design'; design: Design }
   | { kind: 'design-update'; design: Design }
   | { kind: 'gate'; stage: Stage }         // 승인 게이트 대기
+  /** MD 가 구성 전체를 매장에 깔았을 때의 한 문단 · 선정 카드에 실린다 */
+  | { kind: 'md-floor-note'; text: string }
   // 시리즈 DNA 승인 대기 · 사진에서 읽은 불변 요소는 가설이다. 사람이 승인해야 잠긴다 (규칙 16)
   | { kind: 'dna-gate'; invariant: import('./types').SeriesDnaElement[]; of: number }
   | { kind: 'checkpoint'; label: string }
@@ -867,6 +899,8 @@ export interface RunState {
   dossierPending: boolean
   reportPending: boolean
   designs: Design[]
+  /** MD 가 최종 구성을 매장 관점에서 한 문단으로 · 없으면 MD 리뷰가 안 돈 것 */
+  mdFloorNote?: string
   checkpoints: string[]
   finished: boolean
   /** 미리 만들어 둔 예시 Run · 삭제되지 않는다 */

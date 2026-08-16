@@ -1,7 +1,7 @@
 // ── 이미지 생성 클라이언트 · OpenAI (서버 프록시 경유) · 신발 전용 ────
 // 키는 서버(Vite dev 미들웨어 / server/openai-api.mjs)에만 존재한다.
 // 브라우저 번들에는 키가 들어가지 않는다 (VITE_ prefix 사용 금지).
-import type { DesignSpec, FootwearLineProfile } from './types'
+import type { DesignConcept, DesignSpec, FootwearLineProfile } from './types'
 import { TYPE_EN, UNKNOWN } from './types'
 import type { EngineId } from './imageEngines'
 import { shapePrompt } from './imageEngines'
@@ -14,12 +14,6 @@ export const IMAGE_MODEL = 'gpt-image-1'
 export const USD_PER_IMAGE = 0.042
 
 export interface GenResult { url: string; hash: string; cached: boolean }
-
-export async function apiStatus(): Promise<{ keyPresent: boolean; model: string; cachedImages: number }> {
-  const r = await fetch(apiUrl('/api/status'))
-  if (!r.ok) throw new Error(`status ${r.status}`)
-  return r.json()
-}
 
 /** 이미지 한 장을 만드는 요청. 시간 제한과 재시도가 여기 한 곳에 있다.
  *
@@ -274,7 +268,49 @@ function genomeClause(spec: DesignSpec): string {
   ].filter(Boolean).join(' ')
 }
 
-export function sketchPrompt(spec: DesignSpec, engine: EngineId = 'detail', brand?: BrandIdentity, trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
+// ── 파트별 절 · 게놈의 parts 블록을 프롬프트로 ────────────────────────
+//
+// 신발은 어퍼 하나가 아니다. 예전 프롬프트는 upper_material 하나가 신발 전체의 소재였고,
+// 미드솔·아웃솔은 "34mm midsole" 같은 수치 한 줄이었다. 백카운터·토캡·설포·칼라는 이름조차
+// 안 나왔다. 게놈이 파트마다 form(선으로 그릴 것)과 material(렌더에서만)을 갖게 됐으니,
+// 스케치에는 form 만, 렌더에는 둘 다 실린다 — 층이 그대로 지켜진다.
+const PART_EN: Record<string, string> = {
+  heel_counter: 'Heel counter', toe_cap: 'Toe cap', midsole: 'Midsole', outsole: 'Outsole',
+  tongue_eyestay: 'Tongue and eyestay', collar: 'Collar', overlays: 'Overlays',
+}
+export function partsClause(spec: DesignSpec, mode: 'sketch' | 'render'): string {
+  const parts = spec.genome?.parts
+  if (!parts) return ''
+  const lines = Object.entries(parts)
+    .filter(([, v]) => v && v.form && v.form.toLowerCase() !== 'none')
+    .map(([k, v]) => mode === 'sketch'
+      ? `${PART_EN[k] ?? k}: ${v.form}`
+      : `${PART_EN[k] ?? k}: ${v.form}${v.material && v.material.toLowerCase() !== 'none' ? `, in ${v.material}` : ''}`)
+  return lines.length ? `Part by part — ${lines.join('. ')}.` : ''
+}
+
+/** 아웃솔(바닥면) 스케치 · 기준 스케치와 짝을 이룬다.
+ *  미드솔·아웃솔은 어퍼만큼 중요한데 측면 스케치에는 러그·플렉스 그루브·컴파운드 분할이 안 보인다.
+ *  게놈의 outsole.form 이 그 도면의 지시다. 스케치와 같은 흑백 선화 규칙을 따른다. */
+export function outsoleSketchPrompt(spec: DesignSpec): string {
+  const o = spec.genome?.parts?.outsole
+  const f = spec.fields as Record<string, string | number | boolean>
+  const tread = o?.form
+    ? o.form
+    : f.lug_depth_mm
+      ? `lugged tread with ${f.lug_depth_mm}mm lugs, heel and forefoot zones distinct`
+      : 'segmented rubber tread with flex grooves across the forefoot and a distinct heel pad'
+  return [
+    `Black-ink technical drawing of the OUTSOLE of the same ${en(spec.itemType)}, seen straight from below (bottom view), toe at the top of the frame and heel at the bottom.`,
+    `Tread pattern: ${tread}.`,
+    'Show lug shapes, flex grooves and any compound split between heel and forefoot as clean line work. Outline the sole perimeter exactly matching the shoe form.',
+    'One single outsole centred in frame, no side view, no upper visible, no second object.',
+    'Black ink line on white paper, single consistent line weight, no colour, no shading, no photographic texture.',
+    'No text, no numbers, no measurement lines, no labels, no logo.',
+  ].join(' ')
+}
+
+export function sketchPrompt(spec: DesignSpec, engine: EngineId = 'detail', brand?: BrandIdentity, _trend?: TrendClauseInput | null, line?: FootwearLineProfile): string {
   // 스케치는 측면 한 컷이다. 한 장에 여러 시점을 넣으면 카드에서 서로 겹쳐 읽히지 않는다.
   // 다른 각도는 S3에서 컬러 렌더의 뷰로 따로 만든다.
   //
@@ -284,7 +320,7 @@ export function sketchPrompt(spec: DesignSpec, engine: EngineId = 'detail', bran
   const view = SHOE_VIEW.lateral + ', one single shoe only, one single view, nothing else in frame'
   return shapePrompt(engine, {
     subject: en(spec.itemType), spec: sketchSpecPhrase(spec), view,
-    brand: [silhouetteClause(spec), spec.genome ? genomeClause(spec) : emphasisClause(spec), linePromptClause(line), sketchBrandClause(brand)].filter(Boolean).join(' '),
+    brand: [silhouetteClause(spec), spec.genome ? genomeClause(spec) : emphasisClause(spec), partsClause(spec, 'sketch'), linePromptClause(line), sketchBrandClause(brand)].filter(Boolean).join(' '),
     mode: 'sketch',
   })
 }
@@ -297,24 +333,28 @@ export function renderPrompt(spec: DesignSpec, engine: EngineId = 'detail', bran
   })
 }
 
-// ── 스케치 변형 · 하나의 외형에서 여러 흑백 스케치를 뽑는다 ──────────
-// 외형(실루엣·아웃솔)은 기준 스케치 그대로, 어퍼의 해석만 갈라진다.
-// 컬러 디자인은 이 흑백 스케치들 각각을 사진으로 옮겨 만든다.
-const SKETCH_VAR_ANGLES = [
-  'Rework the upper panel split: fewer, larger panels with one continuous quarter panel and relocated seam lines.',
-  'Rework the lacing and closure area: a different eyestay shape and lacing geometry, with a reshaped tongue.',
-  'Rework the overlays: add a distinct mudguard and heel-counter overlay treatment along the same silhouette.',
-]
-
-export function sketchVariationPrompt(k: number): string {
+// ── 컨셉 렌더 · 한 스케치 위의 N번째 디자인 ─────────────────────────
+//
+// 이게 '베리에이션'이다. 스케치(형태)는 그대로 두고 소재·컬러·창의도만 갈린다.
+// 예전에는 스케치 변형(흑백 어퍼 재해석) → 고정 6개 소재 표 → 렌더 뒤 슬라이더 편집,
+// 세 갈래가 따로 있었고 어느 것도 조사·게놈·브랜드를 보지 않았다.
+// 이제 컨셉은 서버(authorConcepts)가 그 셋을 근거로 저작하고, 여기서는 그 render_clause 를
+// 스케치 편집 프롬프트로 감싸기만 한다. 파트별 소재·색이 문단으로 들어간다.
+export function conceptRenderPrompt(spec: DesignSpec, concept: DesignConcept, brand?: BrandIdentity): string {
+  const markClause = brand ? brandPromptClause(brand) : ''
+  const drawsMark = !!brand?.applyLogoToImages && !!brand.logo?.style?.prompt_clause
   return [
-    'This is one more black-ink technical sketch of the SAME shoe form.',
-    'Keep the exact silhouette, proportions, midsole geometry and outsole line of the original.',
-    SKETCH_VAR_ANGLES[k % SKETCH_VAR_ANGLES.length],
-    'Same strict lateral side view, one single shoe, nothing else in frame.',
-    'Same black ink line style on white paper, no colour, no shading.',
-    'No text, no numbers, no labels, no logo.',
-  ].join(' ')
+    'Replace this line drawing with a full-colour photorealistic studio product photograph of the same shoe.',
+    'The output must be a photograph, not a drawing: no outlines, no white fill, no flat areas.',
+    'Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole line exactly as drawn — nothing about the form changes.',
+    concept.render_clause,
+    partsClause(spec, 'render'),
+    markClause,
+    'Strict lateral side view, one single shoe, toe pointing to the left and heel on the right, seamless white background, sharp focus, real material texture under studio light.',
+    drawsMark
+      ? 'Laces as clearly separated cords with distinct eyelets. No text, no lettering, no watermark, no human.'
+      : 'Laces as clearly separated cords with distinct eyelets. No text, no logo, no watermark, no human.',
+  ].filter(Boolean).join(' ')
 }
 
 /** 스케치 → 기준 렌더 · 새로 그리지 않고 테크시트를 사진으로 옮긴다.
@@ -322,33 +362,13 @@ export function sketchVariationPrompt(k: number): string {
 // 색이 들어가는 단계에서만 보이는 것들 · 소재 해석과 컬러 블로킹.
 // 선화는 질감을 못 그린다. 그래서 소재 변화는 여기서 갈라야 의미가 있다.
 // 스케치 한 장에서 디자인 여러 장을 뽑을 때, 이 목록이 장마다 다른 해석을 준다.
-const MATERIAL_READS: { clause: string; why: string }[] = [
-  { clause: 'Read the upper as one material throughout, tonal and quiet, with the panel breaks visible only as seams.',
-    why: 'Single-material read: shows the panel structure itself carrying the design, the quietest commercial option.' },
-  { clause: 'Read it as two contrasting materials: a matte body with the overlays in a glossier, darker finish so the panel structure reads at a distance.',
-    why: 'Contrast read: makes the overlay topology legible from across a shop floor.' },
-  { clause: 'Read it in a light neutral body with the sole unit and heel counter in a deeper contrasting tone.',
-    why: 'Grounded read: a darker sole visually anchors the silhouette and hides wear at the contact line.' },
-  { clause: 'Read it as a technical mix: a woven or knitted body with smooth synthetic overlays, the two surfaces clearly different under the same light.',
-    why: 'Technical read: the woven-plus-smooth mix signals function, the read performance buyers check first.' },
-  { clause: 'Read it in a single deep saturated colour, sole included, so the silhouette reads as one solid mass.',
-    why: 'Monoblock read: one saturated mass makes the outline itself the identity, a display-table device.' },
-  { clause: 'Read it with a natural undyed sole and a rich pigmented upper, the join between them clearly visible.',
-    why: 'Natural-sole read: the undyed sole cues craft and material honesty against a pigmented upper.' },
-]
+// (예전 자리) MATERIAL_READS 고정 6개 표는 서버 authorConcepts 가 조사·게놈·브랜드를 근거로 저작하는 컨셉으로 대체됐다.
 
-/** 이 디자인 컷이 어떤 소재 해석을 받는가 · clause 는 프롬프트로, why 는 카드로 */
-export function materialRead(index: number): { clause: string; why: string } {
-  return MATERIAL_READS[index % MATERIAL_READS.length]
-}
-
-export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInput | null, line?: FootwearLineProfile, brand?: BrandIdentity, variantIndex?: number): string {
+export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInput | null, line?: FootwearLineProfile, brand?: BrandIdentity): string {
   // 브랜드 마크를 사진에 그려 넣을지는 브랜드 설정이 정한다.
   // 참고 사진에서 배치 규칙을 읽어 두었으면 그 형태 묘사가 여기 실린다.
   const markClause = brand ? brandPromptClause(brand) : ''
   const drawsMark = !!brand?.applyLogoToImages && !!brand.logo?.style?.prompt_clause
-  // 같은 스케치에서 여러 장을 뽑을 때만 소재 해석을 갈라 준다
-  const matClause = typeof variantIndex === 'number' ? materialRead(variantIndex).clause : ''
   return [
     'Replace this line drawing with a full-colour photorealistic studio product photograph of the same shoe.',
     'The output must be a photograph, not a drawing: no outlines, no white fill, no flat areas.',
@@ -356,7 +376,7 @@ export function renderFromSketchPrompt(spec: DesignSpec, trend?: TrendClauseInpu
     'Keep the silhouette, panel lines, lacing layout, midsole geometry and the outsole line exactly as drawn.',
     `Materials and colour: ${shoeSpecPhrase(spec)}.`,
     spec.genome ? genomeClause(spec) : emphasisClause(spec),
-    matClause,
+    partsClause(spec, 'render'),
     linePromptClause(line),
     trendPromptClause(trend ?? null),
     markClause,
@@ -424,30 +444,7 @@ export function colorwayEditPrompt(cw: ColorwayPlan | string): string {
   return `Keep the exact same product, same camera angle, same shape and proportions. Only recolor the main material to ${clause}. Same seamless white background and lighting.`
 }
 
-// ── 3D 멀티뷰 · Tripo가 기대하는 [front, left, back, right] 턴어라운드 ─
-// 기준 렌더(lateral, 토가 왼쪽)는 곧 left 뷰다. 나머지 세 방향을 편집으로 만든다.
-// 임의 각도 컷을 아무 자리에 끼우는 것보다, 규약에 맞는 직교 4뷰를 주는 쪽이
-// 형태 복원이 훨씬 정확하다.
-export type TripoRole = 'front' | 'left' | 'back' | 'right'
-
-const TURNAROUND: Record<TripoRole, string> = {
-  front: 'a strict frontal orthographic view: the toe faces the viewer head-on, both edges of the shoe symmetrical in frame',
-  left: 'a strict left side orthographic profile: toe pointing to the left, heel on the right',
-  back: 'a strict rear orthographic view: the heel counter faces the viewer head-on, the topline visible from behind',
-  right: 'a strict right side orthographic profile: toe pointing to the right, heel on the left',
-}
-
-/** 턴어라운드 편집 지시 · 같은 신발을 카메라만 돌려 다시 찍는다 */
-export function turnaroundPrompt(role: TripoRole): string {
-  return [
-    'This is one frame of a product turnaround for 3D reconstruction.',
-    'Keep the exact same shoe: same design, same materials, same colours, same proportions, same sole.',
-    `Rotate the camera to ${TURNAROUND[role]}.`,
-    'Orthographic product photography: camera at the mid-height of the shoe, the whole shoe centred and fully in frame,',
-    'seamless pure white background, soft even light, no perspective distortion, no crop.',
-    'No text, no logo, no watermark, no human, no props, no reflection.',
-  ].join(' ')
-}
+// (예전 자리) 3D 턴어라운드 4뷰 프롬프트는 2026-08-13 단일 이미지 3D 로 바뀌며 호출자가 사라졌다. 제거.
 
 /** 착용 컷 · 기준 렌더를 편집해 사람이 착용한 상태로 옮긴다.
  *  제품 형태는 그대로 두고 배경과 사람만 들어오게 지시한다. */
@@ -492,105 +489,8 @@ export function wearEditPrompt(itemType: string, index: number): string {
   ].join(' ')
 }
 
-// ── 스케치 한 장에서 갈라져 나오는 실제 제품 베리에이션 ─────────────
-// 같은 골격을 유지하되 한 축씩만 바꾼다. 전부 바꾸면 다른 신발이 되고 비교가 안 된다.
-const VARIATION_AXES: { key: string; label: string; instruction: string }[] = [
-  { key: 'material', label: 'Material swap', instruction: 'Keep the exact silhouette and proportions. Change the upper to a different material with visibly different surface: brushed suede instead of smooth calf, with the grain clearly readable.' },
-  { key: 'sole', label: 'Sole rebuild', instruction: 'Keep the exact upper. Rebuild the sole unit: thicker lugged rubber outsole with a slightly raised platform, so the stance reads heavier and more grounded.' },
-  { key: 'hardware', label: 'Hardware shift', instruction: 'Keep the exact silhouette, material and colour. Change the hardware and trim: add a slim metal plate across the vamp and replace the stitching accent with a tonal one.' },
-  { key: 'tone', label: 'Tonal shift', instruction: 'Keep the exact shape, material and hardware. Shift the colourway to a deep ink tone with a matte finish, keeping the sole in a contrasting natural shade.' },
-  { key: 'toe', label: 'Toe reshape', instruction: 'Keep the material, colour and sole. Reshape the toe into a squarer, blunter front while holding the same overall length.' },
-  { key: 'panel', label: 'Panel split', instruction: 'Keep the silhouette, colour and sole. Break the upper into more panels with a visible seam running from the vamp to the quarter.' },
-  { key: 'closure', label: 'Closure change', instruction: 'Keep the silhouette and material. Change how it opens: add an elastic gore panel at the side instead of the current opening.' },
-  { key: 'shaft', label: 'Height shift', instruction: 'Keep the material, colour and toe. Raise the collar so it sits higher on the ankle, reading as a taller, more covered shape.' },
-]
-
-// ── 스타일 슬라이더 베리에이션 ──────────────────────────────────────
-// RebuilderAI/ai-vringon-create-variation 의 방식을 그대로 따른다.
-// 그쪽은 Qwen-Image-Edit + LoRA로 돌리지만, 방식 자체는 모델과 무관하다:
-//   네 갈래(무드·실루엣·밀도·엣지)에 양극 슬라이더 여덟 개, 범위 -1..1.
-//   |값| <= 0.2 는 죽은 구간이라 문장에 안 실린다.
-//   실린 항목을 쉼표로 이어 "Edit this shoe to be ..." 한 문장으로 만들고,
-//   끝에 골격과 색은 유지하라는 제약을 붙인다.
-// 슬라이더 키 이름도 그쪽 페이로드와 같게 두었다. 나중에 그 워커로 그대로 넘길 수 있다.
-export type StyleSliders = Partial<Record<
-  | 'mood_creative_classic' | 'mood_maximal_minimal'
-  | 'silhouette_long_short' | 'silhouette_voluminous_slim'
-  | 'density_dense_airy' | 'density_chunky_balanced'
-  | 'edge_soft_sharp' | 'edge_fluid_structured',
-  number
->>
-
-const SLIDER_WORDS: { key: keyof StyleSliders; pos: string; neg: string; group: string }[] = [
-  { key: 'mood_creative_classic', pos: 'more creative', neg: 'more classic', group: 'Mood' },
-  { key: 'mood_maximal_minimal', pos: 'more maximal', neg: 'more minimal', group: 'Mood' },
-  { key: 'silhouette_long_short', pos: 'a longer silhouette', neg: 'a shorter silhouette', group: 'Silhouette' },
-  { key: 'silhouette_voluminous_slim', pos: 'more voluminous', neg: 'slimmer', group: 'Silhouette' },
-  { key: 'density_dense_airy', pos: 'denser in detail', neg: 'airier', group: 'Density' },
-  { key: 'density_chunky_balanced', pos: 'chunkier', neg: 'more balanced in proportion', group: 'Density' },
-  { key: 'edge_soft_sharp', pos: 'sharper edged', neg: 'softer edged', group: 'Edge' },
-  { key: 'edge_fluid_structured', pos: 'more structured', neg: 'more fluid in line', group: 'Edge' },
-]
-
-const DEADZONE = 0.2
-
-/** 슬라이더 묶음 → 사람이 읽는 한 줄. 원본 build_instruction 과 같은 규칙이다. */
-export function slidersToPhrase(s: StyleSliders): string {
-  const parts = SLIDER_WORDS
-    .filter(w => Math.abs(s[w.key] ?? 0) > DEADZONE)
-    .map(w => ((s[w.key] as number) > 0 ? w.pos : w.neg))
-  return parts.join(', ')
-}
-
-/** 이 베리에이션이 무엇을 건드렸는지 · 카드에 그대로 적는다 */
-export function slidersToLabel(s: StyleSliders): string {
-  const on = SLIDER_WORDS.filter(w => Math.abs(s[w.key] ?? 0) > DEADZONE)
-  if (!on.length) return 'Subtle pass'
-  const groups = [...new Set(on.map(w => w.group))]
-  return `${groups.join(' + ')} · ${on.map(w => ((s[w.key] as number) > 0 ? w.pos : w.neg)).join(', ')}`
-}
-
-/** 베리에이션마다 서로 다른 슬라이더 조합을 준다.
- *  같은 축을 두 번 쓰지 않도록 갈래를 돌려 가며 집는다. */
-export function variationSliders(index: number, rng?: { next: () => number }): StyleSliders {
-  const groups = ['Mood', 'Silhouette', 'Density', 'Edge']
-  const g = groups[index % groups.length]
-  const inGroup = SLIDER_WORDS.filter(w => w.group === g)
-  const out: StyleSliders = {}
-  // 그 갈래의 슬라이더 둘을 서로 반대쪽으로 민다. 방향은 회차마다 뒤집는다.
-  const flip = Math.floor(index / groups.length) % 2 === 0 ? 1 : -1
-  const strength = () => 0.45 + (rng ? rng.next() : 0.4) * 0.45
-  inGroup.forEach((w, i) => { out[w.key] = (i === 0 ? 1 : -1) * flip * strength() })
-  return out
-}
-
-export function variationAxes() {
-  return VARIATION_AXES
-}
-
-/** 스케치·기준 렌더에서 갈라지는 제품 베리에이션. 편집이라 같은 계보가 유지된다. */
-export function variationPrompt(axisIndex: number, sliders?: StyleSliders): string {
-  // 슬라이더가 있으면 그쪽이 우선이다. 없으면 옛 축 목록으로 떨어진다.
-  if (sliders) {
-    const phrase = slidersToPhrase(sliders)
-    return [
-      'This is a product design variation, not a new product.',
-      phrase
-        ? `Edit this shoe to be ${phrase}.`
-        : 'Generate a variation of this shoe with subtle style changes.',
-      'Keep the overall shoe structure and colour palette intact.',
-      'Photorealistic studio product photograph on a seamless white background, same camera angle as the original, soft even light, sharp focus.',
-      'No text, no logo, no watermark, no human.',
-    ].join(' ')
-  }
-  const a = VARIATION_AXES[axisIndex % VARIATION_AXES.length]
-  return [
-    'This is a product design variation, not a new product.',
-    a.instruction,
-    'Photorealistic studio product photograph on a seamless white background, same camera angle as the original, soft even light, sharp focus.',
-    'No text, no logo, no watermark, no human.',
-  ].join(' ')
-}
+// (예전 자리) 렌더 뒤 베리에이션 — 고정 8축 목록과 스타일 슬라이더 — 은 conceptRenderPrompt + 서버 authorConcepts 로 대체됐다.
+// 둘 다 조사·게놈·브랜드를 보지 않아 카드가 '왜'를 말할 수 없었다. 스케치당 여러 디자인은 이제 컨셉으로 갈린다.
 
 // ── 컨셉 촬영 · 디자인 다음 단계 ────────────────────────────────────
 // 가상 모델 착용컷과, 무드에 맞는 스튜디오·로케이션 컨셉컷을 만든다.
@@ -619,7 +519,7 @@ export const CONCEPT_SHOTS: ConceptShot[] = [
   {
     key: 'fit_full',
     label: 'Virtual fitting',
-    build: (subject, p, mood) => [
+    build: (_subject, p, mood) => [
       'Keep this exact product: same design, materials, proportions, colour and hardware.',
       `Place it on a model: ${p.brief}. The shoes are worn on both feet.`,
       'Editorial campaign frame, the product clearly visible and in sharp focus, natural pose, plain studio backdrop with soft directional light.',
@@ -712,10 +612,6 @@ export interface ModelResult {
   note?: string
 }
 
-export async function modelProbe(): Promise<{ available: boolean; reason?: string }> {
-  const r = await fetch(apiUrl('/api/model/probe'))
-  return r.json()
-}
 
 /** ordered에는 [front, left, back, right] 순서로 해시를 넣는다. 없는 자리는 null. */
 /** 단일 이미지 → 3D (2026-08-13 방식 변경).

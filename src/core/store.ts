@@ -90,7 +90,7 @@ export function newRunId(): string {
 }
 
 /** 목록에 보여줄 한 줄 제목 · 화면에서 길게 늘어지지 않게 짧게 만든다 */
-export function makeTitle(st: RunState, labels: { mode: string; category: string; type: string }): string {
+export function makeTitle(_st: RunState, labels: { mode: string; category: string; type: string }): string {
   return `${labels.type} · ${labels.mode}`
 }
 

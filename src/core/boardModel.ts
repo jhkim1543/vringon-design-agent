@@ -6,7 +6,7 @@ import type { Design, RunState } from './types'
 import { COMP_GROUP_LABEL, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL, TYPE_LABEL } from './types'
 import { buildLocalPitch } from './pitch'
 import type { SeasonDossier } from './research'
-import { GRADE_LABEL, shotUrl, SOURCE_LABEL, metricText } from './research'
+import { GRADE_LABEL, shotUrl, metricText } from './research'
 
 export type BoardNodeKind =
   | 'input' | 'research' | 'signal' | 'direction' | 'design' | 'selection' | 'appendix'
@@ -58,7 +58,7 @@ export function buildBoardModel(st: RunState): BoardModel {
     { key: 'sketchlane', title: '5 · Sketches', note: 'One form, black ink only' },
     { key: 'design', title: '6 · Designs', note: 'Colour enters here' },
     { key: 'selection', title: '7 · Selection', note: 'Metrics and calls' },
-    { key: 'variation', title: '8 · Variations', note: 'One design, several products' },
+    { key: 'variation', title: '8 · Concepts', note: 'Same sketch, another material and colour story' },
     { key: 'campaign', title: '9 · Campaign shots', note: 'Worn on a model, staged on set' },
     { key: 'showroom', title: '10 · 3D showroom', note: 'Turn it, or open it full size' },
   ]
@@ -176,7 +176,6 @@ export function buildBoardModel(st: RunState): BoardModel {
   const dosRow = 2 + compShotRows
   const dossier = st.dossier as SeasonDossier | null
   if (dossier?.macrotrends?.length) {
-    const pct = metricText
     nodes.push({
       id: 'dos', kind: 'research', column: 1, row: dosRow,
       title: `${dossier.season} · ${dossier.season_title}`,
@@ -226,6 +225,12 @@ export function buildBoardModel(st: RunState): BoardModel {
       title: s.label,
       body: [
         `${s.axis} · seen ${s.observed_count}x · ${s.direction === 'rising' ? 'rising' : s.direction === 'stable' ? 'holding' : 'fading'}`,
+        // 파트 · 미드솔/아웃솔 신호는 이름으로 드러난다
+        ...(s.part && s.part !== 'other' ? [`part: ${s.part.replace(/_/g, ' ')}`] : []),
+        // 소셜에서 왔으면 어느 플랫폼에서, 무엇과 함께, 왜 · 사실 기반 조사의 세 질문
+        ...(s.social_platforms?.length ? [`seen on ${s.social_platforms.slice(0, 3).join(', ')}`] : []),
+        ...(s.mentioned_with?.length ? [`mentioned with ${s.mentioned_with.slice(0, 3).join(', ')}`] : []),
+        ...(s.purchase_drivers?.length ? [`why it sells: ${s.purchase_drivers.slice(0, 2).join('; ')}`] : []),
         // 출처의 질 · 개수가 아니라 등급이 confidence 를 정했다는 것을 카드가 보여 준다
         ...(s.source_tiers?.length
           ? [`sources: ${(['T1', 'T2', 'T3', 'T4'] as const).map(tier => {
@@ -267,35 +272,41 @@ export function buildBoardModel(st: RunState): BoardModel {
   const deck = buildLocalPitch(st)
   const pitchOf = (id: string) => deck.designPitches.find(x => x.design_id === id)
 
-  // ── 5 스케치 레인 · 외형이 잡히는 흑백 단계. 색이 들어간 디자인과 명확히 갈라 보인다
+  // ── 5 스케치 레인 · 외형이 잡히는 흑백 단계. 색이 들어간 디자인과 명확히 갈라 보인다.
+  // 기준 측면 스케치 + 아웃솔(바닥면) 도면. 옛 저장본의 sketch_var(흑백 어퍼 변형)도 그대로 읽는다.
   let skRow = 0
+  const SKETCH_VIEWS = ['sketch', 'sketch_outsole', 'sketch_var']
   alive.forEach(d => {
-    const sketches = d.images.filter(im => im.view === 'sketch' || im.view === 'sketch_var')
+    const sketches = d.images.filter(im => SKETCH_VIEWS.includes(im.view))
     sketches.forEach((im, k) => {
       const id = `sk-${d.spec.design_id}-${k}`
+      const isBase = im.view === 'sketch'
+      const isOutsole = im.view === 'sketch_outsole'
       // 왜 이 스케치가 나왔는지는 스케치 옆에 있어야 한다. 디자인 칸이 아니라 여기다.
       const pit = pitchOf(d.spec.design_id)
-      const why = k === 0
+      const why = isBase
         ? [
             d.spec.comboLabel ? `Reads the research as: ${d.spec.comboLabel}` : '',
             ...(pit?.why ?? []).slice(0, 2),
             d.rationale?.narrative?.[0] ?? '',
           ].filter(Boolean)
-        : ['Same silhouette and outsole as the base form. Only the upper is read differently.']
+        : isOutsole
+          ? [im.whyUsed ?? 'Bottom view of the same form: lugs, flex grooves and compound split.', 'The midsole and outsole are designed, not inherited — this sheet is their drawing.']
+          : ['Same silhouette and outsole as the base form. Only the upper is read differently.']
       nodes.push({
         id, kind: 'design', column: 4, row: skRow++,
-        title: `${d.spec.design_id} · ${k === 0 ? 'Base form' : `Ink variation ${k}`}`,
+        title: `${d.spec.design_id} · ${isBase ? 'Base form' : isOutsole ? 'Outsole sheet' : `Ink variation ${k}`}`,
         body: why,
         imageUrl: im.url,
         prompts: im.promptUsed ? [`Sketch prompt: ${im.promptUsed.slice(0, 180)}${im.promptUsed.length > 180 ? '…' : ''}`] : undefined,
         tone: 'muted',
       })
       const dir = st.directions.find(x => d.rationale.driving_signals.some(ds => x.signal_ids.includes(ds.signal_id)))
-      if (k === 0 && dir) edges.push({ from: `dir-${dir.id}`, to: id, label: 'form' })
-      if (k > 0) edges.push({ from: `sk-${d.spec.design_id}-0`, to: id, label: 'ink variation', dashed: true })
-      // 렌더가 없으면 "coloured"라고 쓸 수 없다. 색이 안 들어갔으니까.
-      const rendered = d.images.some(x => x.view !== 'sketch' && x.view !== 'sketch_var')
-      edges.push({ from: id, to: d.spec.design_id, label: k === 0 ? (rendered ? 'coloured' : 'spec only') : undefined, dashed: k === 0 && !rendered })
+      if (isBase && dir) edges.push({ from: `dir-${dir.id}`, to: id, label: 'form' })
+      if (!isBase) edges.push({ from: `sk-${d.spec.design_id}-0`, to: id, label: isOutsole ? 'same form, from below' : 'ink variation', dashed: true })
+      // 렌더가 없으면 "coloured"라고 쓸 수 없다. 색이 안 들어갔으니까. 아웃솔 도면은 디자인으로 이어지지 않는다 — 참조다.
+      const rendered = d.images.some(x => !SKETCH_VIEWS.includes(x.view))
+      if (!isOutsole) edges.push({ from: id, to: d.spec.design_id, label: isBase ? (rendered ? 'coloured' : 'spec only') : undefined, dashed: isBase && !rendered })
     })
   })
 
@@ -394,7 +405,8 @@ export function buildBoardModel(st: RunState): BoardModel {
       title: `Top ${top.length}`,
       body: [
         ...top.map(d => `${d.spec.design_id} · ${TIER_LABEL[d.spec.tier]} · distance ${d.topDistance ?? 'n/a'}`),
-        'At least one per tier, with a distance threshold so they do not converge',
+        // MD 가 이 구성을 매장에 깔았을 때 · 예전에는 계산만 하고 어디에도 안 실렸다
+        ...(st.mdFloorNote ? [`On the floor: ${st.mdFloorNote}`] : ['At least one per tier, with a distance threshold so they do not converge']),
       ],
       tone: 'accent',
     })
@@ -434,29 +446,43 @@ export function buildBoardModel(st: RunState): BoardModel {
       })
     })
   }
-  // ── 7 베리에이션 · 스케치 하나에서 갈라진 실제 제품안들 ─────────────
-  let varRow = 0
+  // ── 8 컨셉 · 한 스케치 위의 다른 디자인들 (형태 고정, 소재·컬러·창의도만 다름) ─────
+  //
+  // 이 레인이 곧 '베리에이션'이다. 6번 칸의 히어로가 첫 컨셉(commercial_safe)이고, 여기 오는 것이
+  // 두 번째부터다. 예전에는 렌더 뒤에 스타일 슬라이더로 편집한 컷이 여기 걸렸는데, 그 편집은
+  // 조사·게놈·브랜드를 보지 않아 카드가 '왜'를 말할 수 없었다. 이제 컨셉마다 why 와 angle 이 있다.
+  // 옛 저장본의 view:'variation' 컷도 같은 자리에 그대로 읽는다.
+  let conRow = 0
   st.designs.filter(d => !d.rejected).forEach(d => {
-    const vars = d.images.filter(im => im.view === 'variation')
-    vars.forEach((im, k) => {
+    const concepts = d.images.filter(im => (im.view === 'design' && im.concept) || im.view === 'variation')
+    concepts.forEach((im, k) => {
       const id = `var-${d.spec.design_id}-${k}`
-      // 무엇을 얼마나 밀었는지 · 슬라이더 값이 있으면 그대로 보여 준다
+      const isConcept = !!im.concept
+      // 옛 슬라이더 컷은 무엇을 밀었는지만 남아 있다 · 있는 그대로 보여 준다
       const sl = im.sliders
-        ? Object.entries(im.sliders)
-            .filter(([, v]) => Math.abs(v) > 0.2)
+        ? Object.entries(im.sliders).filter(([, v]) => Math.abs(v) > 0.2)
             .map(([key, v]) => `${key.split('_').slice(1).join(' ')} ${v > 0 ? '+' : ''}${v.toFixed(2)}`)
         : []
       nodes.push({
-        id, kind: 'design', column: 7, row: varRow++,
-        title: `${d.spec.design_id} · ${(im.variantAxis ?? 'Variation').split(' · ')[0]}`,
-        body: [
-          im.variantAxis?.split(' · ')[1] ?? 'One axis changed',
-          sl.length ? `Sliders: ${sl.join(', ')}` : '',
-          'Structure and palette held; only this axis moved.',
-        ].filter(Boolean),
+        id, kind: 'design', column: 7, row: conRow++,
+        title: isConcept
+          ? `${d.spec.design_id} · ${im.concept!.name}`
+          : `${d.spec.design_id} · ${(im.variantAxis ?? 'Variation').split(' · ')[0]}`,
+        body: isConcept
+          ? [
+              `Concept ${im.concept!.index + 1} · ${im.concept!.angle.replace(/_/g, ' ')}`,
+              im.whyUsed ?? '',
+              'Same sketch as the hero. Only material, colour and finish moved.',
+            ].filter(Boolean)
+          : [
+              im.variantAxis?.split(' · ')[1] ?? 'One axis changed',
+              sl.length ? `Sliders: ${sl.join(', ')}` : '',
+              'Structure and palette held; only this axis moved.',
+            ].filter(Boolean),
         imageUrl: im.url,
+        prompts: im.promptUsed ? [`Concept prompt: ${im.promptUsed.slice(0, 200)}${im.promptUsed.length > 200 ? '…' : ''}`] : undefined,
       })
-      edges.push({ from: d.spec.design_id, to: id, label: (im.variantAxis ?? 'variation').split(' · ')[0] })
+      edges.push({ from: d.spec.design_id, to: id, label: isConcept ? im.concept!.angle.replace(/_/g, ' ') : (im.variantAxis ?? 'variation').split(' · ')[0] })
     })
   })
 

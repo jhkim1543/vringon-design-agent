@@ -1314,8 +1314,7 @@
     "moderate rocker"
    ],
    "image_urls": [
-    "https://image.msscdn.net/thumbnails/images/goods_img/20260112/5884226/5884226_17682026805765_500.jpg",
-    "https://image.msscdn.net/thumbnails/images/prd_img/20260112/5884226/detail_5884226_17682026876222_500.jpg"
+    "/samples/1ad88f507a3d74d08d416dc6.webp"
    ],
    "product_url": "https://www.musinsa.com/products/5884226",
    "retailer": "무신사 스토어"
@@ -1352,8 +1351,7 @@
     "moderate rocker"
    ],
    "image_urls": [
-    "https://image.msscdn.net/thumbnails/images/goods_img/20250418/5042975/5042975_17454032311548_500.jpg",
-    "https://image.msscdn.net/thumbnails/images/prd_img/20250418/5042975/detail_5042975_17454032363389_500.jpg"
+    "/samples/1d5b49f671513761d69bbc4d.webp"
    ],
    "product_url": "https://www.musinsa.com/products/5042975",
    "retailer": "무신사 스토어"
@@ -1390,8 +1388,7 @@
     "moderate rocker"
    ],
    "image_urls": [
-    "https://static.nike.com/a/images/t_web_pdp_936_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/bcc74905-983b-4bf5-8417-6c187b8758c8/NIKE%2BVOMERO%2B18.png",
-    "https://static.nike.com/a/images/t_prod_ps/w_1536%2Cc_auto%2Car_4%3A5%2Cf_auto%2Cq_auto/845727d1-ba37-418a-a382-23d421ac82c8/image.jpg"
+    "/samples/88b55c3cad3c36c93a014c20.jpg"
    ],
    "product_url": "https://www.nike.com/kr/t/%EB%82%98%EC%9D%B4%ED%82%A4-%EB%B3%B4%EB%A9%94%EB%A1%9C-18-sUlilE2b/HM6803-005",
    "retailer": "Nike.com KR"
@@ -1429,8 +1426,7 @@
     "mild rocker"
    ],
    "image_urls": [
-    "https://img.runningwarehouse.com/watermark/rs.php?nw=455&path=A1AESM1-1.jpg",
-    "https://img.runningwarehouse.com/watermark/rs.php?nw=455&path=A1AESM1-2.jpg"
+    "/samples/aae523614e95d2a1ceb14592.webp"
    ],
    "product_url": "https://www.runningwarehouse.com/adidas_adizero_Evo_SL/descpage-A1AESM1.html",
    "retailer": "Running Warehouse"
@@ -1475,7 +1471,7 @@
    "size_status": "sold_out",
    "colorway_count": 4,
    "image_urls": [
-    "https://img.ssfshop.com/cmd/LB_500x660/src/https%3A//img.ssfshop.com/goods/SPRT/26/07/01/GR3826070135295_0_ORGINL_20260701164154487.jpg"
+    "/samples/9e3cbe5b2a58c1fb9ddd53e7.jpg"
    ],
    "product_url": "https://asics.co.kr/p/AKR_112630211-002"
   },
@@ -1519,7 +1515,7 @@
    "size_status": "full",
    "colorway_count": 5,
    "image_urls": [
-    "https://img.ssfshop.com/cmd/LB_750x1000/src/https%3A//img.ssfshop.com/goods/SPRT/26/01/06/GR3826010609756_0_ORGINL_20260106165740264.jpg"
+    "/samples/0fdf824877ae4febbaf9e196.jpg"
    ],
    "product_url": "https://www.asics.co.kr/p/AKR_112630225-004"
   },
@@ -1569,8 +1565,7 @@
    "available_sizes": 15,
    "size_status": "full",
    "image_urls": [
-    "https://cdn.011st.com/11dims/resize/600x600/quality/75/11src/cat/25/0/6/5/6/7/7/RmUqK/453065677_1.jpg",
-    "https://static.fetchingapp.co.kr/itemImage/69259c5f8326f8013caf0d68ffe1bf46.jpg"
+    "/samples/7de9a79494063c51ea431b85.jpg"
    ],
    "product_url": "https://www.nike.com/kr/t/%EB%B3%B4%EB%A9%94%EB%A1%9C-18-%EB%82%A8%EC%84%B1-%EB%A1%9C%EB%93%9C-%EB%9F%AC%EB%8B%9D%ED%99%94-sUlilE2b/HM6803-005"
   },
@@ -1613,8 +1608,7 @@
    "available_sizes": 17,
    "size_status": "full",
    "image_urls": [
-    "https://feature.com/cdn/shop/files/Nike-Vomero-Plus---Black-Black-Anthracite--IO4482-002---02-06-26---Feature--RV-4.jpg",
-    "https://www.solesense.com/cdn/shop/products/nike-vomero-plus-black-anthracite-io4482-002-2.jpg"
+    "/samples/73ab8c4d4bf7462de3885441.webp"
    ],
    "product_url": "https://www.nike.com/kr/t/%EB%B3%B4%EB%A9%94%EB%A1%9C-%ED%94%8C%EB%9F%AC%EC%8A%A4-%EB%82%A8%EC%84%B1-%EB%A1%9C%EB%93%9C-%EB%9F%AC%EB%8B%9D%ED%99%94-5YDCfF7R"
   },
@@ -1658,7 +1652,7 @@
    "size_status": "sold_out",
    "colorway_count": 1,
    "image_urls": [
-    "https://image.yswholesale.com/yssports/images/stock_1.jpg"
+    "/samples/6456830fb933f12a2058c18c.jpg"
    ],
    "product_url": "https://www.onyourmark-running.com/product/%ED%98%B8%EC%B9%B4-%EB%A7%88%ED%95%98-61147790sntf/3038/display/1/%7B%24relativeTerm_url%7D"
   },
@@ -1705,8 +1699,7 @@
    "size_status": "sold_out",
    "colorway_count": 3,
    "image_urls": [
-    "https://image.sellic.co.kr/images/product_img/006/039/715/original/HK-1162012-FTCL.png",
-    "https://fleetrunner.co.kr/data/editor/goods/250801/eeb5c5ffd2c7cf006581f75c0ec4388c_183137.png"
+    "/samples/cca0d9c2535ca93a02a20562.png"
    ],
    "product_url": "https://fleetrunner.co.kr/goods/goods_view.php?goodsNo=10691"
   },
@@ -1747,7 +1740,7 @@
    "size_status": "sold_out",
    "colorway_count": 1,
    "image_urls": [
-    "https://mabseoul.com/web/product/big/placeholder.png"
+    "/samples/7c2019a8fd7b6fca8cf7752e.png"
    ],
    "product_url": "https://mabseoul.com/product/detail.html?cate_no=0&display_group=0&product_no=2422"
   }
@@ -2063,7 +2056,7 @@
       },
       "grade": "big",
       "silhouette_spec": "퍼포먼스 러닝 라스트, 엔지니어드 메시 어퍼, 얇은 분절 러버 아웃솔, 풀길이 카본 플레이트, 시멘티드 공법",
-      "image_url": "https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/535a97b9-4a70-4f86-8374-4a838a989bae/W%2BZOOM%2BFLY%2B6.png"
+      "image_url": "/samples/023602a5a9784d358e7af8f9.jpg"
      },
      {
       "segment": "women",
@@ -2079,7 +2072,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "미디엄 볼륨 라스트, 우븐 메시, Pebax® 플레이트, 전략 러버 포드, 시멘티드",
-      "image_url": "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/1cf67d88-5ac2-43e0-a75d-44f4a54130bc/5c80438e/1169610-bkstr_bkstr_01.jpg"
+      "image_url": "/samples/c91ac502557148e66091e4a7.avif"
      },
      {
       "segment": "women",
@@ -2095,7 +2088,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "퍼포먼스 러닝 라스트, 엔지니어드 메시, ASICSGRIP 구역 러버, 풀길이 카본 플레이트, 시멘티드",
-      "image_url": "https://images.asics.com/is/image/asics/1012B676_101_SL_LT_GLB?%24sfcc-product%24="
+      "image_url": "/samples/6e91e1d6d6cd95958ba475bc.jpg"
      },
      {
       "segment": "men",
@@ -2111,7 +2104,7 @@
       },
       "grade": "big",
       "silhouette_spec": "미디엄 볼륨 라스트, 엔지니어드 메시, 얇은 분절 러버, 풀길이 카본 플레이트, 시멘티드",
-      "image_url": "https://static.nike.com/a/images/t_web_pdp_936_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/fc282e42-102c-4667-87f1-306ab371dde7/ZOOM%2BFLY%2B6%2BCM.png"
+      "image_url": "/samples/76bd3d1df922332075ca516c.jpg"
      },
      {
       "segment": "men",
@@ -2127,7 +2120,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "퍼포먼스 라스트, 우븐 어퍼, Pebax® 플레이트, 전략 러버 포드, 시멘티드",
-      "image_url": "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/1cf67d88-5ac2-43e0-a75d-44f4a54130bc/5c80438e/1169610-bkstr_bkstr_01.jpg"
+      "image_url": "/samples/c91ac502557148e66091e4a7.avif"
      },
      {
       "segment": "men",
@@ -2143,7 +2136,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "미디엄 볼륨 라스트, 엔지니어드 메시, ASICSGRIP 러버, 풀길이 카본 플레이트, 시멘티드",
-      "image_url": "https://images.asics.com/is/image/asics/1011B875_750_SL_LT_GLB?%24sfcc-product%24="
+      "image_url": "/samples/6e5cc30bfdf946836a63d014.jpg"
      },
      {
       "segment": "kids",
@@ -2159,7 +2152,7 @@
       },
       "grade": "stable",
       "silhouette_spec": "주니어 라스트, 경량 메시 어퍼, 분절 러버 아웃솔, 반사 포인트, 시멘티드",
-      "image_url": "https://static.nike.com/a/images/t_web_pdp_936_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/2afac9b1-1d39-44a7-87bd-511117cf4005/AIR%2BZOOM%2BPEGASUS%2B42%2B%28GS%29.png"
+      "image_url": "/samples/9994aa5a6ed98a764f095be0.jpg"
      },
      {
       "segment": "kids",
@@ -2175,7 +2168,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "주니어 라스트, 우븐 니트 메시, 하이 어브레이전 러버, 안정 힐 쉘, 시멘티드",
-      "image_url": "https://media.nz.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/c02520a1-b7df-4ff4-93ad-26cf96e94b7d/3ddb307e/1131170-bwht_bwht_03.jpg"
+      "image_url": "/samples/7d3072250ab4cbdf8678d01f.avif"
      },
      {
       "segment": "kids",
@@ -2191,7 +2184,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "주니어 라스트, 엔지니어드 메시, 솔리드 러버 아웃솔, 토캡 스티칭, 시멘티드",
-      "image_url": "https://images.asics.com/is/image/asics/1014A298_701_SR_RT_GLB?%24zoom%24="
+      "image_url": "/samples/9686b1d5488e5261d943f737.jpg"
      }
     ],
     "grade": "big",
@@ -2364,7 +2357,7 @@
       },
       "grade": "big",
       "silhouette_spec": "라운드 토·로우 힐·엔지니어드 메시·레이스업·리플렉티브 테이프",
-      "image_url": "https://nmp.about.nike.com/about/prod/5593cfa7-39ca-407f-a2f2-4347be5c2d96/su24-peg41-volt-womens-hero-re.jpg?m=eyJlZGl0cyI6eyJqcGVnIjp7InF1YWxpdHkiOjEwMH0sIndlYnAiOnsicXVhbGl0eSI6MTAwfSwiZXh0cmFjdCI6eyJsZWZ0IjowLCJ0b3AiOjEyNSwid2lkdGgiOjMwMDAsImhlaWdodCI6MjAwMH0sInJlc2l6ZSI6eyJ3aWR0aCI6Mzg0MH19fQ%3D%3D&s=573e04a5481b427997d68e9632ea0da6f459e0cef3cec5578e9b43248cbd715c"
+      "image_url": "/samples/c55b44bf007401f5a5a9ec20.avif"
      },
      {
       "segment": "women",
@@ -2380,7 +2373,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "세미 라운드 토·로우 힐·엔지니어드 메시·레이스업·토 캡 보강",
-      "image_url": "https://assets.asics.com/system/media_libraries/17334/file.press.jpg?20250326174145="
+      "image_url": "/samples/5bda0ae8418bc3234eabc32f.jpg"
      },
      {
       "segment": "women",
@@ -2396,7 +2389,7 @@
       },
       "grade": "stable",
       "silhouette_spec": "라운드 토·로우 힐·엔지니어드 메시·레이스업·미니멀 오버레이",
-      "image_url": "https://media.nz.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/83c50d0b-a6e9-4c65-86df-ad6e16f2d278/c5a3fce6/1127896-lcs_lcs_01.jpg"
+      "image_url": "/samples/41a04793d3f7a51518ca2fd7.avif"
      },
      {
       "segment": "men",
@@ -2412,7 +2405,7 @@
       },
       "grade": "big",
       "silhouette_spec": "세미 라운드 토·로우 힐·엔지니어드 메시·레이스업·리플렉티브 디테일",
-      "image_url": "https://nmp.about.nike.com/about/prod/5593cfa7-39ca-407f-a2f2-4347be5c2d96/su24-peg41-volt-womens-hero-re.jpg?m=eyJlZGl0cyI6eyJqcGVnIjp7InF1YWxpdHkiOjEwMH0sIndlYnAiOnsicXVhbGl0eSI6MTAwfSwiZXh0cmFjdCI6eyJsZWZ0IjowLCJ0b3AiOjEyNSwid2lkdGgiOjMwMDAsImhlaWdodCI6MjAwMH0sInJlc2l6ZSI6eyJ3aWR0aCI6Mzg0MH19fQ%3D%3D&s=573e04a5481b427997d68e9632ea0da6f459e0cef3cec5578e9b43248cbd715c"
+      "image_url": "/samples/c55b44bf007401f5a5a9ec20.avif"
      },
      {
       "segment": "men",
@@ -2428,7 +2421,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "라운드 토·로우 힐·엔지니어드 메시·레이스업·힐 클립 내부",
-      "image_url": "https://assets.asics.com/system/media_libraries/17334/file.press.jpg?20250326174145="
+      "image_url": "/samples/5bda0ae8418bc3234eabc32f.jpg"
      },
      {
       "segment": "men",
@@ -2460,7 +2453,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "세미 라운드 토·로우 힐·엔지니어드 메시·레이스업·리플렉티브 테이프",
-      "image_url": "https://static.nike.com/a/images/t_web_pdp_936_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/9542c72c-ee2c-4c79-93ec-2ef516bdffea/AIR%2BZOOM%2BPEGASUS%2B41%2B%28GS%29.png"
+      "image_url": "/samples/57e29405e0d6eecac98e3c4d.jpg"
      },
      {
       "segment": "kids",
@@ -2476,7 +2469,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "라운드 토·로우 힐·엔지니어드 메시·레이스업·토 캡 보강",
-      "image_url": "https://media.nz.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/afe8e9e4-9826-432e-8460-8462fe64c830/e40c2013/1131170-shtg_shtg_01.jpg"
+      "image_url": "/samples/50a85e0548ca7a901e42b24c.avif"
      },
      {
       "segment": "kids",
@@ -2665,7 +2658,7 @@
       },
       "grade": "big",
       "silhouette_spec": "토 러닝 라운드, 힐 10mm 비벨, 소재 엔지니어드 메쉬, 클로저 레이스, 부자재 외장 힐카운터·리플렉티브",
-      "image_url": "https://images.asics.com/is/image/asics/1012B670_101_SR_RT_GLB?%24zoom%24="
+      "image_url": "/samples/296e9bcdaf2719185797b86f.webp"
      },
      {
       "segment": "women",
@@ -2681,7 +2674,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "토 라운드, 힐 6mm 비벨, 소재 creel jacquard 메쉬, 클로저 레이스, 부자재 패딩 칼라·내장 프레임",
-      "image_url": "https://media.au.hoka.com/cdn-cgi/image/fit%3Dscale-down%2Cf%3Dauto%2Cw%3D1280/products/326e32fc-b726-4326-9d39-98c7cbbfc845/7ad0eb16/1134235-swml_swml_02.jpg"
+      "image_url": "/samples/ad18ffb8a7125b1062dad77c.avif"
      },
      {
       "segment": "women",
@@ -2697,7 +2690,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "토 라운드, 힐 10mm 비벨, 소재 엔지니어드 메쉬, 클로저 레이스, 부자재 힐 클립·리플렉티브",
-      "image_url": "https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/f0958727-9cee-41e9-b615-393a11217a84/W%2BNIKE%2BSTRUCTURE%2B26%2BESS.png"
+      "image_url": "/samples/50685e8040d902f2b4fee57d.jpg"
      },
      {
       "segment": "men",
@@ -2713,7 +2706,7 @@
       },
       "grade": "early_sign",
       "silhouette_spec": "토 라운드, 힐 10mm 비벨, 소재 엔지니어드 메쉬, 클로저 레이스, 부자재 미드풋 서포트·리플렉티브",
-      "image_url": "https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto%2Cu_9ddf04c7-2a9a-4d76-add1-d15af8f0263d%2Cc_scale%2Cfl_relative%2Cw_1.0%2Ch_1.0%2Cfl_layer_apply/aa001ff5-8d32-45f1-bba8-d4e66914d478/NIKE%2BSTRUCTURE%2BPLUS%2BRR.png"
+      "image_url": "/samples/850147a2b0d24588d1ccde7c.jpg"
      },
      {
       "segment": "men",
@@ -2729,7 +2722,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "토 라운드, 힐 8mm 비벨, 소재 엔지니어드 메쉬, 클로저 레이스, 부자재 외장 힐카운터",
-      "image_url": "https://images.asics.com/is/image/asics/1011C056_001_SB_FR_GLB?%24sfcc-product%24="
+      "image_url": "/samples/8f9f907117b2e53e9ab0d700.jpg"
      },
      {
       "segment": "men",
@@ -2761,7 +2754,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "토 라운드, 힐 8.5mm 비벨, 소재 엔지니어드 메쉬, 클로저 레이스, 부자재 AHARPLUS 힐 플러그",
-      "image_url": "https://images.asics.com/is/image/asics/1014A380_005_SL_LT_GLB?%24sfcc-product%24="
+      "image_url": "/samples/3ecd119c4fc78ab9f0311c02.jpg"
      },
      {
       "segment": "kids",
@@ -2966,7 +2959,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "토 세이프 라운드, 힐 5mm 로커, 엔지니어드 메시, 분절 러버, 시멘티드",
-      "image_url": "https://www.rei.com/media/da206698-fc55-4297-84fc-1fe91c521b10.jpg?size=784x588"
+      "image_url": "/samples/1f2d687af779da6dd476246a.avif"
      },
      {
       "segment": "women",
@@ -2982,7 +2975,7 @@
       },
       "grade": "stable",
       "silhouette_spec": "토 세이프 라운드, 힐 10mm 드롭, 엔지니어드 메시, 분절 러버, 시멘티드",
-      "image_url": "https://images.footlocker.com/is/image/EBFL2/B8502001?wid=1200&hei=1200&fmt=png-alpha"
+      "image_url": "/samples/3724c1242891ec1e3dd0c4a1.webp"
      },
      {
       "segment": "women",
@@ -3014,7 +3007,7 @@
       },
       "grade": "big",
       "silhouette_spec": "토 세이프 라운드, 힐 5mm 로커, 엔지니어드 메시, 분절 러버, 시멘티드",
-      "image_url": "https://www.rei.com/media/9d13a208-0472-4f5c-9b7f-1c438d6f693d.jpg?size=784x588"
+      "image_url": "/samples/ec1264038a88321f7352a41b.avif"
      },
      {
       "segment": "men",
@@ -3030,7 +3023,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "토 세이프 라운드, 힐 10mm 드롭, 엔지니어드 메시, 분절 러버, 시멘티드",
-      "image_url": "https://www.rei.com/media/bae2c805-af88-41e4-be9b-7adfed759c55.jpg?size=784x588"
+      "image_url": "/samples/c9f4a32236a3f3ab52254cd3.avif"
      },
      {
       "segment": "men",
@@ -3046,7 +3039,7 @@
       },
       "grade": "early_sign",
       "silhouette_spec": "토 세이프 라운드, 힐 5~8mm 드롭, 엔지니어드 메시, 분절 러버, 시멘티드",
-      "image_url": "https://m.media-amazon.com/images/I/71BZsJYITRL._AC_SR73%2C58_.jpg"
+      "image_url": "/samples/48298dcf648ff2c373bf1623.jpg"
      },
      {
       "segment": "kids",
@@ -3062,7 +3055,7 @@
       },
       "grade": "safe",
       "silhouette_spec": "토 세이프 라운드, 힐 5mm 드롭, 엔지니어드 메시, 분절 러버, 시멘티드",
-      "image_url": "https://m.media-amazon.com/images/I/71vXaOuCDHL._AC_SR73%2C58_.jpg"
+      "image_url": "/samples/4c0a1399130ac3feeae8ee46.jpg"
      },
      {
       "segment": "kids",
