@@ -1052,25 +1052,37 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
           })),
         })
         if (cancelled) return
+        // design_id 를 느슨하게 맞춘다. 스키마는 string 이지만 모델이 "[SH-26FW-C02]" 처럼
+        // 대괄호를 붙여 보내는 경우가 있고, 그러면 === 비교가 전부 실패한다.
+        // 실제로 그렇게 되면 MD 가 고른 것이 하나도 안 잡혀 지표 순위로 조용히 되돌아갔다 —
+        // 로그에는 "MD picks ..." 가 그대로 찍히므로 겉으로는 반영된 것처럼 보인다.
+        const normId = (v: unknown) => String(v ?? '').replace(/[[\]\s"']/g, '').toUpperCase()
+        const findById = (v: unknown) => topCandidates.find(x => normId(x.spec.design_id) === normId(v))
+
         // 평가를 각 안에 붙인다. 카드가 이걸 그대로 보여 준다.
         for (const r of review.reviews ?? []) {
-          const d = topCandidates.find(x => x.spec.design_id === r.design_id)
-          if (d) d.mdReview = r
+          const d = findById(r.design_id)
+          if (d) { d.mdReview = r; emit({ kind: 'design-update', design: { ...d } }) }
         }
         for (const p of review.picks ?? []) {
-          const d = topCandidates.find(x => x.spec.design_id === p.design_id)
-          if (d) d.mdPick = p
+          const d = findById(p.design_id)
+          if (d) { d.mdPick = p; emit({ kind: 'design-update', design: { ...d } }) }
+        }
+        // 못 맞춘 것은 말한다. 조용히 버리면 MD 판단이 사라진 것을 아무도 모른다.
+        const unmatched = (review.picks ?? []).filter(p => !findById(p.design_id))
+        if (unmatched.length) {
+          emit({ kind: 'log', stage: 'S4', text: `${unmatched.length} MD pick(s) did not match any candidate id (${unmatched.map(p => String(p.design_id)).join(', ')}) · those picks are not applied` })
         }
         if (review.floor_note) emit({ kind: 'md-floor-note', text: review.floor_note })
         const buys = (review.reviews ?? []).filter(r => r.verdict === 'buy').length
         const fixes = (review.reviews ?? []).filter(r => r.verdict === 'buy_if_fixed').length
         emit({ kind: 'log', stage: 'S4', text: `MD verdict: ${buys} to buy, ${fixes} to buy if fixed, ${(review.reviews ?? []).length - buys - fixes} passed${review.cached ? ' (reused an earlier pass)' : ''}` })
         for (const p of (review.picks ?? []).slice(0, 3)) {
-          emit({ kind: 'log', stage: 'S4', text: `MD picks ${p.design_id} as ${p.role_in_range}: ${p.reason}` })
+          emit({ kind: 'log', stage: 'S4', text: `MD picks ${findById(p.design_id)?.spec.design_id ?? String(p.design_id)} as ${p.role_in_range}: ${p.reason}` })
         }
         if (review.floor_note) emit({ kind: 'log', stage: 'S4', text: `On the floor: ${review.floor_note}` })
         // MD가 실제로 고른 것이 있으면 그것이 최종 선정이다. 지표 순위보다 사람의 판단이 앞선다.
-        const picked = (review.picks ?? []).map(p => topCandidates.find(x => x.spec.design_id === p.design_id)).filter((x): x is Design => !!x)
+        const picked = (review.picks ?? []).map(p => findById(p.design_id)).filter((x): x is Design => !!x)
         if (picked.length) {
           top.forEach(d => { d.isTop = false; emit({ kind: 'design-update', design: { ...d } }) })
           top.length = 0
