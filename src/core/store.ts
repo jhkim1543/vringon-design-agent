@@ -2,6 +2,10 @@
 // 진행 중인 Run도 계속 저장한다. 새로고침이나 렌더 오류로 화면이 날아가도
 // 결과를 잃지 않게 하기 위한 것이다.
 import { isSketchView } from './types'
+
+/** 마지막 저장 실패 사유 · 화면이 "저장되지 않았다"고 말할 수 있어야 한다 */
+let saveError: string | null = null
+export function lastSaveError(): string | null { return saveError }
 import type { RunState } from './types'
 
 export interface RunRecord {
@@ -26,8 +30,13 @@ function read<T>(k: string, fallback: T): T {
 }
 
 function write(k: string, v: unknown) {
-  try { localStorage.setItem(k, JSON.stringify(v)) }
-  catch { /* 용량 초과 시 조용히 넘긴다. 저장 실패가 실행을 막으면 안 된다 */ }
+  try { localStorage.setItem(k, JSON.stringify(v)); saveError = null }
+  catch (e) {
+    // 저장 실패가 실행을 막아선 안 되지만, 조용히 넘어가서도 안 된다.
+    // 용량이 차면 사용자는 분석을 다 돌리고도 그게 남지 않았다는 걸 모른 채 창을 닫는다.
+    saveError = String((e as Error)?.message ?? e)
+    console.warn('[store] 저장 실패 · 이 분석은 브라우저에 남지 않는다:', saveError)
+  }
 }
 
 /** 이 앱이 주얼리도 다루던 시절의 Run이 브라우저에 남아 있다.

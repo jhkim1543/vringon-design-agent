@@ -195,7 +195,7 @@ export default function BrandSetup({ brand, onSave, onClose }: {
                     <div className="logo-prev"><img src={b.logo.dataUrl} alt={t('Logo')} /></div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 12.5, fontWeight: 600 }}>{b.logo.name}</div>
-                      <div className="hint">{t('Kept in this browser only. Never uploaded.')}</div>
+                      <div className="hint">{t('The file stays in this browser. When a render needs the mark, the image is sent to the server to composite it, and that composite is cached there.')}</div>
                     </div>
                     <button className="btn btn-ghost btn-sm" onClick={() => set('logo', null)}>{t('Remove')}</button>
                   </div>

@@ -128,7 +128,11 @@ export function brandPromptClause(b: BrandIdentity): string {
   // 로고를 파일로 얹기만 하면 네모난 판을 붙인 티가 난다. 실제 마크는 패널을 타고 휜다.
   // 그래서 "로고가 적용된 제품 사진"을 올렸으면, 거기서 읽어 낸 형태 묘사를 프롬프트에 싣는다.
   // 상표명은 절대 싣지 않는다 — 이름을 주면 모델이 기억 속의 다른 것을 그린다. 형태만 준다.
-  if (b.applyLogoToImages && b.logo && b.logo.placement !== 'none') {
+  // clasp·pendant 는 주얼리 시절의 위치다. 옛 저장본에 남아 있으면 신발 프롬프트에
+  // "on the clasp" 가 실린다 — 신발에 없는 자리다. 위치를 못 쓰면 마크 지시를 빼는 편이
+  // 엉뚱한 곳을 지시하는 것보다 낫다.
+  const SHOE_PLACEMENTS = ['tongue', 'heel', 'side', 'insole']
+  if (b.applyLogoToImages && b.logo && SHOE_PLACEMENTS.includes(b.logo.placement)) {
     const where: Record<string, string> = {
       tongue: 'on the tongue', heel: 'on the heel counter', side: 'on the lateral side panel',
       insole: 'on the insole', clasp: 'on the clasp', pendant: 'on the pendant face',

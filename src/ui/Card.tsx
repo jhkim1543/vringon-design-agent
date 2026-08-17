@@ -125,7 +125,7 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
       {onVerdict && !d.rejected && (
         <div className="gate-actions">
           {d.verdict === 'approve' && <Tag kind="ok">{t('Approved')}</Tag>}
-          {d.verdict === 'reject' && <Tag kind="danger">Rejected · {d.verdictTags?.join(', ')}</Tag>}
+          {d.verdict === 'reject' && <Tag kind="danger">{t('Rejected')} · {d.verdictTags?.join(', ')}</Tag>}
           {!d.verdict && !pendingReject && (<>
             <button className="btn btn-ok btn-sm" onClick={() => onVerdict(d.spec.design_id, 'approve', [])}>{t('Approve')}</button>
             <button className="btn btn-danger btn-sm" onClick={() => setPendingReject(true)}>{t('Reject')}</button>

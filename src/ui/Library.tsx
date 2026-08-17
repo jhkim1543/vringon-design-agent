@@ -2,7 +2,7 @@
 import { t } from '../core/i18n'
 import { useMemo, useState } from 'react'
 import type { RunRecord } from '../core/store'
-import { deleteRun, listRuns, toggleFavorite } from '../core/store'
+import { deleteRun, lastSaveError, listRuns, toggleFavorite } from '../core/store'
 import { CAT_LABEL, MODE_LABEL, TIER_LABEL, TYPE_LABEL } from '../core/types'
 import { Tag } from './bits'
 
@@ -37,6 +37,13 @@ export default function Library({ onOpen, filter: initial = 'all' }: {
         <div>
           <h1>{t('Library')}</h1>
           <p className="lead">{t('Past runs, with their boards. Star the ones worth keeping.')}</p>
+          {/* 저장이 실패했으면 여기서 말한다. 브라우저 저장소가 차면 분석을 다 돌리고도
+              남지 않는데, 조용히 넘어가면 사용자는 그걸 모른 채 창을 닫는다. */}
+          {lastSaveError() && (
+            <p className="lead" style={{ color: 'var(--danger)' }}>
+              {t('The last run could not be saved to this browser — its storage is full. Export what you need before closing the tab.')}
+            </p>
+          )}
         </div>
         <div className="chiprow" style={{ flex: 'none' }}>
           <button className={`pick sm ${filter === 'all' ? 'on' : ''}`} onClick={() => setFilter('all')}>

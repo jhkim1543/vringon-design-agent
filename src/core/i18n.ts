@@ -943,4 +943,9 @@ const KO: Record<string, string> = {
   'stiff': '뻣뻣하게',
   'flexible': '유연하게',
   'Not set': '미설정',
+
+  // ── 브랜드 설정 정직성 수정 · 실제로 일어나는 일을 적는다 ──
+  'The file stays in this browser. When a render needs the mark, the image is sent to the server to composite it, and that composite is cached there.': '파일은 이 브라우저에 있습니다. 렌더에 마크를 얹을 때만 그 이미지가 서버로 가서 합성되고, 합성본은 서버 캐시에 남습니다.',
+  'Approve or reject on the cards. Rejected picks are dropped before campaign shots and 3D, and the reasons are summarised on this board.': '카드에서 승인하거나 반려하세요. 반려한 안은 캠페인 컷과 3D 전에 빠지고, 사유는 이 보드에 요약됩니다.',
+  'The last run could not be saved to this browser — its storage is full. Export what you need before closing the tab.': '마지막 분석을 이 브라우저에 저장하지 못했습니다 — 저장 공간이 찼습니다. 탭을 닫기 전에 필요한 것을 내보내세요.',
 }

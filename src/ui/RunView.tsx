@@ -393,7 +393,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
         {gated && (
           <div className="gatebar">
             <span style={{ fontWeight: 700 }}>{t('Review gate')}</span>
-            <span className="hint">{t('Approve or reject on the cards. Reasons feed the next run.')}</span>
+            <span className="hint">{t('Approve or reject on the cards. Rejected picks are dropped before campaign shots and 3D, and the reasons are summarised on this board.')}</span>
             <span style={{ marginLeft: 'auto' }} className="hint">{approvedCount} approved · {rejectedCount} rejected</span>
             <button className="btn btn-primary btn-sm" onClick={onResume}>{t('Continue')}</button>
           </div>
