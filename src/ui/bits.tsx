@@ -1,5 +1,5 @@
 // 공용 소형 컴포넌트
-import { LANGS, setLang, useLang } from '../core/i18n'
+import { LANGS, setLang, useLang, t } from '../core/i18n'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 
@@ -36,7 +36,8 @@ export function Seg<T extends string | number>({ options, value, onChange, forma
     <div className="seg">
       {options.map(o => (
         <button key={String(o)} className={o === value ? 'on' : ''} onClick={() => onChange(o)}>
-          {format ? format(o) : String(o)}
+          {/* format 이 없으면 값 그대로 찍혀 언어 전환이 안 닿았다. 기본도 사전을 거친다. */}
+          {format ? format(o) : t(String(o).replace(/_/g, ' '))}
         </button>
       ))}
     </div>
@@ -74,7 +75,7 @@ export function Tag({ kind, children }: { kind?: 'accent' | 'ok' | 'warn' | 'dan
 export function LangToggle() {
   const lang = useLang()
   return (
-    <div className="langtoggle" role="group" aria-label="Language">
+    <div className="langtoggle" role="group" aria-label={t('Language')}>
       {LANGS.map(l => (
         <button key={l.id} className={lang === l.id ? 'on' : ''}
           onClick={() => setLang(l.id)}

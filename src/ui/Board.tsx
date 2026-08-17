@@ -859,7 +859,7 @@ function BoardInner({ st, onVerdict, runId, onBoardImage }: { st: RunState; onVe
             ? currentNode.design.rationale.narrative.map((n, i) => <div key={i}>{n}</div>)
             : currentNode.body.map((b, i) => <div key={i}>{b}</div>)}
           {currentNode.design?.viewMismatch && (
-            <div style={{ color: 'var(--warn)' }}>Details disagree between views on this one. The gap survived a regeneration and is left visible.</div>
+            <div style={{ color: 'var(--warn)' }}>{t('Details disagree between views on this one. The gap survived a regeneration and is left visible.')}</div>
           )}
           {currentNode.design && (
             <div style={{ color: 'var(--text-3)', marginTop: 4 }}>

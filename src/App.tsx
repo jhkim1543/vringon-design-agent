@@ -225,7 +225,7 @@ export default function App() {
         <div className="right">
           <button className={`btn btn-sm ${isBrandConfigured(brand) ? 'btn-ghost' : 'btn-primary'}`}
             onClick={() => setBrandOpen(true)}
-            title="Logo and brand rules ride along with every result">
+            title={t('Logo and brand rules ride along with every result')}>
             {isBrandConfigured(brand) ? brand.brandName : t('Set up brand')}
           </button>
           <LangToggle />

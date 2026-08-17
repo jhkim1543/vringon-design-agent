@@ -85,7 +85,8 @@ const STEPS = [
 ] as const
 
 // Seg에 쓰는 'Not set' 표기 · unknown을 그대로 노출하면 오타처럼 보인다
-const U_FMT = (v: string) => v === UNKNOWN ? 'Not set' : v.replace(/_/g, ' ')
+// 라인 프로필 값은 화면에만 번역해 보여 준다. 저장·프롬프트로 가는 값은 원래 enum 그대로다.
+const U_FMT = (v: string) => t(v === UNKNOWN ? 'Not set' : v.replace(/_/g, ' '))
 
 const OBJECTIVES = Object.keys(OBJECTIVE_LABEL) as ResearchObjective[]
 
@@ -254,8 +255,8 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                         onClick={() => set('itemType', firstTypeOf('shoe', g.id))}>
                         <span className="fam-ic"><Icon /></span>
                         <span className="fam-txt">
-                          <span className="fam-t">{g.label}</span>
-                          <span className="fam-n">{g.note}</span>
+                          <span className="fam-t">{t(g.label)}</span>
+                          <span className="fam-n">{t(g.note)}</span>
                         </span>
                       </button>
                     )
@@ -268,7 +269,7 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                 <div className="chiprow">
                   {(curGroup?.types ?? []).map(ty => (
                     <button key={ty.id} className={`pick ${p.itemType === ty.id ? 'on' : ''}`}
-                      onClick={() => set('itemType', ty.id)}>{ty.label}</button>
+                      onClick={() => set('itemType', ty.id)}>{t(ty.label)}</button>
                   ))}
                 </div>
               </div>
@@ -286,7 +287,7 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                   <button key={pr.id} className={`opt ${p.linePreset === pr.id ? 'on' : ''}`}
                     onClick={() => applyPreset(pr.id)}>
                     <span className="o-t">{t(pr.label)}</span>
-                    <span className="o-d">{pr.blurb}</span>
+                    <span className="o-d">{t(pr.blurb)}</span>
                     {p.linePreset === pr.id && <Badge />}
                   </button>
                 ))}
@@ -300,7 +301,7 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                 <div className="chiprow">
                   {(['daily', 'running', 'work', 'formal', 'outdoor', 'travel', 'occasion'] as const).map(u => (
                     <button key={u} className={`pick ${line.product.useCase === u ? 'on' : ''}`}
-                      onClick={() => setLine('product', { useCase: u })}>{u}</button>
+                      onClick={() => setLine('product', { useCase: u })}>{U_FMT(u)}</button>
                   ))}
                 </div>
               </div>
@@ -309,7 +310,7 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                 <div className="chiprow">
                   {(['urban', 'indoor', 'trail', 'court', 'wet_climate', 'all'] as const).map(u => (
                     <button key={u} className={`pick ${line.product.environment === u ? 'on' : ''}`}
-                      onClick={() => setLine('product', { environment: u })}>{u.replace('_', ' ')}</button>
+                      onClick={() => setLine('product', { environment: u })}>{U_FMT(u)}</button>
                   ))}
                 </div>
               </div>
@@ -572,7 +573,7 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                 <h2>{t('Your series')}</h2>
                 <div className="stack">
                   <span className="lbl">{t('Name')}</span>
-                  <input className="input" style={{ maxWidth: 260 }} placeholder="e.g. Arc line"
+                  <input className="input" style={{ maxWidth: 260 }} placeholder={t('e.g. Arc line')}
                     value={p.series.seriesName} onChange={e => setSeries({ seriesName: e.target.value })} />
                 </div>
                 <label className="dropzone">
@@ -759,9 +760,9 @@ export default function Wizard({ onStart }: { onStart: (p: RunParams) => void })
                   {(['fast', 'detail'] as const).map(id => (
                     <button key={id} className={`opt ${p.imageEngine === id ? 'on' : ''}`}
                       onClick={() => set('imageEngine', id)}>
-                      <span className="o-t">{ENGINES[id].label}</span>
-                      <span className="o-d">{ENGINES[id].blurb}</span>
-                      <span className="o-m">${ENGINES[id].usdPerImage.toFixed(3)} · {ENGINES[id].secPerImage}s each</span>
+                      <span className="o-t">{t(ENGINES[id].label)}</span>
+                      <span className="o-d">{t(ENGINES[id].blurb)}</span>
+                      <span className="o-m">${ENGINES[id].usdPerImage.toFixed(3)} · {ENGINES[id].secPerImage}s {t('each')}</span>
                       {p.imageEngine === id && <Badge />}
                     </button>
                   ))}

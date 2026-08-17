@@ -26,7 +26,7 @@ export default class ErrorBoundary extends Component<Props, State> {
       <div className="errpane">
         <div className="errbox">
           <h2>{t('Something broke while rendering')}</h2>
-          <p>The run itself is saved. Reload and it will come back from where it stopped.</p>
+          <p>{t('The run itself is saved. Reload and it will come back from where it stopped.')}</p>
           <pre>{String(error.message || error).slice(0, 400)}</pre>
           <div className="errbtns">
             <button className="btn btn-primary" onClick={() => location.reload()}>{t('Reload')}</button>

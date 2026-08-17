@@ -59,7 +59,7 @@ export default function Library({ onOpen, filter: initial = 'all' }: {
               <button className="lc-thumb" onClick={() => onOpen(r, 'board')}>
                 {r.thumb
                   ? <img src={r.thumb} alt="" onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-                  : <span className="lc-nothumb">No image</span>}
+                  : <span className="lc-nothumb">{t('No image')}</span>}
                 {st.sample && <span className="lc-badge">{t('Sample')}</span>}
               </button>
               <div className="lc-body">

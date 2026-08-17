@@ -106,7 +106,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                       {c.competitor_group && c.competitor_group !== 'direct' &&
                         <Tag kind={c.retailer ? 'ok' : 'warn'}>{COMP_GROUP_LABEL[c.competitor_group]}</Tag>}
                       {c.competitor_group === 'direct' && <Tag kind="ok">{COMP_GROUP_LABEL.direct}</Tag>}
-                      {!c.in_band && <Tag kind="warn">Out of band</Tag>}
+                      {!c.in_band && <Tag kind="warn">{t('Out of band')}</Tag>}
                     </div>
                     {/* 미확인 값은 줄에서 뺀다 · unknown이 나열되면 바이어 톤이 무너진다 (Gemini QA) */}
                     <div className="cc-meta">
@@ -150,7 +150,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                     <div className="cc-links">
                       {c.product_url && <a href={c.product_url} target="_blank" rel="noreferrer">{t('Product')}</a>}
                       {(c.source_urls ?? []).slice(0, 2).map((u, i) => (
-                        <a key={i} href={u} target="_blank" rel="noreferrer">Source {i + 1}</a>
+                        <a key={i} href={u} target="_blank" rel="noreferrer">{t('Source')} {i + 1}</a>
                       ))}
                     </div>
                   </div>
@@ -364,7 +364,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                   {status === 'running' && progress[s.key] != null && (
                     <div className="progressbar"><div style={{ width: `${progress[s.key]}%` }} /></div>
                   )}
-                  {status === 'gated' && <Tag kind="warn">Waiting</Tag>}
+                  {status === 'gated' && <Tag kind="warn">{t('Waiting')}</Tag>}
                 </div>
               </div>
             )
@@ -430,12 +430,12 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
         {st.dnaConflict && !st.dnaConflict.resolved && (
           <div className="notice warn" style={{ marginBottom: 14, flexDirection: 'column' }}>
             <div>
-              <b>Your description and what we observed disagree.</b> {st.dnaConflict.brandClaim} vs {st.dnaConflict.observed}. Pick which one leads.
+              <b>{t('Your description and what we observed disagree.')}</b> {st.dnaConflict.brandClaim} vs {st.dnaConflict.observed}. {t('Pick which one leads.')}
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
-              <button className="btn btn-ghost btn-sm" onClick={() => onResolveDna('description')}>Follow the description</button>
-              <button className="btn btn-ghost btn-sm" onClick={() => onResolveDna('archive')}>Follow the archive</button>
-              <button className="btn btn-ghost btn-sm" onClick={() => onResolveDna('shift')}>Shift toward the description</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => onResolveDna('description')}>{t('Follow the description')}</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => onResolveDna('archive')}>{t('Follow the archive')}</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => onResolveDna('shift')}>{t('Shift toward the description')}</button>
             </div>
           </div>
         )}
@@ -453,28 +453,28 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
 
 
         {st.seriesDna && (
-          <Collapse title="Series DNA"
+          <Collapse title={t('Series DNA')}
             summary={`${st.seriesDna.invariant.length} fixed (locked) · ${st.seriesDna.variable.length} variable · ${st.seriesDna.ambiguous.length} unclear`}
             defaultOpen={!st.dnaConflict?.resolved}>
             <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12.5 }}>
               {st.seriesDna.invariant.map(e => (
                 <div key={e.element}>
-                  <Tag kind="accent">Locked</Tag> <b>{e.label}</b>
+                  <Tag kind="accent">{t('Locked')}</Tag> <b>{e.label}</b>
                   <span className="hint"> seen in {e.observed_in}/{e.of} · {e.confidence} · must_inherit</span>
                 </div>
               ))}
               {st.seriesDna.variable.map(e => (
-                <div key={e.element}><Tag>Variable</Tag> {e.label} <span className="hint">{e.variation_range?.join(' / ')}</span></div>
+                <div key={e.element}><Tag>{t('Variable')}</Tag> {e.label} <span className="hint">{e.variation_range?.join(' / ')}</span></div>
               ))}
               {st.seriesDna.ambiguous.map(e => (
-                <div key={e.element}><Tag kind="warn">Unclear</Tag> {e.label} <span className="hint">seen as [{e.observed?.join(', ')}] · {e.note}</span></div>
+                <div key={e.element}><Tag kind="warn">{t('Unclear')}</Tag> {e.label} <span className="hint">{t('seen as')} [{e.observed?.join(', ')}] · {e.note}</span></div>
               ))}
             </div>
           </Collapse>
         )}
 
         {st.reportBias && (
-          <Collapse title="Source bias" summary={`${st.reportBias.publisher} · ${st.reportBias.perspective}`}>
+          <Collapse title={t('Source bias')} summary={`${st.reportBias.publisher} · ${st.reportBias.perspective}`}>
             <div style={{ padding: '10px 14px', fontSize: 12.5, color: 'var(--text-2)' }}>
               {st.reportBias.notes.map((n, i) => <div key={i}>· {n}</div>)}
             </div>
@@ -484,7 +484,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
         {st.signals.length > 0 && (
           <Collapse title={t('Signals')} summary={sigSummary}>
             <table className="mini">
-              <thead><tr><th>Signal</th><th>Axis</th><th>Seen</th><th>{t('Trend')}</th><th title="Commercial / Cultural / Forecast / Feasibility">{t('Indices')}</th><th>{t('Tooling')}</th><th>Source</th></tr></thead>
+              <thead><tr><th>{t('Signal')}</th><th>{t('Axis')}</th><th>{t('Seen')}</th><th>{t('Trend')}</th><th title={t('Commercial / Cultural / Forecast / Feasibility')}>{t('Indices')}</th><th>{t('Tooling')}</th><th>{t('Source')}</th></tr></thead>
               <tbody>
                 {st.signals.map(s => {
                   const idx = s.indices
@@ -498,13 +498,13 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
                   ].filter(Boolean).join(' · ') || 'reuses tooling'
                   return (
                     <tr key={s.signal_id}>
-                      <td><b>{s.label}</b> <span style={{ color: 'var(--text-3)', fontSize: 11 }}>{s.signal_id}</span>{s.oem_group && <Tag kind="warn">OEM group</Tag>}
+                      <td><b>{s.label}</b> <span style={{ color: 'var(--text-3)', fontSize: 11 }}>{s.signal_id}</span>{s.oem_group && <Tag kind="warn">{t('OEM group')}</Tag>}
                         {s.co_occurring?.length ? <div style={{ color: 'var(--text-3)', fontSize: 11 }}>with {s.co_occurring.slice(0, 4).join(' · ')}</div> : null}
                       </td>
                       <td>{s.axis}</td>
                       <td>{s.observed_count}x</td>
                       <td>{s.adoption_stage && s.adoption_stage !== 'unknown' ? s.adoption_stage : s.direction === 'rising' ? 'Rising' : s.direction === 'stable' ? 'Holding' : 'Fading'}</td>
-                      <td title="Commercial / Cultural / Forecast / Feasibility">{iTxt}</td>
+                      <td title={t('Commercial / Cultural / Forecast / Feasibility')}>{iTxt}</td>
                       <td style={{ fontSize: 11 }}>{tooling}</td>
                       <td>{s.sources.slice(0, 2).map((u, i) => <a key={i} href={u} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-hi)', marginRight: 4 }}>[{i + 1}]</a>)}</td>
                     </tr>
@@ -518,7 +518,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
         {/* 디렉션 · S1의 결론이므로 항상 노출 */}
         {st.directions.length > 0 && (
           <div className="panel" style={{ marginBottom: 14 }}>
-            <div className="panel-h">Three directions</div>
+            <div className="panel-h">{t('Three directions')}</div>
             <div style={{ padding: '10px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
               {st.directions.map(d => (
                 <div key={d.id} style={{ background: 'var(--bg-2)', border: '1px solid var(--line-2)', borderRadius: 9, padding: '10px 12px' }}>

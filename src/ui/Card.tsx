@@ -55,7 +55,7 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
             </div>
           )}
         <div className="flag" style={{ display: 'flex', gap: 4 }}>
-          {d.isTop && <Tag kind="accent">TOP</Tag>}
+          {d.isTop && <Tag kind="accent">{t('TOP')}</Tag>}
           {d.viewMismatch && <Tag kind="warn">{t('View mismatch')}</Tag>}
           {d.rejected && <Tag kind="danger">{t('Rule reject')}</Tag>}
         </div>
@@ -90,7 +90,7 @@ export function DesignCard({ d, signals, stagePassed, onVerdict, compact }: {
           {d.model && (
             <a className="tag tag-accent" href={d.model.url} download={`${d.spec.design_id}.glb`}
               title={t('Download the 3D model (GLB)')}
-              onClick={e => e.stopPropagation()}>GLB ↓</a>
+              onClick={e => e.stopPropagation()}>{t('GLB')} ↓</a>
           )}
         </div>
 

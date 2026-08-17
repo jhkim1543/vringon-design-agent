@@ -1,6 +1,9 @@
 // ── VRINGON Shoe Agent · 도메인 타입 (신발 전용) ─────────────────────
 // 주얼리는 별도 제품(vringon-jewelry-agent)으로 분리되었다. 여기는 신발만 다룬다.
 
+// lineFingerprint 가 화면에 그대로 붙는 요약을 만든다. i18n 은 types 를 안 부르므로 순환은 없다.
+import { t } from './i18n'
+
 export type Mode = 'trend' | 'series' | 'moodboard'
 /** 카테고리는 신발 하나다. 저장된 Run과의 호환을 위해 리터럴 타입만 남긴다. */
 export type Category = 'shoe'
@@ -224,10 +227,11 @@ export function marketFingerprint(c: LineCommercial | undefined): string {
 export function lineFingerprint(raw: FootwearLineProfile | undefined, itemType: string): string {
   const lp = asFootwearLine(raw)
   if (!lp) return TYPE_LABEL[itemType] ?? itemType
+  // 화면에 그대로 붙는 요약이라 여기서도 사전을 거친다. 저장되는 값은 바뀌지 않는다.
   const bits = [
-    TYPE_LABEL[itemType] ?? itemType,
-    lp.product.useCase !== UNKNOWN ? lp.product.useCase : '',
-    lp.product.targetConsumer,
+    t(TYPE_LABEL[itemType] ?? itemType),
+    lp.product.useCase !== UNKNOWN ? t(lp.product.useCase) : '',
+    t(lp.product.targetConsumer),
     lp.lastFit.lastFamily !== UNKNOWN ? lp.lastFit.lastFamily : '',
     lp.upper.outer !== UNKNOWN ? `${lp.upper.outer} upper` : '',
     lp.bottom.outsole !== UNKNOWN ? lp.bottom.outsole : '',
