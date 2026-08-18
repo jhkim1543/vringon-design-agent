@@ -890,4 +890,8 @@ export const JA: Record<string, string> = {
   'The file stays in this browser. When a render needs the mark, the image is sent to the server to composite it, and that composite is cached there.': 'ファイルはこのブラウザにあります。レンダーにマークを載せるときだけ画像がサーバーへ送られて合成され、その合成結果はサーバーにキャッシュされます。',
   'Approve or reject on the cards. Rejected picks are dropped before campaign shots and 3D, and the reasons are summarised on this board.': 'カードで承認または却下してください。却下した案はキャンペーンカットと3Dの前に外れ、理由はこのボードに要約されます。',
   'The last run could not be saved to this browser — its storage is full. Export what you need before closing the tab.': '直近の分析をこのブラウザに保存できませんでした — 保存容量がいっぱいです。タブを閉じる前に必要なものを書き出してください。',
+
+  // ── 반응형 · 보드 안내 ──
+  'This board is five lanes wide.': 'このボードは5レーン幅です。',
+  'Turn your phone sideways, or open it on a tablet or desktop to work on it.': 'スマートフォンを横向きにするか、タブレットかデスクトップで開いてください。',
 }

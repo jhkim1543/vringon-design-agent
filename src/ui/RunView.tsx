@@ -519,7 +519,7 @@ export default function RunView({ st, progress, gated, onResume, onGateVerdict, 
         {st.directions.length > 0 && (
           <div className="panel" style={{ marginBottom: 14 }}>
             <div className="panel-h">{t('Three directions')}</div>
-            <div style={{ padding: '10px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            <div className="dir-grid" style={{ padding: '10px 14px' }}>
               {st.directions.map(d => (
                 <div key={d.id} style={{ background: 'var(--bg-2)', border: '1px solid var(--line-2)', borderRadius: 9, padding: '10px 12px' }}>
                   <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 4 }}>{d.title}</div>

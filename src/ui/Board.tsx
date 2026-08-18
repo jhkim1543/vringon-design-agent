@@ -704,6 +704,12 @@ function BoardInner({ st, onVerdict, runId, onBoardImage }: { st: RunState; onVe
 
   return (
     <div className={`board ${light ? 'board-light' : ''}${tool !== 'select' ? ' placing' : ''}`} data-theme={light ? 'light' : 'dark'}>
+      {/* 폰 세로에서는 다섯 레인이 안 읽힌다. 억지로 줄이지 않고, 돌려 보라고 말한다.
+          CSS 가 480px 세로에서만 보이게 한다. */}
+      <div className="board-narrow-note">
+        <b>{t('This board is five lanes wide.')}</b>
+        <span>{t('Turn your phone sideways, or open it on a tablet or desktop to work on it.')}</span>
+      </div>
       <div className="boardbar">
         {!present ? (<>
           {/* ── 윗줄 · 정체와 내보내기 ─────────────────────── */}
