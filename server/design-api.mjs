@@ -14,6 +14,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { familyOf } from './category-templates.mjs'
 import { askJson } from './inference.mjs'
+import { record } from './usage-ledger.mjs'
 
 const MODEL = 'gpt-5'
 
@@ -42,6 +43,8 @@ async function ask(apiKey, { input, schema, name, effort = 'medium', role = 'aut
       })
       if (!r.ok) throw new Error(`design ${r.status}: ${(await r.text()).slice(0, 300)}`)
       const j = await r.json()
+      // 응답의 usage 를 장부에 남긴다. 예전에는 여기서 텍스트만 꺼내고 usage 는 버렸다.
+      record({ kind: 'inference', name: `design/${name}`, model: MODEL, usage: j.usage, meta: { effort, role } })
       const text = j.output?.find(o => o.type === 'message')?.content?.[0]?.text
       if (!text) throw new Error('empty design response')
       return JSON.parse(text)

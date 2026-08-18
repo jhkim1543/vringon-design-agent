@@ -35,6 +35,7 @@ import type { BrandIdentity } from './brand'
 import { checkBrandFit } from './brand'
 import type { Genome } from './genome'
 import { getLang, LANG_NAME } from './i18n'
+import { setRunId } from './apiBase'
 import { campaignCount, lineFingerprint, MODE_LABEL, MODE_SCOPE, TIER_LABEL, TYPE_EN, TYPE_LABEL , isSketchView } from './types'
 import { ENGINES } from './imageEngines'
 
@@ -155,6 +156,9 @@ export function runPipeline(params: RunParams, emit: Emit, speed = 1): PipelineH
 
     // 이 분석의 조사 언어를 고정한다. 도중에 화면 언어를 바꿔도 결과는 안 섞인다.
     setRunLang(params.researchLang ?? null)
+    // 사용량 장부에 붙을 이 Run 의 이름표. 서버가 호출마다 적으므로 나중에
+    // "이 분석이 실제로 얼마를 썼나"를 셀 수 있다. 모드·품목·시각으로 사람이 읽을 수 있게.
+    setRunId(`${params.mode}-${params.itemType}-${new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '')}`)
 
     emit({ kind: 'stage-start', stage: 'S1' })
     emit({ kind: 'log', stage: 'S1', text: `${MODE_LABEL[params.mode]} mode · building the brief` })

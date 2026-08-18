@@ -15,6 +15,7 @@ import { authorConcepts, authorGenome, planTerritories, verifyRender } from './d
 import { inferenceStatus, isLocal, localImageEdit, localImageGenerate, localModelFromImage, localProbe } from './inference.mjs'
 import { marketOf } from './markets.mjs'
 import { handleBoardSync } from './board-sync.mjs'
+import { record, setCurrentRun } from './usage-ledger.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..')
@@ -366,7 +367,7 @@ function applyCors(req, res) {
   if (!origin || !ALLOWED_ORIGINS.includes(origin)) return
   res.setHeader('Access-Control-Allow-Origin', origin)
   res.setHeader('Vary', 'Origin')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Run-Id')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   res.setHeader('Access-Control-Max-Age', '86400')
 }
@@ -375,6 +376,10 @@ function applyCors(req, res) {
 export async function handleApi(req, res) {
   const url = new URL(req.url, 'http://localhost')
   const path = url.pathname
+  // 어느 Run 의 호출인지 · 러너와 앱이 X-Run-Id 로 알려 준다. 장부의 줄마다 이 이름표가 붙어
+  // "이 Run 이 실제로 얼마를 썼나"를 나중에 셀 수 있다. 없으면 unlabelled 로 적힌다.
+  const runId = req.headers['x-run-id']
+  if (runId) setCurrentRun(String(runId))
 
   applyCors(req, res)
   if (req.method === 'OPTIONS') { res.statusCode = 204; return res.end() }
@@ -640,6 +645,7 @@ export async function handleApi(req, res) {
         const p = join(CACHE_DIR, `${b.single}.png`)
         if (!existsSync(p)) return json(res, 404, { error: 'that render is not in the cache' })
         const r = await makeModel({ buf: readFileSync(p), name: `${b.single}.png` })
+        record({ kind: 'model3d', name: 'model/generate', model: 'image_to_model', usage: { units: r.cached ? 0 : 1 }, cached: !!r.cached })
         return json(res, 200, { ...r, url: `/api/model/file/${r.hash}.${r.format}` })
       }
 
@@ -782,10 +788,13 @@ export async function handleApi(req, res) {
     const body = await readBody(req)
     if (path === '/api/image/generate') {
       const { hash, cached, model } = await generate(body)
+      // 장수를 적는다. 캐시 적중은 과금이 없었으니 0 장 · cached 표시만 남긴다.
+      record({ kind: 'image', name: 'image/generate', model, usage: { units: cached ? 0 : 1 }, cached, meta: { engine: body.engine ?? 'detail' } })
       return json(res, 200, { url: `/api/image/file/${hash}.png`, hash, cached, model })
     }
     if (path === '/api/image/edit') {
       const { hash, cached, model } = await edit(body)
+      record({ kind: 'image', name: 'image/edit', model, usage: { units: cached ? 0 : 1 }, cached, meta: { engine: body.engine ?? 'detail' } })
       return json(res, 200, { url: `/api/image/file/${hash}.png`, hash, cached, model })
     }
   } catch (e) {

@@ -8,6 +8,7 @@
 // 이 파일의 규칙은 하나다: 파일에서 실제로 읽어낸 것만 말한다.
 // 페이지 번호는 모델이 그 페이지를 봤을 때만 붙는다.
 import { createHash } from 'node:crypto'
+import { countSearches, record } from './usage-ledger.mjs'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { askJson } from './inference.mjs'
@@ -83,6 +84,7 @@ async function ask(apiKey, { model, input, schema, name, webSearch = false, role
       })
       if (!r.ok) throw new Error(`upload analysis ${r.status}: ${(await r.text()).slice(0, 300)}`)
       const j = await r.json()
+      record({ kind: 'inference', name: `analyze/${name}`, model, usage: j.usage, meta: { effort: 'high', searches: countSearches(j) } })
       const text = j.output?.find(o => o.type === 'message')?.content?.[0]?.text
       if (!text) throw new Error('empty response')
       return JSON.parse(text)

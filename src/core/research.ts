@@ -3,7 +3,7 @@ import { getLang, LANG_NAME } from './i18n'
 import type { Lang } from './i18n'
 import type { CompetitorGroup, CompetitorProduct, FootwearLineProfile, ReportBias, ResearchObjective, Signal } from './types'
 import { asFootwearLine } from './types'
-import { apiUrl } from './apiBase'
+import { apiUrl, runHeaders } from './apiBase'
 import { withRetry } from './net'
 
 /** 이 분석이 쓰는 언어. 파이프라인이 시작할 때 한 번 정하고 끝까지 유지한다. */
@@ -111,7 +111,7 @@ async function post<T>(url: string, body: unknown): Promise<T> {
   // 다만 20분을 기다린 끝의 타임아웃까지 세 번 걸면 한 시간이 날아가므로 두 번까지만 건다.
   return withRetry(async () => {
     const r = await fetch(url, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json', ...runHeaders() },
       body: JSON.stringify({ ...(body as object), lang, langName: LANG_NAME[lang] }),
       signal: AbortSignal.timeout(20 * 60_000),
     })

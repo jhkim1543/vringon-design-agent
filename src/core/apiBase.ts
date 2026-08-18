@@ -24,3 +24,13 @@ export function apiUrl(path: string): string {
   // BASE_URL 은 항상 슬래시로 끝난다 ('/' 또는 '/vringon-design-agent/').
   return `${import.meta.env.BASE_URL}${p.slice(1)}`
 }
+
+// ── 이 Run 의 이름표 ─────────────────────────────────────────────────
+// 서버는 호출마다 사용량을 장부에 적는데, 어느 Run 의 호출인지 알아야 "이 분석이 실제로
+// 얼마를 썼나"를 셀 수 있다. 파이프라인이 시작할 때 setRunId 로 정하고, 모든 API 호출이
+// 이 헤더를 붙인다. 없으면 서버가 unlabelled 로 적는다 — 그래도 돈은 적힌다.
+let runId: string | null = null
+export function setRunId(id: string | null) { runId = id }
+export function runHeaders(): Record<string, string> {
+  return runId ? { 'X-Run-Id': runId } : {}
+}

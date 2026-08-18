@@ -6,7 +6,7 @@
 //   ② 채택된 게놈들과 구조축이 겹치는지 검사 (다양성 게이트 · 품질 판단 금지)
 //   ③ 게놈 → 스펙 힌트 변환 (기존 hintApplied/blocked 정직성 기계를 그대로 탄다)
 import type { DesignConcept, DesignGenome, DesignTier, Signal, Territory } from './types'
-import { apiUrl } from './apiBase'
+import { apiUrl, runHeaders } from './apiBase'
 import { withRetry } from './net'
 
 export type Genome = DesignGenome
@@ -16,7 +16,7 @@ async function post<T>(url: string, body: unknown): Promise<T> {
   // 규칙 조합으로 떨어지는데, 몇 초짜리 끊김으로 그렇게 되면 결과가 조용히 나빠진다.
   return withRetry(async () => {
     const r = await fetch(url, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json', ...runHeaders() },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(300_000),
     })

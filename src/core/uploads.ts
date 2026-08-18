@@ -2,7 +2,7 @@
 // 예전에는 여기가 없었다. 파일 입력이 f.name만 담고 내용은 아무도 열지 않았다.
 import type { SeriesDna, UploadRef } from './types'
 import type { LogoStyle } from './brand'
-import { apiUrl } from './apiBase'
+import { apiUrl, runHeaders } from './apiBase'
 
 const MAX_FILES = 12
 
@@ -29,7 +29,7 @@ export async function uploadFiles(files: File[]): Promise<{ ok: UploadRef[]; fai
     try {
       const dataBase64 = await toBase64(f)
       const r = await fetch(apiUrl('/api/upload'), {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json', ...runHeaders() },
         body: JSON.stringify({ files: [{ name: f.name, type: f.type, dataBase64 }] }),
       })
       const j = await r.json()
@@ -71,7 +71,7 @@ export interface MoodboardRead {
 
 async function post<T>(url: string, body: unknown): Promise<T> {
   const r = await fetch(url, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    method: 'POST', headers: { 'Content-Type': 'application/json', ...runHeaders() },
     body: JSON.stringify(body),
   })
   const j = await r.json()

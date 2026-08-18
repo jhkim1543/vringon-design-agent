@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { researchDossier } from './dossier-api.mjs'
+import { countSearches, record } from './usage-ledger.mjs'
 import { familyLens, familyOf, typeLens } from './category-templates.mjs'
 import { resolveMarkets, retailClause, searchClause, sourceQuota, userLocation } from './markets.mjs'
 
@@ -288,7 +289,9 @@ async function ask(apiKey, { input, schema, name, location = null }) {
   const msg = j.output?.find(o => o.type === 'message')
   const text = msg?.content?.[0]?.text
   if (!text) throw new Error('리서치 응답이 비어 있습니다')
-  const searches = (j.output ?? []).filter(o => o.type === 'web_search_call').length
+  const searches = countSearches(j)
+  // 조사는 토큰과 검색 건수 둘 다 과금된다. 둘 다 적는다.
+  record({ kind: 'inference', name: `research/${name}`, model: RESEARCH_MODEL, usage: j.usage, meta: { effort: 'high', searches, market: location?.country ?? '' } })
   return { data: scrubTracking(JSON.parse(text)), searches }
 }
 

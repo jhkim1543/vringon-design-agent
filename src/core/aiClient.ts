@@ -8,7 +8,7 @@ import type { EngineId } from './imageEngines'
 import { shapePrompt } from './imageEngines'
 import type { BrandIdentity } from './brand'
 import { brandPromptClause } from './brand'
-import { apiUrl } from './apiBase'
+import { apiUrl, runHeaders } from './apiBase'
 
 export const IMAGE_MODEL = 'gpt-image-1'
 /** gpt-image-1 medium 1024² 근사 단가 (USD) · 정확한 청구액은 OpenAI 대시보드 기준 */
@@ -32,7 +32,7 @@ async function imageCall(url: string, body: unknown, what: string): Promise<GenR
   return withRetry(async () => {
     const r = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...runHeaders() },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(330_000),
     })
@@ -594,7 +594,7 @@ export async function stampLogo(baseHash: string, brand: BrandIdentity): Promise
   const logo = brand.logo
   if (!logo?.dataUrl || logo.placement === 'none') return null
   const r = await fetch(apiUrl('/api/image/logo'), {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    method: 'POST', headers: { 'Content-Type': 'application/json', ...runHeaders() },
     body: JSON.stringify({
       baseHash, dataUrl: logo.dataUrl, placement: logo.placement, scale: logo.scale,
     }),
@@ -626,7 +626,7 @@ export async function generateModel(single: string, meta: {
   subject?: string; itemType?: string
 }): Promise<ModelResult> {
   const r = await fetch(apiUrl('/api/model/generate'), {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    method: 'POST', headers: { 'Content-Type': 'application/json', ...runHeaders() },
     body: JSON.stringify({ single, ...meta }),
   })
   const j = await r.json()
