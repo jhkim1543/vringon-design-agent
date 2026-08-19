@@ -252,15 +252,50 @@ proportion, panel split, a reserved unmarked area for the logo); `conceptRenderP
 If you add a field to the genome, decide which layer it belongs to before it reaches a prompt.
 
 Caches: research legs cache by prompt hash under `.cache/research`; when you change a research
-prompt, bump its prefix (`trend11ft`, `comp9ft`, `pulse4ft`, `brand8ft`, `genome4`, `concepts1`)
+prompt, bump its prefix (`trend11ft`, `comp9ft`, `pulse4ft`, `brand8ft`, `dossier7ft`, `genome5`, `concepts1`)
 or old answers keep being served. Image generation caches by prompt hash under `.cache/images` and
 re-runs are never re-billed.
 
 Design tokens come from `VRINGON UI 시스템 ver3` and live in `src/tokens.css` — 68 colour pairs plus
 the spacing and radius scales. Nothing in the stylesheet uses an off-scale value.
 
-Design tokens come from `VRINGON UI 시스템 ver3` and live in `src/tokens.css` — 68 colour pairs plus
-the spacing and radius scales. Nothing in the stylesheet uses an off-scale value.
+## Tools — what each one is for
+
+Everything in `tools/` runs standalone with `node` (the `.ts` ones bundle through esbuild first;
+each file's header comment has the exact command). None of them are part of the app build.
+
+**Making samples** — these spend real money.
+
+| | |
+|---|---|
+| `run-sample.ts` | Trend mode, headless. Gates auto-pass, freezes to `src/samples/` |
+| `run-sample-series.ts` | Series mode. Needs `fetch-archive.mjs` to have pulled an archive first |
+| `run-sample-moodboard.ts` | Moodboard mode. Reads a PDF already in the upload cache |
+| `fetch-archive.mjs` | Pulls product photos off public pages into the upload cache, for the series archive |
+| `freeze-sample-shots.mjs` | Downloads a sample's remote photos to `public/samples/` and strips tracking params |
+
+**Checking things** — all free, all read-only unless stated.
+
+| | |
+|---|---|
+| `usage-report.mjs` | Ledger → cost table, per run and per feature. Rates live in its `RATES` block |
+| `i18n-audit.mjs` | Finds text bypassing `t()`, display attributes bypassing it, and keys with no dictionary entry |
+| `settings-probe.mjs` | Cheap check that brand and MD settings actually change the output — text calls only, no images |
+| `shot-audit.mjs` | Which sites gave us product photos and which refused |
+| `_audit.ts` | Builds the board model from each sample and reports anomalies |
+| `engine-compare.ts` | Same design through both image engines, side by side. Evidence for API-COST-DETAIL §8 |
+| `engine-compare-render.ts` | Whether a fast sketch survives into a detail render. Evidence for §9 |
+
+**Maintenance** — these write.
+
+| | |
+|---|---|
+| `gc-samples.mjs` | Deletes files in `public/samples/` that no sample references. `--check` to look first |
+| `migrate-sample.mjs` | Brings a sample frozen before a pipeline fix in line with what the pipeline emits now. `--check` first |
+
+`npm run typecheck` covers `src` and `tools` together — `tsconfig.json` alone only sees `src`, and
+esbuild strips types without checking them, so a runner error would otherwise surface only after
+launching a two-hour run.
 
 ## Honest limits
 

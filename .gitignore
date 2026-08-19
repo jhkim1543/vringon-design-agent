@@ -6,3 +6,6 @@ dist
 *.local
 .cache
 tsconfig.tsbuildinfo
+
+# 도구 번들 산출물 · tools/_audit.ts 를 esbuild 로 말면 나온다
+tools/_audit.mjs
