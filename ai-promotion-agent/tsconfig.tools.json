@@ -1,0 +1,17 @@
+// tools/ 를 타입 검사하는 설정.
+//
+// 왜 따로 있는가: tsconfig.json 의 include 는 ["src"] 뿐이라 tools/ 는 tsc 를 한 번도
+// 거치지 않았다. 헤드리스 러너는 esbuild 로 번들되는데 esbuild 는 타입을 지우기만 하고
+// 검사하지 않는다. 그래서 tools/ 의 오타는 두 시간짜리 Run 을 띄운 직후에야 터진다 —
+// 실제로 없는 상수를 참조하는 줄과, 유니온에 없는 값을 넣은 줄이 그렇게 발견됐다.
+//
+//   npx tsc --noEmit -p tsconfig.tools.json
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    // 러너는 Node 에서 돈다. DOM 은 파이프라인이 브라우저와 공유하는 코드 때문에 필요하다.
+    "types": ["node"]
+  },
+  "include": ["tools", "src"]
+}
